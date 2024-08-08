@@ -9,8 +9,7 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { authenticated } from '../../access/authenticated'
-import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { authenticated, authenticatedOrPublished } from '../../access'
 import { Banner } from '../../blocks/Banner'
 import { Code } from '../../blocks/Code'
 import { MediaBlock } from '../../blocks/MediaBlock'
@@ -26,9 +25,10 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
+import { COLLECTION_SLUG_POSTS } from '../constants'
 
 export const Posts: CollectionConfig = {
-  slug: 'posts',
+  slug: COLLECTION_SLUG_POSTS,
   access: {
     create: authenticated,
     delete: authenticated,
@@ -207,4 +207,4 @@ export const Posts: CollectionConfig = {
     },
     maxPerDoc: 50,
   },
-}
+} as const

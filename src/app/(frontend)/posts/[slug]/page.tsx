@@ -6,13 +6,13 @@ import configPromise from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { draftMode, headers } from 'next/headers'
 import React, { cache } from 'react'
-import RichText from 'src/app/components/RichText'
+import RichText from '@/components/RichText'
 
-import type { Post } from '../../../../payload-types'
+import type { Post } from '@/payload-types'
 
-import { PostHero } from '../../../heros/PostHero'
-import { generateMeta } from '../../../utilities/generateMeta'
-import PageClient from './page.client'
+import { PostHero } from '@/lib/heros/PostHero'
+import { generateMeta } from '@/lib/utils/generateMeta'
+// import PageClient from './page.client'
 
 export async function generateStaticParams() {
   const payload = await getPayloadHMR({ config: configPromise })
@@ -34,7 +34,7 @@ export default async function Post({ params: { slug = '' } }) {
 
   return (
     <article className="pt-16 pb-16">
-      <PageClient />
+      {/* <PageClient /> */}
 
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />
@@ -52,17 +52,21 @@ export default async function Post({ params: { slug = '' } }) {
 
         <RelatedPosts
           className="mt-12"
-          docs={post.relatedPosts.filter((post) => typeof post === 'object')}
+          docs={post.relatedPosts?.filter((post) => typeof post === 'object')}
         />
       </div>
     </article>
   )
 }
 
-export async function generateMetadata({ params: { slug } }): Promise<Metadata> {
+export async function generateMetadata({
+  params: { slug },
+}: {
+  params: { slug: string }
+}): Promise<Metadata> {
   const post = await queryPostBySlug({ slug })
 
-  return generateMeta({ doc: post })
+  return generateMeta({ doc: post, collectionSlug: 'posts' })
 }
 
 const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {

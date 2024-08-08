@@ -6,6 +6,18 @@
  * and re-run `payload generate:types` to regenerate this file.
  */
 
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CartItems".
+ */
+export type CartItems =
+  | {
+      product?: (string | null) | Product;
+      quantity?: number | null;
+      id?: string | null;
+    }[]
+  | null;
+
 export interface Config {
   auth: {
     users: UserAuthOperations;
@@ -16,15 +28,22 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    orders: Order;
+    products: Product;
+    tags: Tag;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
+  db: {
+    defaultIDType: string;
+  };
   globals: {
     header: Header;
     footer: Footer;
+    settings: Settings;
   };
   locale: null;
   user: User & {
@@ -34,12 +53,17 @@ export interface Config {
 export interface UserAuthOperations {
   forgotPassword: {
     email: string;
+    password: string;
   };
   login: {
-    password: string;
     email: string;
+    password: string;
   };
   registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
     email: string;
     password: string;
   };
@@ -265,6 +289,80 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    tour_gallery_1?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    tour_card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    tour_gallery?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    blog_image_size2?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    blog_image_size3?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    appointment_contact_image?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    doctorImage?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    blogImage?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -334,6 +432,15 @@ export interface Post {
 export interface User {
   id: string;
   name?: string | null;
+  roles: ('admin' | 'editor' | 'customer')[];
+  purchases?: (string | Product)[] | null;
+  stripeCustomerID?: string | null;
+  cart?: {
+    items?: CartItems;
+    createdOn?: string | null;
+    lastModified?: string | null;
+  };
+  skipSync?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -344,6 +451,177 @@ export interface User {
   loginAttempts?: number | null;
   lockUntil?: string | null;
   password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  title: string;
+  publishedOn?: string | null;
+  layout: (
+    | {
+        richText?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        links?:
+          | {
+              link: {
+                type?: ('reference' | 'custom') | null;
+                newTab?: boolean | null;
+                reference?: {
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null;
+                url?: string | null;
+                label: string;
+                appearance?: ('default' | 'outline') | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'cta';
+      }
+    | {
+        position?: ('default' | 'fullscreen') | null;
+        media: string | Media;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'mediaBlock';
+      }
+    | {
+        introContent?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        populateBy?: ('collection' | 'selection') | null;
+        relationTo?: 'posts' | null;
+        categories?: (string | Category)[] | null;
+        limit?: number | null;
+        selectedDocs?:
+          | {
+              relationTo: 'posts';
+              value: string | Post;
+            }[]
+          | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'archive';
+      }
+  )[];
+  stripeProductID?: string | null;
+  priceJSON?: string | null;
+  enablePaywall?: boolean | null;
+  paywall?:
+    | (
+        | {
+            richText?: {
+              root: {
+                type: string;
+                children: {
+                  type: string;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            links?:
+              | {
+                  link: {
+                    type?: ('reference' | 'custom') | null;
+                    newTab?: boolean | null;
+                    reference?: {
+                      relationTo: 'pages';
+                      value: string | Page;
+                    } | null;
+                    url?: string | null;
+                    label: string;
+                    appearance?: ('default' | 'outline') | null;
+                  };
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+        | {
+            position?: ('default' | 'fullscreen') | null;
+            media: string | Media;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'mediaBlock';
+          }
+        | {
+            introContent?: {
+              root: {
+                type: string;
+                children: {
+                  type: string;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            populateBy?: ('collection' | 'selection') | null;
+            relationTo?: 'posts' | null;
+            categories?: (string | Category)[] | null;
+            limit?: number | null;
+            selectedDocs?:
+              | {
+                  relationTo: 'posts';
+                  value: string | Post;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'archive';
+          }
+      )[]
+    | null;
+  categories?: (string | Category)[] | null;
+  relatedProducts?: (string | Product)[] | null;
+  slug?: string | null;
+  skipSync?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -511,6 +789,42 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: string;
+  orderedBy?: (string | null) | User;
+  stripePaymentIntentID?: string | null;
+  total: number;
+  items?:
+    | {
+        product: string | Product;
+        price?: number | null;
+        quantity?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags".
+ */
+export interface Tag {
+  id: string;
+  slug?: string | null;
+  title?: ('Ayurveda' | 'Yoga' | 'Blog') | null;
+  heading?: string | null;
+  description?: string | null;
+  button_name?: string | null;
+  button_link?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -628,6 +942,24 @@ export interface Footer {
         id?: string | null;
       }[]
     | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "settings".
+ */
+export interface Settings {
+  id: string;
+  productsPage?: (string | null) | Page;
+  general?: {
+    appName?: string | null;
+    appDescription?: string | null;
+  };
+  admin?: {
+    email?: string | null;
+    phone_number?: number | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }

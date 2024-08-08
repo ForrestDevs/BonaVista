@@ -1,11 +1,10 @@
-// storage-adapter-import-placeholder
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
-
-import { payloadCloudPlugin } from '@payloadcms/plugin-cloud'
+import { s3Storage } from '@payloadcms/storage-s3'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
+import { stripePlugin } from '@payloadcms/plugin-stripe'
 import {
   BoldFeature,
   FixedToolbarFeature,
@@ -19,20 +18,28 @@ import { UnderlineFeature } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
-
-import Categories from './payload/collections/Categories'
+import { Categories } from './payload/collections/Categories'
 import { Media } from './payload/collections/Media'
 import { Pages } from './payload/collections/Pages'
 import { Posts } from './payload/collections/Posts'
-import Users from './payload/collections/Users'
+import { Users } from './payload/collections/Users'
 import BeforeDashboard from './payload/components/BeforeDashboard'
 import BeforeLogin from './payload/components/BeforeLogin'
 import { seed } from './payload/endpoints/seed'
-import { Footer } from './payload/globals/Footer/Footer'
-import { Header } from './payload/globals/Header/Header'
+import { Footer } from './payload/globals/Footer'
+import { Header } from './payload/globals/Header'
 import { revalidateRedirects } from './payload/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { Page, Post } from 'src/payload-types'
+import { Orders } from './payload/collections/Orders'
+import { Products } from './payload/collections/Products'
+import { Tags } from './payload/collections/Tags'
+import { createPaymentIntent } from './payload/endpoints/create-payment-intent'
+import { customersProxy } from './payload/endpoints/customers'
+import { productsProxy } from './payload/endpoints/products'
+import { productUpdated } from './payload/stripe/webhooks/productUpdated'
+import { priceUpdated } from './payload/stripe/webhooks/priceUpdated'
+import { Settings } from './payload/globals/Settings'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -44,7 +51,7 @@ const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
 const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
   return doc?.slug
     ? `${process.env.NEXT_PUBLIC_SERVER_URL}/${doc.slug}`
-    : process.env.NEXT_PUBLIC_SERVER_URL
+    : process.env.NEXT_PUBLIC_SERVER_URL || ''
 }
 
 export default buildConfig({
@@ -116,20 +123,46 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || '',
   }),
-  collections: [Pages, Posts, Media, Categories, Users],
+  collections: [Pages, Posts, Media, Categories, Users, Orders, Products, Tags],
   cors: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ''].filter(Boolean),
   csrf: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ''].filter(Boolean),
   endpoints: [
+    {
+      handler: createPaymentIntent,
+      method: 'post',
+      path: '/create-payment-intent',
+    },
+    {
+      handler: customersProxy,
+      method: 'get',
+      path: '/stripe/customers',
+    },
+    {
+      handler: productsProxy,
+      method: 'get',
+      path: '/stripe/products',
+    },
     // The seed endpoint is used to populate the database with some example data
     // You should delete this endpoint before deploying your site to production
-    {
-      handler: seed,
-      method: 'get',
-      path: '/seed',
-    },
+    // {
+    //   handler: seed,
+    //   method: 'get',
+    //   path: '/seed',
+    // },
   ],
-  globals: [Header, Footer],
+  globals: [Header, Footer, Settings],
   plugins: [
+    stripePlugin({
+      isTestKey: Boolean(process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY),
+      rest: false,
+      stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+      stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOKS_SIGNING_SECRET,
+      webhooks: {
+        'price.updated': priceUpdated,
+        'product.created': productUpdated,
+        'product.updated': productUpdated,
+      },
+    }),
     redirectsPlugin({
       collections: ['pages', 'posts'],
       overrides: {
@@ -185,11 +218,44 @@ export default buildConfig({
         },
       },
     }),
-    payloadCloudPlugin(), // storage-adapter-placeholder
+    s3Storage({
+      collections: {
+        ['media']: true,
+      },
+      bucket: process.env.S3_BUCKET || '',
+      config: {
+        endpoint: process.env.S3_ENDPOINT || '',
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+        },
+        region: process.env.S3_REGION || '',
+      },
+    }),
   ],
-  secret: process.env.PAYLOAD_SECRET,
+  secret: process.env.PAYLOAD_SECRET || 'default',
   sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
+  },
+  async onInit(payload) {
+    const existingUsers = await payload.find({
+      collection: 'users',
+      limit: 1,
+    })
+
+    // This is useful for local development
+    // so you do not need to create a first-user every time
+    if (existingUsers.docs.length === 0) {
+      await payload.create({
+        collection: 'users',
+        data: {
+          name: 'Dev User',
+          email: 'dev@payloadcms.com',
+          password: 'test',
+          roles: ['admin'],
+        },
+      })
+    }
   },
 })

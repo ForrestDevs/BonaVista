@@ -1,7 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { authenticated } from '../../access/authenticated'
-import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { authenticated, authenticatedOrPublished } from '../../access'
 import { Archive } from '../../blocks/ArchiveBlock'
 import { CallToAction } from '../../blocks/CallToAction'
 import { Content } from '../../blocks/Content'
@@ -12,7 +11,6 @@ import { slugField } from '../../fields/slug'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidatePage } from './hooks/revalidatePage'
-
 import {
   MetaDescriptionField,
   MetaImageField,
@@ -20,8 +18,10 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
+import { COLLECTION_SLUG_PAGES } from '../constants'
+
 export const Pages: CollectionConfig = {
-  slug: 'pages',
+  slug: COLLECTION_SLUG_PAGES,
   access: {
     create: authenticated,
     delete: authenticated,
@@ -29,6 +29,7 @@ export const Pages: CollectionConfig = {
     update: authenticated,
   },
   admin: {
+    useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data }) => {
@@ -40,7 +41,7 @@ export const Pages: CollectionConfig = {
     },
     preview: (doc) =>
       generatePreviewPath({ path: `/${typeof doc?.slug === 'string' ? doc.slug : ''}` }),
-    useAsTitle: 'title',
+    
   },
   fields: [
     {
@@ -116,4 +117,4 @@ export const Pages: CollectionConfig = {
     },
     maxPerDoc: 50,
   },
-}
+} as const
