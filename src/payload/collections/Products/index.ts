@@ -20,6 +20,7 @@ export const Products: CollectionConfig = {
     delete: admin,
   },
   admin: {
+    group: "Shop",
     useAsTitle: 'title',
     defaultColumns: ['title', 'stripeProductID', '_status'],
     preview: (doc) => {

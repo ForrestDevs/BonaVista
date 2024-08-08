@@ -29,6 +29,7 @@ export const Pages: CollectionConfig = {
     update: authenticated,
   },
   admin: {
+    group: "Content",
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {

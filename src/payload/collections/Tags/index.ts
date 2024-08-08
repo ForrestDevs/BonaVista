@@ -12,6 +12,7 @@ export const Tags: CollectionConfig = {
     read: () => true,
   },
   admin: {
+    group: "Content",
     useAsTitle: 'title',
     defaultColumns: ['title', 'path', 'updatedAt', 'createdAt'],
   },

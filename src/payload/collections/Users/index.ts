@@ -10,6 +10,7 @@ import { customerProxy } from './endpoints/customer'
 export const Users: CollectionConfig = {
   slug: COLLECTION_SLUG_USERS,
   admin: {
+    group: "Admin",
     defaultColumns: ['name', 'email'],
     useAsTitle: 'name',
   },

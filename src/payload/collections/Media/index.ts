@@ -9,6 +9,9 @@ import { urlField } from '../../fields/url'
 import { COLLECTION_SLUG_MEDIA } from '../constants'
 
 export const Media: CollectionConfig = {
+  admin: {
+    group: "Content"
+  },
   slug: COLLECTION_SLUG_MEDIA,
   access: {
     create: authenticated,

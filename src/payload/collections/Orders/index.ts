@@ -15,6 +15,7 @@ export const Orders: CollectionConfig = {
     update: admin,
   },
   admin: {
+    group: "Shop",
     useAsTitle: 'orderNumber',
     defaultColumns: [],
     preview: doc => `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/orders/${doc.id}`,

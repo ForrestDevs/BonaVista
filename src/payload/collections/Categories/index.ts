@@ -11,6 +11,7 @@ export const Categories: CollectionConfig = {
     update: authenticated,
   },
   admin: {
+    group: "Shop",
     useAsTitle: 'title',
   },
   fields: [

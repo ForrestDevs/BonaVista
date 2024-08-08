@@ -59,10 +59,10 @@ export default buildConfig({
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeLogin` statement on line 15.
-      beforeLogin: [BeforeLogin],
+      // beforeLogin: [BeforeLogin],
       // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeDashboard` statement on line 15.
-      beforeDashboard: [BeforeDashboard],
+      // beforeDashboard: [BeforeDashboard],
     },
     user: Users.slug,
     livePreview: {
@@ -166,6 +166,9 @@ export default buildConfig({
     redirectsPlugin({
       collections: ['pages', 'posts'],
       overrides: {
+        admin: {
+          group: "Forms"
+        },
         // @ts-expect-error
         fields: ({ defaultFields }) => {
           return defaultFields.map((field) => {
@@ -196,7 +199,15 @@ export default buildConfig({
       fields: {
         payment: false,
       },
+      formSubmissionOverrides: {
+        admin: {
+          group: "Forms",
+        }
+      },
       formOverrides: {
+        admin: {
+          group: "Forms",
+        },
         fields: ({ defaultFields }) => {
           return defaultFields.map((field) => {
             if ('name' in field && field.name === 'confirmationMessage') {
