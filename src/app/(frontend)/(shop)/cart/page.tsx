@@ -11,16 +11,16 @@ import type { Page, Settings } from '@/payload-types'
 // import { fetchDoc } from '../../_api/fetchDoc'
 // import { fetchSettings } from '../../_api/fetchGlobals'
 
-import { Blocks } from '@/components/Blocks'
-import { Gutter } from '@/components/Gutter'
-import { Hero } from '@/components/Hero'
-import { Message } from '@/components/Message'
+import { Blocks } from '@/components/payload/Blocks'
+import { Gutter } from '@/components/payload/Gutter'
+import { Hero } from '@/components/payload/Hero'
+import { Message } from '@/components/payload/Message'
 import { generateMeta } from '@/lib/utils/generateMeta'
 
 import { CartPage } from './cart'
 
 import classes from './index.module.scss'
-import { equal } from 'assert'
+
 
 // Force this page to be dynamic so that Next.js does not cache it
 // See the note in '../[slug]/page.tsx' about this
@@ -32,10 +32,6 @@ export default async function Cart() {
   let page: Page | null = null
 
   try {
-    // page = await fetchDoc<Page>({
-    //   slug: 'cart',
-    //   collection: 'pages',
-    // })
     const pages = await payload.find({
       collection: 'pages',
       where: {
@@ -52,14 +48,6 @@ export default async function Cart() {
     // in production you may want to redirect to a 404  page or at least log the error somewhere
     // console.error(error)
   }
-
-  // if no `cart` page exists, render a static one using dummy content
-  // you should delete this code once you have a cart page in the CMS
-  // this is really only useful for those who are demoing this template
-  //   if (!page) {
-  //     page = staticCart
-  //   }
-
   if (!page) {
     return notFound()
   }
@@ -137,10 +125,6 @@ export async function generateMetadata(): Promise<Metadata> {
     // when deploying this template on Payload Cloud, this page needs to build before the APIs are live
     // in production you may want to redirect to a 404  page or at least log the error somewhere
   }
-
-  //   if (!page) {
-  //     page = staticCart
-  //   }
 
   return generateMeta({ doc: page, collectionSlug: 'pages' })
 }

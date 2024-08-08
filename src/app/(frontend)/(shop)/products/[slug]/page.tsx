@@ -4,7 +4,7 @@ import config from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
 import React, { cache } from 'react'
 import type { Page as PageType } from '@/payload-types'
-import { RenderBlocks } from '@/components/RenderBlocks'
+import { RenderBlocks } from '@/components/payload/RenderBlocks'
 import { generateMeta } from '@/lib/utils/generateMeta'
 import { notFound } from 'next/navigation'
 
@@ -28,6 +28,7 @@ const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
 
 export async function generateStaticParams() {
   const payload = await getPayloadHMR({ config })
+  
   const pages = await payload.find({
     collection: 'pages',
     draft: false,

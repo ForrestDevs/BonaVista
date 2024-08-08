@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PayloadRedirects } from '@/components/PayloadRedirects'
+import { PayloadRedirects } from '@/components/payload/PayloadRedirects'
 import configPromise from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { draftMode, headers } from 'next/headers'
@@ -8,8 +8,9 @@ import { homeStatic } from 'src/payload/seed/home-static'
 
 import type { Page as PageType } from '@/payload-types'
 
-import { Blocks } from '@/components/Blocks'
-import { Hero } from '@/components/Hero'
+import { Blocks } from '@/components/payload/Blocks'
+import { Hero } from '@/components/payload/Hero'
+
 import { generateMeta } from '@/lib/utils/generateMeta'
 
 export async function generateStaticParams() {
@@ -36,11 +37,6 @@ export default async function Page({ params: { slug = 'home' } }) {
   page = await queryPageBySlug({
     slug,
   })
-
-  // // Remove this code once your website is seeded
-  // if (!page) {
-  //   page = homeStatic
-  // }
 
   if (!page) {
     return <PayloadRedirects url={url} />

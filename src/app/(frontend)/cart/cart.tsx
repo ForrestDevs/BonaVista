@@ -66,10 +66,10 @@ export const CartPage: React.FC<{
                 )}
               </div>
               {cart?.items?.map((item, index) => {
-                if (typeof item.product === 'object') {
+                if (typeof item.product === 'object' && item.product !== null) {
                   const {
                     product,
-                    // product: { id, stripeProductID, title },
+                    product: { id, stripeProductID, title },
                     quantity,
                   } = item
 
@@ -92,13 +92,13 @@ export const CartPage: React.FC<{
                           )}
                         </Link> */}
                         <div className={classes.rowContent}>
-                          {!product?.stripeProductID && (
+                          {!stripeProductID && (
                             <p className={classes.warning}>
                               {
                                 'This product is not yet connected to Stripe. To link this product, '
                               }
                               <Link
-                                href={`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/collections/products/${product?.id}`}
+                                href={`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/collections/products/${id}`}
                               >
                                 edit this product in the admin panel
                               </Link>
@@ -107,7 +107,7 @@ export const CartPage: React.FC<{
                           )}
                           <h5 className={classes.title}>
                             <Link className={classes.titleLink} href={`/products/${product?.slug}`}>
-                              {product?.title}
+                              {title}
                             </Link>
                           </h5>
                           <div className={classes.actions}>
@@ -127,9 +127,11 @@ export const CartPage: React.FC<{
                                 value={typeof quantity === 'number' ? quantity : ''}
                               />
                             </label>
-                            <RemoveFromCartButton product={product!} />
+                            {/* <RemoveFromCartButton product={product && product} /> */}
                           </div>
-                          <Price button={false} product={product!} quantity={quantity!} />
+                          {product != null ? ( // Check for null
+                            <Price button={false} product={product} quantity={quantity ?? 0} />
+                          ) : null}
                         </div>
                       </div>
                       {!isLast && <HR />}

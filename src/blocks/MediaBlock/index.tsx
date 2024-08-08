@@ -1,9 +1,9 @@
 import React from 'react'
 import { cn } from '@/lib/utils/cn'
 import type { Page } from '@/payload-types'
-import { Media } from '@/components/Media'
+import { Media } from '@/components/payload/Media'
 import type { StaticImageData } from 'next/image'
-import RichText from '@/components/RichText'
+import RichText from '@/components/payload/RichText'
 
 type Props = Extract<Page['layout'][0], { blockType: 'mediaBlock' }> & {
   breakout?: boolean

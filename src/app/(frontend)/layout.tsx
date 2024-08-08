@@ -5,10 +5,10 @@ import type { Metadata } from 'next'
 import { cn } from '@/lib/utils/cn'
 import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
-import { AdminBar } from '@/components/AdminBar'
-import { Footer } from '@/components/Footer'
-import { Header } from '@/components/Header'
-import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { AdminBar } from '@/components/payload/AdminBar'
+// import { Footer } from '@/components/Footer'
+// import { Header } from '@/components/Header'
+// import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Providers } from '@/lib/providers'
 import { InitTheme } from '@/lib/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/lib/utils/merge-open-graph'
@@ -44,10 +44,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <Providers>
           {/* <AdminBar /> */}
-          <LivePreviewListener />
-          <Header />
+          {/* <LivePreviewListener /> */}
+          {/* <Header /> */}
           {children}
-          <Footer />
+          {/* <Footer /> */}
         </Providers>
       </body>
     </html>

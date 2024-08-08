@@ -1,9 +1,9 @@
 import React from 'react'
 
 import { Product } from '@/payload-types'
-import { ProductCard } from '@/components/ProductCard'
-import { Gutter } from '@/components/Gutter'
-import RichText from '@/components/RichText'
+import { ProductCard } from '@/components/payload/ProductCard'
+import { Gutter } from '@/components/payload/Gutter'
+import RichText from '@/components/payload/RichText'
 
 import classes from './index.module.scss'
 

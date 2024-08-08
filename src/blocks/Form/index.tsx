@@ -4,7 +4,7 @@ import type { Form as FormType } from '@payloadcms/plugin-form-builder/types'
 import { useRouter } from 'next/navigation'
 import React, { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import RichText from '@/components/RichText'
+import RichText from '@/components/payload/RichText'
 import { Button } from '@/components/ui/button'
 
 import { buildInitialFormState } from './buildInitialFormState'
