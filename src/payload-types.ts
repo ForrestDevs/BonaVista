@@ -31,6 +31,7 @@ export interface Config {
     orders: Order;
     products: Product;
     tags: Tag;
+    'product-collections': ProductCollection;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -819,6 +820,23 @@ export interface Tag {
   description?: string | null;
   button_name?: string | null;
   button_link?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-collections".
+ */
+export interface ProductCollection {
+  id: string;
+  slug?: string | null;
+  title: string;
+  description?: string | null;
+  publishedOn?: string | null;
+  products?: (string | Product)[] | null;
+  categories?: (string | Category)[] | null;
+  relatedProducts?: (string | Product)[] | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;

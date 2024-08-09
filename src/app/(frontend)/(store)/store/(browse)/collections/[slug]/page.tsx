@@ -1,9 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-
-import { getCollectionByHandle, getCollectionsList, listRegions } from '@lib/data'
-import CollectionTemplate from '@modules/collections/templates'
-import { SortOptions } from '@modules/store/components/refinement-list/sort-products'
+import CollectionTemplate from '@/components/store/collections/collection-template'
+import { SortOptions } from '@/components/store/lists/refinement-list/sort-products'
 
 type Props = {
   params: { handle: string; countryCode: string }
@@ -64,12 +62,5 @@ export default async function CollectionPage({ params, searchParams }: Props) {
     notFound()
   }
 
-  return (
-    <CollectionTemplate
-      collection={collection}
-      page={page}
-      sortBy={sortBy}
-      countryCode={params.countryCode}
-    />
-  )
+  return <CollectionTemplate collection={collection} page={page} sortBy={sortBy} />
 }

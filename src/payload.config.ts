@@ -40,6 +40,7 @@ import { productsProxy } from './payload/endpoints/products'
 import { productUpdated } from './payload/stripe/webhooks/productUpdated'
 import { priceUpdated } from './payload/stripe/webhooks/priceUpdated'
 import { Settings } from './payload/globals/Settings'
+import { ProductCollections } from './payload/collections/ProductCollection'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -123,7 +124,7 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || '',
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Orders, Products, Tags],
+  collections: [Pages, Posts, Media, Categories, Users, Orders, Products, Tags, ProductCollections],
   cors: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ''].filter(Boolean),
   csrf: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ''].filter(Boolean),
   endpoints: [

@@ -9,7 +9,7 @@ import getPayload from '@/lib/utils/getPayload'
 import { COLLECTION_SLUG_PAGES } from '@/payload/collections/constants'
 import { Container } from '@/components/ui/craft'
 import MissingStripeKeyAlert from '@/components/errors/missing-stripe-key'
-import { CheckoutCard } from '@/components/checkout/CheckoutCard'
+import { CheckoutCard } from '@/components/store/checkout/CheckoutCard'
 
 export const dynamic = 'force-dynamic'
 
