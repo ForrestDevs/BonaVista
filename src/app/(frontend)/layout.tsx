@@ -1,4 +1,4 @@
-import './globals.css'
+import '@/lib/styles/globals.css'
 
 import React from 'react'
 import type { Metadata } from 'next'
@@ -14,6 +14,7 @@ import { InitTheme } from '@/lib/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/lib/utils/merge-open-graph'
 import config from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
+import { getLocale, getMessages } from 'next-intl/server'
 
 export async function generateMetadata(): Promise<Metadata> {
   const payload = await getPayloadHMR({ config })
@@ -34,8 +35,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale()
+
   return (
-    <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
+    <html
+      className={cn(GeistSans.variable, GeistMono.variable)}
+      lang={locale}
+      suppressHydrationWarning
+    >
       <head>
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />

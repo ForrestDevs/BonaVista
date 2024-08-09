@@ -20,7 +20,6 @@ export const orderRouter = router({
         const { docs } = await payload.find({
           collection: COLLECTION_SLUG_ORDERS,
           where: { id: { equals: id } },
-          depth: 3,
         })
 
         if (!docs?.length) {

@@ -63,7 +63,6 @@ const flattenCart = (cart: User['cart']): User['cart'] => ({
 // Step 4: If the user is authenticated, merge the user's cart with the local cart
 // Step 4B: Sync the cart to Payload and clear local storage
 // Step 5: If the user is logged out, sync the cart to local storage only
-
 export const CartProvider = (props: any) => {
   // const { setTimedNotification } = useNotifications();
   const { children } = props
