@@ -5,17 +5,12 @@ import type { Metadata } from 'next'
 import { cn } from '@/lib/utils/cn'
 import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
-import { AdminBar } from '@/components/payload/AdminBar'
-// import { Footer } from '@/components/Footer'
-// import { Header } from '@/components/Header'
-// import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Providers } from '@/lib/providers'
-import { InitTheme } from '@/lib/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/lib/utils/merge-open-graph'
 import config from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
-import { getLocale, getMessages } from 'next-intl/server'
-import { Footer } from '@/components/payload/Footer'
+import { getLocale } from 'next-intl/server'
+import { Footer } from '@/components/layout/footer'
 
 export async function generateMetadata(): Promise<Metadata> {
   const payload = await getPayloadHMR({ config })
@@ -45,15 +40,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning
     >
       <body>
-        <div className="flex min-h-full flex-col">
+        <main className="flex min-h-full flex-col">
           <Providers>
-            {/* <AdminBar /> */}
-            {/* <LivePreviewListener /> */}
-            {/* <Header /> */}
             {children}
             <Footer />
           </Providers>
-        </div>
+        </main>
       </body>
     </html>
   )

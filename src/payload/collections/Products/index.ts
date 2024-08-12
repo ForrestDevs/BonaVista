@@ -79,6 +79,23 @@ export const Products: CollectionConfig = {
           ],
         },
         {
+          label: 'Meta',
+          name: 'meta',
+          fields: [
+            {
+              name: 'description',
+              label: 'Description',
+              type: 'textarea',
+            },
+            {
+              name: 'image',
+              label: 'Image',
+              type: 'upload',
+              relationTo: 'media',
+            },
+          ],
+        },
+        {
           label: 'Product Details',
           fields: [
             {

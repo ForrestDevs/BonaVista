@@ -29,7 +29,6 @@ const nextConfig = {
 		scrollRestoration: true,
 		ppr: true,
 		after: true,
-		reactCompiler: true,
 	},
   reactStrictMode: true,
   redirects,

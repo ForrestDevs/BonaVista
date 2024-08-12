@@ -1,24 +1,25 @@
 import React from 'react'
-
-import { NextIntlClientProvider } from 'next-intl'
-import { HeaderThemeProvider } from './HeaderTheme'
-import { CartProvider } from './Cart'
-import { getMessages } from 'next-intl/server'
-import { ThemeProvider } from '@/lib/providers/theme-digital'
+import TrpcProvider from './Trpc'
+import ThemeProvider from '@/lib/providers/Theme'
+import CartProvider from '@/lib/providers/Cart'
+import LocaleProvider from '@/lib/providers/i18n'
+import { Toaster } from 'sonner'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 export const Providers: React.FC<{
   children: React.ReactNode
 }> = async ({ children }) => {
-  const messages = await getMessages()
   return (
-    <NextIntlClientProvider messages={messages}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <CartProvider>{children}</CartProvider>
+    <LocaleProvider>
+      <ThemeProvider>
+        <TrpcProvider>
+          <CartProvider>
+            {children}
+            <Toaster />
+            <ReactQueryDevtools initialIsOpen={false} />
+          </CartProvider>
+        </TrpcProvider>
       </ThemeProvider>
-    </NextIntlClientProvider>
+    </LocaleProvider>
   )
 }
-
-
-
-

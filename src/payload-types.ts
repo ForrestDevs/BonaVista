@@ -54,7 +54,6 @@ export interface Config {
 export interface UserAuthOperations {
   forgotPassword: {
     email: string;
-    password: string;
   };
   login: {
     email: string;
@@ -66,7 +65,6 @@ export interface UserAuthOperations {
   };
   unlock: {
     email: string;
-    password: string;
   };
 }
 /**
@@ -536,6 +534,10 @@ export interface Product {
         blockType: 'archive';
       }
   )[];
+  meta?: {
+    description?: string | null;
+    image?: string | Media | null;
+  };
   stripeProductID?: string | null;
   priceJSON?: string | null;
   enablePaywall?: boolean | null;

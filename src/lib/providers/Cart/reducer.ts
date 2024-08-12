@@ -1,33 +1,4 @@
-import type { Product, User } from '@/payload-types'
-
-export type CartItem = {
-  product?: (string | null) | Product
-  quantity?: number | null
-  id?: string | null
-}
-
-type CartType = User['cart']
-
-type CartAction =
-  | {
-      payload: CartItem
-      type: 'ADD_ITEM'
-    }
-  | {
-      payload: CartType
-      type: 'MERGE_CART'
-    }
-  | {
-      payload: CartType
-      type: 'SET_CART'
-    }
-  | {
-      payload: Product
-      type: 'DELETE_ITEM'
-    }
-  | {
-      type: 'CLEAR_CART'
-    }
+import { CartAction, CartItem, CartType } from '@/lib/types/cart'
 
 export const cartReducer = (cart: CartType, action: CartAction): CartType => {
   switch (action.type) {

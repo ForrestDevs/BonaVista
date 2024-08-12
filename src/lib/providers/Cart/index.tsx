@@ -1,61 +1,12 @@
 'use client'
 
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from 'react'
-import type { Product, User } from '@/payload-types'
-import type { CartItem } from './reducer'
+import React, { useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react'
+import type { Product } from '@/payload-types'
 import { useAuth } from '@payloadcms/ui'
 import { cartReducer } from './reducer'
-
-export type CartContext = {
-  addItemToCart: (item: CartItem) => void
-  cart: User['cart']
-  cartIsEmpty: boolean | undefined
-  cartTotal: {
-    formatted: string
-    raw: number
-  }
-  clearCart: () => void
-  deleteItemFromCart: (product: Product) => void
-  hasInitializedCart: boolean
-  isProductInCart: (product: Product) => boolean
-}
-
-const Context = createContext({} as CartContext)
-
-export const useCart = () => useContext(Context)
-
-const arrayHasItems = (array: any) => Array.isArray(array) && array.length > 0
-
-/**
- * ensure that cart items are fully populated, filter out any items that are not
- * this will prevent discontinued products from appearing in the cart
- */
-const flattenCart = (cart: User['cart']): User['cart'] => ({
-  ...cart,
-  items: cart?.items
-    ?.filter(Boolean)
-    .map((item) => {
-      if (!item?.product || typeof item?.product !== 'object') {
-        return null
-      }
-
-      return {
-        ...item,
-        // flatten relationship to product
-        product: item?.product?.id,
-        quantity: typeof item?.quantity === 'number' ? item?.quantity : 0,
-      }
-    })
-    .filter(Boolean) as CartItem[],
-})
+import { CartContext } from './context'
+import { arrayHasItems, flattenCart } from '@/lib/utils/cart'
+import { CartTotalState } from '@/lib/types/cart'
 
 // Step 1: Check local storage for a cart
 // Step 2: If there is a cart, fetch the products and hydrate the cart
@@ -63,22 +14,14 @@ const flattenCart = (cart: User['cart']): User['cart'] => ({
 // Step 4: If the user is authenticated, merge the user's cart with the local cart
 // Step 4B: Sync the cart to Payload and clear local storage
 // Step 5: If the user is logged out, sync the cart to local storage only
-export const CartProvider = (props: any) => {
-  // const { setTimedNotification } = useNotifications();
-  const { children } = props
+export default function CartProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
-
+  const hasInitialized = useRef(false)
   const [cart, dispatchCart] = useReducer(cartReducer, {})
-
-  const [total, setTotal] = useState<{
-    formatted: string
-    raw: number
-  }>({
+  const [total, setTotal] = useState<CartTotalState>({
     formatted: '0.00',
     raw: 0,
   })
-
-  const hasInitialized = useRef(false)
   const [hasInitializedCart, setHasInitialized] = useState(false)
 
   // Check local storage for a cart
@@ -250,7 +193,7 @@ export const CartProvider = (props: any) => {
 
     setTotal({
       formatted: (newTotal / 100).toLocaleString('en-US', {
-        currency: 'USD',
+        currency: 'CAD',
         style: 'currency',
       }),
       raw: newTotal,
@@ -258,7 +201,7 @@ export const CartProvider = (props: any) => {
   }, [cart, hasInitialized])
 
   return (
-    <Context.Provider
+    <CartContext.Provider
       value={{
         addItemToCart,
         cart,
@@ -270,7 +213,9 @@ export const CartProvider = (props: any) => {
         isProductInCart,
       }}
     >
-      {children && children}
-    </Context.Provider>
+      {children}
+    </CartContext.Provider>
   )
 }
+
+export const useCart = () => useContext(CartContext)

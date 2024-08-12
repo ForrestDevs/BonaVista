@@ -10,6 +10,7 @@ export const authenticated: isAuthenticated = ({ req: { user } }) => {
   if (user) {
     return true
   }
+  return false
 }
 
 export const authenticatedOrPublished: Access = ({ req: { user } }) => {

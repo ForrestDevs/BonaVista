@@ -2,16 +2,14 @@ import type { Metadata } from 'next'
 import { PayloadRedirects } from '@/components/payload/PayloadRedirects'
 import configPromise from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
-import { draftMode, headers } from 'next/headers'
+import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
-import { homeStatic } from 'src/payload/seed/home-static'
-
 import type { Page as PageType } from '@/payload-types'
-
-import { Blocks } from '@/components/payload/Blocks'
-import { Hero } from '@/components/payload/Hero'
+import { Blocks } from '@/components/layout/blocks/render'
+import { Hero } from '@/components/layout/heros/render'
 
 import { generateMeta } from '@/lib/utils/generateMeta'
+import { notFound } from 'next/navigation'
 
 export async function generateStaticParams() {
   const payload = await getPayloadHMR({ config: configPromise })
@@ -29,7 +27,7 @@ export async function generateStaticParams() {
     .map(({ slug }) => slug)
 }
 
-export default async function Page({ params: { slug = 'home' } }) {
+export default async function Page({ params: { slug = '' } }) {
   const url = '/' + slug
 
   let page: PageType | null
@@ -39,7 +37,7 @@ export default async function Page({ params: { slug = 'home' } }) {
   })
 
   if (!page) {
-    return <PayloadRedirects url={url} />
+    return notFound()
   }
 
   const { hero, layout } = page
