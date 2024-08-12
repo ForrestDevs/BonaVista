@@ -1,12 +1,8 @@
 /** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
-  ],
-  darkMode: ['selector', '[data-theme="dark"]'],
+
+module.exports = {
+  content: ['./src/components/**/*.{ts,tsx}', './src/app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}'],
+  darkMode: ['class', '[data-theme="dark"]'],
   plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
   prefix: '',
   safelist: [
@@ -104,6 +100,7 @@ export default {
           to: { height: '0' },
         },
       },
+      // @ts-ignore
       typography: ({ theme }) => ({
         DEFAULT: {
           css: {
