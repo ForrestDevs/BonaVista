@@ -8,9 +8,9 @@ const withNextIntl = createNextIntlPlugin()
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  devIndicators: {
-    buildActivity: false,
-  },
+  // devIndicators: {
+  //   buildActivity: false,
+  // },
   images: {
     remotePatterns: [
       ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
@@ -23,6 +23,14 @@ const nextConfig = {
       }),
     ],
   },
+  experimental: {
+		esmExternals: true,
+		mdxRs: true,
+		scrollRestoration: true,
+		ppr: true,
+		after: true,
+		reactCompiler: true,
+	},
   reactStrictMode: true,
   redirects,
 }

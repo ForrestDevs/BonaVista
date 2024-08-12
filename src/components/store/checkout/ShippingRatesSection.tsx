@@ -2,8 +2,9 @@ import type Stripe from 'stripe'
 import { useOptimistic, useTransition } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import type * as Commerce from 'commerce-kit'
-import { RadioGroup, RadioGroupItem } from '@/ui/shadcn/radio-group'
-import { cn, formatMoney } from '@/lib/utils'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { cn } from '@/lib/utils/cn'
+import { formatMoney } from '@/lib/utils/formatMoney'
 
 export const ShippingRatesSection = ({
   shippingRates,

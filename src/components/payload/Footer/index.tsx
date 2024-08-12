@@ -2,7 +2,7 @@ import { getCachedGlobal } from '@/lib/utils/getGlobals'
 import Link from 'next/link'
 import React from 'react'
 import type { Footer } from '@/payload-types'
-import { ThemeSelector } from '@/lib/providers/Theme/ThemeSelector'
+// import { ThemeSelector } from '@/lib/providers/Theme/ThemeSelector'
 import { CMSLink } from '../Link'
 
 export async function Footer() {
@@ -24,10 +24,10 @@ export async function Footer() {
         </Link>
 
         <div className="flex flex-col-reverse items-start md:flex-row gap-4 md:items-center">
-          <ThemeSelector />
+          {/* <ThemeSelector /> */}
           <nav className="flex flex-col md:flex-row gap-4">
             {navItems.map(({ link }, i) => {
-              return <Link href={link.url!}>{link.label}</Link>
+              return <Link key={i} href={link.url!}>{link.label}</Link>
             })}
           </nav>
         </div>

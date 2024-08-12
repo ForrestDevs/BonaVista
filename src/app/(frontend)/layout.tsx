@@ -15,6 +15,7 @@ import { mergeOpenGraph } from '@/lib/utils/merge-open-graph'
 import config from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { getLocale, getMessages } from 'next-intl/server'
+import { Footer } from '@/components/payload/Footer'
 
 export async function generateMetadata(): Promise<Metadata> {
   const payload = await getPayloadHMR({ config })
@@ -43,19 +44,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       lang={locale}
       suppressHydrationWarning
     >
-      <head>
-        <InitTheme />
-        <link href="/favicon.ico" rel="icon" sizes="32x32" />
-        <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
-      </head>
       <body>
-        <Providers>
-          {/* <AdminBar /> */}
-          {/* <LivePreviewListener /> */}
-          {/* <Header /> */}
-          {children}
-          {/* <Footer /> */}
-        </Providers>
+        <div className="flex min-h-full flex-col">
+          <Providers>
+            {/* <AdminBar /> */}
+            {/* <LivePreviewListener /> */}
+            {/* <Header /> */}
+            {children}
+            <Footer />
+          </Providers>
+        </div>
       </body>
     </html>
   )

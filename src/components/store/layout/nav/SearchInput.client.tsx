@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils/cn'
 import { useDebouncedValue } from '@/lib/hooks/useDebounce'
 
 const inputClasses = cn(
-  'min-w-14 md:max-w-72 appearance-none rounded-md border bg-white py-2 pl-4 pr-10 md:pl-2 md:pr-8 lg:pl-4 lg:pr-10 transition-opacity inline-block',
+  'min-w-14 md:max-w-72 appearance-none rounded-md border py-2 pl-4 pr-10 md:pl-2 md:pr-8 lg:pl-4 lg:pr-10 transition-opacity inline-block',
 )
 
 export const SearchInputPlaceholder = ({ placeholder }: { placeholder: string }) => {
@@ -33,23 +33,23 @@ export const SearchInput = ({ placeholder }: { placeholder: string }) => {
   const [_isQueryPending, debouncedQuery] = useDebouncedValue(query, 100)
 
   useEffect(() => {
-    router.prefetch(`/search?q=${encodeURIComponent(query)}`)
+    router.prefetch(`/store/search?q=${encodeURIComponent(query)}`)
   }, [query, router])
 
   useEffect(() => {
     if (debouncedQuery) {
-      router.push(`/search?q=${encodeURIComponent(debouncedQuery)}`, { scroll: false })
+      router.push(`/store/search?q=${encodeURIComponent(debouncedQuery)}`, { scroll: false })
     }
   }, [debouncedQuery, router])
 
   useEffect(() => {
-    if (pathname === '/search' && !query) {
-      router.push(`/`, { scroll: true })
+    if (pathname === '/store/search' && !query) {
+      router.push(`/store`, { scroll: true })
     }
   }, [pathname, query, router])
 
   useEffect(() => {
-    if (pathname !== '/search') {
+    if (pathname !== '/store/search') {
       setQuery('')
     }
   }, [pathname])
@@ -60,7 +60,7 @@ export const SearchInput = ({ placeholder }: { placeholder: string }) => {
         const query = e.target.value
         setQuery(query)
       }}
-      className={inputClasses}
+      // className={inputClasses}
       placeholder={placeholder}
       type="search"
       enterKeyHint="search"
