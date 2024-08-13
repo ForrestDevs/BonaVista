@@ -39,6 +39,9 @@ module.exports = {
       },
     },
     extend: {
+      backgroundImage: {
+        'header-gradient': 'linear-gradient(to bottom, rgba(27, 58, 87, 0.8) 0%, rgba(27, 58, 87, 0.4) 100%)',
+      },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',

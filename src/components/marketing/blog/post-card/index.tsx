@@ -4,7 +4,7 @@ import React, { Fragment } from 'react'
 
 import Link from 'next/link'
 import { cn } from '@/lib/utils/cn'
-import useClickableCard from '@/lib/utils/useClickableCard'
+import useClickableCard from '@/lib/hooks/useClickableCard'
 import type { Post } from '@/payload-types'
 import { Media } from '@/components/layout/media'
 
@@ -12,12 +12,11 @@ export const PostCard: React.FC<{
   alignItems?: 'center'
   className?: string
   doc?: Post
-  relationTo?: 'posts'
   showCategories?: boolean
   title?: string
 }> = (props) => {
   const { card, link } = useClickableCard({})
-  const { className, doc, relationTo, showCategories, title: titleFromProps } = props
+  const { className, doc, showCategories, title: titleFromProps } = props
 
   const { slug, categories, meta, title } = doc || {}
   const { description, image: metaImage } = meta || {}
@@ -25,7 +24,7 @@ export const PostCard: React.FC<{
   const hasCategories = categories && Array.isArray(categories) && categories.length > 0
   const titleToUse = titleFromProps || title
   const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
-  const href = `/${relationTo}/${slug}`
+  const href = `/blog/${slug}`
 
   return (
     <article

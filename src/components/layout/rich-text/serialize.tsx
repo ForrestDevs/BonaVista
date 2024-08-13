@@ -1,9 +1,8 @@
-import { BannerBlock } from '@/blocks/Banner'
-import { CallToActionBlock } from '@/blocks/CallToAction'
-import { CodeBlock, CodeBlockProps } from '@/blocks/Code'
-import { MediaBlock } from '@/blocks/MediaBlock'
+import { CallToActionBlock } from '@/components/layout/blocks/call-to-action'
+import { CodeBlock, CodeBlockProps } from '@/components/layout/blocks/code'
+import { MediaBlock } from '@/components/layout/blocks/media'
 import React, { Fragment, JSX } from 'react'
-import { CMSLink } from '@/components/payload/Link'
+import { CMSLink } from '@/components/layout/link'
 import { DefaultNodeTypes, SerializedBlockNode } from '@payloadcms/richtext-lexical'
 import type { BannerBlock as BannerBlockProps } from 'src/payload-types'
 

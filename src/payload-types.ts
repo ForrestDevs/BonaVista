@@ -91,7 +91,7 @@ export interface Page {
       };
       [k: string]: unknown;
     } | null;
-    links?:
+    'link-groups'?:
       | {
           link: {
             type?: ('reference' | 'custom') | null;
@@ -126,7 +126,7 @@ export interface Page {
           };
           [k: string]: unknown;
         } | null;
-        links?:
+        'link-groups'?:
           | {
               link: {
                 type?: ('reference' | 'custom') | null;
@@ -476,7 +476,7 @@ export interface Product {
           };
           [k: string]: unknown;
         } | null;
-        links?:
+        'link-groups'?:
           | {
               link: {
                 type?: ('reference' | 'custom') | null;
@@ -559,7 +559,7 @@ export interface Product {
               };
               [k: string]: unknown;
             } | null;
-            links?:
+            'link-groups'?:
               | {
                   link: {
                     type?: ('reference' | 'custom') | null;
@@ -923,17 +923,39 @@ export interface PayloadMigration {
  */
 export interface Header {
   id: string;
+  logo?: (string | null) | Media;
   navItems?:
     | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?: {
-            relationTo: 'pages';
-            value: string | Page;
-          } | null;
-          url?: string | null;
-          label: string;
+        navItem?: {
+          type?: ('single' | 'group') | null;
+          singleLink?: {
+            label: string;
+            type?: ('reference' | 'custom') | null;
+            reference?: {
+              relationTo: 'pages';
+              value: string | Page;
+            } | null;
+            url?: string | null;
+            newTab?: boolean | null;
+          };
+          linkGroup?: {
+            title: string;
+            links?:
+              | {
+                  title: string;
+                  description?: string | null;
+                  image?: string | Media | null;
+                  type?: ('reference' | 'custom') | null;
+                  reference?: {
+                    relationTo: 'pages';
+                    value: string | Page;
+                  } | null;
+                  url?: string | null;
+                  newTab?: boolean | null;
+                  id?: string | null;
+                }[]
+              | null;
+          };
         };
         id?: string | null;
       }[]

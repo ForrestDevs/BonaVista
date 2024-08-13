@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useRef, useState, type ReactNode } from 'react'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
-import { useMediaQuery } from '@/components/ui/hooks/useMediaQuery'
+import { useMediaQuery } from '@/lib/hooks/useMediaQuery'
 
 export function ResponsiveDrawer({ children }: { children: ReactNode }) {
   const router = useRouter()

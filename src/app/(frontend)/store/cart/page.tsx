@@ -3,6 +3,8 @@
 // import { getCartFromCookiesAction } from '@/actions/cartActions'
 // import { CheckoutCard } from '@/ui/checkout/CheckoutCard'
 
+import { Button } from "@/components/ui/button";
+
 // export const generateMetadata = async (): Promise<Metadata> => {
 //   const t = await getTranslations('/cart.metadata')
 //   return {
@@ -11,7 +13,11 @@
 // }
 
 export default async function CartPage() {
-  return <div>Cart</div>
+  return <div>Cart
+    <Button variant="ghost">
+      Buy Now
+    </Button>
+  </div>
   // const cart = await getCartFromCookiesAction()
   // if (!cart) {
   //   return null

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PayloadRedirects } from '@/components/payload/PayloadRedirects'
+import { PayloadRedirects } from '@/components/layout/redirects'
 import configPromise from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { draftMode } from 'next/headers'

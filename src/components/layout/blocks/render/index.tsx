@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import type { Page } from '@/payload-types'
-import { ArchiveBlock } from '@/components/layout/blocks/archive'
+import { ArchiveBlock } from '@/components/layout/blocks/post-collection'
 import { CallToActionBlock } from '@/components/layout/blocks/call-to-action'
 import { ContentBlock } from '@/components/layout/blocks/content'
 import { FormBlock } from '@/components/layout/blocks/form'
@@ -34,6 +34,7 @@ export const Blocks: React.FC<{
             if (Block) {
               return (
                 <div className="my-16" key={index}>
+                  {/* @ts-expect-error */}
                   <Block id={toKebabCase(blockName ?? '')} {...block} />
                 </div>
               )

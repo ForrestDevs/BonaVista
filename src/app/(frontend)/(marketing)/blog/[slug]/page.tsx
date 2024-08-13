@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 import { RelatedPosts } from '@/components/layout/blocks/related-posts'
-import { PayloadRedirects } from '@/components/payload/PayloadRedirects'
+import { PayloadRedirects } from '@/components/layout/redirects'
 import configPromise from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { draftMode, headers } from 'next/headers'

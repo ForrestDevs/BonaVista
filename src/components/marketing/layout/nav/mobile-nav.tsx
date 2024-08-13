@@ -12,13 +12,14 @@ export default function MobileNav() {
     <Sheet open={open} onOpenChange={setOpen}>
       {/* This button will trigger open the mobile sheet menu */}
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
+        <Button variant="ghost" size="icon" className="md:hidden" style={{ zIndex: 10 }} >
           <MenuIcon />
         </Button>
       </SheetTrigger>
 
       <SheetContent side="left">
         <div className="flex flex-col items-start">
+          hello
           {/* {mobileItems.map((item, index) => (
             <Button
               key={index}
