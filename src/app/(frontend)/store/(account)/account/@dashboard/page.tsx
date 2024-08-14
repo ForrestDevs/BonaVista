@@ -1,21 +1,32 @@
-// import { Metadata } from "next"
+import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { getMeUser } from '@/lib/utils/getMeUser'
+import getPayload from '@/lib/utils/getPayload'
+import { COLLECTION_SLUG_ORDERS } from '@/payload/collections/constants'
+import Overview from '@/components/store/account/components/overview'
 
-// import { getCustomer, listCustomerOrders } from "@lib/data"
-// import Overview from "@modules/account/components/overview"
-// import { notFound } from "next/navigation"
+export const metadata: Metadata = {
+  title: 'Account',
+  description: 'Overview of your account activity.',
+}
 
-// export const metadata: Metadata = {
-//   title: "Account",
-//   description: "Overview of your account activity.",
-// }
+export default async function OverviewTemplate() {
+  const payload = await getPayload()
 
-// export default async function OverviewTemplate() {
-//   const customer = await getCustomer().catch(() => null)
-//   const orders = (await listCustomerOrders().catch(() => null)) || null
+  const { user } = await getMeUser()
 
-//   if (!customer) {
-//     notFound()
-//   }
+  const { docs } = await payload.find({
+    collection: COLLECTION_SLUG_ORDERS,
+    where: {
+      orderedBy: {
+        equals: user,
+      },
+    },
+  })
 
-//   return <Overview customer={customer} orders={orders} />
-// }
+  if (!user) {
+    ;<>NO USER</>
+  }
+
+  return <Overview customer={user} orders={docs} />
+}

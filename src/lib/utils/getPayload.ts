@@ -1,5 +1,7 @@
-import { getPayloadHMR } from "@payloadcms/next/utilities"
-import configPromise from "@payload-config"
+'use server'
+
+import { getPayloadHMR } from '@payloadcms/next/utilities'
+import configPromise from '@payload-config'
 
 const getPayload = () => getPayloadHMR({ config: configPromise })
 
