@@ -40,6 +40,7 @@ export const Products: CollectionConfig = {
   },
   fields: [
     {
+      label: 'Title',
       name: 'title',
       type: 'text',
       required: true,

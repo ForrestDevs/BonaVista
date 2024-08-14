@@ -23,7 +23,7 @@ export function ResponsiveDrawer({ children }: { children: ReactNode }) {
   }
 
   return (
-    <Drawer open={open} direction={isDesktop ? 'right' : 'bottom'} onOpenChange={resetDrawer}>
+    <Drawer open={open} direction={isDesktop ? 'right' : 'bottom'} onOpenChange={resetDrawer} shouldScaleBackground={true}>
       <DrawerContent
         onPointerDownOutside={() => {
           setOpen(false)
