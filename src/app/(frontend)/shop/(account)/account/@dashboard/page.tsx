@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { getMeUser } from '@/lib/utils/getMeUser'
 import getPayload from '@/lib/utils/getPayload'
 import { ORDER_SLUG } from '@/payload/collections/constants'
-import Overview from '@/components/store/account/components/overview'
+import Overview from '@/components/shop/account/components/overview'
 
 export const metadata: Metadata = {
   title: 'Account',

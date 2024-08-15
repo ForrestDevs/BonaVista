@@ -4,5 +4,5 @@ import { redirect } from 'next/navigation'
 // We want to redirect to `/cart` to avoid conflict of the routes
 export default function RedirectToCart() {
   // return null
-  redirect('/store/cart')
+  redirect('/shop/cart')
 }

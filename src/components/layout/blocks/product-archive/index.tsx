@@ -5,8 +5,8 @@ import RichText from '@/components/layout/rich-text'
 import type { ArchiveBlockProps } from './types'
 import getPayload from '@/lib/utils/getPayload'
 import { PRODUCT_CATEGORY_SLUG, PRODUCT_COLLECTION_SLUG } from '@/payload/collections/constants'
-import ProductCollectionCard from '@/components/store/layout/cards/product-collection-card'
-import ProductCategoryCard from '@/components/store/layout/cards/product-category-card'
+import ProductCollectionCard from '@/components/shop/layout/cards/product-collection-card'
+import ProductCategoryCard from '@/components/shop/layout/cards/product-category-card'
 
 export const ProductArchiveBlock: React.FC<
   ArchiveBlockProps & {

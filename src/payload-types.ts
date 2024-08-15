@@ -12,9 +12,17 @@
  */
 export type ProductVariants =
   | {
-      size?: string | null;
-      price?: number | null;
-      sku?: string | null;
+      stripePriceID?: string | null;
+      priceJSON?: string | null;
+      useParentMeta?: boolean | null;
+      title?: string | null;
+      description?: string | null;
+      images?:
+        | {
+            image?: string | Media | null;
+            id?: string | null;
+          }[]
+        | null;
       id?: string | null;
     }[]
   | null;
@@ -519,7 +527,15 @@ export interface Product {
   slug?: string | null;
   title: string;
   publishedOn?: string | null;
+  description?: string | null;
+  images?:
+    | {
+        image?: string | Media | null;
+        id?: string | null;
+      }[]
+    | null;
   relatedProducts?: (string | Product)[] | null;
+  categories?: (string | ProductCategory)[] | null;
   layout: (
     | {
         richText?: {
@@ -594,12 +610,6 @@ export interface Product {
         blockType: 'archive';
       }
   )[];
-  meta?: {
-    description?: string | null;
-    image?: string | Media | null;
-  };
-  stripeProductID?: string | null;
-  priceJSON?: string | null;
   enablePaywall?: boolean | null;
   paywall?:
     | (
@@ -677,10 +687,11 @@ export interface Product {
           }
       )[]
     | null;
+  stripeProductID?: string | null;
+  priceJSON?: string | null;
+  skipSync?: boolean | null;
   hasVariants?: boolean | null;
   variants?: ProductVariants;
-  categories?: (string | ProductCategory)[] | null;
-  skipSync?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;

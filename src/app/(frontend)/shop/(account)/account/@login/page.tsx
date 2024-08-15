@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import LoginTemplate from '@/components/store/account/layout/login-layout'
+import LoginTemplate from '@/components/shop/account/layout/login-layout'
 
 export const metadata: Metadata = {
   title: 'Sign in',

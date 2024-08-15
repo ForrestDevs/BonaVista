@@ -1,4 +1,4 @@
-import { Nav, StoreHeader } from '@/components/store/layout/nav/Nav'
+import { Nav, StoreHeader } from '@/components/shop/layout/nav/Nav'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
 export default async function StoreLayout({

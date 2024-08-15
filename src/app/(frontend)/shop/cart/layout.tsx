@@ -2,9 +2,9 @@ import { type ReactNode } from 'react'
 import { getTranslations } from 'next-intl/server'
 // import { getCartFromCookiesAction } from '@/actions/cartActions'
 
-// import { CartSummaryTable } from '@/components/store/checkout/CartSummaryTable'
-// import { CartEmpty } from '@/components/store/checkout/CartEmpty'
-// import { StripeElementsContainer } from '@/components/store/checkout/StripeElementsContainer'
+// import { CartSummaryTable } from '@/components/shop/checkout/CartSummaryTable'
+// import { CartEmpty } from '@/components/shop/checkout/CartEmpty'
+// import { StripeElementsContainer } from '@/components/shop/checkout/StripeElementsContainer'
 
 export default async function CartLayout({ children }: { children: ReactNode }) {
   // const cart = await getCartFromCookiesAction()

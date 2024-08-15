@@ -47,8 +47,9 @@ export default async function StoreHome() {
 
   return (
     <Fragment>
+      {page && <Blocks blocks={page.layout} />}
       {/* Hero Section */}
-      <section className="relative w-full py-24 md:py-32 lg:py-48 overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-800">
+      {/* <section className="relative w-full py-24 md:py-32 lg:py-48 overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-800">
         <div className="absolute inset-0 bg-[url('/hero-background.jpg')] bg-cover bg-center opacity-20"></div>
         <div className="container relative px-4 md:px-6 z-10">
           <div className="flex flex-col items-center space-y-8 text-center">
@@ -75,10 +76,10 @@ export default async function StoreHome() {
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent"></div>
-      </section>
+      </section> */}
 
       {/* Featured Products Section */}
-      <section className="w-full py-16 md:py-24 bg-white">
+      {/* <section className="w-full py-16 md:py-24 bg-white">
         <div className="container px-4 md:px-6">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12">
             Featured Product Lines
@@ -138,10 +139,10 @@ export default async function StoreHome() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Seasonal Promotion Section */}
-      <section className="w-full py-16 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+      {/* <section className="w-full py-16 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="text-center md:text-left space-y-4">
@@ -155,10 +156,10 @@ export default async function StoreHome() {
             </Button>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Categories Section */}
-      <section className="w-full py-16 md:py-24 bg-gray-50">
+      {/* <section className="w-full py-16 md:py-24 bg-gray-50">
         <div className="container px-4 md:px-6">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12">
             Water Care Categories
@@ -206,10 +207,10 @@ export default async function StoreHome() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Deals Section */}
-      <section className="w-full py-12 bg-gradient-to-r from-blue-600 to-indigo-800 text-white">
+      {/* <section className="w-full py-12 bg-gradient-to-r from-blue-600 to-indigo-800 text-white">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
             <div className="text-center md:text-left">
@@ -221,9 +222,7 @@ export default async function StoreHome() {
             </Button>
           </div>
         </div>
-      </section>
-
-      {page && <Blocks blocks={page.layout} />}
+      </section> */}
     </Fragment>
   )
 }

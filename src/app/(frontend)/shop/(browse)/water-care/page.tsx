@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ChevronRightIcon, FilterIcon, SlidersHorizontalIcon } from 'lucide-react'
-import { ShopWaterCare } from '@/components/store/products/product-card'
+import { ShopWaterCare } from '@/components/shop/products/product-card'
 
 export default function ShopWaterCarePage() {
   return (
