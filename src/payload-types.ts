@@ -8,6 +8,18 @@
 
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductVariants".
+ */
+export type ProductVariants =
+  | {
+      size?: string | null;
+      price?: number | null;
+      sku?: string | null;
+      id?: string | null;
+    }[]
+  | null;
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "CartItems".
  */
 export type CartItems =
@@ -26,11 +38,11 @@ export interface Config {
     pages: Page;
     posts: Post;
     media: Media;
-    categories: Category;
+    'product-categories': ProductCategory;
     users: User;
     orders: Order;
     products: Product;
-    tags: Tag;
+    'post-tags': PostTag;
     'product-collections': ProductCollection;
     redirects: Redirect;
     forms: Form;
@@ -209,7 +221,6 @@ export interface Page {
         } | null;
         populateBy?: ('collection' | 'selection') | null;
         relationTo?: 'posts' | null;
-        categories?: (string | Category)[] | null;
         limit?: number | null;
         selectedDocs?:
           | {
@@ -242,6 +253,57 @@ export interface Page {
         id?: string | null;
         blockName?: string | null;
         blockType: 'formBlock';
+      }
+    | {
+        introContent?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        middleContent?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        populateBy?: ('collection' | 'selection') | null;
+        relationTo?: ('product-collections' | 'product-categories') | null;
+        limit?: number | null;
+        selectedDocs?:
+          | (
+              | {
+                  relationTo: 'product-collections';
+                  value: string | ProductCollection;
+                }
+              | {
+                  relationTo: 'product-categories';
+                  value: string | ProductCategory;
+                }
+            )[]
+          | null;
+        showProductCollectionsFirst?: boolean | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'product-archive';
       }
   )[];
   meta?: {
@@ -365,25 +427,6 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories".
- */
-export interface Category {
-  id: string;
-  title: string;
-  parent?: (string | null) | Category;
-  breadcrumbs?:
-    | {
-        doc?: (string | null) | Category;
-        url?: string | null;
-        label?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts".
  */
 export interface Post {
@@ -405,7 +448,7 @@ export interface Post {
     [k: string]: unknown;
   };
   relatedPosts?: (string | Post)[] | null;
-  categories?: (string | Category)[] | null;
+  tags?: (string | PostTag)[] | null;
   meta?: {
     title?: string | null;
     image?: string | Media | null;
@@ -420,6 +463,22 @@ export interface Post {
       }[]
     | null;
   slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-tags".
+ */
+export interface PostTag {
+  id: string;
+  slug?: string | null;
+  title?: ('Ayurveda' | 'Yoga' | 'Blog') | null;
+  heading?: string | null;
+  description?: string | null;
+  button_name?: string | null;
+  button_link?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -457,8 +516,10 @@ export interface User {
  */
 export interface Product {
   id: string;
+  slug?: string | null;
   title: string;
   publishedOn?: string | null;
+  relatedProducts?: (string | Product)[] | null;
   layout: (
     | {
         richText?: {
@@ -521,7 +582,6 @@ export interface Product {
         } | null;
         populateBy?: ('collection' | 'selection') | null;
         relationTo?: 'posts' | null;
-        categories?: (string | Category)[] | null;
         limit?: number | null;
         selectedDocs?:
           | {
@@ -604,7 +664,6 @@ export interface Product {
             } | null;
             populateBy?: ('collection' | 'selection') | null;
             relationTo?: 'posts' | null;
-            categories?: (string | Category)[] | null;
             limit?: number | null;
             selectedDocs?:
               | {
@@ -618,10 +677,24 @@ export interface Product {
           }
       )[]
     | null;
-  categories?: (string | Category)[] | null;
-  relatedProducts?: (string | Product)[] | null;
-  slug?: string | null;
+  hasVariants?: boolean | null;
+  variants?: ProductVariants;
+  categories?: (string | ProductCategory)[] | null;
   skipSync?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-categories".
+ */
+export interface ProductCategory {
+  id: string;
+  slug?: string | null;
+  title: string;
+  description?: string | null;
+  products?: (string | Product)[] | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -792,6 +865,21 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-collections".
+ */
+export interface ProductCollection {
+  id: string;
+  slug?: string | null;
+  title: string;
+  description?: string | null;
+  publishedOn?: string | null;
+  products?: (string | Product)[] | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
  */
 export interface Order {
@@ -809,39 +897,6 @@ export interface Order {
     | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tags".
- */
-export interface Tag {
-  id: string;
-  slug?: string | null;
-  title?: ('Ayurveda' | 'Yoga' | 'Blog') | null;
-  heading?: string | null;
-  description?: string | null;
-  button_name?: string | null;
-  button_link?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-collections".
- */
-export interface ProductCollection {
-  id: string;
-  slug?: string | null;
-  title: string;
-  description?: string | null;
-  publishedOn?: string | null;
-  products?: (string | Product)[] | null;
-  categories?: (string | Category)[] | null;
-  relatedProducts?: (string | Product)[] | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

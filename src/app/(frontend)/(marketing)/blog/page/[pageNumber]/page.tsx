@@ -1,7 +1,7 @@
 import type { Metadata } from 'next/types'
 
-import { CollectionArchive } from '@/components/payload/CollectionArchive'
-import { PageRange } from '@/components/payload/PageRange'
+import { PostArchive } from '@/components/marketing/blog/post-archive'
+import { PageRange } from '@/components/marketing/blog/pagination/page-range'
 import { Pagination } from '@/components/marketing/blog/pagination'
 import configPromise from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
@@ -37,7 +37,7 @@ export default async function Page({ params: { pageNumber = 2 } }) {
         />
       </div>
 
-      <CollectionArchive posts={posts.docs} />
+      <PostArchive posts={posts.docs} />
 
       <div className="container">
         {posts.totalPages > 1 && (

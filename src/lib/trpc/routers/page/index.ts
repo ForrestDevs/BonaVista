@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 
-import { COLLECTION_SLUG_PAGES } from '@/payload/collections/constants'
+import { PAGE_SLUG } from '@/payload/collections/constants'
 import { publicProcedure, router } from '@/lib/trpc'
 import ensurePath from '@/lib/utils/ensurePath'
 
@@ -24,7 +24,7 @@ export const pageRouter = router({
         if (slug !== '/') slug = ensurePath(slug).replace(/\/$/, '')
 
         const { docs } = await payload.find({
-          collection: COLLECTION_SLUG_PAGES,
+          collection: PAGE_SLUG,
           where: { slug: { equals: slug } },
           depth: 3,
         })
@@ -51,7 +51,7 @@ export const pageRouter = router({
   getAllPages: publicProcedure.query(async () => {
     try {
       const { docs } = await payload.find({
-        collection: COLLECTION_SLUG_PAGES,
+        collection: PAGE_SLUG,
         draft: false,
       })
 

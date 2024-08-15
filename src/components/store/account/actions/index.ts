@@ -1,5 +1,5 @@
 import getPayload from '@/lib/utils/getPayload'
-import { COLLECTION_SLUG_USERS } from '@/payload/collections/constants'
+import { USER_SLUG } from '@/payload/collections/constants'
 
 export async function logCustomerIn(_currentState: unknown, formData: FormData) {
   const email = formData.get('email') as string
@@ -9,7 +9,7 @@ export async function logCustomerIn(_currentState: unknown, formData: FormData) 
 
   try {
     await payload.login({
-      collection: COLLECTION_SLUG_USERS,
+      collection: USER_SLUG,
       data: {
         email,
         password,
@@ -30,7 +30,7 @@ export async function signUp(_currentState: unknown, formData: FormData) {
 
   try {
     await payload.create({
-      collection: COLLECTION_SLUG_USERS,
+      collection: USER_SLUG,
       data: {
         ...customer,
         roles: ['customer'],
@@ -38,7 +38,7 @@ export async function signUp(_currentState: unknown, formData: FormData) {
     })
 
     await payload.login({
-      collection: COLLECTION_SLUG_USERS,
+      collection: USER_SLUG,
       data: {
         email: customer.email,
         password: customer.password,

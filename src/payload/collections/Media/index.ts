@@ -6,13 +6,13 @@ import {
 } from '@payloadcms/richtext-lexical'
 import { anyone, authenticated } from '@/payload/access'
 import { urlField } from '../../fields/url'
-import { COLLECTION_SLUG_MEDIA } from '../constants'
+import { MEDIA_SLUG } from '../constants'
 
 export const Media: CollectionConfig = {
+  slug: MEDIA_SLUG,
   admin: {
     group: "Content"
   },
-  slug: COLLECTION_SLUG_MEDIA,
   access: {
     create: authenticated,
     delete: authenticated,

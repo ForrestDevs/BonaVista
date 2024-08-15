@@ -1,6 +1,6 @@
 import type { PayloadHandler } from 'payload'
 import type { CartItems } from '@/payload-types'
-import { COLLECTION_SLUG_USERS } from '../collections/constants'
+import { USER_SLUG } from '../collections/constants'
 import { stripe } from '@/payload/stripe'
 
 
@@ -17,7 +17,7 @@ export const createPaymentIntent: PayloadHandler = async (req): Promise<Response
 
   const fullUser = await payload.findByID({
     id: user?.id,
-    collection: COLLECTION_SLUG_USERS,
+    collection: USER_SLUG,
   })
 
   if (!fullUser) {

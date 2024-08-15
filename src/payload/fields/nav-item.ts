@@ -1,6 +1,7 @@
 import type { Field } from 'payload'
 
 import deepMerge from '../utilities/deepMerge'
+import { MEDIA_SLUG, PAGE_SLUG } from '../collections/constants'
 
 type NavItemType = (options?: {
   overrides?: Record<string, unknown>
@@ -34,7 +35,7 @@ export const navItem: NavItemType = ({ overrides = {} } = {}) => {
       },
       label: 'Document to link to',
       maxDepth: 1,
-      relationTo: ['pages'],
+      relationTo: [PAGE_SLUG],
       required: true,
     },
     {
@@ -68,7 +69,7 @@ export const navItem: NavItemType = ({ overrides = {} } = {}) => {
     {
       name: 'image',
       type: 'upload',
-      relationTo: 'media',
+      relationTo: MEDIA_SLUG,
       label: 'Link Image (optional)',
     },
     ...linkFields,

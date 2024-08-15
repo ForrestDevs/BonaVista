@@ -1,13 +1,13 @@
-import type { Config } from 'src/payload-types'
-
-import configPromise from '@payload-config'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { unstable_cache } from 'next/cache'
+import { CollectionSlug, DataFromCollectionSlug } from 'payload'
+import getPayload from './getPayload'
 
-type Collection = keyof Config['collections']
-
-async function getDocument(collection: Collection, slug: string, depth = 0) {
-  const payload = await getPayloadHMR({ config: configPromise })
+export async function getDocument<T extends CollectionSlug>(
+  collection: T,
+  slug: string,
+  depth = 0,
+): Promise<DataFromCollectionSlug<T> | null> {
+  const payload = await getPayload()
 
   const page = await payload.find({
     collection,
@@ -19,13 +19,28 @@ async function getDocument(collection: Collection, slug: string, depth = 0) {
     },
   })
 
-  return page.docs[0]
+  if (page.docs.length > 0) {
+    return page.docs[0]
+  }
+
+  return null
 }
 
 /**
  * Returns a unstable_cache function mapped with the cache tag for the slug
  */
-export const getCachedDocument = (collection: Collection, slug: string) =>
-  unstable_cache(async () => getDocument(collection, slug), [collection, slug], {
-    tags: [`${collection}_${slug}`],
-  })
+export async function getCachedDocument<T extends CollectionSlug>(
+  collection: T,
+  slug: string,
+  depth?: number,
+) {
+  const cache = unstable_cache(
+    async () => getDocument<T>(collection, slug, depth),
+    [collection, slug],
+    {
+      tags: [`${collection}_${slug}`],
+    },
+  )
+
+  return await cache()
+}

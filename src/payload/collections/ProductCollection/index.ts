@@ -1,10 +1,10 @@
 import type { CollectionConfig } from 'payload'
-import { COLLECTION_SLUG_PRODUCT_COLLECTIONS } from '../constants'
+import { PRODUCT_COLLECTION_SLUG, PRODUCT_SLUG } from '../constants'
 import { admin } from '@/payload/access'
 import { slugField } from '@/payload/fields/slug'
 
-export const ProductCollections: CollectionConfig = {
-  slug: COLLECTION_SLUG_PRODUCT_COLLECTIONS,
+export const ProductCollection: CollectionConfig = {
+  slug: PRODUCT_COLLECTION_SLUG,
   access: {
     create: admin,
     read: () => true,
@@ -16,8 +16,8 @@ export const ProductCollections: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title'],
     preview: (doc) => {
-      return `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/next/preview?url=${encodeURIComponent(
-        `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/products/${doc.slug}`,
+      return `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/api/preview?url=${encodeURIComponent(
+        `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/store/collections/${doc.slug}`,
       )}&secret=${process.env.PAYLOAD_PUBLIC_DRAFT_SECRET}`
     },
   },
@@ -67,30 +67,8 @@ export const ProductCollections: CollectionConfig = {
       label: 'Products',
       name: 'products',
       type: 'relationship',
-      relationTo: 'products',
+      relationTo: PRODUCT_SLUG,
       hasMany: true,
-    },
-    {
-      name: 'categories',
-      type: 'relationship',
-      relationTo: 'categories',
-      hasMany: true,
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'relatedProducts',
-      type: 'relationship',
-      relationTo: 'products',
-      hasMany: true,
-      filterOptions: ({ id }) => {
-        return {
-          id: {
-            not_in: [id],
-          },
-        }
-      },
     },
   ],
   timestamps: true,

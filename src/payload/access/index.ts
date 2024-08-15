@@ -1,6 +1,6 @@
 import type { Access } from 'payload'
 import type { FieldAccess } from 'payload'
-import { checkRole } from '../collections/Users/checkRole'
+import { checkRole } from '../collections/User/checkRole'
 import type { AccessArgs } from 'payload'
 import type { User } from '@/payload-types'
 

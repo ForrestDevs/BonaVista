@@ -1,5 +1,5 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
-import { checkRole } from '../collections/Users/checkRole'
+import { checkRole } from '../collections/User/checkRole'
 import { stripe } from '@/payload/stripe'
 
 const logs = process.env.LOGS_STRIPE_PROXY === '1'

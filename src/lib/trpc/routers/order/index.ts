@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
-import { COLLECTION_SLUG_ORDERS } from '@/payload/collections/constants'
+import { ORDER_SLUG } from '@/payload/collections/constants'
 import { publicProcedure, router } from '@/lib/trpc'
 import getPayload from '@/lib/utils/getPayload'
 
@@ -18,7 +18,7 @@ export const orderRouter = router({
         const { id } = input
 
         const { docs } = await payload.find({
-          collection: COLLECTION_SLUG_ORDERS,
+          collection: ORDER_SLUG,
           where: { id: { equals: id } },
         })
 

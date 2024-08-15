@@ -1,6 +1,6 @@
 import { unstable_cache } from 'next/cache'
 import getPayload from '@/lib/utils/getPayload'
-import { COLLECTION_SLUG_PRODUCTS } from '@/payload/collections/constants'
+import { PRODUCT_SLUG } from '@/payload/collections/constants'
 import { PaginatedDocs } from 'payload'
 import { Product } from '@payload-types'
 
@@ -11,7 +11,7 @@ export const searchProducts = unstable_cache(uncachedSearchProducts, ['search', 
 async function uncachedSearchProducts(query: string) {
   const payload = await getPayload()
   const products = await payload.find({
-    collection: COLLECTION_SLUG_PRODUCTS,
+    collection: PRODUCT_SLUG,
     limit: 100,
   })
   const searchResults = simpleSearch(products, query)

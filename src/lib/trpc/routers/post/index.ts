@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { publicProcedure, router } from '@/lib/trpc'
 import getPayload from '@/lib/utils/getPayload'
-import { COLLECTION_SLUG_POSTS, COLLECTION_SLUG_TAGS } from '@/payload/collections/constants'
+import { POST_SLUG, POST_TAG_SLUG } from '@/payload/collections/constants'
 
 const payload = await getPayload()
 
@@ -10,7 +10,7 @@ export const postRouter = router({
     const { page } = input
     try {
       const { docs, hasPrevPage, hasNextPage, totalPages } = await payload.find({
-        collection: COLLECTION_SLUG_POSTS,
+        collection: POST_SLUG,
         depth: 5,
         page: page,
         limit: 6,
@@ -27,7 +27,7 @@ export const postRouter = router({
   getAllPostsWithoutPagination: publicProcedure.query(async () => {
     try {
       const { docs } = await payload.find({
-        collection: COLLECTION_SLUG_POSTS,
+        collection: POST_SLUG,
         pagination: false,
         draft: false,
       })
@@ -45,7 +45,7 @@ export const postRouter = router({
       try {
         const { slug, page } = input
         const { docs: tagData } = await payload.find({
-          collection: COLLECTION_SLUG_TAGS,
+          collection: POST_TAG_SLUG,
           where: {
             slug: {
               equals: slug,
@@ -62,7 +62,7 @@ export const postRouter = router({
           hasPrevPage,
           totalPages,
         } = await payload.find({
-          collection: COLLECTION_SLUG_POSTS,
+          collection: POST_SLUG,
           where: {
             'tags.value': {
               equals: tagData?.at(0)?.id,
@@ -84,7 +84,7 @@ export const postRouter = router({
       try {
         const { slug } = input
         const { docs: tagData } = await payload.find({
-          collection: COLLECTION_SLUG_TAGS,
+          collection: POST_TAG_SLUG,
           where: {
             slug: {
               equals: slug,
@@ -96,7 +96,7 @@ export const postRouter = router({
           return
         }
         const { docs: blogsData } = await payload.find({
-          collection: COLLECTION_SLUG_POSTS,
+          collection: POST_SLUG,
           where: {
             'tags.value': {
               equals: tagData?.at(0)?.id,
@@ -119,7 +119,7 @@ export const postRouter = router({
     .query(async ({ input }) => {
       try {
         const { docs } = await payload.find({
-          collection: COLLECTION_SLUG_POSTS,
+          collection: POST_SLUG,
           draft: false,
           where: {
             slug: {

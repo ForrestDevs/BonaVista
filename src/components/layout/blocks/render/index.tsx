@@ -6,6 +6,7 @@ import { ContentBlock } from '@/components/layout/blocks/content'
 import { FormBlock } from '@/components/layout/blocks/form'
 import { MediaBlock } from '@/components/layout/blocks/media'
 import { toKebabCase } from '@/lib/utils/toKebabCase'
+import { ProductArchiveBlock } from '../product-archive'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -13,6 +14,7 @@ const blockComponents = {
   cta: CallToActionBlock,
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
+  'product-archive': ProductArchiveBlock,
 }
 
 export const Blocks: React.FC<{

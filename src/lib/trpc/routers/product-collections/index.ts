@@ -2,8 +2,8 @@ import { z } from 'zod'
 import { publicProcedure, router } from '@/lib/trpc'
 import getPayload from '@/lib/utils/getPayload'
 import {
-  COLLECTION_SLUG_PRODUCT_COLLECTIONS,
-  COLLECTION_SLUG_PRODUCTS,
+  PRODUCT_COLLECTION_SLUG,
+  PRODUCT_SLUG,
 } from '@/payload/collections/constants'
 
 const payload = await getPayload()
@@ -19,7 +19,7 @@ export const productRouter = router({
     .query(async ({ input }) => {
       try {
         const collection = await payload.find({
-          collection: COLLECTION_SLUG_PRODUCT_COLLECTIONS,
+          collection: PRODUCT_COLLECTION_SLUG,
           where: {
             id: {
               equals: input.id,
@@ -41,7 +41,7 @@ export const productRouter = router({
     )
     .query(async ({ input }) => {
       const collections = await payload.find({
-        collection: COLLECTION_SLUG_PRODUCT_COLLECTIONS,
+        collection: PRODUCT_COLLECTION_SLUG,
         limit: input.limit,
       })
       return collections
@@ -55,7 +55,7 @@ export const productRouter = router({
     .query(async ({ input }) => {
       try {
         const collection = await payload.find({
-          collection: COLLECTION_SLUG_PRODUCT_COLLECTIONS,
+          collection: PRODUCT_COLLECTION_SLUG,
           where: {
             slug: {
               equals: input.slug,
@@ -81,7 +81,7 @@ export const productRouter = router({
     .query(async ({ input }) => {
       try {
         const products = payload.find({
-          collection: COLLECTION_SLUG_PRODUCTS,
+          collection: PRODUCT_SLUG,
           where: {
             'collection.slug': {
               equals: input.slug,

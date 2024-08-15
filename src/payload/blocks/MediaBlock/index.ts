@@ -1,3 +1,4 @@
+import { MEDIA_SLUG } from '@/payload/collections/constants'
 import type { Block } from 'payload'
 
 export const MediaBlock: Block = {
@@ -21,7 +22,7 @@ export const MediaBlock: Block = {
     {
       name: 'media',
       type: 'upload',
-      relationTo: 'media',
+      relationTo: MEDIA_SLUG,
       required: true,
     },
   ],

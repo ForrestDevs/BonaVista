@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { router, userProcedure } from '@/lib/trpc'
 import getPayload from '@/lib/utils/getPayload'
-import { COLLECTION_SLUG_USERS } from '@/payload/collections/constants'
+import { USER_SLUG } from '@/payload/collections/constants'
 import { getFieldsToSign } from 'payload'
 
 const payload = await getPayload()
@@ -77,7 +77,7 @@ export const accountRouter = router({
     const { user } = ctx
 
     const { docs } = await payload.find({
-      collection: COLLECTION_SLUG_USERS,
+      collection: USER_SLUG,
       where: {
         id: {
           equals: user.id,

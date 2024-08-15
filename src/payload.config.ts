@@ -18,11 +18,11 @@ import { UnderlineFeature } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
-import { Categories } from './payload/collections/Categories'
+import { ProductCategory } from './payload/collections/ProductCategory'
 import { Media } from './payload/collections/Media'
-import { Pages } from './payload/collections/Pages'
-import { Posts } from './payload/collections/Posts'
-import { Users } from './payload/collections/Users'
+import { Pages } from './payload/collections/Page'
+import { Posts } from './payload/collections/Post'
+import { User } from './payload/collections/User'
 import BeforeDashboard from './payload/components/BeforeDashboard'
 import BeforeLogin from './payload/components/BeforeLogin'
 import { seed } from './payload/endpoints/seed'
@@ -31,16 +31,16 @@ import { Header } from './payload/globals/Header'
 import { revalidateRedirects } from './payload/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { Page, Post } from 'src/payload-types'
-import { Orders } from './payload/collections/Orders'
-import { Products } from './payload/collections/Products'
-import { Tags } from './payload/collections/Tags'
+import { Orders } from './payload/collections/Order'
+import { Product } from './payload/collections/Product'
+import { PostTag } from './payload/collections/PostTag'
 import { createPaymentIntent } from './payload/endpoints/create-payment-intent'
 import { customersProxy } from './payload/endpoints/customers'
 import { productsProxy } from './payload/endpoints/products'
 import { productUpdated } from './payload/stripe/webhooks/productUpdated'
 import { priceUpdated } from './payload/stripe/webhooks/priceUpdated'
 import { Settings } from './payload/globals/Settings'
-import { ProductCollections } from './payload/collections/ProductCollection'
+import { ProductCollection } from './payload/collections/ProductCollection'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -65,7 +65,7 @@ export default buildConfig({
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeDashboard` statement on line 15.
       // beforeDashboard: [BeforeDashboard],
     },
-    user: Users.slug,
+    user: User.slug,
     livePreview: {
       breakpoints: [
         {
@@ -124,7 +124,7 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || '',
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Orders, Products, Tags, ProductCollections],
+  collections: [Pages, Posts, Media, ProductCategory, User, Orders, Product, PostTag, ProductCollection],
   cors: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ''].filter(Boolean),
   csrf: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ''].filter(Boolean),
   endpoints: [
