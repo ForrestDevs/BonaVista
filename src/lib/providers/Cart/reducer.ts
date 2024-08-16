@@ -3,10 +3,12 @@ import { CartAction, CartItem, CartType } from '@/lib/types/cart'
 export const cartReducer = (cart: CartType, action: CartAction): CartType => {
   switch (action.type) {
     case 'SET_CART': {
+      console.log('Setting cart', action)
       return action.payload
     }
 
     case 'MERGE_CART': {
+      console.log('Merging cart', action)
       const { payload: incomingCart } = action
 
       const syncedItems: CartItem[] = [
@@ -39,6 +41,7 @@ export const cartReducer = (cart: CartType, action: CartAction): CartType => {
     }
 
     case 'ADD_ITEM': {
+      console.log('Adding item to cart', action)
       // if the item is already in the cart, increase the quantity
       const { payload: incomingItem } = action
       const productId =
@@ -68,6 +71,7 @@ export const cartReducer = (cart: CartType, action: CartAction): CartType => {
     }
 
     case 'DELETE_ITEM': {
+      console.log('Deleting item from cart', action)
       const { payload: incomingProduct } = action
       const withDeletedItem = { ...cart }
 
@@ -84,6 +88,7 @@ export const cartReducer = (cart: CartType, action: CartAction): CartType => {
     }
 
     case 'CLEAR_CART': {
+      console.log('Clearing cart')
       return {
         ...cart,
         items: [],

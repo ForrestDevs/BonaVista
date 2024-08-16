@@ -146,11 +146,11 @@ export default async function ProductDetail({ params }: Props) {
               {product.images?.map((image, index) => (
                 <CarouselItem key={index}>
                   <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
-                    <img
+                    {/* <img
                       src={image.image?.toString() || ''}
                       alt={`${product.title} ${index + 1}`}
                       className="h-full w-full object-cover object-center"
-                    />
+                    /> */}
                   </div>
                 </CarouselItem>
               ))}

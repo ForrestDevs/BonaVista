@@ -2,18 +2,16 @@ import { Button } from '@/components/ui/button'
 import { YnsLink } from '@/components/ui/link'
 import { ResponsiveDrawer } from '@/components/shop/layout/responsive-drawer'
 import CartModalPage from './cart'
+import CartClose from './cart-close'
+import { DialogClose } from '@/components/ui/dialog'
+import Link from 'next/link'
 
-export default function CartModalPageFoo() {
+export default function CartOverlay() {
   return (
     <ResponsiveDrawer>
-      <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Cart</h2>
-          <YnsLink href="/shop/cart" className="text-sm text-muted-foreground underline">
-            Open full view
-          </YnsLink>
-        </div>
+      <CartHeader />
 
+      <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
         <div className="mt-8">
           <CartModalPage />
           {/* <ul role="list" className="-my-6 divide-y divide-neutral-200">
@@ -24,16 +22,33 @@ export default function CartModalPageFoo() {
         </div>
       </div>
 
-      <div className="border-t px-4 py-6 sm:px-6">
-        <div id="cart-overlay-description" className="flex justify-between text-base font-medium">
-          <p>Total</p>
-          <p>$100</p>
-        </div>
-        <p className="mt-0.5 text-sm text-neutral-500">Shipping and taxes info</p>
-        <Button asChild={true} size={'lg'} className="mt-6 w-full rounded-full text-lg">
-          <YnsLink href="/shop/cart">Go to payment</YnsLink>
-        </Button>
-      </div>
+      <CartFooter />
     </ResponsiveDrawer>
+  )
+}
+
+function CartHeader() {
+  return (
+    <div className="px-4 py-6 border-b flex items-center justify-between">
+      <h2 className="text-lg font-semibold">Your Cart</h2>
+      <YnsLink href="/shop/cart" className="text-sm text-muted-foreground underline">
+        Open full view
+      </YnsLink>
+    </div>
+  )
+}
+
+function CartFooter() {
+  return (
+    <div className="p-4 border-t">
+      <div className="flex justify-between items-center mb-4">
+        <span className="text-sm font-medium">Subtotal</span>
+        <span className="text-lg font-semibold">$137.21</span>
+      </div>
+      <Link href="/shop/checkout">
+        <Button className="w-full mb-2">Proceed to Checkout</Button>
+      </Link>
+      <CartClose />
+    </div>
   )
 }

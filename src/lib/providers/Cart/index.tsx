@@ -1,12 +1,13 @@
 'use client'
 
 import React, { useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react'
-import type { Product } from '@/payload-types'
+import type { Product, User } from '@/payload-types'
 import { useAuth } from '@payloadcms/ui'
 import { cartReducer } from './reducer'
 import { CartContext } from './context'
 import { arrayHasItems, flattenCart } from '@/lib/utils/cart'
 import { CartTotalState } from '@/lib/types/cart'
+import { getMeUser } from '@/lib/utils/getMeUser'
 
 // Step 1: Check local storage for a cart
 // Step 2: If there is a cart, fetch the products and hydrate the cart
@@ -15,7 +16,16 @@ import { CartTotalState } from '@/lib/types/cart'
 // Step 4B: Sync the cart to Payload and clear local storage
 // Step 5: If the user is logged out, sync the cart to local storage only
 export default function CartProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth()
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { user } = await getMeUser()
+      setUser(user)
+    }
+    fetchUser()
+  }, [])
+
   const hasInitialized = useRef(false)
   const [cart, dispatchCart] = useReducer(cartReducer, {})
   const [total, setTotal] = useState<CartTotalState>({
@@ -27,8 +37,9 @@ export default function CartProvider({ children }: { children: React.ReactNode }
   // Check local storage for a cart
   // If there is a cart, fetch the products and hydrate the cart
   useEffect(() => {
+    console.log('Initializing cart', user)
     // wait for the user to be defined before initializing the cart
-    if (user === undefined) return
+    if (user === null) return
     if (!hasInitialized.current) {
       hasInitialized.current = true
 
@@ -74,9 +85,10 @@ export default function CartProvider({ children }: { children: React.ReactNode }
   // authenticate the user and if logged in, merge the user's cart with local state
   // only do this after we have initialized the cart to ensure we don't lose any items
   useEffect(() => {
+    console.log('Authenticating user', user)
     if (!hasInitialized.current) return
 
-    if (user && user?.cart?.items?.length > 0) {
+    if (user && user?.cart?.items?.length) {
       // merge the user's cart with the local state upon logging in
       dispatchCart({
         type: 'MERGE_CART',
@@ -95,6 +107,7 @@ export default function CartProvider({ children }: { children: React.ReactNode }
   // every time the cart changes, determine whether to save to local storage or Payload based on authentication status
   // upon logging in, merge and sync the existing local cart to Payload
   useEffect(() => {
+    console.log('Syncing cart')
     // wait until we have attempted authentication (the user is either an object or `null`)
     if (!hasInitialized.current || user === undefined || !cart?.items) return
 
@@ -157,6 +170,7 @@ export default function CartProvider({ children }: { children: React.ReactNode }
 
   // this method can be used to add new items AND update existing ones
   const addItemToCart = useCallback((incomingItem: any) => {
+    console.log('Adding item to cart', incomingItem)
     dispatchCart({
       type: 'ADD_ITEM',
       payload: incomingItem,
@@ -164,6 +178,7 @@ export default function CartProvider({ children }: { children: React.ReactNode }
   }, [])
 
   const deleteItemFromCart = useCallback((incomingProduct: Product) => {
+    console.log('Deleting item from cart', incomingProduct)
     dispatchCart({
       type: 'DELETE_ITEM',
       payload: incomingProduct,
@@ -171,6 +186,7 @@ export default function CartProvider({ children }: { children: React.ReactNode }
   }, [])
 
   const clearCart = useCallback(() => {
+    console.log('Clearing cart')
     dispatchCart({
       type: 'CLEAR_CART',
     })
@@ -178,6 +194,7 @@ export default function CartProvider({ children }: { children: React.ReactNode }
 
   // calculate the new cart total whenever the cart changes
   useEffect(() => {
+    console.log('Calculating cart total')
     if (!hasInitialized) return
 
     const newTotal =

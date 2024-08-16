@@ -1,10 +1,6 @@
-import type { Product, User } from '@payload-types'
+import type { Product, User, CartItems } from '@payload-types'
 
-export type CartItem = {
-  product?: (string | null) | Product
-  quantity?: number | null
-  id?: string | null
-}
+export type CartItem = Exclude<NonNullable<CartItems>[number], null>
 
 export type CartType = User['cart']
 

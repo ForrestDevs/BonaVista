@@ -1,6 +1,6 @@
-import SkeletonOrderConfirmedHeader from '@/components/skeletons/components/skeleton-order-confirmed-header'
-import SkeletonOrderInformation from '@/components/skeletons/components/skeleton-order-information'
-import SkeletonOrderItems from '@/components/skeletons/components/skeleton-order-items'
+import SkeletonOrderConfirmedHeader from '../../components/skeleton-order-confirmed-header'
+import SkeletonOrderItems from '../../components/skeleton-order-items'
+import SkeletonOrderInformation from '../../components/skeleton-order-information'
 
 const SkeletonOrderConfirmed = () => {
   return (

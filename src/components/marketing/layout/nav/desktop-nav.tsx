@@ -14,7 +14,9 @@ import {
 } from '@/components/ui/navigation-menu'
 
 export default async function DesktopNav() {
-  const header: Header = await getCachedGlobal('header')()
+  const header = await getCachedGlobal<"header">('header')
+
+  if (!header) return null
 
   return (
     <div className="mr-4 hidden gap-2 md:flex">

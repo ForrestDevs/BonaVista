@@ -2,7 +2,7 @@ import type { PayloadHandler } from 'payload'
 import type { CartItems } from '@/payload-types'
 import { USER_SLUG } from '../collections/constants'
 import { stripe } from '@/payload/stripe'
-
+import { CartItem } from '@/lib/types/cart'
 
 // this endpoint creates a `PaymentIntent` with the items in the cart
 // to do this, we loop through the items in the cart and lookup the product in Stripe
@@ -18,7 +18,10 @@ export const createPaymentIntent: PayloadHandler = async (req): Promise<Response
   const fullUser = await payload.findByID({
     id: user?.id,
     collection: USER_SLUG,
+    depth: 1,
   })
+
+  console.log("Full User", JSON.stringify(fullUser, null, 2))
 
   if (!fullUser) {
     return new Response('User not found', { status: 404 })
@@ -30,8 +33,8 @@ export const createPaymentIntent: PayloadHandler = async (req): Promise<Response
     // lookup user in Stripe and create one if not found
     if (!stripeCustomerID) {
       const customer = await stripe.customers.create({
-        name: fullUser?.name,
-        email: fullUser?.email,
+        name: fullUser?.name || '',
+        email: fullUser?.email || '',
       })
 
       stripeCustomerID = customer.id
@@ -47,7 +50,7 @@ export const createPaymentIntent: PayloadHandler = async (req): Promise<Response
 
     let total = 0
 
-    const hasItems = fullUser?.cart?.items?.length > 0
+    const hasItems = fullUser.cart?.items?.length ?? 0 > 0
 
     if (!hasItems) {
       throw new Error('No items in cart')
@@ -55,20 +58,21 @@ export const createPaymentIntent: PayloadHandler = async (req): Promise<Response
 
     // for each item in cart, lookup the product in Stripe and add its price to the total
     await Promise.all(
-      fullUser?.cart?.items?.map(async (item: CartItems[0]): Promise<Response> => {
+      (fullUser.cart?.items ?? []).map(async (item: CartItem): Promise<Response> => {
         const { product, quantity } = item
 
         if (!quantity) {
-          return null
+          return new Response('No quantity', { status: 400 })
         }
 
-        if (typeof product === 'string' || !product?.stripeProductID) {
-          throw new Error('No Stripe Product ID')
-        }
+        // if (typeof product === 'string' || product?.stripeProductID) {
+        //   throw new Error('No Stripe Product ID')
+        // }
 
         const prices = await stripe.prices.list({
           expand: ['data.product'],
           limit: 100,
+          // @ts-ignore
           product: product.stripeProductID,
         })
 
@@ -77,9 +81,9 @@ export const createPaymentIntent: PayloadHandler = async (req): Promise<Response
         }
 
         const price = prices.data[0]
-        total += price.unit_amount * quantity
+        total += (price.unit_amount ?? 0) * quantity
 
-        return null
+        return new Response(null)
       }),
     )
 

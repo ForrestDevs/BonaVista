@@ -4,7 +4,10 @@ import getPayload from './getPayload'
 
 type Global = keyof Config['globals']
 
-async function getGlobal(slug: Global, depth = 0) {
+export async function getGlobal<T extends Global>(
+  slug: T,
+  depth = 0,
+): Promise<Config['globals'][T] | null> {
   const payload = await getPayload()
 
   const global = await payload.findGlobal({
@@ -18,7 +21,17 @@ async function getGlobal(slug: Global, depth = 0) {
 /**
  * Returns a unstable_cache function mapped with the cache tag for the slug
  */
-export const getCachedGlobal = (slug: Global, depth = 0) =>
-  unstable_cache(async () => getGlobal(slug, depth), [slug], {
-    tags: [`global_${slug}`],
-  })
+export async function getCachedGlobal<T extends Global>(
+  slug: T,
+  depth?: number,
+) {
+  const cache = unstable_cache(
+    async () => getGlobal<T>(slug, depth),
+    [slug],
+    {
+      tags: [`global_${slug}`],
+    },
+  )
+
+  return await cache()
+}
