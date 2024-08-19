@@ -1,6 +1,6 @@
 'use client'
 
-import { Select, CopyToClipboard, TextField, useField } from '@payloadcms/ui'
+import { Select, CopyToClipboard, TextField, useField, useDocumentInfo, useForm } from '@payloadcms/ui'
 import { useState, useEffect, use } from 'react'
 
 type OptionsType = {
@@ -12,41 +12,78 @@ export function PriceSelect(props: typeof TextField) {
   const { name } = props
   const [options, setOptions] = useState<OptionsType[]>([])
   const { value, setValue } = useField({ path: name })
+  const { getDataByPath} = useForm()
+
+  const stripeProductID = getDataByPath("stripeProductID")
+
   useEffect(() => {
-    const getStripeProductPrices = async () => {
-      const pricesFetch = await fetch('/api/stripe/prices', {
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      const res = await pricesFetch.json()
-
-      console.log('res', res)
-
-      if (res?.data) {
-        const fetchedProducts = res.data.reduce(
-          (acc: any, item: any) => {
-            acc.push({
-              label: item.name || item.id,
-              value: item.id,
-            })
-            return acc
-          },
-          [
-            {
-              label: 'Select a product',
-              value: '',
+    const fetchPrices = async () => {
+      if (stripeProductID) {
+        try {
+          const pricesFetch = await fetch(`/api/stripe/prices?product=${stripeProductID}`, {
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
             },
-          ],
-        )
-        setOptions(fetchedProducts)
-      }
-    }
+          });
 
-    getStripeProductPrices()
-  }, [])
+          const res = await pricesFetch.json();
+
+          if (res?.data) {
+            const fetchedPrices = res.data.map((item: any) => ({
+              label: `${item.nickname || item.id} - ${new Intl.NumberFormat('en-US', { style: 'currency', currency: item.currency }).format(item.unit_amount / 100)}`,
+              value: item.id,
+            }));
+
+            setOptions([
+              { label: 'Select a price', value: '' },
+              ...fetchedPrices,
+            ]);
+          }
+        } catch (error) {
+          console.error('Error fetching prices:', error);
+        }
+      }
+    };
+
+    fetchPrices();
+  }, [stripeProductID]);
+ 
+  // useEffect(() => {
+  //   const getStripeProductPrices = async () => {
+  //     const pricesFetch = await fetch('/api/stripe/prices', {
+  //       credentials: 'include',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     })
+
+  //     const res = await pricesFetch.json()
+
+  //     console.log('res', res)
+
+  //     if (res?.data) {
+  //       const fetchedProducts = res.data.reduce(
+  //         (acc: any, item: any) => {
+  //           acc.push({
+  //             label: item.name || item.id,
+  //             value: item.id,
+  //           })
+  //           return acc
+  //         },
+  //         [
+  //           {
+  //             label: 'Select a product',
+  //             value: '',
+  //           },
+  //         ],
+  //       )
+  //       setOptions(fetchedProducts)
+  //     }
+  //   }
+
+  //   getStripeProductPrices()
+  // }, [])
 
   const href = `https://dashboard.stripe.com/${
     process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''

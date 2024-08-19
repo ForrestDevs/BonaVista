@@ -1,3 +1,5 @@
+'use client'
+
 import { useFormState } from 'react-dom'
 import { LOGIN_VIEW } from './layout/login-layout'
 import { Input } from '@/components/ui/input'

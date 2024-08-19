@@ -1,5 +1,55 @@
+'use server'
+
 import getPayload from '@/lib/utils/getPayload'
 import { USER_SLUG } from '@/payload/collections/constants'
+import { redirect } from 'next/navigation'
+import { headers as getHeaders } from 'next/headers'
+import type { User } from '@payload-types'
+import { ORDER_SLUG } from '@/payload/collections/constants'
+
+export async function signOut() {
+  await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/logout`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  redirect(`/shop/account`)
+}
+
+export async function getCurrentUser() {
+  const payload = await getPayload()
+  const headers = await getHeaders()
+  const { user } = await payload.auth({ headers })
+
+  if (!user) {
+    return null
+  }
+
+  return user as User
+}
+
+export async function getCurrentUserOrders() {
+  const payload = await getPayload()
+  const user = await getCurrentUser()
+
+  if (!user) {
+    return null
+  }
+
+  const orders = await payload.find({
+    collection: ORDER_SLUG,
+    where: {
+      orderedBy: {
+        equals: user.id,
+      },
+    },
+  })
+
+  return orders
+}
 
 export async function logCustomerIn(_currentState: unknown, formData: FormData) {
   const email = formData.get('email') as string

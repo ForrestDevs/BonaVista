@@ -41,6 +41,7 @@ import { productUpdated } from './payload/stripe/webhooks/productUpdated'
 import { priceUpdated } from './payload/stripe/webhooks/priceUpdated'
 import { Settings } from './payload/globals/Settings'
 import { ProductCollection } from './payload/collections/ProductCollection'
+import { pricesProxy } from './payload/endpoints/prices'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -122,9 +123,21 @@ export default buildConfig({
     },
   }),
   db: mongooseAdapter({
-    url: process.env.DATABASE_URI || '',
+    url:
+      process.env.DATABASE_URI ||
+      'mongodb+srv://adminUser:adminPassword@bvcluster.rj022dr.mongodb.net/?retryWrites=true&w=majority&appName=bvCluster',
   }),
-  collections: [Pages, Posts, Media, ProductCategory, User, Orders, Product, PostTag, ProductCollection],
+  collections: [
+    Pages,
+    Posts,
+    Media,
+    ProductCategory,
+    User,
+    Orders,
+    Product,
+    PostTag,
+    ProductCollection,
+  ],
   cors: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ''].filter(Boolean),
   csrf: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ''].filter(Boolean),
   endpoints: [
@@ -143,6 +156,11 @@ export default buildConfig({
       method: 'get',
       path: '/stripe/products',
     },
+    {
+      handler: pricesProxy,
+      method: 'get',
+      path: '/stripe/prices',
+    },
     // The seed endpoint is used to populate the database with some example data
     // You should delete this endpoint before deploying your site to production
     // {
@@ -154,10 +172,10 @@ export default buildConfig({
   globals: [Header, Footer, Settings],
   plugins: [
     stripePlugin({
-      isTestKey: Boolean(process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY),
-      rest: false,
       stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
       stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOKS_SIGNING_SECRET,
+      isTestKey: Boolean(process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY),
+      rest: false,
       webhooks: {
         'price.updated': priceUpdated,
         'product.created': productUpdated,
@@ -168,7 +186,7 @@ export default buildConfig({
       collections: ['pages', 'posts'],
       overrides: {
         admin: {
-          group: "Forms"
+          group: 'Forms',
         },
         // @ts-expect-error
         fields: ({ defaultFields }) => {
@@ -202,12 +220,12 @@ export default buildConfig({
       },
       formSubmissionOverrides: {
         admin: {
-          group: "Forms",
-        }
+          group: 'Forms',
+        },
       },
       formOverrides: {
         admin: {
-          group: "Forms",
+          group: 'Forms',
         },
         fields: ({ defaultFields }) => {
           return defaultFields.map((field) => {
@@ -234,12 +252,18 @@ export default buildConfig({
       collections: {
         ['media']: true,
       },
-      bucket: process.env.S3_BUCKET || '',
+      bucket: process.env.S3_BUCKET || 'bonavista',
       config: {
-        endpoint: process.env.S3_ENDPOINT || '',
+        endpoint:
+          // process.env.S3_ENDPOINT ||
+          'https://0cfae28bf40e0c4d144f531d5343ec0b.r2.cloudflarestorage.com/bonavista',
         credentials: {
-          accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+          accessKeyId: 
+          // process.env.S3_ACCESS_KEY_ID || 
+          '12967cfdb3c3699eac9e04631ad60eed',
+          secretAccessKey:
+            // process.env.S3_SECRET_ACCESS_KEY ||
+            '762147e6fba455ad0fcfefecfbd39a5b043837b39b7dd29db21072a2e03d44b5',
         },
         region: process.env.S3_REGION || '',
       },

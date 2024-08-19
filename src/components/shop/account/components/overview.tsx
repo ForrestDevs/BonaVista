@@ -17,13 +17,13 @@ type OverviewProps = {
 
 const Overview = ({ customer, orders }: OverviewProps) => {
   return (
-    <div data-testid="overview-page-wrapper">
-      <div className="hidden small:block">
-        <div className="text-xl-semi flex justify-between items-center mb-4">
-          <span data-testid="welcome-message" data-value={customer?.name}>
+    <div className="w-full">
+      <div className="">
+        <div className="text-xl-semi flex justify-between items-center mb-4 bg-red-500">
+          <span className="text-gray-500" data-testid="welcome-message" data-value={customer?.name}>
             Hello {customer?.name}
           </span>
-          <span className="text-small-regular text-ui-fg-base">
+          <span className="text-sm text-gray-500">
             Signed in as:{' '}
             <span
               className="font-semibold"
@@ -34,6 +34,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
             </span>
           </span>
         </div>
+
         <div className="flex flex-col py-8 border-t border-gray-200">
           <div className="flex flex-col gap-y-4 h-full col-span-1 row-span-2 flex-1">
             <div className="flex items-start gap-x-16 mb-6">
@@ -113,6 +114,8 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                 )}
               </ul>
             </div>
+
+
           </div>
         </div>
       </div>

@@ -46,6 +46,7 @@ export const cartReducer = (cart: CartType, action: CartAction): CartType => {
       const { payload: incomingItem } = action
       const productId =
         typeof incomingItem.product === 'string' ? incomingItem.product : incomingItem?.product?.id
+      const variantId = incomingItem.variant?.id
 
       const indexInCart = cart?.items?.findIndex(({ product }) =>
         typeof product === 'string' ? product === productId : product?.id === productId,

@@ -10,28 +10,8 @@
   h4,
   h5,
   h6 {
-    font-family: 'Raleway', sans-serif;
+    /* font-family: 'Raleway', sans-serif; */
     font-weight: 800; /* ExtraBold for h1, default */
-  }
-
-  h2 {
-    font-weight: 700; /* Bold */
-  }
-
-  h3 {
-    font-weight: 700; /* Bold */
-  }
-
-  h4 {
-    font-weight: 500; /* Medium */
-  }
-
-  h5 {
-    font-weight: 500; /* Medium */
-  }
-
-  h6 {
-    font-weight: 500; /* Medium */
   }
 
   body,
@@ -39,10 +19,28 @@
   a,
   button {
     font-family: 'Raleway', sans-serif;
+    color: var(--color-charcoal);
     font-weight: 400; /* Regular for body text */
   }
 
+  /* Typography
+body {
+  font-family: 'Roboto', sans-serif; Secondary font for body text
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif; Primary font for headings
+} */
+
   :root {
+    --color-charcoal: #2C3E50;
+    --color-navy: #1E3A5F;
+    --color-dark-green: #1E4C3C;
+    --color-copper: #B87333;
+    --color-flame: #E4572E;
+    --color-beige: #F5F3EF;
+    --color-stone: #D2D2D2;
+
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -95,5 +93,11 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   }
 }

@@ -53,19 +53,19 @@ export const priceUpdated: StripeWebhookHandler<{
       product: stripeProductID,
     })
 
-    await payload.update({
-      id: payloadProductID,
-      collection: 'products',
-      data: {
-        priceJSON: JSON.stringify(stripePrices),
-        skipSync: true,
-      },
-    })
+    if (payloadProductID) {
+      await payload.update({
+        id: payloadProductID,
+        collection: 'products',
+        data: {
+          priceJSON: JSON.stringify(stripePrices),
+          skipSync: true,
+        },
+      })
+    }
 
     if (logs) payload.logger.info(`✅ Successfully updated product price.`)
   } catch (error: unknown) {
     payload.logger.error(`- Error updating product price: ${error}`)
   }
 }
-
-

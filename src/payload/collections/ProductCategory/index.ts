@@ -43,12 +43,6 @@ export const ProductCategory: CollectionConfig = {
       name: 'description',
       type: 'text',
     },
-    {
-      name: 'products',
-      type: 'relationship',
-      relationTo: PRODUCT_SLUG,
-      hasMany: true,
-    },
   ],
   timestamps: true,
 } as const

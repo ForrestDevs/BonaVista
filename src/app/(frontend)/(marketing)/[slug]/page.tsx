@@ -27,7 +27,7 @@ export async function generateStaticParams() {
     .map(({ slug }) => slug)
 }
 
-export default async function Page({ params: { slug = '' } }) {
+export default async function Page({ params: { slug = 'home' } }) {
   const url = '/' + slug
 
   let page: PageType | null

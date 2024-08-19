@@ -15,6 +15,9 @@ import {
 } from '@/components/ui/select'
 import { Product, ProductVariants } from '@payload-types'
 import { ProductVariant } from '@/lib/types/product'
+import Image from 'next/image'
+import { Media } from '@/components/layout/media'
+import { Media as MediaType } from '@payload-types'
 
 // type ProductVariant = {
 //   size: string
@@ -47,11 +50,25 @@ export function ProductCard({ product }: { product: Product }) {
     <Link href={`/shop/product/${product.slug}`} passHref>
       <Card className="cursor-pointer group transition-all duration-300 hover:shadow-lg">
         <CardHeader className="p-0 relative overflow-hidden">
-          <img
+          <Media
+            resource={product.images?.[0]?.image as MediaType}
+            imgClassName="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+
+          {/* <img
             src={product.images?.at(0)?.image?.toString() || ''}
             alt={product.title}
-            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-          />
+            className=""
+          /> */}
+
+          {/* {product.images && <>Has</>}
+          {!product.images?.[0]?.image && <div className="w-full h-48 bg-gray-200">No image</div>}
+          {product.images?.[0]?.image && typeof product.images?.[0]?.image !== 'string' && (
+            <Media fill imgClassName="object-cover" resource={product.images?.[0]?.image} />
+          )} */}
+
+          {/* <Media fill imgClassName="object-cover" resource={product.images?.[0]?.image as MediaType} /> */}
+
           <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <InfoIcon className="h-5 w-5 text-blue-600" />
           </div>

@@ -4,22 +4,17 @@ import type { User } from '@payload-types'
 import { cn } from '@/lib/utils/cn'
 import { useParams, usePathname } from 'next/navigation'
 import { User as UserIcon, MapPin, Package, ChevronDown, ArrowRightSquare } from 'lucide-react'
-import { useAuth } from '@payloadcms/ui'
 import { YnsLink } from '@/components/ui/link'
+import { signOut } from '../actions'
 
 const AccountNav = ({ customer }: { customer: Omit<User, 'password_hash'> | null }) => {
   const route = usePathname()
-  const auth = useAuth()
-
-  const handleLogout = async () => {
-    await auth.logOut()
-  }
 
   return (
     <div>
       <div className="small:hidden">
-        {route !== `/store/account` ? (
-          <YnsLink href="/account" className="flex items-center gap-x-2 font-medium py-2">
+        {route !== `/shop/account` ? (
+          <YnsLink href="/shop/account" className="flex items-center gap-x-2 font-medium py-2">
             <>
               <ChevronDown className="transform rotate-90" />
               <span>Account</span>
@@ -32,7 +27,7 @@ const AccountNav = ({ customer }: { customer: Omit<User, 'password_hash'> | null
               <ul>
                 <li>
                   <YnsLink
-                    href="/store/account/profile"
+                    href="/shop/account/profile"
                     className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
                   >
                     <>
@@ -46,7 +41,7 @@ const AccountNav = ({ customer }: { customer: Omit<User, 'password_hash'> | null
                 </li>
                 <li>
                   <YnsLink
-                    href="/store/account/addresses"
+                    href="/shop/account/addresses"
                     className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
                   >
                     <>
@@ -60,7 +55,7 @@ const AccountNav = ({ customer }: { customer: Omit<User, 'password_hash'> | null
                 </li>
                 <li>
                   <YnsLink
-                    href="/store/account/orders"
+                    href="/shop/account/orders"
                     className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
                   >
                     <div className="flex items-center gap-x-2">
@@ -74,7 +69,7 @@ const AccountNav = ({ customer }: { customer: Omit<User, 'password_hash'> | null
                   <button
                     type="button"
                     className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full"
-                    onClick={handleLogout}
+                    onClick={() => signOut()}
                   >
                     <div className="flex items-center gap-x-2">
                       <ArrowRightSquare />
@@ -88,7 +83,7 @@ const AccountNav = ({ customer }: { customer: Omit<User, 'password_hash'> | null
           </>
         )}
       </div>
-      <div className="hidden small:block">
+      <div className="">
         <div>
           <div className="pb-4">
             <h3 className="text-base-semi">Account</h3>
@@ -96,27 +91,27 @@ const AccountNav = ({ customer }: { customer: Omit<User, 'password_hash'> | null
           <div className="text-base-regular">
             <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
               <li>
-                <AccountNavLink href="/store/account" route={route!}>
+                <AccountNavLink href="/shop/account" route={route!}>
                   Overview
                 </AccountNavLink>
               </li>
               <li>
-                <AccountNavLink href="/store/account/profile" route={route!}>
+                <AccountNavLink href="/shop/account/profile" route={route!}>
                   Profile
                 </AccountNavLink>
               </li>
               <li>
-                <AccountNavLink href="/store/account/addresses" route={route!}>
+                <AccountNavLink href="/shop/account/addresses" route={route!}>
                   Addresses
                 </AccountNavLink>
               </li>
               <li>
-                <AccountNavLink href="/store/account/orders" route={route!}>
+                <AccountNavLink href="/shop/account/orders" route={route!}>
                   Orders
                 </AccountNavLink>
               </li>
               <li className="text-gray-700">
-                <button type="button" onClick={handleLogout}>
+                <button type="button" onClick={() => signOut()}>
                   Log out
                 </button>
               </li>

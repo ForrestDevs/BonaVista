@@ -1,6 +1,9 @@
 import type { Product, User, CartItems } from '@payload-types'
+import type { ProductVariant } from '@/lib/types/product'
 
-export type CartItem = Exclude<NonNullable<CartItems>[number], null>
+export type CartItem = Exclude<NonNullable<CartItems>[number], null> & {
+  variant?: ProductVariant
+}
 
 export type CartType = User['cart']
 
@@ -25,9 +28,7 @@ export type CartAction =
       type: 'CLEAR_CART'
     }
 
-
 export type CartTotalState = {
   formatted: string
   raw: number
 }
-

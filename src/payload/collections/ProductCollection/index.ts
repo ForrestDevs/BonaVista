@@ -63,13 +63,6 @@ export const ProductCollection: CollectionConfig = {
         ],
       },
     },
-    {
-      label: 'Products',
-      name: 'products',
-      type: 'relationship',
-      relationTo: PRODUCT_SLUG,
-      hasMany: true,
-    },
   ],
   timestamps: true,
 } as const

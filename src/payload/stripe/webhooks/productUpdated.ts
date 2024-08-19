@@ -12,8 +12,8 @@ export const productUpdated: StripeWebhookHandler<{
 
   const {
     id: stripeProductID,
-    // name: stripeProductName,
-    // description: stripeDescription,
+    name: stripeProductName,
+    description: stripeDescription,
   } = event.data.object
 
   if (logs) payload.logger.info(`Syncing Stripe product with ID: ${stripeProductID} to Payload...`)
@@ -63,16 +63,18 @@ export const productUpdated: StripeWebhookHandler<{
   try {
     if (logs) payload.logger.info(`- Updating document...`)
 
-    await payload.update({
-      id: payloadProductID,
-      collection: 'products',
-      data: {
-        // name: stripeProductName,
-        // description: stripeDescription,
-        priceJSON: JSON.stringify(prices),
-        skipSync: true,
-      },
-    })
+    if (payloadProductID) {
+      await payload.update({
+        id: payloadProductID,
+        collection: 'products',
+        data: {
+          title: stripeProductName,
+          description: stripeDescription,
+          priceJSON: JSON.stringify(prices),
+          skipSync: true,
+        },
+      })
+    }
 
     if (logs) payload.logger.info(`✅ Successfully updated product.`)
   } catch (error: unknown) {

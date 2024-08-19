@@ -26,7 +26,7 @@ export const AddToCartButton: React.FC<{
   const { className, product } = props
   const [isInCart, setIsInCart] = useState<boolean>()
   const { addItemToCart, cart, hasInitializedCart, isProductInCart } = useCart()
-  // const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null)
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null)
   const [quantity, setQuantity] = useState(1)
 
   const handleAddToCart = () => {
@@ -34,12 +34,15 @@ export const AddToCartButton: React.FC<{
     addItemToCart({
       product,
       quantity,
+      variant: selectedVariant ?? undefined,
     })
 
     router.push('/shop/cart-overlay')
+
+
     // !isInCart
     //   ? () => {
-          
+
     //     }
     //   : undefined
     // if (selectedVariant) {
@@ -51,18 +54,19 @@ export const AddToCartButton: React.FC<{
     //   alert('Please select a size')
     // }
   }
-  // useEffect(() => {
-  //   setIsInCart(isProductInCart(product))
-  // }, [isProductInCart, product, cart])
+  useEffect(() => {
+    setIsInCart(isProductInCart(product))
+  }, [isProductInCart, product, cart])
 
   return (
     <Fragment>
       <div className="mt-6">
         <Select
-          onValueChange={
-            (value) => console.log(value)
-            // setSelectedVariant(product.variants?.find((v) => v.id === value) || null)
-          }
+          onValueChange={(value) => {
+            // e.preventDefault()
+            console.log('onValueChange', value)
+            setSelectedVariant(product.variants?.find((v) => v.id === value) || null)
+          }}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select size" />
@@ -70,7 +74,7 @@ export const AddToCartButton: React.FC<{
           <SelectContent>
             {product.variants?.map((variant) => (
               <SelectItem key={variant.id} value={variant.id ?? ''}>
-                {variant.title} - ${variant.stripePriceID}
+                {variant.title}
               </SelectItem>
             ))}
           </SelectContent>
@@ -86,7 +90,7 @@ export const AddToCartButton: React.FC<{
         />
         <Button className="flex-grow" onClick={handleAddToCart}>
           <ShoppingCartIcon className="mr-2 h-4 w-4" />
-          Add to Cart
+          {isInCart ? '✓ View in cart' : 'Add to cart'}
         </Button>
       </div>
     </Fragment>
@@ -107,7 +111,7 @@ export const AddToCartButton: React.FC<{
     //   }
     //   type={!isInCart ? 'button' : undefined}
     // >
-    //   {isInCart ? '✓ View in cart' : 'Add to cart'}
+    //
     // </Button>
   )
 }

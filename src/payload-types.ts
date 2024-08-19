@@ -536,6 +536,7 @@ export interface Product {
     | null;
   relatedProducts?: (string | Product)[] | null;
   categories?: (string | ProductCategory)[] | null;
+  collections?: (string | ProductCollection)[] | null;
   layout: (
     | {
         richText?: {
@@ -705,7 +706,20 @@ export interface ProductCategory {
   slug?: string | null;
   title: string;
   description?: string | null;
-  products?: (string | Product)[] | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-collections".
+ */
+export interface ProductCollection {
+  id: string;
+  slug?: string | null;
+  title: string;
+  description?: string | null;
+  publishedOn?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -873,21 +887,6 @@ export interface Form {
     | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-collections".
- */
-export interface ProductCollection {
-  id: string;
-  slug?: string | null;
-  title: string;
-  description?: string | null;
-  publishedOn?: string | null;
-  products?: (string | Product)[] | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

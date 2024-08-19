@@ -1,3 +1,3 @@
-export default function ModalCartDefault() {
+export default function CartDefault() {
   return null
 }

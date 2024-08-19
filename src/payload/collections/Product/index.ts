@@ -10,8 +10,8 @@ import { MediaBlock } from '@/payload/blocks/MediaBlock'
 import { Archive } from '@/payload/blocks/ArchiveBlock'
 import { ProductSelect } from './ui/ProductSelect'
 import { checkUserPurchases } from './access/checkUserPurchases'
-import { z } from 'zod'
 import { PriceSelect } from './ui/PriceSelect'
+import { PRODUCT_COLLECTION_SLUG } from '../constants'
 
 export const Product: CollectionConfig = {
   slug: PRODUCT_SLUG,
@@ -24,7 +24,7 @@ export const Product: CollectionConfig = {
   admin: {
     group: 'Shop',
     useAsTitle: 'title',
-    defaultColumns: ['title', 'stripeProductID', '_status'],
+    defaultColumns: ['title', 'description', 'stripeProductID', '_status'],
     preview: (doc) => {
       return `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/next/preview?url=${encodeURIComponent(
         `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/products/${doc.slug}`,
@@ -103,6 +103,15 @@ export const Product: CollectionConfig = {
       name: 'categories',
       type: 'relationship',
       relationTo: PRODUCT_CATEGORY_SLUG,
+      hasMany: true,
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'collections',
+      type: 'relationship',
+      relationTo: PRODUCT_COLLECTION_SLUG,
       hasMany: true,
       admin: {
         position: 'sidebar',

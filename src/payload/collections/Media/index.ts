@@ -107,8 +107,8 @@ export const Media: CollectionConfig = {
     crop: false,
   },
   // upload: {
-  // disableLocalStorage: true,
-  // Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload
-  // staticDir: path.resolve(dirname, '../../../public/media'),
+  //   disableLocalStorage: true,
+  //   Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload
+  //   staticDir: path.resolve(dirname, '../../../public/media'),
   // },
 } as const
