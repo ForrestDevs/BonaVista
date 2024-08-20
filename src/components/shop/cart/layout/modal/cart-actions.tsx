@@ -13,7 +13,7 @@ interface CartActionProps {
 export function DecreaseQuantityButton({ item }: CartActionProps) {
   const { addItemToCart, deleteItemFromCart } = useCart()
 
-  const { product, quantity } = item
+  const { product, variant, quantity } = item
 
   if (!product) {
     return null
@@ -31,14 +31,28 @@ export function DecreaseQuantityButton({ item }: CartActionProps) {
     return null
   }
 
+  const isVariant = variant !== undefined
+
   const handleDecreaseQuantity = () => {
-    if (quantity > 1) {
-      addItemToCart({
-        product,
-        quantity: quantity - 1,
-      })
+    if (isVariant) {
+      if (quantity > 1) {
+        addItemToCart({
+          product,
+          variant,
+          quantity: quantity - 1,
+        })
+      } else {
+        deleteItemFromCart(product, variant?.id ?? '')
+      }
     } else {
-      deleteItemFromCart(product)
+      if (quantity > 1) {
+        addItemToCart({
+          product,
+          quantity: quantity - 1,
+        })
+      } else {
+        deleteItemFromCart(product)
+      }
     }
   }
 
@@ -58,7 +72,7 @@ export function DecreaseQuantityButton({ item }: CartActionProps) {
 export function IncreaseQuantityButton({ item }: CartActionProps) {
   const { addItemToCart } = useCart()
 
-  const { product, quantity } = item
+  const { product, variant, quantity } = item
 
   if (!product) {
     return null
@@ -76,11 +90,28 @@ export function IncreaseQuantityButton({ item }: CartActionProps) {
     return null
   }
 
+  console.log('Increase quantity', item)
+
+  const isVariant = variant !== undefined
+
+  console.log('Is variant', isVariant)
+
   const handleIncreaseQuantity = () => {
-    addItemToCart({
-      product,
-      quantity: quantity + 1,
-    })
+    console.log('handleIncreaseQuantity', item)
+    if (isVariant) {
+      console.log('addItemToCart variant', product, variant, quantity)
+      addItemToCart({
+        product,
+        variant,
+        quantity: quantity + 1,
+      })
+    } else {
+      console.log('addItemToCart non variant', product, quantity)
+      addItemToCart({
+        product,
+        quantity: quantity + 1,
+      })
+    }
   }
 
   return (
@@ -99,7 +130,7 @@ export function IncreaseQuantityButton({ item }: CartActionProps) {
 export function RemoveItemButton({ item }: CartActionProps) {
   const { deleteItemFromCart, isProductInCart } = useCart()
 
-  const { product } = item
+  const { product, variant } = item
 
   if (!product) {
     return null
@@ -115,8 +146,14 @@ export function RemoveItemButton({ item }: CartActionProps) {
     return null
   }
 
+  const isVariant = variant !== undefined
+
   const handleRemoveItem = () => {
-    deleteItemFromCart(product)
+    if (isVariant) {
+      deleteItemFromCart(product, variant?.id ?? '')
+    } else {
+      deleteItemFromCart(product)
+    }
   }
 
   return (

@@ -3,10 +3,8 @@ export const priceFromJSON = (priceJSON: string, quantity: number = 1, raw?: boo
 
   if (priceJSON) {
     try {
-      const parsed = JSON.parse(priceJSON)?.data[0]
-      const priceValue = parsed.unit_amount * quantity
-      const priceType = parsed.type
-
+      const parsed = JSON.parse(priceJSON)
+      const priceValue = parsed.amount * quantity
       if (raw) return priceValue.toString()
 
       price = (priceValue / 100).toLocaleString('en-US', {
@@ -14,13 +12,15 @@ export const priceFromJSON = (priceJSON: string, quantity: number = 1, raw?: boo
         style: 'currency',
       })
 
-      if (priceType === 'recurring') {
-        price += `/${
-          parsed.recurring.interval_count > 1
-            ? `${parsed.recurring.interval_count} ${parsed.recurring.interval}`
-            : parsed.recurring.interval
-        }`
-      }
+      console.log('price', price)
+
+      // if (priceType === 'recurring') {
+      //   price += `/${
+      //     parsed.recurring.interval_count > 1
+      //       ? `${parsed.recurring.interval_count} ${parsed.recurring.interval}`
+      //       : parsed.recurring.interval
+      //   }`
+      // }
     } catch (e) {
       console.error(`Cannot parse priceJSON`) // eslint-disable-line no-console
     }

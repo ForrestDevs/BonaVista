@@ -21,7 +21,7 @@ import { ProductCard } from '@/components/shop/products/product-card'
 import { ProductVariant } from '@/lib/types/product'
 import { getCachedDocument } from '@/lib/utils/getDocument'
 import { PRODUCT_SLUG } from '@/payload/collections/constants'
-import { AddToCartButton } from '@/components/shop/layout/add-to-cart'
+import { CartActions } from '@/components/shop/layout/add-to-cart'
 import { notFound } from 'next/navigation'
 import { RelatedProducts } from '@/components/layout/blocks/related-products'
 import { Price } from '@/components/shop/layout/price'
@@ -181,7 +181,7 @@ export default async function ProductDetail({ params }: Props) {
           </div> */}
           <p className="mt-4 text-lg text-gray-700">{product.description}</p>
           {/* <Price product={product} /> */}
-          <AddToCartButton product={product} />
+          <CartActions product={product} />
 
           <div className="mt-6 space-y-2">
             <div className="flex items-center text-green-600">

@@ -12,10 +12,10 @@
  */
 export type ProductVariants =
   | {
+      title: string;
       stripePriceID?: string | null;
       priceJSON?: string | null;
       useParentMeta?: boolean | null;
-      title?: string | null;
       description?: string | null;
       images?:
         | {
@@ -689,9 +689,9 @@ export interface Product {
       )[]
     | null;
   stripeProductID?: string | null;
-  priceJSON?: string | null;
   skipSync?: boolean | null;
   hasVariants?: boolean | null;
+  baseVariant?: ProductBaseVariant;
   variants?: ProductVariants;
   updatedAt: string;
   createdAt: string;
@@ -723,6 +723,14 @@ export interface ProductCollection {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductBaseVariant".
+ */
+export interface ProductBaseVariant {
+  stripePriceID?: string | null;
+  priceJSON?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

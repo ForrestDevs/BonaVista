@@ -4,7 +4,7 @@ import { ShoppingBagIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { YnsLink } from '@/components/ui/link'
 import Link from 'next/link'
-
+import { CartBadge, CartTooltipData } from './cart-tooltip-data'
 
 // import { formatMoney } from '@/lib/utils/formatMoney'
 // import { useCart } from '@/lib/providers/Cart'
@@ -29,24 +29,19 @@ export function CartSummaryNavInner() {
       <Tooltip delayDuration={100}>
         <TooltipTrigger asChild>
           <div>
-            <Link
+            <YnsLink
               href="/shop/cart-overlay"
               scroll={false}
               className="relative mr-2.5 block h-6 w-6"
               prefetch={true}
             >
               <ShoppingBagIcon />
-              <span className="absolute bottom-0 right-0 inline-flex h-5 w-5 translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border-2 bg-white text-center text-xs">
-                <span className="sr-only">Items in cart</span>
-                <span>1</span>
-              </span>
-              <span className="sr-only">Total: $100</span>
-            </Link>
+              <CartBadge />
+            </YnsLink>
           </div>
         </TooltipTrigger>
         <TooltipContent side="left" sideOffset={25}>
-          <p>Cart</p>
-          <p>Total: $100</p>
+          <CartTooltipData />
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

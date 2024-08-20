@@ -1,5 +1,4 @@
 import React from 'react'
-import { getMeUser } from '@/lib/utils/getMeUser'
 import AccountLayout from '@/components/shop/account/layout/account-layout'
 import getPayload from '@/lib/utils/getPayload'
 import { headers as getHeaders } from 'next/headers'

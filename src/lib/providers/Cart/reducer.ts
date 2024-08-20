@@ -40,31 +40,44 @@ export const cartReducer = (cart: CartType, action: CartAction): CartType => {
       }
     }
 
+    /**
+     * Handles adding an item to the cart or updating its quantity if it already exists.
+     *
+     * @param {CartAction} action - The action object containing the item to be added.
+     * @returns {CartType} The updated cart state.
+     */
     case 'ADD_ITEM': {
-      console.log('Adding item to cart', action)
-      // if the item is already in the cart, increase the quantity
       const { payload: incomingItem } = action
+
+      // Determine the product ID based on whether it's a string or an object
       const productId =
         typeof incomingItem.product === 'string' ? incomingItem.product : incomingItem?.product?.id
+
+      // Get the variant ID if it exists
       const variantId = incomingItem.variant?.id
 
-      const indexInCart = cart?.items?.findIndex(({ product }) =>
-        typeof product === 'string' ? product === productId : product?.id === productId,
-      ) // eslint-disable-line function-paren-newline
+      // Find the index of the item in the cart, if it exists
+      const indexInCart = cart?.items?.findIndex((item) =>
+        typeof item.product === 'string'
+          ? item.product === productId
+          : item.product?.id === productId && item.variant?.id === variantId,
+      )
 
+      // Create a new array with the existing cart items
       const withAddedItem = [...(cart?.items || [])]
 
       if (indexInCart === -1) {
+        // If the item is not in the cart, add it
         withAddedItem.push(incomingItem)
-      }
-
-      if (typeof indexInCart === 'number' && indexInCart > -1) {
+      } else if (typeof indexInCart === 'number' && indexInCart > -1) {
+        // If the item is already in the cart, update its quantity
         withAddedItem[indexInCart] = {
           ...withAddedItem[indexInCart],
-          quantity: (incomingItem.quantity || 0) > 0 ? incomingItem.quantity : undefined,
+          quantity: (withAddedItem[indexInCart]?.quantity || 0) + (incomingItem.quantity || 1),
         }
       }
 
+      // Return the updated cart state
       return {
         ...cart,
         items: withAddedItem,
@@ -73,14 +86,17 @@ export const cartReducer = (cart: CartType, action: CartAction): CartType => {
 
     case 'DELETE_ITEM': {
       console.log('Deleting item from cart', action)
-      const { payload: incomingProduct } = action
+      const {
+        payload: { product: incomingProduct, variantId },
+      } = action
       const withDeletedItem = { ...cart }
 
-      const indexInCart = cart?.items?.findIndex(({ product }) =>
-        typeof product === 'string'
-          ? product === incomingProduct.id
-          : product?.id === incomingProduct.id,
-      ) // eslint-disable-line function-paren-newline
+      const indexInCart = cart?.items?.findIndex((item) =>
+        typeof item.product === 'string'
+          ? item.product === incomingProduct.id
+          : item.product?.id === incomingProduct.id &&
+            (variantId ? item.variant?.id === variantId : true),
+      )
 
       if (typeof indexInCart === 'number' && withDeletedItem.items && indexInCart > -1)
         withDeletedItem.items.splice(indexInCart, 1)

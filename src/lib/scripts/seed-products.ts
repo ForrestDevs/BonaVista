@@ -115,7 +115,9 @@ const poolProducts: Partial<Product>[] = [
     description: 'Prevents and treats algae growth in pools',
     images: [],
     hasVariants: false,
-    priceJSON: '{"amount": 1499, "currency": "cad"}',
+    baseVariant: {
+      priceJSON: '{"amount": 1499, "currency": "cad"}',
+    },
     _status: 'published',
   },
   {
@@ -144,7 +146,9 @@ const poolProducts: Partial<Product>[] = [
     description: 'Durable brush for cleaning pool walls and floor',
     images: [],
     hasVariants: false,
-    priceJSON: '{"amount": 1499, "currency": "cad"}',
+    baseVariant: {
+      priceJSON: '{"amount": 1499, "currency": "cad"}',
+    },
     _status: 'published',
   },
   {
@@ -153,7 +157,9 @@ const poolProducts: Partial<Product>[] = [
     description: 'Fine mesh net for removing debris from pool surface',
     images: [],
     hasVariants: false,
-    priceJSON: '{"amount": 1499, "currency": "cad"}',
+    baseVariant: {
+      priceJSON: '{"amount": 1499, "currency": "cad"}',
+    },
     _status: 'published',
   },
   {
@@ -182,7 +188,9 @@ const poolProducts: Partial<Product>[] = [
     description: 'Eliminates foam in hot tubs and spas',
     images: [],
     hasVariants: false,
-    priceJSON: '{"amount": 1499, "currency": "cad"}',
+    baseVariant: {
+      priceJSON: '{"amount": 1499, "currency": "cad"}',
+    },
     _status: 'published',
   },
   {
@@ -211,15 +219,15 @@ const seedProducts = async () => {
   const payload = await getPayload({ config })
 
   // Delete all Stripe products and prices
-//   const stripeProducts = await stripe.products.list({ limit: 100 })
-//   for (const product of stripeProducts.data) {
-//     const prices = await stripe.prices.list({ product: product.id })
-//     for (const price of prices.data) {
-//       await stripe.prices.update(price.id, { active: false })
-//     }
-//     await stripe.products.del(product.id)
-//   }
-//   console.log('Deleted all Stripe products and prices')
+  //   const stripeProducts = await stripe.products.list({ limit: 100 })
+  //   for (const product of stripeProducts.data) {
+  //     const prices = await stripe.prices.list({ product: product.id })
+  //     for (const price of prices.data) {
+  //       await stripe.prices.update(price.id, { active: false })
+  //     }
+  //     await stripe.products.del(product.id)
+  //   }
+  //   console.log('Deleted all Stripe products and prices')
 
   // Delete all Payload products
   const existingProducts = await payload.find({
@@ -264,8 +272,8 @@ const seedProducts = async () => {
       // Create a default price for products without variants
       const price = await stripe.prices.create({
         product: stripeProduct.id,
-        unit_amount: JSON.parse(product.priceJSON ?? '{}').amount,
-        currency: JSON.parse(product.priceJSON ?? '{}').currency,
+        unit_amount: JSON.parse(product.baseVariant?.priceJSON ?? '{}').amount,
+        currency: JSON.parse(product.baseVariant?.priceJSON ?? '{}').currency,
       })
       stripePriceId = price.id
     }
@@ -276,6 +284,7 @@ const seedProducts = async () => {
       data: {
         title: product.title ?? '',
         description: product.description ?? '',
+        images: product.images ?? [],
         layout: [
           {
             richText: {

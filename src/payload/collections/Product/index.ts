@@ -36,6 +36,7 @@ export const Product: CollectionConfig = {
     afterDelete: [deleteProductFromCarts],
     // afterRead: [populateArchiveBlock],
     beforeChange: [beforeProductChange],
+    
   },
   versions: {
     drafts: true,
@@ -159,15 +160,6 @@ export const Product: CollectionConfig = {
               },
             },
             {
-              label: 'Price JSON',
-              name: 'priceJSON',
-              type: 'textarea',
-              admin: {
-                readOnly: true,
-                rows: 10,
-              },
-            },
-            {
               name: 'skipSync',
               type: 'checkbox',
               label: 'Skip Sync',
@@ -189,6 +181,37 @@ export const Product: CollectionConfig = {
               defaultValue: false,
             },
             {
+              label: 'Base Variant',
+              name: 'baseVariant',
+              type: 'group',
+              interfaceName: 'ProductBaseVariant',
+              admin: {
+                condition: (_, siblingData) => !siblingData.hasVariants,
+              },
+              fields: [
+                {
+                  label: 'Stripe Price Object',
+                  name: 'stripePriceID',
+                  type: 'text',
+                  admin: {
+                    readOnly: true,
+                    // components: {
+                    //   Field: PriceSelect,
+                    // },
+                  },
+                },
+                {
+                  label: 'Price Object Json',
+                  name: 'priceJSON',
+                  type: 'textarea',
+                  admin: {
+                    readOnly: true,
+                    rows: 10,
+                  },
+                },
+              ],
+            },
+            {
               label: 'Variants',
               name: 'variants',
               type: 'array',
@@ -197,6 +220,12 @@ export const Product: CollectionConfig = {
                 condition: (_, siblingData) => siblingData.hasVariants,
               },
               fields: [
+                {
+                  label: 'Title',
+                  name: 'title',
+                  type: 'text',
+                  required: true,
+                },
                 {
                   label: 'Stripe Price Object',
                   name: 'stripePriceID',
@@ -221,14 +250,6 @@ export const Product: CollectionConfig = {
                   name: 'useParentMeta',
                   type: 'checkbox',
                   defaultValue: true,
-                },
-                {
-                  label: 'Title',
-                  name: 'title',
-                  type: 'text',
-                  admin: {
-                    condition: (_, siblingData) => !siblingData.useParentMeta,
-                  },
                 },
                 {
                   label: 'Description',

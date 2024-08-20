@@ -1,11 +1,14 @@
-import type { Product, User, CartItems } from '@payload-types'
+import type { Product } from '@payload-types'
 import type { ProductVariant } from '@/lib/types/product'
+import type { CartItems } from '@payload-types'
 
 export type CartItem = Exclude<NonNullable<CartItems>[number], null> & {
   variant?: ProductVariant
 }
 
-export type CartType = User['cart']
+export type CartType =
+  | { items?: CartItem[]; createdOn?: string | null; lastModified?: string | null }
+  | undefined
 
 export type CartAction =
   | {
@@ -21,7 +24,7 @@ export type CartAction =
       type: 'SET_CART'
     }
   | {
-      payload: Product
+      payload: { product: Product; variantId?: string }
       type: 'DELETE_ITEM'
     }
   | {

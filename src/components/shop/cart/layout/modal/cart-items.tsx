@@ -35,21 +35,25 @@ function CartItemRow({ item }: CartItemRowProps) {
     return <div>{item.id}</div>
   }
 
-  const { title, priceJSON, images } = item.product
+  const isVariant = item.variant !== undefined
+  const priceJSON = isVariant ? item.variant?.priceJSON : item.product.baseVariant?.priceJSON
   const price = priceFromJSON(priceJSON || '')
+  const title = isVariant ? item.product.title + ' - ' + item.variant?.title : item.product.title
+
+  console.log('Item row', item)
 
   return (
     <div className="flex items-center space-x-4">
-      {images && images.length > 0 && (
+      {item.product.images && item.product.images.length > 0 && (
         <div className="w-16 h-16">
-          <Media resource={images[0].image as MediaType} imgClassName="object-cover" />
+          <Media resource={item.product.images[0].image as MediaType} imgClassName="object-cover" />
         </div>
       )}
       <div className="flex-1">
         <h3 className="text-sm font-medium">{title}</h3>
         <p className="text-sm text-muted-foreground">{price}</p>
         <div className="flex items-center mt-1">
-          <DecreaseQuantityButton item={item} />
+          {/* <DecreaseQuantityButton item={item} /> */}
           <span className="mx-2 text-sm">{item.quantity}</span>
           <IncreaseQuantityButton item={item} />
         </div>

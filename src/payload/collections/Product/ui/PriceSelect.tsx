@@ -1,6 +1,13 @@
 'use client'
 
-import { Select, CopyToClipboard, TextField, useField, useDocumentInfo, useForm } from '@payloadcms/ui'
+import {
+  Select,
+  CopyToClipboard,
+  TextField,
+  useField,
+  useDocumentInfo,
+  useForm,
+} from '@payloadcms/ui'
 import { useState, useEffect, use } from 'react'
 
 type OptionsType = {
@@ -11,10 +18,19 @@ type OptionsType = {
 export function PriceSelect(props: typeof TextField) {
   const { name } = props
   const [options, setOptions] = useState<OptionsType[]>([])
-  const { value, setValue } = useField({ path: name })
-  const { getDataByPath} = useForm()
+  
+  
+  const { getDataByPath } = useForm()
 
-  const stripeProductID = getDataByPath("stripeProductID")
+  const hasVariant = getDataByPath('hasVariants')
+
+  const path = hasVariant ? 'variants' + name : 'baseVariant.' + name
+
+  const { value, setValue } = useField({ path })
+
+  const stripeProductID = getDataByPath('stripeProductID')
+
+
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -25,65 +41,33 @@ export function PriceSelect(props: typeof TextField) {
             headers: {
               'Content-Type': 'application/json',
             },
-          });
+          })
 
-          const res = await pricesFetch.json();
+          const res = await pricesFetch.json()
 
           if (res?.data) {
             const fetchedPrices = res.data.map((item: any) => ({
               label: `${item.nickname || item.id} - ${new Intl.NumberFormat('en-US', { style: 'currency', currency: item.currency }).format(item.unit_amount / 100)}`,
               value: item.id,
-            }));
+            }))
 
-            setOptions([
-              { label: 'Select a price', value: '' },
-              ...fetchedPrices,
-            ]);
+
+            setOptions([{ label: 'Select a price', value: '' }, ...fetchedPrices])
+            console.log('options', fetchedPrices)
           }
         } catch (error) {
-          console.error('Error fetching prices:', error);
+          console.error('Error fetching prices:', error)
         }
       }
-    };
+    }
 
-    fetchPrices();
-  }, [stripeProductID]);
- 
-  // useEffect(() => {
-  //   const getStripeProductPrices = async () => {
-  //     const pricesFetch = await fetch('/api/stripe/prices', {
-  //       credentials: 'include',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     })
+    console.log('stripeProductID', stripeProductID)
+    console.log('name', name)
+    console.log('value', value)
+    console.log('hasVariant', hasVariant)
 
-  //     const res = await pricesFetch.json()
-
-  //     console.log('res', res)
-
-  //     if (res?.data) {
-  //       const fetchedProducts = res.data.reduce(
-  //         (acc: any, item: any) => {
-  //           acc.push({
-  //             label: item.name || item.id,
-  //             value: item.id,
-  //           })
-  //           return acc
-  //         },
-  //         [
-  //           {
-  //             label: 'Select a product',
-  //             value: '',
-  //           },
-  //         ],
-  //       )
-  //       setOptions(fetchedProducts)
-  //     }
-  //   }
-
-  //   getStripeProductPrices()
-  // }, [])
+    fetchPrices()
+  }, [stripeProductID, name, value, hasVariant])
 
   const href = `https://dashboard.stripe.com/${
     process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''
@@ -104,7 +88,7 @@ export function PriceSelect(props: typeof TextField) {
             process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''
           }prices/create`}
           rel="noopener noreferrer"
-          style={{ color: 'var(--theme-text' }}
+          style={{ color: 'var(--theme-text)' }}
           target="_blank"
         >
           create a new one

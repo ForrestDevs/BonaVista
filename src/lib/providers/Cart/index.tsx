@@ -1,13 +1,34 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react'
+import React, {
+  useCallback,
+  createContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+  useContext,
+} from 'react'
 import type { Product, User } from '@/payload-types'
-import { useAuth } from '@payloadcms/ui'
 import { cartReducer } from './reducer'
-import { CartContext } from './context'
 import { arrayHasItems, flattenCart } from '@/lib/utils/cart'
-import { CartTotalState } from '@/lib/types/cart'
-import { getMeUser } from '@/lib/utils/getMeUser'
+import { CartItem, CartTotalState, CartType } from '@/lib/types/cart'
+
+export type CartContextProps = {
+  hasInitializedCart: boolean
+  cart: CartType
+  cartIsEmpty: boolean | undefined
+  cartTotal: {
+    formatted: string
+    raw: number
+  }
+  addItemToCart: (item: CartItem) => void
+  deleteItemFromCart: (product: Product, variantId?: string) => void
+  isProductInCart: (product: Product, variantId?: string) => boolean
+  clearCart: () => void
+}
+
+const CartContext = createContext({} as CartContextProps)
 
 // Step 1: Check local storage for a cart
 // Step 2: If there is a cart, fetch the products and hydrate the cart
@@ -15,24 +36,20 @@ import { getMeUser } from '@/lib/utils/getMeUser'
 // Step 4: If the user is authenticated, merge the user's cart with the local cart
 // Step 4B: Sync the cart to Payload and clear local storage
 // Step 5: If the user is logged out, sync the cart to local storage only
-export default function CartProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { user } = await getMeUser()
-      setUser(user)
-    }
-    fetchUser()
-  }, [])
-
+export default function CartProvider({
+  children,
+  user,
+}: {
+  children: React.ReactNode
+  user: User | null
+}) {
   const hasInitialized = useRef(false)
+  const [hasInitializedCart, setHasInitialized] = useState(false)
   const [cart, dispatchCart] = useReducer(cartReducer, {})
   const [total, setTotal] = useState<CartTotalState>({
     formatted: '0.00',
     raw: 0,
   })
-  const [hasInitializedCart, setHasInitialized] = useState(false)
 
   // Check local storage for a cart
   // If there is a cart, fetch the products and hydrate the cart
@@ -92,7 +109,9 @@ export default function CartProvider({ children }: { children: React.ReactNode }
       // merge the user's cart with the local state upon logging in
       dispatchCart({
         type: 'MERGE_CART',
-        payload: user?.cart,
+        payload: {
+          items: Array.isArray(user.cart.items) ? user.cart.items : [],
+        },
       })
     }
 
@@ -150,48 +169,6 @@ export default function CartProvider({ children }: { children: React.ReactNode }
     setHasInitialized(true)
   }, [user, cart])
 
-  const isProductInCart = useCallback(
-    (incomingProduct: Product): boolean => {
-      let isInCart = false
-      const { items: itemsInCart } = cart || {}
-      if (Array.isArray(itemsInCart) && itemsInCart.length > 0) {
-        isInCart = Boolean(
-          itemsInCart.find(({ product }) =>
-            typeof product === 'string'
-              ? product === incomingProduct.id
-              : product?.id === incomingProduct.id,
-          ), // eslint-disable-line function-paren-newline
-        )
-      }
-      return isInCart
-    },
-    [cart],
-  )
-
-  // this method can be used to add new items AND update existing ones
-  const addItemToCart = useCallback((incomingItem: any) => {
-    console.log('Adding item to cart', incomingItem)
-    dispatchCart({
-      type: 'ADD_ITEM',
-      payload: incomingItem,
-    })
-  }, [])
-
-  const deleteItemFromCart = useCallback((incomingProduct: Product) => {
-    console.log('Deleting item from cart', incomingProduct)
-    dispatchCart({
-      type: 'DELETE_ITEM',
-      payload: incomingProduct,
-    })
-  }, [])
-
-  const clearCart = useCallback(() => {
-    console.log('Clearing cart')
-    dispatchCart({
-      type: 'CLEAR_CART',
-    })
-  }, [])
-
   // calculate the new cart total whenever the cart changes
   useEffect(() => {
     console.log('Calculating cart total')
@@ -199,13 +176,16 @@ export default function CartProvider({ children }: { children: React.ReactNode }
 
     const newTotal =
       cart?.items?.reduce((acc, item) => {
-        return (
-          acc +
-          (typeof item.product === 'object'
-            ? JSON.parse(item?.product?.priceJSON || '{}')?.data?.[0]?.unit_amount *
-              (typeof item?.quantity === 'number' ? item?.quantity : 0)
-            : 0)
-        )
+        if (typeof item.product !== 'object') return acc
+
+        let price = 0
+        if (item.product && item.product.hasVariants && item.variant) {
+          price = JSON.parse(item.variant.priceJSON || '{}')?.unit_amount || 0
+        } else if (item.product && !item.product.hasVariants && item.product.baseVariant) {
+          price = JSON.parse(item.product.baseVariant.priceJSON || '{}')?.unit_amount || 0
+        }
+
+        return acc + price * (typeof item?.quantity === 'number' ? item?.quantity : 0)
       }, 0) || 0
 
     setTotal({
@@ -217,17 +197,67 @@ export default function CartProvider({ children }: { children: React.ReactNode }
     })
   }, [cart, hasInitialized])
 
+  // this method can be used to add new items AND update existing ones
+  const addItemToCart = useCallback((incomingItem: CartItem) => {
+    console.log('Adding item to cart', incomingItem)
+    dispatchCart({
+      type: 'ADD_ITEM',
+      payload: incomingItem,
+    })
+  }, [])
+
+  // this method can be used to check if a product is in the cart
+  const isProductInCart = useCallback(
+    (incomingProduct: Product, variantId?: string): boolean => {
+      let isInCart = false
+      const { items: itemsInCart } = cart || {}
+      if (Array.isArray(itemsInCart) && itemsInCart.length > 0) {
+        isInCart = Boolean(
+          itemsInCart.find((item) => {
+            const productMatch =
+              typeof item.product === 'string'
+                ? item.product === incomingProduct.id
+                : item.product?.id === incomingProduct.id
+
+            const variantMatch = variantId ? item.variant?.id === variantId : true
+
+            return productMatch && variantMatch
+          }),
+        )
+      }
+      return isInCart
+    },
+    [cart],
+  )
+
+  // this method can be used to delete an item from the cart
+  const deleteItemFromCart = useCallback((incomingProduct: Product, variantId?: string) => {
+    console.log('Deleting item from cart', incomingProduct)
+    dispatchCart({
+      type: 'DELETE_ITEM',
+      payload: { product: incomingProduct, variantId },
+    })
+  }, [])
+
+  // this method can be used to clear the cart
+  const clearCart = useCallback(() => {
+    console.log('Clearing cart')
+    dispatchCart({
+      type: 'CLEAR_CART',
+    })
+  }, [])
+
   return (
     <CartContext.Provider
       value={{
-        addItemToCart,
+        hasInitializedCart,
         cart,
         cartIsEmpty: hasInitializedCart && !arrayHasItems(cart?.items),
         cartTotal: total,
-        clearCart,
-        deleteItemFromCart,
-        hasInitializedCart,
+        addItemToCart,
         isProductInCart,
+        deleteItemFromCart,
+        clearCart,
       }}
     >
       {children}

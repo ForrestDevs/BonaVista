@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 
 import type { Product } from '@/payload-types'
-import { AddToCartButton } from '@/components/shop/layout/add-to-cart'
+import { CartActions } from '@/components/shop/layout/add-to-cart'
 import { RemoveFromCartButton } from '@/components/shop/layout/remove-from-cart'
 import { priceFromJSON } from '@/lib/utils/priceFromJSON'
 
@@ -39,7 +39,7 @@ export const Price: React.FC<{
           )}
         </div>
       )}
-      {button && button === 'addToCart' && <AddToCartButton product={product} />}
+      {button && button === 'addToCart' && <CartActions product={product} />}
       {button && button === 'removeFromCart' && <RemoveFromCartButton product={product} />}
     </div>
   )
