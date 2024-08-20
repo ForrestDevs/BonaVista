@@ -3,10 +3,7 @@ import config from '@payload-config'
 import Stripe from 'stripe'
 import { Product } from '@payload-types'
 
-const stripe = new Stripe(
-  'sk_test_51Pj5HTLgaGitM8WqgcFBxIrPnWkumuWLmhp3M10dQ6P8Ohc7L72nAT7MKQEBAxGYfk3EDe9jPM1zHHUYJxWQNs3S00RdeCyWSG',
-  {},
-)
+const stripe = new Stripe(process.env.STRIPE_API_KEY ?? '', {})
 
 const poolProducts: Partial<Product>[] = [
   {
@@ -211,15 +208,15 @@ const seedProducts = async () => {
   const payload = await getPayload({ config })
 
   // Delete all Stripe products and prices
-//   const stripeProducts = await stripe.products.list({ limit: 100 })
-//   for (const product of stripeProducts.data) {
-//     const prices = await stripe.prices.list({ product: product.id })
-//     for (const price of prices.data) {
-//       await stripe.prices.update(price.id, { active: false })
-//     }
-//     await stripe.products.del(product.id)
-//   }
-//   console.log('Deleted all Stripe products and prices')
+  //   const stripeProducts = await stripe.products.list({ limit: 100 })
+  //   for (const product of stripeProducts.data) {
+  //     const prices = await stripe.prices.list({ product: product.id })
+  //     for (const price of prices.data) {
+  //       await stripe.prices.update(price.id, { active: false })
+  //     }
+  //     await stripe.products.del(product.id)
+  //   }
+  //   console.log('Deleted all Stripe products and prices')
 
   // Delete all Payload products
   const existingProducts = await payload.find({
