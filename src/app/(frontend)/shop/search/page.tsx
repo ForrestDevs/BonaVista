@@ -5,7 +5,7 @@ import { getTranslations } from 'next-intl/server'
 // import { ProductNotFound } from '@/ui/products/ProductNotFound'
 
 import { searchProducts } from '@/lib/search/search'
-import { ProductCard } from '@/components/shop/products/product-card'
+// import { ProductCard } from '@/components/shop/products/product-card'
 // import { publicUrl } from '@/env.mjs'
 
 export const generateMetadata = async ({
@@ -48,7 +48,9 @@ export default async function SearchPage({
         {products?.length ? (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((p) =>
-              typeof p === 'object' ? <ProductCard key={p.id} product={p} /> : null,
+              typeof p === 'object' ? (
+                <div key={p.id}>{p.title}</div>
+              ) : null,
             )}
           </div>
         ) : (

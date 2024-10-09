@@ -154,7 +154,7 @@ export const Product: CollectionConfig = {
               type: 'text',
               admin: {
                 components: {
-                  Field: ProductSelect,
+                  Field: '@/payload/collections/Product/ui/ProductSelect',
                 },
               },
             },
@@ -203,7 +203,7 @@ export const Product: CollectionConfig = {
                   type: 'text',
                   admin: {
                     components: {
-                      Field: PriceSelect,
+                      Field: '@/payload/collections/Product/ui/PriceSelect',
                     },
                   },
                 },

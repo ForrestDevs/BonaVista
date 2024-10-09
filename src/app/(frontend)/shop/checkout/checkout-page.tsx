@@ -15,10 +15,8 @@ import CheckoutForm from './checkout-form'
 import { Media } from '@/components/layout/media'
 import { Price } from '@/components/shop/layout/price'
 
-// const apiKey = `${process.env.STRIPE_PUBLISHABLE_KEY}`
-const stripe = loadStripe(
-  'pk_test_51Pj5HTLgaGitM8WqTDrAzI2vCQEo1BmtBEMUMtVQ1KybKnY1tvhdiIhCrDSbYEWZEWiEPnFJ1LpkBlxUgcAyxUKm00qOeoolXl',
-)
+const apiKey = `${process.env.STRIPE_PUBLISHABLE_KEY}`
+
 
 export const CheckoutPage: React.FC<{
   settings: Settings
@@ -34,6 +32,7 @@ export const CheckoutPage: React.FC<{
 
   const { cart, cartIsEmpty, cartTotal } = useCart()
 
+  const stripe = loadStripe(apiKey)
   useEffect(() => {
     if (props.user !== null && cartIsEmpty) {
       router.push('/shop/cart')

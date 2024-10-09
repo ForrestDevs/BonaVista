@@ -89,7 +89,7 @@ export const User: CollectionConfig = {
       },
       admin: {
         components: {
-          Field: CustomerSelect,
+          Field: '@/payload/collections/User/ui/CustomerSelect',
         },
         position: 'sidebar',
       },

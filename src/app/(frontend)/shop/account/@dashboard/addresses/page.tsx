@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 export default async function Addresses() {
   const nextHeaders = headers()
   const payload = await getPayload()
-  const { user } = await payload.auth({ headers: nextHeaders })
+  // const { user } = await payload.auth({ headers: nextHeaders })
 
-  if (!user) {
-    notFound()
-  }
+  // if (!user) {
+  //   notFound()
+  // }
 
   return (
     <div className="w-full" data-testid="addresses-page-wrapper">

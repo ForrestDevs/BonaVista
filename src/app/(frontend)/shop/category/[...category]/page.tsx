@@ -6,7 +6,7 @@ import { ProductCategory } from '@payload-types'
 import { Blocks } from '@/components/layout/blocks/render'
 import { getCachedDocument } from '@/lib/utils/getDocument'
 import type { Product } from '@payload-types'
-import { ProductCard } from '@/components/shop/products/product-card'
+// import { ProductCard } from '@/components/shop/products/product-card'
 import { getCategoryProducts } from '../../actions'
 
 type Props = {
@@ -47,7 +47,8 @@ export default async function CategoryPage({ params }: Props) {
       <h1>{category.title}</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <div key={product.id}>{product.title}</div>
+          // <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </>

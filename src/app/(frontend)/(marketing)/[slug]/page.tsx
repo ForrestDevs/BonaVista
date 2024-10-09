@@ -62,13 +62,13 @@ export async function generateMetadata({ params: { slug = 'home' } }): Promise<M
 }
 
 const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = draftMode()
+  // const { isEnabled: draft } = draftMode()
 
   const payload = await getPayloadHMR({ config: configPromise })
 
   const result = await payload.find({
     collection: 'pages',
-    draft,
+    // draft,
     limit: 1,
     overrideAccess: true,
     where: {

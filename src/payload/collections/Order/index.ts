@@ -16,7 +16,7 @@ export const Orders: CollectionConfig = {
   },
   admin: {
     group: "Shop",
-    useAsTitle: 'orderNumber',
+    // useAsTitle: 'orderNumber',
     defaultColumns: [],
     preview: doc => `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/orders/${doc.id}`,
   },
@@ -38,7 +38,7 @@ export const Orders: CollectionConfig = {
       label: 'Stripe Payment Intent ID',
       admin: {
         components: {
-          Field: LinkToPaymentIntent,
+          Field: '@/payload/collections/Order/ui/LinkToPaymentIntent',
         },
         position: 'sidebar',
       },

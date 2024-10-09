@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/table'
 import Spinner from '@/components/ui/spinner'
 import { HttpTypes } from '@medusajs/types'
-import { updateLineItem } from '@/lib/medusa/data/cart'
+// import { updateLineItem } from '@/lib/medusa/data/cart'
 import { Media } from '@/components/layout/media'
 
 type ItemProps = {
@@ -32,16 +32,16 @@ export function CartItem({ item, type = 'full' }: ItemProps) {
     setError(null)
     setUpdating(true)
 
-    const message = await updateLineItem({
-      lineId: item.id,
-      quantity,
-    })
-      .catch((err) => {
-        setError(err.message)
-      })
-      .finally(() => {
-        setUpdating(false)
-      })
+    // const message = await updateLineItem({
+    //   lineId: item.id,
+    //   quantity,
+    // })
+    //   .catch((err) => {
+    //     setError(err.message)
+    //   })
+    //   .finally(() => {
+    //     setUpdating(false)
+    //   })
   }
   // TODO: Update this to grab the actual max inventory
   const maxQtyFromInventory = 10

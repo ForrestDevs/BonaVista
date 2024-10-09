@@ -3,7 +3,7 @@ import { Metadata } from 'next'
 import { mergeOpenGraph } from '@/lib/utils/merge-open-graph'
 import { notFound } from 'next/navigation'
 import { serverClient } from '@/lib/trpc/serverClient'
-import OrderCompletedTemplate from '@/components/shop/order/templates/order-completed-template'
+// import OrderCompletedTemplate from '@/components/shop/order/templates/order-completed-template'
 
 type Props = {
   params: { id: string }

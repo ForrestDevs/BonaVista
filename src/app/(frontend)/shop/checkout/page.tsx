@@ -36,11 +36,11 @@ export default async function Checkout() {
   }
   const payload = await getPayload()
 
-  const { user } = await payload.auth({
-    headers,
-  })
+  // const { user } = await payload.auth({
+  //   headers,
+  // })
 
-  console.log(user)
+  // console.log(user)
   
   let settings: Settings | null = null
 
@@ -131,7 +131,7 @@ export default async function Checkout() {
         }}
         type="lowImpact"
       /> */}
-      <CheckoutPage settings={settings!} user={user as User} />
+      {/* <CheckoutPage settings={settings!} user={user as User} /> */}
     </div>
   )
 }

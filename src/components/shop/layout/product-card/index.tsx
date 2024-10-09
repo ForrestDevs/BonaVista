@@ -22,10 +22,10 @@ export const ProductCard: React.FC<{
     showCategories,
     title: titleFromProps,
     doc,
-    doc: { slug, title, categories, priceJSON, meta } = {},
+    doc: { slug, title, categories, priceJSON, description, images } = {},
     className,
   } = props
-  const { description, image: metaImage } = meta || {}
+  // const { description, image: metaImage } = meta || {}
   const hasCategories = categories && Array.isArray(categories) && categories.length > 0
   const titleToUse = titleFromProps || title
   const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
@@ -43,8 +43,8 @@ export const ProductCard: React.FC<{
   return (
     <Card>
       <Link href={href}>
-        {!metaImage && <div>No image</div>}
-        {metaImage && typeof metaImage !== 'string' && <Media resource={metaImage} fill />}
+        {!images && <div>No image</div>}
+        {images && typeof images !== 'string' && <Media resource={images[0].image!} fill />}
       </Link>
       <CardContent>
         {showCategories && hasCategories && (

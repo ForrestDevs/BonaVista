@@ -7,29 +7,29 @@ import getPayload from '@/lib/utils/getPayload'
 import { PAGE_SLUG } from '@/payload/collections/constants'
 import { Container } from '@/components/ui/craft'
 import MissingStripeKeyAlert from '@/components/errors/missing-stripe-key'
-import { CheckoutCard } from '@/components/shop/checkout/CheckoutCard'
+// import { CheckoutCard } from '@/components/shop/checkout/CheckoutCard'
 import { Hero } from '@/components/layout/heros/render'
 import { Blocks } from '@/components/layout/blocks/render'
 import { CartTemplate } from '@/components/shop/cart/layout/cart-template'
 import { headers as getHeaders } from 'next/headers'
-import { enrichLineItems, retrieveCart } from '@/lib/medusa/data/cart'
+// import { enrichLineItems, retrieveCart } from '@/lib/medusa/data/cart'
 import { HttpTypes } from '@medusajs/types'
-import { getCustomer } from '@/lib/medusa/data/customer'
+// import { getCustomer } from '@/lib/medusa/data/customer'
 
-const fetchCart = async () => {
-  const cart = await retrieveCart()
+// const fetchCart = async () => {
+//   const cart = await retrieveCart()
 
-  if (!cart) {
-    return null
-  }
+//   if (!cart) {
+//     return null
+//   }
 
-  if (cart?.items?.length) {
-    const enrichedItems = await enrichLineItems(cart?.items, cart?.region_id!)
-    cart.items = enrichedItems as HttpTypes.StoreCartLineItem[]
-  }
+//   if (cart?.items?.length) {
+//     const enrichedItems = await enrichLineItems(cart?.items, cart?.region_id!)
+//     cart.items = enrichedItems as HttpTypes.StoreCartLineItem[]
+//   }
 
-  return cart
-}
+//   return cart
+// }
 
 export default async function Cart() {
   const payload = await getPayload()
@@ -70,14 +70,14 @@ export default async function Cart() {
     // in production you may want to redirect to a 404  page or at least log the error somewhere
     // console.error(error)
   }
-  const cart = await fetchCart()
-  const customer = await getCustomer()
+  // const cart = await fetchCart()
+  // const customer = await getCustomer()
 
   return (
     <Fragment>
       <MissingStripeKeyAlert />
       <Hero {...page?.hero} />
-      <CartTemplate page={page} settings={settings!} customer={customer} cart={cart} />
+      {/* <CartTemplate page={page} settings={settings!} customer={customer} cart={cart} /> */}
       <Blocks blocks={page?.layout} />
     </Fragment>
   )

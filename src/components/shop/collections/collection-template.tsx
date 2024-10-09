@@ -1,8 +1,8 @@
 import { Suspense } from 'react'
 import { ProductCollection } from '@/payload-types'
-import SkeletonProductGrid from '@/components/shop/skeletons/templates/skeleton-product-grid'
+import SkeletonProductGrid from '@/components/shop/skeletons/layout/skeleton-product-grid'
 import { SortOptions } from '../lists/refinement-list/sort-products'
-import PaginatedProducts from '../lists/pagination/paginated-products'
+// import PaginatedProducts from '../lists/pagination/paginated-products'
 
 // import RefinementList from '@modules/store/components/refinement-list'
 // import { SortOptions } from '@modules/store/components/refinement-list/sort-products'
@@ -27,11 +27,11 @@ export default function CollectionTemplate({
           <h1>{collection.title}</h1>
         </div>
         <Suspense fallback={<SkeletonProductGrid />}>
-          <PaginatedProducts
+          {/* <PaginatedProducts
             sortBy={sortBy || 'created_at'}
             page={pageNumber}
             collectionId={collection.id}
-          />
+          /> */}
         </Suspense>
       </div>
     </div>

@@ -6,7 +6,7 @@ import { useElements } from '@stripe/react-stripe-js'
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
 import { Button } from '@/components/ui/button'
-import { setQuantity } from '@/actions/addToCartAction'
+// import { setQuantity } from '@/actions/addToCartAction'
 import { formatMoney } from '@/lib/utils/formatMoney'
 
 export const CartItemQuantity = ({
@@ -38,7 +38,7 @@ export const CartItemQuantity = ({
     const doWork = async () => {
       try {
         const modifier = action === 'INCREASE' ? 1 : -1
-        await setQuantity({ cartId, productId, quantity: quantity + modifier })
+        // await setQuantity({ cartId, productId, quantity: quantity + modifier })
         await elements?.fetchUpdates()
         router.refresh()
         stateRef.current?.promise.resolve()

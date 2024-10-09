@@ -17,7 +17,7 @@ import {
   ShieldCheckIcon,
   ArrowRightIcon,
 } from 'lucide-react'
-import { ProductCard } from '@/components/shop/products/product-card'
+// import { ProductCard } from '@/components/shop/products/product-card'
 import { ProductVariant } from '@/lib/types/product'
 import { getCachedDocument } from '@/lib/utils/getDocument'
 import { PRODUCT_SLUG } from '@/payload/collections/constants'

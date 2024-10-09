@@ -66,13 +66,13 @@ export async function generateMetadata({
 }
 
 const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = draftMode()
+  // const { isEnabled: draft } = draftMode()
 
   const payload = await getPayloadHMR({ config: configPromise })
 
   const result = await payload.find({
     collection: 'posts',
-    draft,
+    // draft,
     limit: 1,
     overrideAccess: true,
     where: {
