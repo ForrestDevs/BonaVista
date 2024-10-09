@@ -18,6 +18,9 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
+   "@medusajs/js-sdk": "preview",
+    "@medusajs/types": "preview",
+    "@medusajs/ui": "preview",
     "@payloadcms/db-mongodb": "3.0.0-beta.68",
     "@payloadcms/live-preview-react": "3.0.0-beta.68",
     "@payloadcms/next": "3.0.0-beta.68",
@@ -63,6 +66,7 @@
     "graphql": "^16.9.0",
     "jsonwebtoken": "9.0.1",
     "lexical": "0.16.1",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.378.0",
     "next": "15.0.0-canary.53",
     "next-intl": "^3.17.2",
@@ -83,12 +87,15 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@medusajs/client-types": "preview",
+    "@medusajs/ui-preset": "preview",
     "@next/eslint-plugin-next": "14.2.5",
     "@payloadcms/eslint-config": "^1.1.1",
     "@tailwindcss/typography": "^0.5.13",
     "@types/escape-html": "^1.0.4",
     "@types/node": "^20.12.12",
     "@types/qs": "^6.9.15",
+    "@types/lodash": "^4.17.7",
     "@types/react": "npm:types-react@19.0.0-rc.0",
     "@types/react-dom": "npm:types-react-dom@19.0.0-rc.0",
     "autoprefixer": "^10.4.19",

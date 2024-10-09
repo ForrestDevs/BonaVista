@@ -138,13 +138,13 @@ const getProfileCompletion = (customer: Omit<User, 'password_hash'> | null) => {
     count++
   }
 
-  //   if (customer.phone) {
-  //     count++
-  //   }
+    // if (customer.phone) {
+    //   count++
+    // }
 
-  //   if (customer.billing_address) {
-  //     count++
-  //   }
+    // if (customer.billing_address) {
+    //   count++
+    // }
 
   return (count / 4) * 100
 }

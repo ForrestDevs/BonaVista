@@ -12,6 +12,24 @@ import { Hero } from '@/components/layout/heros/render'
 import { Blocks } from '@/components/layout/blocks/render'
 import { CartTemplate } from '@/components/shop/cart/layout/cart-template'
 import { headers as getHeaders } from 'next/headers'
+import { enrichLineItems, retrieveCart } from '@/lib/medusa/data/cart'
+import { HttpTypes } from '@medusajs/types'
+import { getCustomer } from '@/lib/medusa/data/customer'
+
+const fetchCart = async () => {
+  const cart = await retrieveCart()
+
+  if (!cart) {
+    return null
+  }
+
+  if (cart?.items?.length) {
+    const enrichedItems = await enrichLineItems(cart?.items, cart?.region_id!)
+    cart.items = enrichedItems as HttpTypes.StoreCartLineItem[]
+  }
+
+  return cart
+}
 
 export default async function Cart() {
   const payload = await getPayload()
@@ -52,14 +70,14 @@ export default async function Cart() {
     // in production you may want to redirect to a 404  page or at least log the error somewhere
     // console.error(error)
   }
-  const headers = getHeaders()
-  const { user } = await payload.auth({ headers })
+  const cart = await fetchCart()
+  const customer = await getCustomer()
 
   return (
     <Fragment>
       <MissingStripeKeyAlert />
       <Hero {...page?.hero} />
-      <CartTemplate page={page} settings={settings!} user={user as User} />
+      <CartTemplate page={page} settings={settings!} customer={customer} cart={cart} />
       <Blocks blocks={page?.layout} />
     </Fragment>
   )

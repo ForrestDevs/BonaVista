@@ -13,59 +13,57 @@ import {
   TableCell,
 } from '@/components/ui/table'
 import Spinner from '@/components/ui/spinner'
+import { HttpTypes } from '@medusajs/types'
+import { updateLineItem } from '@/lib/medusa/data/cart'
+import { Media } from '@/components/layout/media'
 
 type ItemProps = {
-  item: CartItem
+  item: HttpTypes.StoreCartLineItem
+  type?: 'full' | 'preview'
 }
 
-export function CartItem({ item }: ItemProps) {
+export function CartItem({ item, type = 'full' }: ItemProps) {
   const [updating, setUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const type: string = 'full'
+  const { handle } = item.variant?.product ?? {}
 
-  //   const { handle } = item.variant.product
-  //   const changeQuantity = async (quantity: number) => {
-  //     setError(null)
-  //     setUpdating(true)
+  const changeQuantity = async (quantity: number) => {
+    setError(null)
+    setUpdating(true)
 
-  //     const message = await updateLineItem({
-  //       lineId: item.id,
-  //       quantity,
-  //     })
-  //       .catch((err) => {
-  //         return err.message
-  //       })
-  //       .finally(() => {
-  //         setUpdating(false)
-  //       })
-
-  //     message && setError(message)
-  //   }
-
-  if (typeof item.product === 'string' || item.product === null || item.product === undefined) {
-    return null
+    const message = await updateLineItem({
+      lineId: item.id,
+      quantity,
+    })
+      .catch((err) => {
+        setError(err.message)
+      })
+      .finally(() => {
+        setUpdating(false)
+      })
   }
-
-  const { slug, title } = item.product
+  // TODO: Update this to grab the actual max inventory
+  const maxQtyFromInventory = 10
+  const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
 
   return (
     <TableRow className="w-full" data-testid="product-row">
       <TableCell className="!pl-0 p-4 w-24">
         <YnsLink
-          href={`/products/${slug}`}
+          href={`/products/${handle}`}
           className={cn('flex', {
             'w-16': type === 'preview',
             'small:w-24 w-12': type === 'full',
           })}
         >
-          {/* <Thumbnail thumbnail={item.thumbnail} size="square" /> */}
+          <Media resource={item.thumbnail} size="sm" />
         </YnsLink>
       </TableCell>
 
       <TableCell className="text-left">
         <span className="text-base font-medium text-gray-900" data-testid="product-title">
-          {title}
+          {item.product_title} 
         </span>
         {/* <LineItemOptions variant={item.variant} data-testid="product-variant" /> */}
       </TableCell>

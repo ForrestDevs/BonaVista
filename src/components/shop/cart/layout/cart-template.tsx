@@ -12,16 +12,18 @@ import { CartSummary } from '@/components/shop/cart/layout/cart-summary'
 
 import EmptyCartMessage from '../components/empty-cart-message'
 import { CartItems } from './cart-items'
+import { HttpTypes } from '@medusajs/types'
 
 interface CartTemplateProps {
   page: Page
   settings: Settings
-  user: User
+  cart: HttpTypes.StoreCart | null
+  customer: HttpTypes.StoreCustomer | null
 }
 
-export function CartTemplate({ page, settings, user }: CartTemplateProps) {
+export function CartTemplate({ page, settings, cart, customer }: CartTemplateProps) {
   const { productsPage } = settings || {}
-  const { addItemToCart, cart, cartIsEmpty, cartTotal, hasInitializedCart } = useCart()
+  const { addItemToCart, cartIsEmpty, cartTotal, hasInitializedCart } = useCart()
 
   return (
     <div className="py-12">
@@ -31,7 +33,7 @@ export function CartTemplate({ page, settings, user }: CartTemplateProps) {
         ) : cart?.items && cart?.items.length ? (
           <div className="grid grid-cols-1 small:grid-cols-[1fr_360px] gap-x-40">
             <div className="flex flex-col bg-white py-6 gap-y-6">
-              {!user && (
+              {!customer && (
                 <>
                   <SignInPrompt />
                   <Separator />
@@ -44,7 +46,7 @@ export function CartTemplate({ page, settings, user }: CartTemplateProps) {
                 {cart && (
                   <>
                     <div className="bg-white py-6">
-                      <CartSummary cart={cart} />
+                      <CartSummary cart={cart as any} />
                     </div>
                   </>
                 )}
@@ -54,12 +56,6 @@ export function CartTemplate({ page, settings, user }: CartTemplateProps) {
         ) : (
           <div>
             <EmptyCartMessage />
-            {!user && (
-              <>
-                <SignInPrompt />
-                <Separator />
-              </>
-            )}
           </div>
         )}
       </div>
