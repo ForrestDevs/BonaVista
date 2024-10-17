@@ -1,10 +1,12 @@
 import React from 'react'
-import TrpcProvider from './Trpc'
+// import TrpcProvider from './Trpc'
 import ThemeProvider from '@/lib/providers/Theme'
-import CartProvider from '@/lib/providers/Cart'
+// import CartProvider from '@/lib/providers/Cart'
 import LocaleProvider from '@/lib/providers/i18n'
 import { Toaster } from 'sonner'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { CartProvider } from './Cart'
+import { AuthProvider } from './Auth'
 
 export const Providers: React.FC<{
   children: React.ReactNode
@@ -12,13 +14,14 @@ export const Providers: React.FC<{
   return (
     <LocaleProvider>
       <ThemeProvider>
-        <TrpcProvider>
-          <CartProvider>
+        {/* <TrpcProvider> */}
+        <AuthProvider>
+        <CartProvider>
             {children}
             <Toaster />
-            <ReactQueryDevtools initialIsOpen={false} />
           </CartProvider>
-        </TrpcProvider>
+        </AuthProvider>
+        {/* </TrpcProvider> */}
       </ThemeProvider>
     </LocaleProvider>
   )

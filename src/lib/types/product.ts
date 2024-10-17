@@ -1,3 +1,3 @@
-import { ProductVariants } from '@payload-types'
+import { ProductVariant } from '@payload-types'
 
-export type ProductVariant = Exclude<NonNullable<ProductVariants>[number], null>
+export type Variant = Exclude<NonNullable<ProductVariant>[number], null>

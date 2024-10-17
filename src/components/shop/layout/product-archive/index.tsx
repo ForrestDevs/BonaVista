@@ -1,6 +1,6 @@
 // 'use client'
 
-// import { cn } from '@/lib/utils/cn'
+// import { cn } from '@lib/utils/cn'
 // import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 // import type { Product } from '@/payload-types'
 // import { Card } from '../Card'

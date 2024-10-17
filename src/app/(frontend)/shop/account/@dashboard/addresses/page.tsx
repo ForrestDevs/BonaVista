@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { headers } from 'next/headers'
-import getPayload from '@/lib/utils/getPayload'
+import { getCurrentUser } from '@lib/data/auth'
+// import AddressBook from '@components/shop/account/components/address-book'
 
 export const metadata: Metadata = {
   title: 'Addresses',
@@ -9,13 +9,11 @@ export const metadata: Metadata = {
 }
 
 export default async function Addresses() {
-  const nextHeaders = headers()
-  const payload = await getPayload()
-  // const { user } = await payload.auth({ headers: nextHeaders })
+  const user = await getCurrentUser()
 
-  // if (!user) {
-  //   notFound()
-  // }
+  if (!user) {
+    notFound()
+  }
 
   return (
     <div className="w-full" data-testid="addresses-page-wrapper">

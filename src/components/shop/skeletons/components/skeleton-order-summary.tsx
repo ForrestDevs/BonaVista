@@ -1,5 +1,5 @@
-import SkeletonButton from '@/components/shop/skeletons/components/skeleton-button'
-import SkeletonCartTotals from '@/components/shop/skeletons/components/skeleton-cart-totals'
+import SkeletonButton from '@components/shop/skeletons/components/skeleton-button'
+import SkeletonCartTotals from '@components/shop/skeletons/components/skeleton-cart-totals'
 
 const SkeletonOrderSummary = () => {
   return (

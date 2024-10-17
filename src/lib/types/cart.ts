@@ -1,11 +1,6 @@
-import type { Product, User, CartItems } from '@payload-types'
-import type { ProductVariant } from '@/lib/types/product'
+import type { CartItems, Cart, Address } from '@payload-types'
 
-export type CartItem = Exclude<NonNullable<CartItems>[number], null> & {
-  variant?: ProductVariant
-}
-
-export type CartType = User['cart']
+export type CartItem = Exclude<NonNullable<CartItems>[number], null>
 
 export type CartAction =
   | {
@@ -13,16 +8,32 @@ export type CartAction =
       type: 'ADD_ITEM'
     }
   | {
-      payload: CartType
+      payload: Cart
       type: 'MERGE_CART'
     }
   | {
-      payload: CartType
+      payload: Cart
       type: 'SET_CART'
     }
   | {
-      payload: Product
+      payload: string
+      type: 'DECREMENT_QUANTITY'
+    }
+  | {
+      payload: string
       type: 'DELETE_ITEM'
+    }
+  | {
+      payload: string
+      type: 'INCREMENT_QUANTITY'
+    }
+  | {
+      payload: Address
+      type: 'SET_SHIPPING_ADDRESS'
+    }
+  | {
+      payload: Address
+      type: 'SET_BILLING_ADDRESS'
     }
   | {
       type: 'CLEAR_CART'

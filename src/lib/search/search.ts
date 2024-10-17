@@ -1,8 +1,16 @@
 import { unstable_cache } from 'next/cache'
-import getPayload from '@/lib/utils/getPayload'
-import { PRODUCT_SLUG } from '@/payload/collections/constants'
+import getPayload from '@lib/utils/getPayload'
+import { PRODUCT_SLUG } from '@payload/collections/constants'
 import { PaginatedDocs } from 'payload'
 import { Product } from '@payload-types'
+import type { ReadonlyURLSearchParams } from 'next/navigation'
+
+export const createUrl = (pathname: string, params: ReadonlyURLSearchParams | URLSearchParams) => {
+  const paramsString = params.toString()
+  const queryString = `${paramsString.length ? '?' : ''}${paramsString}`
+
+  return `${pathname}${queryString}`
+}
 
 export const searchProducts = unstable_cache(uncachedSearchProducts, ['search', 'products'], {
   tags: ['search', 'products'],

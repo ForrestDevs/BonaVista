@@ -5,24 +5,25 @@ export const home: RequiredDataFromCollectionSlug<'pages'> = {
   _status: 'published',
   hero: {
     type: 'highImpact',
-    links: [
-      {
-        link: {
-          type: 'custom',
-          appearance: 'default',
-          label: 'All posts',
-          url: '/posts',
-        },
-      },
-      {
-        link: {
-          type: 'custom',
-          appearance: 'outline',
-          label: 'Contact',
-          url: '/contact',
-        },
-      },
-    ],
+    
+    // links: [
+    //   {
+    //     link: {
+    //       type: 'custom',
+    //       appearance: 'default',
+    //       label: 'All posts',
+    //       url: '/posts',
+    //     },
+    //   },
+    //   {
+    //     link: {
+    //       type: 'custom',
+    //       appearance: 'outline',
+    //       label: 'Contact',
+    //       url: '/contact',
+    //     },
+    //   },
+    // ],
     // @ts-ignore
     media: '{{IMAGE_1}}',
     richText: {

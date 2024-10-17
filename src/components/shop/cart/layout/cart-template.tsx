@@ -2,28 +2,24 @@
 
 import React from 'react'
 
-import Spinner from '@/components/ui/spinner'
-import { useCart } from '@/lib/providers/Cart'
-import { Separator } from '@/components/ui/separator'
+import Spinner from '@components/ui/spinner'
+import { useCart } from '@lib/providers/Cart'
+import { Separator } from '@components/ui/separator'
 import SignInPrompt from '../components/sign-in-prompt'
-import type { Page, Settings, User } from '@/payload-types'
-
-import { CartSummary } from '@/components/shop/cart/layout/cart-summary'
-
+import type { Page, Settings, ShopSetting, User } from '@payload-types'
+import { CartSummary } from '@components/shop/cart/layout/cart-summary'
 import EmptyCartMessage from '../components/empty-cart-message'
 import { CartItems } from './cart-items'
-import { HttpTypes } from '@medusajs/types'
 
 interface CartTemplateProps {
   page: Page
   settings: Settings
-  cart: HttpTypes.StoreCart | null
-  customer: HttpTypes.StoreCustomer | null
+  customer: User
 }
 
-export function CartTemplate({ page, settings, cart, customer }: CartTemplateProps) {
+export function CartTemplate({ page, settings, customer }: CartTemplateProps) {
   const { productsPage } = settings || {}
-  const { addItemToCart, cartIsEmpty, cartTotal, hasInitializedCart } = useCart()
+  const { cart, addItemToCart, cartIsEmpty, cartTotal, hasInitializedCart } = useCart()
 
   return (
     <div className="py-12">

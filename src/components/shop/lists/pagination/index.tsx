@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/lib/utils/cn'
+import { cn } from '@lib/utils/cn'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 export function Pagination({

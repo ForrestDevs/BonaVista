@@ -1,14 +1,22 @@
-'use client'
-
-import React from 'react'
-import { useCart } from '@/lib/providers/Cart'
+import React, { Suspense } from 'react'
+import { getCart } from '@lib/data/cart'
+import Spinner from '@components/ui/spinner'
 
 export function CartTotal() {
-  const { cartTotal } = useCart()
+  return (
+    <Suspense fallback={<Spinner />}>
+      <CartTotalContent />
+    </Suspense>
+  )
+}
 
-  if (!cartTotal) {
+const CartTotalContent = async () => {
+  const cart = await getCart()
+  const cartTotal = cart?.subtotal
+
+  if (!cart || !cartTotal) {
     return <div>Cart is empty</div>
   }
 
-  return <span className="text-lg font-semibold">{cartTotal.formatted}</span>
+  return <span className="text-lg font-semibold">{cartTotal}</span>
 }

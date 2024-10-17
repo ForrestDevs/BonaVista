@@ -30,7 +30,11 @@ const nextConfig = {
 		ppr: true,
 		after: true,
 	},
-  reactStrictMode: true,
+  devIndicators: {
+    buildActivity: false,
+    appIsrStatus: false,
+  },
+  // reactStrictMode: true,
   redirects,
 }
 

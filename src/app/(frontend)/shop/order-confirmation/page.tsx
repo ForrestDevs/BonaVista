@@ -1,8 +1,9 @@
 import React from 'react'
 import { Metadata } from 'next'
-import { mergeOpenGraph } from '@/lib/utils/merge-open-graph'
+import { mergeOpenGraph } from '@lib/utils/mergeOpenGraph'
 import { notFound } from 'next/navigation'
-import { serverClient } from '@/lib/trpc/serverClient'
+import getPayload from '@lib/utils/getPayload'
+// import { serverClient } from '@lib/trpc/serverClient'
 // import OrderCompletedTemplate from '@/components/shop/order/templates/order-completed-template'
 
 type Props = {
@@ -18,30 +19,29 @@ export const metadata: Metadata = {
   }),
 }
 
-async function getOrder(id: string) {
-  const order = await serverClient.order.getOrderById({ id })
-
-  if (!order) {
-    return notFound()
-  }
-
-  return order
-}
 
 export default async function OrderConfirmedPage({
   params,
   searchParams,
 }: {
-  params: { slug: string }
-  searchParams?: { [key: string]: string | string[] | undefined }
+  params: Promise<{ slug: string }>
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const orderId = Array.isArray(searchParams?.order_id)
-    ? searchParams.order_id[0]
-    : searchParams?.order_id
+  const { slug } = await params
+  const { order_id } = await searchParams
+  const orderId = Array.isArray(order_id)
+    ? order_id[0]
+    : order_id
   if (!orderId) {
     return notFound() // Handle case where orderId is undefined
   }
-  const order = await getOrder(orderId)
+  
+  const payload = await getPayload()
+
+  const order = await payload.findByID({
+    collection: 'orders',
+    id: orderId,
+  })
 
   return (
     <div className="p-4 m-6 flex-1">

@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
-import { ProductCollection } from '@/payload-types'
-import SkeletonProductGrid from '@/components/shop/skeletons/layout/skeleton-product-grid'
+import { ShopCollection } from '@payload-types'
+import SkeletonProductGrid from '@components/shop/skeletons/layout/skeleton-product-grid'
 import { SortOptions } from '../lists/refinement-list/sort-products'
 // import PaginatedProducts from '../lists/pagination/paginated-products'
 
@@ -14,7 +14,7 @@ export default function CollectionTemplate({
   page,
 }: {
   sortBy?: SortOptions
-  collection: ProductCollection
+  collection: ShopCollection
   page?: string
 }) {
   const pageNumber = page ? parseInt(page) : 1

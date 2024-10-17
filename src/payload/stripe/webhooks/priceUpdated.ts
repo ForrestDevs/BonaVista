@@ -58,7 +58,7 @@ export const priceUpdated: StripeWebhookHandler<{
         id: payloadProductID,
         collection: 'products',
         data: {
-          priceJSON: JSON.stringify(stripePrices),
+          // priceJSON: JSON.stringify(stripePrices),
           skipSync: true,
         },
       })

@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
 
-import { RelatedPosts } from '@/components/layout/blocks/related-posts'
-import { PayloadRedirects } from '@/components/layout/redirects'
+import { RelatedPosts } from '@/components/payload/blocks/RelatedPosts'
+import { PayloadRedirects } from '@/components/payload/PayloadRedirects'
 import configPromise from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { draftMode, headers } from 'next/headers'
 import React, { cache } from 'react'
-import RichText from '@/components/layout/rich-text'
+import RichText from '@/components/payload/RichText'
 import type { Post } from '@/payload-types'
 
-import { PostHero } from '@/components/layout/heros/post-hero'
+import { PostHero } from '@/components/payload/heros/PostHero'
 import { generateMeta } from '@/lib/utils/generateMeta'
 
 export async function generateStaticParams() {
@@ -24,7 +24,10 @@ export async function generateStaticParams() {
   return posts.docs?.map(({ slug }) => slug)
 }
 
-export default async function Post({ params: { slug = '' } }) {
+type Params = Promise<{ slug: string | undefined }>
+
+export default async function Post({ params }: { params: Params }) {
+  const { slug } = await params
   const url = '/blog/' + slug
   const post = await queryPostBySlug({ slug })
 
@@ -55,11 +58,8 @@ export default async function Post({ params: { slug = '' } }) {
   )
 }
 
-export async function generateMetadata({
-  params: { slug },
-}: {
-  params: { slug: string }
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { slug } = await params
   const post = await queryPostBySlug({ slug })
 
   return generateMeta({ doc: post, collectionSlug: 'posts' })

@@ -1,5 +1,5 @@
 import React from 'react'
-import { YnsLink } from '@/components/ui/link'
+import { YnsLink } from '@components/ui/link'
 
 export function CartHeader() {
   return (

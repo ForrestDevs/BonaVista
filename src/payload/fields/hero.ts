@@ -36,6 +36,10 @@ export const hero: Field = {
           label: 'Low Impact',
           value: 'lowImpact',
         },
+        {
+          label: 'Parallax',
+          value: 'parallax',
+        },
       ],
       required: true,
     },

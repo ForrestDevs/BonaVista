@@ -1,9 +1,9 @@
 import React from 'react'
 import { ProductCategory } from '@payload-types'
-import { Card, CardHeader, CardContent, CardFooter, CardTitle } from '@/components/ui/card'
+import { Card, CardHeader, CardContent, CardFooter, CardTitle } from '@components/ui/card'
 import { TagIcon } from 'lucide-react'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { Button } from '@components/ui/button'
 import { ChevronRightIcon } from 'lucide-react'
 
 export default function ProductCategoryCard({ category }: { category: ProductCategory }) {

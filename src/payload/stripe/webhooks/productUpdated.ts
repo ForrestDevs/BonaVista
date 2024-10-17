@@ -69,8 +69,8 @@ export const productUpdated: StripeWebhookHandler<{
         collection: 'products',
         data: {
           title: stripeProductName,
-          description: stripeDescription,
-          priceJSON: JSON.stringify(prices),
+          // description: stripeDescription,
+          // priceJSON: JSON.stringify(prices),
           skipSync: true,
         },
       })

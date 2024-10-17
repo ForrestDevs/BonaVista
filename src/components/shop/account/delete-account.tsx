@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -8,12 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
+} from '@components/ui/dialog'
+import { Input } from '@components/ui/input'
 import { useState } from 'react'
 import { useFormState } from 'react-dom'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardFooter } from '@components/ui/card'
+import { Label } from '@components/ui/label'
 // import { deleteUser } from './actions'
 
 export default function DeleteAccountSection() {

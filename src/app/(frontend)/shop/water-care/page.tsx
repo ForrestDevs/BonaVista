@@ -1,17 +1,17 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@components/ui/button'
+import { Input } from '@components/ui/input'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@components/ui/select'
 import { ChevronRightIcon, FilterIcon, SlidersHorizontalIcon } from 'lucide-react'
-// import { ShopWaterCare } from '@/components/shop/products/product-card'
+import { ShopWaterCare } from '@components/shop/products/product-card'
 
 export default function ShopWaterCarePage() {
   return (
@@ -59,7 +59,7 @@ export default function ShopWaterCarePage() {
               </div>
 
               <TabsContent value="all" className="mt-0">
-               {/* <ShopWaterCare /> */}
+               <ShopWaterCare />
               </TabsContent>
 
               {/* Repeat similar TabsContent for other categories */}

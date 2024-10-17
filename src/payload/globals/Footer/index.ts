@@ -10,17 +10,44 @@ export const Footer: GlobalConfig = {
   },
   fields: [
     {
-      name: 'navItems',
-      type: 'array',
-      fields: [
-        link({
-          appearances: false,
-        }),
+      type: 'tabs',
+      tabs: [
+        {
+          name: 'siteFooter',
+          label: 'Site Footer',
+          fields: [
+            {
+              name: 'navItems',
+              type: 'array',
+              fields: [
+                link({
+                  appearances: false,
+                }),
+              ],
+              maxRows: 6,
+            },
+          ],
+        },
+        {
+          name: 'shopFooter',
+          label: 'Shop Footer',
+          fields: [
+            {
+              name: 'navItems',
+              type: 'array',
+              fields: [
+                link({
+                  appearances: false,
+                }),
+              ],
+              maxRows: 6,
+            },
+          ],
+        },
       ],
-      maxRows: 6,
     },
   ],
   hooks: {
     afterChange: [revalidateFooter],
   },
-}
+} as const

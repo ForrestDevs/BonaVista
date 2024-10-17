@@ -1,3 +1,7 @@
+import path from 'path'
+import sharp from 'sharp'
+import { fileURLToPath } from 'url'
+import { buildConfig } from 'payload'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
@@ -5,6 +9,7 @@ import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { stripePlugin } from '@payloadcms/plugin-stripe'
+import { UnderlineFeature } from '@payloadcms/richtext-lexical'
 import {
   BoldFeature,
   FixedToolbarFeature,
@@ -13,35 +18,18 @@ import {
   LinkFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
-import sharp from 'sharp' // editor-import
-import { UnderlineFeature } from '@payloadcms/richtext-lexical'
-import path from 'path'
-import { buildConfig } from 'payload'
-import { fileURLToPath } from 'url'
-import { ProductCategory } from './payload/collections/ProductCategory'
-import { Media } from './payload/collections/Media'
-import { Pages } from './payload/collections/Page'
-import { Posts } from './payload/collections/Post'
-import { User } from './payload/collections/User'
-import BeforeDashboard from './payload/components/BeforeDashboard'
-import BeforeLogin from './payload/components/BeforeLogin'
-import { seed } from './payload/endpoints/seed'
-import { Footer } from './payload/globals/Footer'
-import { Header } from './payload/globals/Header'
-import { revalidateRedirects } from './payload/hooks/revalidateRedirects'
+import { Page, Post } from '@payload-types'
+import { revalidateRedirects } from '@payload/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
-import { Page, Post } from 'src/payload-types'
-import { Orders } from './payload/collections/Order'
-import { Product } from './payload/collections/Product'
-import { PostTag } from './payload/collections/PostTag'
-import { createPaymentIntent } from './payload/endpoints/create-payment-intent'
-import { customersProxy } from './payload/endpoints/customers'
-import { productsProxy } from './payload/endpoints/products'
-import { productUpdated } from './payload/stripe/webhooks/productUpdated'
-import { priceUpdated } from './payload/stripe/webhooks/priceUpdated'
-import { Settings } from './payload/globals/Settings'
-import { ProductCollection } from './payload/collections/ProductCollection'
-import { pricesProxy } from './payload/endpoints/prices'
+import { createPaymentIntent } from '@payload/endpoints/create-payment-intent'
+import { customersProxy } from '@payload/endpoints/customers'
+import { productsProxy } from '@payload/endpoints/products'
+import { productUpdated } from '@payload/stripe/webhooks/productUpdated'
+import { priceUpdated } from '@payload/stripe/webhooks/priceUpdated'
+import { pricesProxy } from '@payload/endpoints/prices'
+import Users from '@payload/collections/Users'
+import globals from '@payload/globals'
+import collections from '@payload/collections'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -66,7 +54,7 @@ export default buildConfig({
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeDashboard` statement on line 15.
       // beforeDashboard: [BeforeDashboard],
     },
-    user: User.slug,
+    user: Users.slug,
     livePreview: {
       breakpoints: [
         {
@@ -90,8 +78,8 @@ export default buildConfig({
       ],
     },
   },
-  // This config helps us configure global or default features that the other editors can inherit
   editor: lexicalEditor({
+    // This config helps us configure global or default features that the other editors can inherit
     features: () => {
       return [
         UnderlineFeature(),
@@ -127,17 +115,8 @@ export default buildConfig({
       process.env.DATABASE_URI ||
       'mongodb+srv://adminUser:adminPassword@bvcluster.rj022dr.mongodb.net/?retryWrites=true&w=majority&appName=bvCluster',
   }),
-  collections: [
-    Pages,
-    Posts,
-    Media,
-    ProductCategory,
-    User,
-    Orders,
-    Product,
-    PostTag,
-    ProductCollection,
-  ],
+  collections,
+  globals,
   cors: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ''].filter(Boolean),
   csrf: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ''].filter(Boolean),
   endpoints: [
@@ -169,7 +148,6 @@ export default buildConfig({
     //   path: '/seed',
     // },
   ],
-  globals: [Header, Footer, Settings],
   plugins: [
     stripePlugin({
       stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
@@ -258,9 +236,9 @@ export default buildConfig({
           // process.env.S3_ENDPOINT ||
           'https://0cfae28bf40e0c4d144f531d5343ec0b.r2.cloudflarestorage.com/bonavista',
         credentials: {
-          accessKeyId: 
-          // process.env.S3_ACCESS_KEY_ID || 
-          '12967cfdb3c3699eac9e04631ad60eed',
+          accessKeyId:
+            // process.env.S3_ACCESS_KEY_ID ||
+            '12967cfdb3c3699eac9e04631ad60eed',
           secretAccessKey:
             // process.env.S3_SECRET_ACCESS_KEY ||
             '762147e6fba455ad0fcfefecfbd39a5b043837b39b7dd29db21072a2e03d44b5',

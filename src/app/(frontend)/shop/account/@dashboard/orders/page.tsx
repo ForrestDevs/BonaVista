@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 import { notFound } from 'next/navigation'
-import { getCurrentUserOrders } from '@/components/shop/account/actions'
+import { getCurrentUserOrders } from '@components/shop/account/actions'
 
 export const metadata: Metadata = {
   title: 'Orders',

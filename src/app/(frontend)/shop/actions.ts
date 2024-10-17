@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation'
-import getPayload from '@/lib/utils/getPayload'
+import getPayload from '@lib/utils/getPayload'
 import {
   PRODUCT_SLUG,
-  PRODUCT_COLLECTION_SLUG,
+  SHOP_COLLECTION_SLUG,
   PRODUCT_CATEGORY_SLUG,
-} from '@/payload/collections/constants'
+} from '@payload/collections/constants'
 import type { Product } from '@payload-types'
 
 export async function getCollectionProducts(collectionSlug: string): Promise<Product[]> {
@@ -12,7 +12,7 @@ export async function getCollectionProducts(collectionSlug: string): Promise<Pro
 
   try {
     const collection = await payload.find({
-      collection: PRODUCT_COLLECTION_SLUG,
+      collection: SHOP_COLLECTION_SLUG,
       where: {
         slug: {
           equals: collectionSlug,

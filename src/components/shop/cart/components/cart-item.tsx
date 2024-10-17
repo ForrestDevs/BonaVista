@@ -1,24 +1,19 @@
 'use client'
 
-import type { CartItem } from '@/lib/types/cart'
-import { cn } from '@/lib/utils/cn'
-import { YnsLink } from '@/components/ui/link'
+import type { CartItem } from '@lib/types/cart'
+import { cn } from '@lib/utils/cn'
+import { YnsLink } from '@components/ui/link'
 import { useState } from 'react'
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from '@/components/ui/table'
-import Spinner from '@/components/ui/spinner'
-import { HttpTypes } from '@medusajs/types'
-// import { updateLineItem } from '@/lib/medusa/data/cart'
-import { Media } from '@/components/layout/media'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@components/ui/table'
+import Spinner from '@components/ui/spinner'
+import { Media } from '@components/payload/Media'
+import { Product } from '@payload-types'
+import Price from '@components/shop/price'
+import { CartItemQuantity } from './cart-item-quantity'
+// import { EditItemQuantityButton } from './edit-item-quantity-button'
 
 type ItemProps = {
-  item: HttpTypes.StoreCartLineItem
+  item: CartItem
   type?: 'full' | 'preview'
 }
 
@@ -26,44 +21,48 @@ export function CartItem({ item, type = 'full' }: ItemProps) {
   const [updating, setUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const { handle } = item.variant?.product ?? {}
+  // const { handle } = item.variant?.product ?? {}
 
   const changeQuantity = async (quantity: number) => {
     setError(null)
     setUpdating(true)
-
-    // const message = await updateLineItem({
-    //   lineId: item.id,
-    //   quantity,
-    // })
-    //   .catch((err) => {
-    //     setError(err.message)
-    //   })
-    //   .finally(() => {
-    //     setUpdating(false)
-    //   })
   }
   // TODO: Update this to grab the actual max inventory
   const maxQtyFromInventory = 10
-  const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
+  // const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
+
+  const product = item.product as Product
+
+  // if (typeof product === 'object') {
+  //   return null
+  // }
+
+  // const title = typeof product === 'object' ? product.title : ''
+  // const hasVariant = typeof item.product === 'object'
+  // const price = item.variant?.price
+
+  const hasVariant = product.enableVariants
+  const price = product.enableVariants
+    ? product.variants.variantProducts[0].price
+    : product.baseProduct.price
 
   return (
     <TableRow className="w-full" data-testid="product-row">
       <TableCell className="!pl-0 p-4 w-24">
         <YnsLink
-          href={`/products/${handle}`}
+          href={`/products/${product.slug}`}
           className={cn('flex', {
             'w-16': type === 'preview',
             'small:w-24 w-12': type === 'full',
           })}
         >
-          <Media resource={item.thumbnail} size="sm" />
+          <Media resource={product.gallery[0].image} size="sm" />
         </YnsLink>
       </TableCell>
 
       <TableCell className="text-left">
         <span className="text-base font-medium text-gray-900" data-testid="product-title">
-          {item.product_title} 
+          {product.title}
         </span>
         {/* <LineItemOptions variant={item.variant} data-testid="product-variant" /> */}
       </TableCell>
@@ -71,6 +70,10 @@ export function CartItem({ item, type = 'full' }: ItemProps) {
       {type === 'full' && (
         <TableCell>
           <div className="flex gap-2 items-center w-28">
+            <CartItemQuantity item={item} />
+            {/* <EditItemQuantityButton item={item} type="minus" />
+            <span>{item.quantity}</span>
+            <EditItemQuantityButton item={item} type="plus" /> */}
             {/* <DeleteButton id={item.id} data-testid="product-delete-button" /> */}
             {/* <CartItemSelect
                 value={item.quantity}
@@ -100,7 +103,7 @@ export function CartItem({ item, type = 'full' }: ItemProps) {
 
       {type === 'full' && (
         <TableCell className="hidden small:table-cell">
-          {/* <LineItemUnitPrice item={item} region={region} style="tight" /> */}
+          <Price amount={price} currencyCode="usd" />
         </TableCell>
       )}
 
@@ -113,9 +116,11 @@ export function CartItem({ item, type = 'full' }: ItemProps) {
           {type === 'preview' && (
             <span className="flex gap-x-1 ">
               <span className="text-gray-500">{item.quantity}x </span>
+              <Price amount={price} currencyCode="usd" />
               {/* <LineItemUnitPrice item={item} region={region} style="tight" /> */}
             </span>
           )}
+          <Price amount={price} currencyCode="usd" />
           {/* <LineItemPrice item={item} region={region} style="tight" /> */}
         </span>
       </TableCell>

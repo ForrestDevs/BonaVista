@@ -1,47 +1,128 @@
+// import type { InfoType } from '@/payload/collections/Products/ui/types'
+import type { User, Customer, CartItems } from '@payload-types'
 import type { PayloadHandler } from 'payload'
-import type { CartItems } from '@/payload-types'
-import { USER_SLUG } from '../collections/constants'
-import { stripe } from '@/payload/stripe'
-import { CartItem } from '@/lib/types/cart'
+import { addDataAndFileToRequest } from '@payloadcms/next/utilities'
+import { stripe } from '@payload/stripe'
+import { CUSTOMER_SLUG, USER_SLUG } from '@payload/collections/constants'
+import Stripe from 'stripe'
 
-// this endpoint creates a `PaymentIntent` with the items in the cart
+// this endpoint creates an `Invoice` with the items in the cart
 // to do this, we loop through the items in the cart and lookup the product in Stripe
 // we then add the price of the product to the total
 // once completed, we pass the `client_secret` of the `PaymentIntent` back to the client which can process the payment
-export const createPaymentIntent: PayloadHandler = async (req): Promise<Response> => {
-  const { payload, user } = req
+export const createPaymentIntent: PayloadHandler = async (req) => {
+  const { payload, user, data } = req
+  console.log({ data })
 
-  if (!user) {
-    return new Response('Unauthorized', { status: 401 })
+  const cartFromRequest = data?.cart
+  const emailFromRequest = data?.email
+
+  if (!user && !emailFromRequest) {
+    return Response.json('A user or an email is required for this transaction.', { status: 401 })
   }
 
-  const fullUser = await payload.findByID({
-    id: user?.id,
-    collection: USER_SLUG,
-    depth: 1,
-  })
+  let customer: Customer | undefined
+  let email: string | undefined
 
-  console.log("Full User", JSON.stringify(fullUser, null, 2))
+  if (user) {
+    const fullUser = await payload.findByID({
+      id: user.id,
+      collection: USER_SLUG,
+    })
 
-  if (!fullUser) {
-    return new Response('User not found', { status: 404 })
+    if (!fullUser) {
+      return Response.json('User not found', { status: 404 })
+    }
+
+    email = fullUser.email
+    customer = await payload
+      .find({
+        collection: CUSTOMER_SLUG,
+        where: {
+          account: {
+            equals: user.id,
+          },
+        },
+      })
+      .then((res) => res.docs[0])
+
+    if (!customer) {
+      // Create a new customer for the user if it doesn't exist
+      customer = await payload.create({
+        collection: CUSTOMER_SLUG,
+        data: {
+          has_account: true,
+          account: user.id,
+          email: fullUser.email,
+        },
+      })
+    }
+  } else if (emailFromRequest) {
+    email = emailFromRequest
+    customer = await payload
+      .find({
+        collection: CUSTOMER_SLUG,
+        where: {
+          email: {
+            equals: email,
+          },
+        },
+      })
+      .then((res) => res.docs[0])
+
+    if (!customer) {
+      // Create a new customer for the email if it doesn't exist
+      customer = await payload.create({
+        collection: CUSTOMER_SLUG,
+        data: {
+          email: email,
+          has_account: false,
+        },
+      })
+    }
+  }
+
+  if (!customer) {
+    return Response.json('Unable to create or find customer', { status: 500 })
+  }
+
+  const cart = (cartFromRequest as { items: CartItems }).items
+
+  if (!cart && cart?.length > 0) {
+    return Response.json(
+      { error: 'Please provide a cart either directly or from the user.' },
+      { status: 401 },
+    )
   }
 
   try {
-    let stripeCustomerID = fullUser?.stripeCustomerID
+    let stripeCustomerID = customer.stripeCustomerID
+    let stripeCustomer: Stripe.Customer | undefined
 
-    // lookup user in Stripe and create one if not found
-    if (!stripeCustomerID) {
-      const customer = await stripe.customers.create({
-        name: fullUser?.name || '',
-        email: fullUser?.email || '',
+    // If the customer has a Stripe Customer ID, use that
+    if (stripeCustomerID) {
+      stripeCustomer = (await stripe.customers.retrieve(stripeCustomerID)) as Stripe.Customer
+    } else {
+      // Lookup customer in Stripe or create a new one
+      const stripeCustomers = await stripe.customers.list({
+        email: email,
+        limit: 1,
       })
 
-      stripeCustomerID = customer.id
+      if (stripeCustomers.data.length > 0) {
+        stripeCustomer = stripeCustomers.data[0]
+      } else {
+        stripeCustomer = await stripe.customers.create({
+          email: email,
+        })
+      }
 
+      stripeCustomerID = stripeCustomer.id
+
+      // Update the customer in Payload with the Stripe Customer ID
       await payload.update({
-        id: user?.id,
-        collection: 'users',
+        collection: CUSTOMER_SLUG,
+        id: customer.id,
         data: {
           stripeCustomerID,
         },
@@ -49,41 +130,38 @@ export const createPaymentIntent: PayloadHandler = async (req): Promise<Response
     }
 
     let total = 0
+    const metadata = []
 
-    const hasItems = fullUser.cart?.items?.length ?? 0 > 0
-
-    if (!hasItems) {
-      throw new Error('No items in cart')
-    }
-
-    // for each item in cart, lookup the product in Stripe and add its price to the total
+    // For each item in cart, calculate the total price
     await Promise.all(
-      (fullUser.cart?.items ?? []).map(async (item: CartItem): Promise<Response> => {
-        const { product, quantity } = item
+      cart?.map(async (item) => {
+        const { product, quantity, variant: variantFromItem } = item
 
-        if (!quantity) {
-          return new Response('No quantity', { status: 400 })
+        if (!quantity || typeof product === 'string') {
+          return null
         }
 
-        // if (typeof product === 'string' || product?.stripeProductID) {
-        //   throw new Error('No Stripe Product ID')
-        // }
+        let price = 0
 
-        const prices = await stripe.prices.list({
-          expand: ['data.product'],
-          limit: 100,
-          // @ts-ignore
-          product: product.stripeProductID,
+        if (variantFromItem) {
+          const variant = product.variants?.variantProducts.find((v) => v.id === variantFromItem)
+          if (variant && typeof variant.price === 'number') {
+            price = variant.price
+          }
+        } else if (typeof product.baseProduct.price === 'number') {
+          price = product.baseProduct.price
+        }
+
+        metadata.push({
+          product: product.id,
+          quantity,
+          variant: variantFromItem,
+          price,
         })
 
-        if (prices.data.length === 0) {
-          return new Response('There are no items in your cart to checkout with', { status: 404 })
-        }
+        total += price * quantity
 
-        const price = prices.data[0]
-        total += (price.unit_amount ?? 0) * quantity
-
-        return new Response(null)
+        return null
       }),
     )
 
@@ -95,13 +173,17 @@ export const createPaymentIntent: PayloadHandler = async (req): Promise<Response
       amount: total,
       currency: 'usd',
       customer: stripeCustomerID,
+      metadata: {
+        cart: JSON.stringify(metadata),
+      },
       payment_method_types: ['card'],
     })
 
-    return new Response(JSON.stringify({ client_secret: paymentIntent.client_secret }))
+    return Response.json({ client_secret: paymentIntent.client_secret }, { status: 200 })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     payload.logger.error(message)
-    return new Response(message, { status: 500 })
+
+    return Response.json({ error: message }, { status: 401 })
   }
 }

@@ -1,12 +1,12 @@
 import { Metadata } from 'next'
-import LoginTemplate from '@/components/shop/account/layout/login-layout'
+import LoginTemplate from '@components/auth'
+
 
 export const metadata: Metadata = {
-  title: 'Sign in',
-  description: 'Sign in to your BonaVista Store account.',
+  title: 'Login',
+  description: 'Login or create an account to get started.',
 }
 
 export default function Login() {
-  // return <LoginTemplate />
-  return <div>Login</div>
+  return <LoginTemplate />
 }

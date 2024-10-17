@@ -1,123 +1,118 @@
 'use client'
 
-import type { User } from '@payload-types'
-import { cn } from '@/lib/utils/cn'
+import React, { useState } from 'react'
+import { cn } from '@lib/utils/cn'
 import { useParams, usePathname } from 'next/navigation'
-import { User as UserIcon, MapPin, Package, ChevronDown, ArrowRightSquare } from 'lucide-react'
-import { YnsLink } from '@/components/ui/link'
-import { signOut } from '../actions'
+import {
+  User as UserIcon,
+  MapPin,
+  Package,
+  ChevronDown,
+  ArrowRightSquare,
+  Menu,
+  LayoutDashboard,
+} from 'lucide-react'
+import { YnsLink } from '@components/ui/link'
+// import { useAuth } from '@lib/providers/Auth'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@components/ui/dropdown-menu'
+import { logout } from '@lib/data/auth'
+import { useRouter } from 'next/navigation'
 
-const AccountNav = ({ customer }: { customer: Omit<User, 'password_hash'> | null }) => {
-  const route = usePathname()
+export default function AccountNav() {
+  const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
+
+  const navItems = [
+    { href: '/shop/account', label: 'Overview', icon: LayoutDashboard },
+    { href: '/shop/account/profile', label: 'Profile', icon: UserIcon },
+    { href: '/shop/account/addresses', label: 'Addresses', icon: MapPin },
+    { href: '/shop/account/orders', label: 'Orders', icon: Package },
+  ]
+
+  const handleLogout = async () => {
+    await logout()
+    router.refresh()
+  }
 
   return (
-    <div>
-      <div className="small:hidden">
-        {route !== `/shop/account` ? (
-          <YnsLink href="/shop/account" className="flex items-center gap-x-2 font-medium py-2">
-            <>
-              <ChevronDown className="transform rotate-90" />
-              <span>Account</span>
-            </>
-          </YnsLink>
-        ) : (
-          <>
-            <div className="text-xl-semi mb-4 px-8">Hello {customer?.name}</div>
-            <div className="text-base-regular">
-              <ul>
-                <li>
-                  <YnsLink
-                    href="/shop/account/profile"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-                  >
-                    <>
-                      <div className="flex items-center gap-x-2">
-                        <UserIcon size={20} />
-                        <span>Profile</span>
-                      </div>
-                      <ChevronDown className="transform -rotate-90" />
-                    </>
-                  </YnsLink>
-                </li>
-                <li>
-                  <YnsLink
-                    href="/shop/account/addresses"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-                  >
-                    <>
-                      <div className="flex items-center gap-x-2">
-                        <MapPin size={20} />
-                        <span>Addresses</span>
-                      </div>
-                      <ChevronDown className="transform -rotate-90" />
-                    </>
-                  </YnsLink>
-                </li>
-                <li>
-                  <YnsLink
-                    href="/shop/account/orders"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
-                  >
-                    <div className="flex items-center gap-x-2">
-                      <Package size={20} />
-                      <span>Orders</span>
-                    </div>
-                    <ChevronDown className="transform -rotate-90" />
-                  </YnsLink>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full"
-                    onClick={() => signOut()}
-                  >
-                    <div className="flex items-center gap-x-2">
-                      <ArrowRightSquare />
-                      <span>Log out</span>
-                    </div>
-                    <ChevronDown className="transform -rotate-90" />
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </>
-        )}
-      </div>
-      <div className="">
-        <div>
-          <div className="pb-4">
-            <h3 className="text-base-semi">Account</h3>
-          </div>
-          <div className="text-base-regular">
-            <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
-              <li>
-                <AccountNavLink href="/shop/account" route={route!}>
-                  Overview
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink href="/shop/account/profile" route={route!}>
-                  Profile
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink href="/shop/account/addresses" route={route!}>
-                  Addresses
-                </AccountNavLink>
-              </li>
-              <li>
-                <AccountNavLink href="/shop/account/orders" route={route!}>
-                  Orders
-                </AccountNavLink>
-              </li>
-              <li className="text-gray-700">
-                <button type="button" onClick={() => signOut()}>
-                  Log out
+    <div className="w-full lg:w-48">
+      {/* Mobile View */}
+      <div className="lg:hidden w-full">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex items-center justify-between w-full py-2 px-4 bg-gray-100 rounded-md">
+            <span className="font-medium">Account Menu</span>
+            <Menu size={20} />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="bg-white border border-gray-200 rounded-md shadow-lg w-[87vw]">
+            {navItems.map((item) => (
+              <DropdownMenuItem
+                key={item.href}
+                className="text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <YnsLink href={item.href} className="flex items-center px-4 py-2 w-full gap-x-2">
+                  <item.icon size={16} />
+                  <span>{item.label}</span>
+                </YnsLink>
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+              <form action={handleLogout}>
+                <button type="submit" className="flex items-center w-full px-4 py-2 gap-x-2">
+                  <ArrowRightSquare size={16} />
+                  <span>Log out</span>
                 </button>
-              </li>
-            </ul>
-          </div>
+              </form>
+
+              {/* <YnsLink href="/logout" className="flex items-center w-full px-4 py-2 gap-x-2">
+                <ArrowRightSquare size={16} />
+                <span>Log out</span>
+              </YnsLink> */}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Desktop View */}
+      <div className="hidden lg:block">
+        <div className="pb-4">
+          <h3 className="text-lg font-semibold">Account</h3>
         </div>
+        <nav className="space-y-1">
+          {navItems.map((item) => (
+            <AccountNavLink
+              key={item.href}
+              href={item.href}
+              className="flex items-center px-3 py-2 text-sm font-medium rounded-md"
+            >
+              <item.icon className="mr-3 h-6 w-6" aria-hidden="true" />
+              {item.label}
+            </AccountNavLink>
+          ))}
+          <form action={handleLogout}>
+            <button
+              type="submit"
+              className="flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50"
+            >
+              <ArrowRightSquare className="mr-3 h-6 w-6" aria-hidden="true" />
+              Log out
+            </button>
+          </form>
+          {/* <YnsLink
+            href="/logout"
+            className="flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50"
+          >
+            <ArrowRightSquare className="mr-3 h-6 w-6" aria-hidden="true" />
+            Log out
+          </YnsLink> */}
+        </nav>
       </div>
     </div>
   )
@@ -125,31 +120,17 @@ const AccountNav = ({ customer }: { customer: Omit<User, 'password_hash'> | null
 
 type AccountNavLinkProps = {
   href: string
-  route: string
   children: React.ReactNode
-  'data-testid'?: string
+  className?: string
 }
 
-const AccountNavLink = ({
-  href,
-  route,
-  children,
-  'data-testid': dataTestId,
-}: AccountNavLinkProps) => {
-  const { countryCode }: { countryCode: string } = useParams()
-
-  const active = route.split(countryCode)[1] === href
+const AccountNavLink = ({ href, children, className }: AccountNavLinkProps) => {
   return (
     <YnsLink
       href={href}
-      className={cn('text-ui-fg-subtle hover:text-ui-fg-base', {
-        'text-ui-fg-base font-semibold': active,
-      })}
-      data-testid={dataTestId}
+      className={cn(className, 'text-gray-600 hover:bg-gray-50 hover:text-gray-900')}
     >
       {children}
     </YnsLink>
   )
 }
-
-export default AccountNav

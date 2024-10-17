@@ -2,34 +2,52 @@ import type { GlobalConfig } from 'payload'
 
 import { link } from '../../fields/link'
 import { revalidateHeader } from './hooks/revalidateHeader'
-import { linkGroup } from '@/payload/fields/linkGroup'
-import Edit from './ui/edit'
 import { navItem } from '@/payload/fields/nav-item'
+import { HEADER_SLUG } from '../constants'
 
 export const Header: GlobalConfig = {
-  slug: 'header',
+  slug: HEADER_SLUG,
   access: {
     read: () => true,
   },
   fields: [
     {
-      name: 'logo',
-      type: 'relationship',
-      relationTo: 'media',
-    },
-    {
-      name: 'navItems',
-      type: 'array',
-      fields: [
-        navItem(),
-        // link({
-        //   appearances: false,
-        // }),
-        // linkGroup({
-        //   appearances: false,
-        // }),
+      type: 'tabs',
+      tabs: [
+        {
+          name: 'siteHeader',
+          label: 'Site Header',
+          fields: [
+            {
+              name: 'logo',
+              type: 'relationship',
+              relationTo: 'media',
+            },
+            {
+              name: 'navItems',
+              type: 'array',
+              fields: [navItem()],
+              maxRows: 6,
+            },
+          ],
+        },
+        {
+          name: 'shopHeader',
+          label: 'Shop Header',
+          fields: [
+            {
+              name: 'navItems',
+              type: 'array',
+              fields: [
+                link({
+                  appearances: false,
+                }),
+              ],
+              maxRows: 6,
+            },
+          ],
+        },
       ],
-      maxRows: 6,
     },
   ],
   hooks: {

@@ -1,9 +1,9 @@
 'use client'
 
 import React from 'react'
-import { Button } from '@/components/ui/button'
-import { useCart } from '@/lib/providers/Cart'
-import { CartItem } from '@/lib/types/cart'
+import { Button } from '@components/ui/button'
+import { useCart } from '@lib/providers/Cart'
+import { CartItem } from '@lib/types/cart'
 import { MinusIcon, PlusIcon, XIcon } from 'lucide-react'
 
 interface CartActionProps {
@@ -38,7 +38,7 @@ export function DecreaseQuantityButton({ item }: CartActionProps) {
         quantity: quantity - 1,
       })
     } else {
-      deleteItemFromCart(product)
+      deleteItemFromCart(product.id)
     }
   }
 
@@ -116,7 +116,7 @@ export function RemoveItemButton({ item }: CartActionProps) {
   }
 
   const handleRemoveItem = () => {
-    deleteItemFromCart(product)
+    deleteItemFromCart(product.id)
   }
 
   return (

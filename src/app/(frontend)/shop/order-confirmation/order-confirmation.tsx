@@ -2,8 +2,8 @@
 
 import React, { Fragment, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useCart } from '@/lib/providers/Cart'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { useCart } from '@lib/providers/Cart'
+import { Alert, AlertDescription, AlertTitle } from '@components/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 

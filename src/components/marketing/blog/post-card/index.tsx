@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils/cn'
 import useClickableCard from '@/lib/hooks/useClickableCard'
 import type { Post } from '@/payload-types'
-import { Media } from '@/components/layout/media'
+import { Media } from '@components/payload/Media'
 
 export const PostCard: React.FC<{
   alignItems?: 'center'
@@ -18,10 +18,10 @@ export const PostCard: React.FC<{
   const { card, link } = useClickableCard({})
   const { className, doc, showCategories, title: titleFromProps } = props
 
-  const { slug, tags, meta, title } = doc || {}
+  const { slug, categories, meta, title } = doc || {}
   const { description, image: metaImage } = meta || {}
 
-  const hasCategories = tags && Array.isArray(tags) && tags.length > 0
+  const hasCategories = categories && Array.isArray(categories) && categories.length > 0
   const titleToUse = titleFromProps || title
   const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
   const href = `/blog/${slug}`
@@ -43,13 +43,13 @@ export const PostCard: React.FC<{
           <div className="uppercase text-sm mb-4">
             {showCategories && hasCategories && (
               <div>
-                {tags?.map((category, index) => {
+                {categories?.map((category, index) => {
                   if (typeof category === 'object') {
                     const { title: titleFromCategory } = category
 
                     const categoryTitle = titleFromCategory || 'Untitled category'
 
-                    const isLast = index === tags.length - 1
+                    const isLast = index === categories.length - 1
 
                     return (
                       <Fragment key={index}>

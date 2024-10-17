@@ -1,9 +1,9 @@
 // import { EllipseMiniSolid } from '@medusajs/icons'
 import { Ellipsis } from 'lucide-react'
 // import { Label, RadioGroup, Text, clx } from '@medusajs/ui'
-import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { cn } from '@/lib/utils/cn'
+import { Label } from '@components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@components/ui/radio-group'
+import { cn } from '@lib/utils/cn'
 import { ChangeEvent } from 'react'
 
 type FilterRadioGroupProps = {

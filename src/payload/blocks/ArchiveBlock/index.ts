@@ -6,13 +6,12 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
-import { POST_SLUG } from '@/payload/collections/constants'
+import { BLOG_CATEGORY_SLUG, POST_SLUG } from '@payload/collections/constants'
 
 export const Archive: Block = {
   slug: 'archive',
   fields: [
     {
-      label: 'Intro Content',
       name: 'introContent',
       type: 'richText',
       editor: lexicalEditor({
@@ -25,6 +24,7 @@ export const Archive: Block = {
           ]
         },
       }),
+      label: 'Intro Content',
     },
     {
       name: 'populateBy',
@@ -47,7 +47,7 @@ export const Archive: Block = {
       admin: {
         condition: (_, siblingData) => siblingData.populateBy === 'collection',
       },
-      defaultValue: POST_SLUG,
+      defaultValue: 'posts',
       label: 'Collections To Show',
       options: [
         {
@@ -55,6 +55,16 @@ export const Archive: Block = {
           value: POST_SLUG,
         },
       ],
+    },
+    {
+      name: 'categories',
+      type: 'relationship',
+      admin: {
+        condition: (_, siblingData) => siblingData.populateBy === 'collection',
+      },
+      hasMany: true,
+      label: 'Categories To Show',
+      relationTo: BLOG_CATEGORY_SLUG,
     },
     {
       name: 'limit',
@@ -74,7 +84,7 @@ export const Archive: Block = {
       },
       hasMany: true,
       label: 'Selection',
-      relationTo: [POST_SLUG],
+      relationTo: ['posts'],
     },
   ],
   labels: {

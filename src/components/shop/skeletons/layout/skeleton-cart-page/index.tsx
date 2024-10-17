@@ -5,11 +5,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import repeat from '@/lib/utils/repeat'
-import SkeletonCartItem from '@/components/shop/skeletons/components/skeleton-cart-item'
-import SkeletonCodeForm from '@/components/shop/skeletons/components/skeleton-code-form'
-import SkeletonOrderSummary from '@/components/shop/skeletons/components/skeleton-order-summary'
+} from '@components/ui/table'
+import repeat from '@lib/utils/repeat'
+import SkeletonCartItem from '@components/shop/skeletons/components/skeleton-cart-item'
+import SkeletonCodeForm from '@components/shop/skeletons/components/skeleton-code-form'
+import SkeletonOrderSummary from '@components/shop/skeletons/components/skeleton-order-summary'
 
 const SkeletonCartPage = () => {
   return (

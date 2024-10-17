@@ -1,13 +1,13 @@
 import type { User, Order } from '@payload-types'
 
-// import { formatAmount } from '@/lib/utils'
+// import { formatAmount } from '@lib/utils'
 // import ChevronDown from '@modules/common/icons/chevron-down'
 // import LocalizedClientLink from '@modules/common/components/localized-client-link'
 
 import { ChevronDown } from 'lucide-react'
-import { YnsLink } from '@/components/ui/link'
-import { Container } from '@/components/ui/container'
-import { Button } from '@/components/ui/button'
+import { YnsLink } from '@components/ui/link'
+import { Container } from '@components/ui/container'
+import { Button } from '@components/ui/button'
 import { PaginatedDocs } from 'payload'
 
 type OverviewProps = {
@@ -138,13 +138,13 @@ const getProfileCompletion = (customer: Omit<User, 'password_hash'> | null) => {
     count++
   }
 
-    // if (customer.phone) {
-    //   count++
-    // }
+  //   if (customer.phone) {
+  //     count++
+  //   }
 
-    // if (customer.billing_address) {
-    //   count++
-    // }
+  //   if (customer.billing_address) {
+  //     count++
+  //   }
 
   return (count / 4) * 100
 }

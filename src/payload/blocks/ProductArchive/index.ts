@@ -99,7 +99,7 @@ export const ProductArchive: Block = {
       },
       hasMany: true,
       label: 'Selection',
-      relationTo: [PRODUCT_COLLECTION_SLUG, PRODUCT_CATEGORY_SLUG],
+      relationTo: [PRODUCT_CATEGORY_SLUG],
     },
     {
       label: "Show Product Collections First",

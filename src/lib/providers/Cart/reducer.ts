@@ -1,14 +1,13 @@
-import { CartAction, CartItem, CartType } from '@/lib/types/cart'
+import type { Cart } from '@payload-types'
+import type { CartItem, CartAction } from '@lib/types/cart'
 
-export const cartReducer = (cart: CartType, action: CartAction): CartType => {
+export const cartReducer = (cart: Cart | null, action: CartAction): Cart => {
   switch (action.type) {
     case 'SET_CART': {
-      console.log('Setting cart', action)
       return action.payload
     }
 
     case 'MERGE_CART': {
-      console.log('Merging cart', action)
       const { payload: incomingCart } = action
 
       const syncedItems: CartItem[] = [
@@ -16,17 +15,19 @@ export const cartReducer = (cart: CartType, action: CartAction): CartType => {
         ...(incomingCart?.items || []),
       ].reduce((acc: CartItem[], item) => {
         // remove duplicates
-        const productId = typeof item.product === 'string' ? item.product : item?.product?.id
+        const productId =
+          item.id /* typeof item.product === 'string' ? item.product : item?.cproduct?.id */
 
-        const indexInAcc = acc.findIndex(({ product }) =>
-          typeof product === 'string' ? product === productId : product?.id === productId,
+        const indexInAcc = acc.findIndex(
+          ({ id }) =>
+            /* typeof product === 'string' ? product === productId : product?.id === productId, */
+            id === productId,
         ) // eslint-disable-line function-paren-newline
 
         if (indexInAcc > -1) {
           acc[indexInAcc] = {
             ...acc[indexInAcc],
-            // customize the merge logic here, e.g.:
-            // quantity: acc[indexInAcc].quantity + item.quantity
+            quantity: acc[indexInAcc].quantity + item.quantity,
           }
         } else {
           acc.push(item)
@@ -41,16 +42,18 @@ export const cartReducer = (cart: CartType, action: CartAction): CartType => {
     }
 
     case 'ADD_ITEM': {
-      console.log('Adding item to cart', action)
       // if the item is already in the cart, increase the quantity
       const { payload: incomingItem } = action
       const productId =
         typeof incomingItem.product === 'string' ? incomingItem.product : incomingItem?.product?.id
-      const variantId = incomingItem.variant?.id
 
-      const indexInCart = cart?.items?.findIndex(({ product }) =>
-        typeof product === 'string' ? product === productId : product?.id === productId,
-      ) // eslint-disable-line function-paren-newline
+      const indexInCart = cart?.items?.findIndex(({ product, variant }) => {
+        if (incomingItem.variant) {
+          return variant === incomingItem.variant
+        } else {
+          return typeof product === 'string' ? product === productId : product?.id === productId
+        }
+      }) // eslint-disable-line function-paren-newline
 
       const withAddedItem = [...(cart?.items || [])]
 
@@ -61,7 +64,10 @@ export const cartReducer = (cart: CartType, action: CartAction): CartType => {
       if (typeof indexInCart === 'number' && indexInCart > -1) {
         withAddedItem[indexInCart] = {
           ...withAddedItem[indexInCart],
-          quantity: (incomingItem.quantity || 0) > 0 ? incomingItem.quantity : undefined,
+          quantity:
+            (incomingItem.quantity || 0) > 0
+              ? (withAddedItem[indexInCart].quantity || 0) + incomingItem.quantity
+              : undefined,
         }
       }
 
@@ -71,16 +77,60 @@ export const cartReducer = (cart: CartType, action: CartAction): CartType => {
       }
     }
 
+    case 'INCREMENT_QUANTITY': {
+      // if the item is already in the cart, increase the quantity
+      const { payload: itemId } = action
+
+      const incrementedItems = cart?.items?.map((item) => {
+        if (item.id === itemId) {
+          return {
+            ...item,
+            quantity: item.quantity + 1,
+          }
+        }
+        return item
+      })
+
+      return {
+        ...cart,
+        items: incrementedItems,
+      }
+    }
+
+    case 'DECREMENT_QUANTITY': {
+      // if the item is already in the cart, decrease the quantity
+      const { payload: itemId } = action
+
+      const incrementedItems = cart?.items?.reduce((items, item) => {
+        if (item.id === itemId) {
+          // Decrement the item if it has more than 1
+          if (item.quantity > 1) {
+            return [
+              ...items,
+              {
+                ...item,
+                quantity: item.quantity - 1,
+              },
+            ]
+          } else {
+            // otherwise remove it entirely from the cart if quantity reaches 0
+            return items
+          }
+        }
+        return [...items, item]
+      }, [])
+
+      return {
+        ...cart,
+        items: incrementedItems,
+      }
+    }
+
     case 'DELETE_ITEM': {
-      console.log('Deleting item from cart', action)
-      const { payload: incomingProduct } = action
+      const { payload: itemId } = action
       const withDeletedItem = { ...cart }
 
-      const indexInCart = cart?.items?.findIndex(({ product }) =>
-        typeof product === 'string'
-          ? product === incomingProduct.id
-          : product?.id === incomingProduct.id,
-      ) // eslint-disable-line function-paren-newline
+      const indexInCart = cart?.items?.findIndex(({ id }) => id === itemId) // eslint-disable-line function-paren-newline
 
       if (typeof indexInCart === 'number' && withDeletedItem.items && indexInCart > -1)
         withDeletedItem.items.splice(indexInCart, 1)
@@ -89,10 +139,25 @@ export const cartReducer = (cart: CartType, action: CartAction): CartType => {
     }
 
     case 'CLEAR_CART': {
-      console.log('Clearing cart')
       return {
         ...cart,
         items: [],
+      }
+    }
+
+    case 'SET_SHIPPING_ADDRESS': {
+      const { payload: shippingAddress } = action
+      return {
+        ...cart,
+        shipping_address: shippingAddress,
+      }
+    }
+
+    case 'SET_BILLING_ADDRESS': {
+      const { payload: billingAddress } = action
+      return {
+        ...cart,
+        billing_address: billingAddress,
       }
     }
 

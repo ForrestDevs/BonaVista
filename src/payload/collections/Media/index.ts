@@ -1,18 +1,21 @@
 import type { CollectionConfig } from 'payload'
+
 import {
   FixedToolbarFeature,
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
-import { anyone, authenticated } from '@/payload/access'
-import { urlField } from '../../fields/url'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+import { anyone, authenticated } from '@payload/access'
 import { MEDIA_SLUG } from '../constants'
 
-export const Media: CollectionConfig = {
+const filename = fileURLToPath(import.meta.url)
+const dirname = path.dirname(filename)
+
+const Media: CollectionConfig = {
   slug: MEDIA_SLUG,
-  admin: {
-    group: "Content"
-  },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -33,17 +36,6 @@ export const Media: CollectionConfig = {
           return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]
         },
       }),
-    },
-    {
-      name: 'sizes',
-      type: 'group',
-      fields: [
-        {
-          name: 'square',
-          type: 'group',
-          fields: [urlField],
-        },
-      ],
     },
   ],
   upload: {
@@ -106,9 +98,6 @@ export const Media: CollectionConfig = {
     focalPoint: false,
     crop: false,
   },
-  // upload: {
-  //   disableLocalStorage: true,
-  //   Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload
-  //   staticDir: path.resolve(dirname, '../../../public/media'),
-  // },
 } as const
+
+export default Media

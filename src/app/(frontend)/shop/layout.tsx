@@ -1,5 +1,6 @@
-import { Nav, StoreHeader } from '@/components/shop/layout/nav/Nav'
-import { TooltipProvider } from '@/components/ui/tooltip'
+import { ShopFooter } from '@components/layout/footers/shop'
+import { ShopHeader } from '@components/layout/headers/shop'
+import { TooltipProvider } from '@components/ui/tooltip'
 
 export default async function StoreLayout({
   children,
@@ -9,14 +10,15 @@ export default async function StoreLayout({
   modal: React.ReactNode
 }>) {
   return (
-    <>
-      <StoreHeader />
+    <div>
+      <ShopHeader />
       <TooltipProvider>
         <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-6 pt-6 sm:px-6 lg:px-8">
           {children}
           {modal}
         </main>
       </TooltipProvider>
-    </>
+      <ShopFooter />
+    </div>
   )
 }

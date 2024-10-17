@@ -1,12 +1,11 @@
 import React from 'react'
 import type { CartItems } from '@payload-types'
-import { Table, TableHeader, TableBody, TableRow, TableHead } from '@/components/ui/table'
+import { Table, TableHeader, TableBody, TableRow, TableHead } from '@components/ui/table'
 import SkeletonLineItem from '../../skeletons/components/skeleton-line-item'
 import { CartItem } from '../components/cart-item'
-import { HttpTypes } from '@medusajs/types'
 
 type ItemsTemplateProps = {
-  items?: HttpTypes.StoreCartLineItem[]
+  items: CartItems
 }
 
 export function CartItems({ items }: ItemsTemplateProps) {
@@ -28,9 +27,9 @@ export function CartItems({ items }: ItemsTemplateProps) {
         <TableBody>
           {items
             ? items
-                .sort((a, b) => {
-                  return (a.created_at ?? '') > (b.created_at ?? '') ? -1 : 1
-                })
+                // .sort((a, b) => {
+                //   return (a.created_at ?? '') > (b.created_at ?? '') ? -1 : 1
+                // })
                 .map((item) => {
                   return <CartItem key={item.id} item={item} />
                 })

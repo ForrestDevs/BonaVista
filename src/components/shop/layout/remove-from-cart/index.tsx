@@ -1,8 +1,8 @@
 import React from 'react'
 
 import type { Product } from '@/payload-types'
-import { useCart } from '@/lib/providers/Cart'
-import { Button } from '@/components/ui/button'
+import { useCart } from '@lib/providers/Cart'
+import { Button } from '@components/ui/button'
 
 export const RemoveFromCartButton: React.FC<{
   className?: string
@@ -22,7 +22,7 @@ export const RemoveFromCartButton: React.FC<{
     <Button
       className={className}
       onClick={() => {
-        deleteItemFromCart(product)
+        deleteItemFromCart(product.id)
       }}
     >
       Remove

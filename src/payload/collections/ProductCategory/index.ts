@@ -1,10 +1,9 @@
 import type { CollectionConfig } from 'payload'
-import { admin, anyone, authenticated } from '@/payload/access'
-import { PRODUCT_CATEGORY_SLUG } from '../constants'
-import { PRODUCT_SLUG } from '../constants'
-import { slugField } from '@/payload/fields/slug'
+import { admin } from '@payload/access'
+import { PRODUCT_CATEGORY_SLUG } from '@payload/collections/constants'
+import { slugField } from '@payload/fields/slug'
 
-export const ProductCategory: CollectionConfig = {
+const ProductCategory: CollectionConfig = {
   slug: PRODUCT_CATEGORY_SLUG,
   access: {
     create: admin,
@@ -46,3 +45,5 @@ export const ProductCategory: CollectionConfig = {
   ],
   timestamps: true,
 } as const
+
+export default ProductCategory

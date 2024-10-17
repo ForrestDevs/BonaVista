@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button'
-import { YnsLink } from '@/components/ui/link'
+import { Button } from '@components/ui/button'
+import { YnsLink } from '@components/ui/link'
 
 const SignInPrompt = () => {
   return (

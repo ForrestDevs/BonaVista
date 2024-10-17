@@ -1,5 +1,5 @@
-import repeat from '@/lib/utils/repeat'
-import SkeletonProductPreview from '@/components/shop/skeletons/components/skeleton-product-preview'
+import repeat from '@lib/utils/repeat'
+import SkeletonProductPreview from '@components/shop/skeletons/components/skeleton-product-preview'
 
 const SkeletonRelatedProducts = () => {
   return (

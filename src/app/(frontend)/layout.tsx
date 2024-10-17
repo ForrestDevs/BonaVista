@@ -6,16 +6,19 @@ import { cn } from '@/lib/utils/cn'
 import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
 import { Providers } from '@/lib/providers'
-import { mergeOpenGraph } from '@/lib/utils/merge-open-graph'
+import { mergeOpenGraph } from '@/lib/utils/mergeOpenGraph'
 import config from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { getLocale } from 'next-intl/server'
-import { Footer } from '@/components/layout/footer'
+import { Footer } from '@/components/layout/footers/site'
+import { LivePreviewListener } from '@/components/payload/LivePreviewListener'
+import { AdminBar } from '@/components/payload/AdminBar'
 
 export async function generateMetadata(): Promise<Metadata> {
   const payload = await getPayloadHMR({ config })
+
   const initData = await payload.findGlobal({
-    slug: 'settings',
+    slug: 'site-settings',
   })
 
   return {
@@ -42,6 +45,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <main className="flex min-h-full flex-col">
           <Providers>
+            {/* <AdminBar /> */}
+            <LivePreviewListener />
             {children}
             <Footer />
           </Providers>

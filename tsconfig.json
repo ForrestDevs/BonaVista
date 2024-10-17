@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "esModuleInterop": true,
-    "target": "ES2017",
+    "target": "ES2015",
     "lib": [
       "dom",
       "dom.iterable",
@@ -10,7 +10,7 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "incremental": true,
@@ -44,6 +44,15 @@
       "@env": [
         "./env.ts"
       ],
+      "@payload/*": [
+        "./src/payload/*"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@lib/*": [
+        "./src/lib/*"
+      ]
     }
   },
   "include": [

@@ -1,10 +1,10 @@
-import getPayload from '@/lib/utils/getPayload'
-import { PAGE_SLUG, PRODUCT_COLLECTION_SLUG } from '@/payload/collections/constants'
+import getPayload from '@lib/utils/getPayload'
+import { PAGE_SLUG, SHOP_COLLECTION_SLUG } from '@payload/collections/constants'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { cache, Fragment } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Button } from '@components/ui/button'
+import { Input } from '@components/ui/input'
 import {
   Card,
   CardContent,
@@ -12,7 +12,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from '@components/ui/card'
 import {
   ChevronRightIcon,
   SparklesIcon,
@@ -26,10 +26,11 @@ import {
 import configPromise from '@payload-config'
 import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { draftMode } from 'next/headers'
-import { generateMeta } from '@/lib/utils/generateMeta'
+import { generateMeta } from '@lib/utils/generateMeta'
 import { Page } from '@payload-types'
-import { getDocument, getCachedDocument } from '@/lib/utils/getDocument'
-import { Blocks } from '@/components/layout/blocks/render'
+import { getDocument, getCachedDocument } from '@lib/utils/getDocument'
+import { RenderBlocks } from '@components/payload/blocks'
+import { RenderHero } from '@components/payload/heros'
 
 export const metadata: Metadata = {
   title: 'Shop | BonaVista Leisurescapes',
@@ -39,15 +40,20 @@ export const metadata: Metadata = {
 export default async function StoreHome() {
   const payload = await getPayload()
 
-  const { docs: collections } = await payload.find({
-    collection: PRODUCT_COLLECTION_SLUG,
-  })
+  // const { docs: collections } = await payload.find({
+  //   collection: SHOP_COLLECTION_SLUG,
+  // })
 
-  const page = await getCachedDocument<typeof PAGE_SLUG>(PAGE_SLUG, 'shop')
+  const page = await getCachedDocument<typeof PAGE_SLUG>(PAGE_SLUG, 'shop', 1)
+
+  if (!page) {
+    return <div>Page not found</div>
+  }
 
   return (
     <Fragment>
-      {page && <Blocks blocks={page.layout} />}
+      <RenderHero {...page.hero} />
+      <RenderBlocks blocks={page.layout} />
       {/* Hero Section */}
       {/* <section className="relative w-full py-24 md:py-32 lg:py-48 overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-800">
         <div className="absolute inset-0 bg-[url('/hero-background.jpg')] bg-cover bg-center opacity-20"></div>

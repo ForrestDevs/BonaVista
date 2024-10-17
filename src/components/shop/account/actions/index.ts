@@ -1,11 +1,10 @@
 'use server'
 
-import getPayload from '@/lib/utils/getPayload'
-import { USER_SLUG } from '@/payload/collections/constants'
+import getPayload from '@lib/utils/getPayload'
+import { USER_SLUG, ORDER_SLUG } from '@payload/collections/constants'
 import { redirect } from 'next/navigation'
 import { headers as getHeaders } from 'next/headers'
 import type { User } from '@payload-types'
-import { ORDER_SLUG } from '@/payload/collections/constants'
 
 export async function signOut() {
   await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/logout`, {

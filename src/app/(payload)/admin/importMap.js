@@ -3,22 +3,24 @@ import { RichTextField as RichTextField_1 } from '@payloadcms/richtext-lexical/c
 import { getGenerateComponentMap as getGenerateComponentMap_2 } from '@payloadcms/richtext-lexical/generateComponentMap'
 import { InlineToolbarFeatureClient as InlineToolbarFeatureClient_3 } from '@payloadcms/richtext-lexical/client'
 import { FixedToolbarFeatureClient as FixedToolbarFeatureClient_4 } from '@payloadcms/richtext-lexical/client'
-import { HeadingFeatureClient as HeadingFeatureClient_5 } from '@payloadcms/richtext-lexical/client'
-import { UnderlineFeatureClient as UnderlineFeatureClient_6 } from '@payloadcms/richtext-lexical/client'
-import { BoldFeatureClient as BoldFeatureClient_7 } from '@payloadcms/richtext-lexical/client'
-import { ItalicFeatureClient as ItalicFeatureClient_8 } from '@payloadcms/richtext-lexical/client'
-import { LinkFeatureClient as LinkFeatureClient_9 } from '@payloadcms/richtext-lexical/client'
-import { OverviewComponent as OverviewComponent_10 } from '@payloadcms/plugin-seo/client'
-import { MetaTitleComponent as MetaTitleComponent_11 } from '@payloadcms/plugin-seo/client'
-import { MetaImageComponent as MetaImageComponent_12 } from '@payloadcms/plugin-seo/client'
-import { MetaDescriptionComponent as MetaDescriptionComponent_13 } from '@payloadcms/plugin-seo/client'
-import { PreviewComponent as PreviewComponent_14 } from '@payloadcms/plugin-seo/client'
-import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_15 } from '@payloadcms/richtext-lexical/client'
-import { BlocksFeatureClient as BlocksFeatureClient_16 } from '@payloadcms/richtext-lexical/client'
-import { default as default_17 } from '@/payload/collections/User/ui/CustomerSelect'
-import { default as default_18 } from '@/payload/collections/Order/ui/LinkToPaymentIntent'
-import { default as default_19 } from '@/payload/collections/Product/ui/ProductSelect'
-import { default as default_20 } from '@/payload/collections/Product/ui/PriceSelect'
+import { UnderlineFeatureClient as UnderlineFeatureClient_5 } from '@payloadcms/richtext-lexical/client'
+import { BoldFeatureClient as BoldFeatureClient_6 } from '@payloadcms/richtext-lexical/client'
+import { ItalicFeatureClient as ItalicFeatureClient_7 } from '@payloadcms/richtext-lexical/client'
+import { LinkFeatureClient as LinkFeatureClient_8 } from '@payloadcms/richtext-lexical/client'
+import { default as default_9 } from 'src/payload/collections/Orders/ui/LinkToPaymentIntent'
+import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_10 } from '@payloadcms/richtext-lexical/client'
+import { HeadingFeatureClient as HeadingFeatureClient_11 } from '@payloadcms/richtext-lexical/client'
+import { default as default_12 } from 'src/payload/collections/Products/ui/RowLabels/OptionLabel'
+import { default as default_13 } from 'src/payload/collections/Products/ui/RowLabels/KeyLabel'
+import { default as default_14 } from 'src/payload/collections/Products/ui/VariantSelect'
+import { default as default_15 } from 'src/payload/collections/Products/ui/RowLabels/VariantLabel'
+import { OverviewComponent as OverviewComponent_16 } from '@payloadcms/plugin-seo/client'
+import { MetaTitleComponent as MetaTitleComponent_17 } from '@payloadcms/plugin-seo/client'
+import { MetaImageComponent as MetaImageComponent_18 } from '@payloadcms/plugin-seo/client'
+import { MetaDescriptionComponent as MetaDescriptionComponent_19 } from '@payloadcms/plugin-seo/client'
+import { PreviewComponent as PreviewComponent_20 } from '@payloadcms/plugin-seo/client'
+import { TreeViewFeatureClient as TreeViewFeatureClient_21 } from '@payloadcms/richtext-lexical/client'
+import { BlocksFeatureClient as BlocksFeatureClient_22 } from '@payloadcms/richtext-lexical/client'
 
 export const importMap = {
   "@payloadcms/richtext-lexical/client#RichTextCell": RichTextCell_0,
@@ -26,20 +28,22 @@ export const importMap = {
   "@payloadcms/richtext-lexical/generateComponentMap#getGenerateComponentMap": getGenerateComponentMap_2,
   "@payloadcms/richtext-lexical/client#InlineToolbarFeatureClient": InlineToolbarFeatureClient_3,
   "@payloadcms/richtext-lexical/client#FixedToolbarFeatureClient": FixedToolbarFeatureClient_4,
-  "@payloadcms/richtext-lexical/client#HeadingFeatureClient": HeadingFeatureClient_5,
-  "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_6,
-  "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_7,
-  "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_8,
-  "@payloadcms/richtext-lexical/client#LinkFeatureClient": LinkFeatureClient_9,
-  "@payloadcms/plugin-seo/client#OverviewComponent": OverviewComponent_10,
-  "@payloadcms/plugin-seo/client#MetaTitleComponent": MetaTitleComponent_11,
-  "@payloadcms/plugin-seo/client#MetaImageComponent": MetaImageComponent_12,
-  "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_13,
-  "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_14,
-  "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_15,
-  "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_16,
-  "@/payload/collections/User/ui/CustomerSelect#default": default_17,
-  "@/payload/collections/Order/ui/LinkToPaymentIntent#default": default_18,
-  "@/payload/collections/Product/ui/ProductSelect#default": default_19,
-  "@/payload/collections/Product/ui/PriceSelect#default": default_20
+  "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_5,
+  "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_6,
+  "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_7,
+  "@payloadcms/richtext-lexical/client#LinkFeatureClient": LinkFeatureClient_8,
+  "src/payload/collections/Orders/ui/LinkToPaymentIntent#default": default_9,
+  "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_10,
+  "@payloadcms/richtext-lexical/client#HeadingFeatureClient": HeadingFeatureClient_11,
+  "src/payload/collections/Products/ui/RowLabels/OptionLabel#default": default_12,
+  "src/payload/collections/Products/ui/RowLabels/KeyLabel#default": default_13,
+  "src/payload/collections/Products/ui/VariantSelect#default": default_14,
+  "src/payload/collections/Products/ui/RowLabels/VariantLabel#default": default_15,
+  "@payloadcms/plugin-seo/client#OverviewComponent": OverviewComponent_16,
+  "@payloadcms/plugin-seo/client#MetaTitleComponent": MetaTitleComponent_17,
+  "@payloadcms/plugin-seo/client#MetaImageComponent": MetaImageComponent_18,
+  "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_19,
+  "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_20,
+  "@payloadcms/richtext-lexical/client#TreeViewFeatureClient": TreeViewFeatureClient_21,
+  "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_22
 }
