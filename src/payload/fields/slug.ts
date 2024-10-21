@@ -16,9 +16,9 @@ export const slugField: Slug = (fieldToUse = 'title', overrides = {}) =>
       admin: {
         position: 'sidebar',
         description: 'Auto generated field ',
-        condition: data => {
-          return !data?.isHome
-        },
+        // condition: data => {
+        //   return !data?.isHome
+        // },
       },
       hooks: {
         beforeValidate: [formatSlug(fieldToUse)],

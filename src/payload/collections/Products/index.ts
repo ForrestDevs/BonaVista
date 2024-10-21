@@ -15,7 +15,7 @@ import type { ProductVariant } from './ui/types'
 import { admins, adminsOrPublished } from '@payload/access'
 import { CallToAction } from '@payload/blocks/CallToAction'
 import { Content } from '@payload/blocks/Content'
-import { MediaBlock } from '@payload/blocks/MediaBlock'
+import { Media } from '@payload/blocks/Media'
 import { slugField } from '@payload/fields/slug'
 // import { beforeProductChange } from './hooks/beforeChange'
 // import { deleteProductFromCarts } from './hooks/deleteProductFromCarts'
@@ -36,13 +36,21 @@ const Products: CollectionConfig = {
     livePreview: {
       url: ({ data }) => {
         const path = generatePreviewPath({
-          path: `/product/${typeof data?.slug === 'string' ? data.slug : ''}`,
+          slug: typeof data?.slug === 'string' ? data.slug : '',
+          collection: 'products',
         })
+
         return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
       },
     },
-    preview: (doc) =>
-      generatePreviewPath({ path: `/product/${typeof doc?.slug === 'string' ? doc.slug : ''}` }),
+    preview: (data) => {
+      const path = generatePreviewPath({
+        slug: typeof data?.slug === 'string' ? data.slug : '',
+        collection: 'products',
+      })
+
+      return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
+    },
     useAsTitle: 'title',
   },
   fields: [
@@ -115,7 +123,7 @@ const Products: CollectionConfig = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock],
+              blocks: [CallToAction, Content, Media],
             },
           ],
         },
@@ -309,7 +317,7 @@ const Products: CollectionConfig = {
                     },
                   ],
                   minRows: 1,
-                  
+
                   validate: (_, { data }) => {
                     //@ts-ignore
                     if (data.variants.variantProducts.length > 1) {

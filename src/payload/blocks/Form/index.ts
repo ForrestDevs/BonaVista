@@ -7,7 +7,7 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-export const FormBlock: Block = {
+export const Form: Block = {
   slug: 'formBlock',
   fields: [
     {

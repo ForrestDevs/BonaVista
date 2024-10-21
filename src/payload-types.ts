@@ -57,6 +57,8 @@ export interface Config {
     'product-categories': ProductCategory;
     brands: Brand;
     customers: Customer;
+    testimonials: Testimonial;
+    spas: Spa;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -538,6 +540,37 @@ export interface Page {
   };
   layout: (
     | {
+        introContent?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        populateBy?: ('collection' | 'selection') | null;
+        relationTo?: 'posts' | null;
+        categories?: (string | BlogCategory)[] | null;
+        limit?: number | null;
+        selectedDocs?:
+          | {
+              relationTo: 'posts';
+              value: string | Post;
+            }[]
+          | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'archive';
+      }
+    | BannerBlock
+    | {
         richText?: {
           root: {
             type: string;
@@ -572,6 +605,13 @@ export interface Page {
         id?: string | null;
         blockName?: string | null;
         blockType: 'cta';
+      }
+    | {
+        language?: ('typescript' | 'javascript' | 'css') | null;
+        code: string;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'code';
       }
     | {
         columns?:
@@ -612,43 +652,6 @@ export interface Page {
         blockType: 'content';
       }
     | {
-        position?: ('default' | 'fullscreen') | null;
-        media: string | Media;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'mediaBlock';
-      }
-    | {
-        introContent?: {
-          root: {
-            type: string;
-            children: {
-              type: string;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
-        populateBy?: ('collection' | 'selection') | null;
-        relationTo?: 'posts' | null;
-        categories?: (string | BlogCategory)[] | null;
-        limit?: number | null;
-        selectedDocs?:
-          | {
-              relationTo: 'posts';
-              value: string | Post;
-            }[]
-          | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'archive';
-      }
-    | {
         form: string | Form;
         enableIntro?: boolean | null;
         introContent?: {
@@ -669,6 +672,13 @@ export interface Page {
         id?: string | null;
         blockName?: string | null;
         blockType: 'formBlock';
+      }
+    | {
+        position?: ('default' | 'fullscreen') | null;
+        media: string | Media;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'mediaBlock';
       }
     | ShopArchive
     | {
@@ -695,6 +705,41 @@ export interface Page {
         blockName?: string | null;
         blockType: 'services';
       }
+    | {
+        introContent?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        populateBy?: ('collection' | 'selection') | null;
+        limit?: number | null;
+        selectedDocs?:
+          | {
+              relationTo: 'testimonials';
+              value: string | Testimonial;
+            }[]
+          | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'testimonials';
+      }
+    | {
+        title: string;
+        message: string;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'contact';
+      }
   )[];
   meta?: {
     title?: string | null;
@@ -703,6 +748,15 @@ export interface Page {
   };
   publishedAt?: string | null;
   slug?: string | null;
+  parent?: (string | null) | Page;
+  breadcrumbs?:
+    | {
+        doc?: (string | null) | Page;
+        url?: string | null;
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -758,6 +812,31 @@ export interface Post {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BannerBlock".
+ */
+export interface BannerBlock {
+  style: 'info' | 'warning' | 'error' | 'success';
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'banner';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -980,6 +1059,18 @@ export interface ProductCategory {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials".
+ */
+export interface Testimonial {
+  id: string;
+  title: string;
+  description: string;
+  reviewer: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "brands".
  */
 export interface Brand {
@@ -1007,6 +1098,52 @@ export interface Order {
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "spas".
+ */
+export interface Spa {
+  id: string;
+  slug?: string | null;
+  title: string;
+  type: 'hot_tub' | 'swim_spa';
+  family: 'self-cleaning' | 'serenity';
+  description?: string | null;
+  images?:
+    | {
+        image: string | Media;
+        id?: string | null;
+      }[]
+    | null;
+  features?:
+    | {
+        feature?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  seats?: number | null;
+  jets?: number | null;
+  dimensions?: {
+    length?: number | null;
+    width?: number | null;
+    height?: number | null;
+  };
+  waterCapacity?: number | null;
+  weightFull?: number | null;
+  weightDry?: number | null;
+  additionalInformation?:
+    | {
+        key?: string | null;
+        value?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  detailsLink?: string | null;
+  quoteLink?: string | null;
+  financingLink?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1108,6 +1245,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'customers';
         value: string | Customer;
+      } | null)
+    | ({
+        relationTo: 'testimonials';
+        value: string | Testimonial;
+      } | null)
+    | ({
+        relationTo: 'spas';
+        value: string | Spa;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1312,31 +1457,6 @@ export interface Footer {
   };
   updatedAt?: string | null;
   createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "BannerBlock".
- */
-export interface BannerBlock {
-  style: 'info' | 'warning' | 'error' | 'success';
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'banner';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

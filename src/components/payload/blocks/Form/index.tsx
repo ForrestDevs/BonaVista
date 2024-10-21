@@ -45,6 +45,7 @@ export const FormBlock: React.FC<
   const formMethods = useForm({
     defaultValues: buildInitialFormState(formFromProps.fields),
   })
+  
   const {
     control,
     formState: { errors },

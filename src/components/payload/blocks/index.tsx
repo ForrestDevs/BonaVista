@@ -8,6 +8,8 @@ import { FormBlock } from '@components/payload/blocks/Form'
 import { MediaBlock } from '@components/payload/blocks/MediaBlock'
 import { toKebabCase } from '@lib/utils/toKebabCase'
 import { ShopArchiveBlock } from '@components/payload/blocks/ShopArchive'
+import { TestimonialBlock } from './TestimonialBlock'
+import { ContactBlock } from './ContactBlock'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -16,6 +18,8 @@ const blockComponents = {
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
   'shop-archive': ShopArchiveBlock,
+  testimonials: TestimonialBlock,
+  contact: ContactBlock,
 }
 
 export const RenderBlocks: React.FC<{

@@ -1,5 +1,5 @@
-import ProfileForm from '@components/shop/account/profile-form'
-import { getCurrentUser } from '@lib/data/auth'
+// import ProfileForm from '@components/shop/account/profile-form'
+// import { getCurrentUser } from '@lib/data/auth'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 }
 
 export default async function Profile() {
-  const user = await getCurrentUser()
+  // const user = await getCurrentUser()
 
-  if (!user) {
-    notFound()
-  }
+  // if (!user) {
+  //   notFound()
+  // }
 
   return (
     <div className="w-full" data-testid="profile-page-wrapper">
@@ -25,7 +25,7 @@ export default async function Profile() {
         </p>
       </div>
       <div className="flex flex-col gap-y-8 w-full">
-        <ProfileForm user={user} />
+        {/* <ProfileForm user={user} /> */}
       </div>
     </div>
   )

@@ -12,7 +12,7 @@ import {
 import { authenticated, authenticatedOrPublished } from '@payload/access'
 import { Banner } from '@payload/blocks/Banner'
 import { Code } from '@payload/blocks/Code'
-import { MediaBlock } from '@payload/blocks/MediaBlock'
+import { Media } from '@payload/blocks/Media'
 import { slugField } from '@payload/fields/slug'
 import { generatePreviewPath } from '@payload/utilities/generatePreviewPath'
 import { populateAuthors } from './hooks/populateAuthors'
@@ -39,13 +39,21 @@ const Posts: CollectionConfig = {
     livePreview: {
       url: ({ data }) => {
         const path = generatePreviewPath({
-          path: `/posts/${typeof data?.slug === 'string' ? data.slug : ''}`,
+          slug: typeof data?.slug === 'string' ? data.slug : '',
+          collection: 'posts',
         })
+
         return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
       },
     },
-    preview: (doc) =>
-      generatePreviewPath({ path: `/posts/${typeof doc?.slug === 'string' ? doc.slug : ''}` }),
+    preview: (data) => {
+      const path = generatePreviewPath({
+        slug: typeof data?.slug === 'string' ? data.slug : '',
+        collection: 'posts',
+      })
+
+      return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
+    },
     useAsTitle: 'title',
   },
   fields: [
@@ -67,13 +75,11 @@ const Posts: CollectionConfig = {
                   return [
                     ...rootFeatures,
                     HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                    BlocksFeature({ blocks: [Banner, Code, MediaBlock] }),
+                    BlocksFeature({ blocks: [Banner, Code, Media] }),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
                     HorizontalRuleFeature(),
                     LinkFeature(),
-                    TreeViewFeature(),
-                  
                   ]
                 },
               }),

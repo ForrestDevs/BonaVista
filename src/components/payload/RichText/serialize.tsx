@@ -17,15 +17,19 @@ import {
   IS_UNDERLINE,
 } from './nodeFormat'
 import type { Page } from '../../../payload-types'
+import { FormBlock, FormBlockType } from '../blocks/Form'
+import { ServicesBlockProps } from '../blocks/ServicesBlock/types'
+import { ServicesBlock } from '../blocks/ServicesBlock'
 
 export type NodeTypes =
   | DefaultNodeTypes
   | SerializedBlockNode<
-      // @ts-ignore // TODO: Fix this
       | Extract<Page['layout'][0], { blockType: 'cta' }>
       | Extract<Page['layout'][0], { blockType: 'mediaBlock' }>
       | BannerBlockProps
       | CodeBlockProps
+      | FormBlockType
+      | ServicesBlockProps
     >
 
 type Props = {
@@ -38,6 +42,13 @@ export function serializeLexical({ nodes }: Props): JSX.Element {
       {nodes?.map((node, index): JSX.Element | null => {
         if (node == null) {
           return null
+        }
+
+
+        if (node.type === 'text') {
+          if (node.style === 'indent') {
+            return <div className="col-start-2" key={index} />
+          }
         }
 
         if (node.type === 'text') {
@@ -71,7 +82,7 @@ export function serializeLexical({ nodes }: Props): JSX.Element {
           if (node.format & IS_SUPERSCRIPT) {
             text = <sup key={index}>{text}</sup>
           }
-
+         
           return text
         }
 
@@ -125,6 +136,10 @@ export function serializeLexical({ nodes }: Props): JSX.Element {
               return <BannerBlock className="col-start-2 mb-4" key={index} {...block} />
             case 'code':
               return <CodeBlock className="col-start-2" key={index} {...block} />
+            case 'formBlock':
+              return <FormBlock key={index} {...block} />
+            case 'services':
+              return <ServicesBlock key={index} {...block} />
             default:
               return null
           }
@@ -142,7 +157,21 @@ export function serializeLexical({ nodes }: Props): JSX.Element {
             }
             case 'heading': {
               const Tag = node?.tag
+
+              if (node.indent) {
+                switch (node.indent) {
+                  case 1:
+                    return <div className="col-start-3" key={index} />
+                  case 2:
+                    return <div className="col-start-4" key={index} />
+                  default:
+                    return null
+                }
+              }
+
+
               return (
+                
                 <Tag className="col-start-2" key={index}>
                   {serializedChildren}
                 </Tag>

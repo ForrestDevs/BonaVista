@@ -15,3 +15,5 @@ export const BRAND_SLUG = 'brands' as const
 export const ADDRESS_SLUG = 'address' as const
 export const CUSTOMER_SLUG = 'customers' as const
 export const CART_SLUG = 'cart' as const
+export const TESTIMONIALS_SLUG = 'testimonials' as const
+export const SPA_SLUG = 'spas' as const

@@ -1,7 +1,7 @@
 import { MEDIA_SLUG } from '@/payload/collections/constants'
 import type { Block } from 'payload'
 
-export const MediaBlock: Block = {
+export const Media: Block = {
   slug: 'mediaBlock',
   fields: [
     {

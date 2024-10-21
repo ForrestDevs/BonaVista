@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
-import { notFound } from 'next/navigation'
-import { getCurrentUserOrders } from '@components/shop/account/actions'
+// import { notFound } from 'next/navigation'
+// import { getCurrentUserOrders } from '@components/shop/account/actions'
 
 export const metadata: Metadata = {
   title: 'Orders',
@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 }
 
 export default async function Orders() {
-  const orders = await getCurrentUserOrders()
+  // const orders = await getCurrentUserOrders()
 
-  if (!orders) {
-    notFound()
-  }
+  // if (!orders) {
+  //   notFound()
+  // }
 
   return (
     <div className="w-full" data-testid="orders-page-wrapper">
@@ -25,9 +25,9 @@ export default async function Orders() {
         </p>
       </div>
       <div>
-        {orders.docs.map((order) => {
+        {/* {orders.docs.map((order) => {
           return <div key={order.id}>{order.id}</div>
-        })}
+        })} */}
         {/* <OrderOverview orders={orders} /> */}
       </div>
     </div>

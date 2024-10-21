@@ -58,19 +58,19 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   }
 }
 
-export async function generateStaticParams() {
-  const payload = await getPayloadHMR({ config: configPromise })
-  const posts = await payload.find({
-    collection: 'posts',
-    depth: 0,
-    limit: 10,
-  })
+// export async function generateStaticParams() {
+//   const payload = await getPayloadHMR({ config: configPromise })
+//   const posts = await payload.find({
+//     collection: 'posts',
+//     depth: 0,
+//     limit: 10,
+//   })
 
-  const pages = []
+//   const pages = []
 
-  for (let i = 1; i <= posts.totalPages; i++) {
-    pages.push(i)
-  }
+//   for (let i = 1; i <= posts.totalPages; i++) {
+//     pages.push(i)
+//   }
 
-  return pages
-}
+//   return pages
+// }

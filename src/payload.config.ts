@@ -9,7 +9,7 @@ import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { stripePlugin } from '@payloadcms/plugin-stripe'
-import { UnderlineFeature } from '@payloadcms/richtext-lexical'
+import { UnderlineFeature, IndentFeature, AlignFeature } from '@payloadcms/richtext-lexical'
 import {
   BoldFeature,
   FixedToolbarFeature,
@@ -82,6 +82,8 @@ export default buildConfig({
     // This config helps us configure global or default features that the other editors can inherit
     features: () => {
       return [
+        AlignFeature(),
+        IndentFeature(),
         UnderlineFeature(),
         BoldFeature(),
         ItalicFeature(),
@@ -186,7 +188,9 @@ export default buildConfig({
       },
     }),
     nestedDocsPlugin({
-      collections: ['categories'],
+      collections: ['pages', 'categories'],
+      generateLabel: (_, doc) => doc.title as string,
+      generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
     }),
     seoPlugin({
       generateTitle,

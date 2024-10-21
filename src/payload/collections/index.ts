@@ -11,6 +11,8 @@ import ProductCategory from './ProductCategory'
 import Brands from './Brands'
 import Customers from './Customers'
 import Cart from './Cart'
+import Testimonials from './Testimonials'
+import Spas from './Spas'
 
 export const collections = [
   Address,
@@ -26,6 +28,8 @@ export const collections = [
   ProductCategory,
   Brands,
   Customers,
+  Testimonials,
+  Spas,
 ]
 
 export default collections

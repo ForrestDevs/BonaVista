@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import { getCurrentUser } from '@lib/data/auth'
+// import { notFound } from 'next/navigation'
+// import { getCurrentUser } from '@lib/data/auth'
 // import AddressBook from '@components/shop/account/components/address-book'
 
 export const metadata: Metadata = {
@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 }
 
 export default async function Addresses() {
-  const user = await getCurrentUser()
+  // const user = await getCurrentUser()
 
-  if (!user) {
-    notFound()
-  }
+  // if (!user) {
+  //   notFound()
+  // }
 
   return (
     <div className="w-full" data-testid="addresses-page-wrapper">

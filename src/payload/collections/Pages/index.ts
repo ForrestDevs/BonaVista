@@ -1,17 +1,11 @@
 import type { CollectionConfig } from 'payload'
-
 import { authenticated, authenticatedOrPublished } from '@payload/access'
-import { Archive } from '@payload/blocks/ArchiveBlock'
-import { CallToAction } from '@payload/blocks/CallToAction'
-import { Content } from '@payload/blocks/Content'
-import { FormBlock } from '@payload/blocks/Form'
-import { MediaBlock } from '@payload/blocks/MediaBlock'
 import { hero } from '@payload/fields/hero'
+import { pageBlocks } from '@/payload/blocks'
 import { slugField } from '@payload/fields/slug'
 import { populatePublishedAt } from '@payload/hooks/populatePublishedAt'
 import { generatePreviewPath } from '@payload/utilities/generatePreviewPath'
 import { revalidatePage } from './hooks/revalidatePage'
-
 import {
   MetaDescriptionField,
   MetaImageField,
@@ -19,11 +13,10 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
-import { ShopArchive } from '@payload/blocks/ShopArchive'
-import { ServicesBlock } from '@/payload/blocks/ServicesBlock'
+import { PAGE_SLUG } from '../constants'
 
 const Pages: CollectionConfig = {
-  slug: 'pages',
+  slug: PAGE_SLUG,
   access: {
     create: authenticated,
     delete: authenticated,
@@ -35,13 +28,21 @@ const Pages: CollectionConfig = {
     livePreview: {
       url: ({ data }) => {
         const path = generatePreviewPath({
-          path: `/${typeof data?.slug === 'string' ? data.slug : ''}`,
+          slug: typeof data?.slug === 'string' ? data.slug : '',
+          collection: 'pages',
         })
+
         return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
       },
     },
-    preview: (doc) =>
-      generatePreviewPath({ path: `/${typeof doc?.slug === 'string' ? doc.slug : ''}` }),
+    preview: (data) => {
+      const path = generatePreviewPath({
+        slug: typeof data?.slug === 'string' ? data.slug : '',
+        collection: 'pages',
+      })
+
+      return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
+    },
     useAsTitle: 'title',
   },
   fields: [
@@ -62,15 +63,7 @@ const Pages: CollectionConfig = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [
-                CallToAction,
-                Content,
-                MediaBlock,
-                Archive,
-                FormBlock,
-                ShopArchive,
-                ServicesBlock,
-              ],
+              blocks: pageBlocks,
               required: true,
             },
           ],

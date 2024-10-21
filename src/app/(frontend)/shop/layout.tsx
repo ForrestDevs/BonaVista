@@ -18,7 +18,7 @@ export default async function StoreLayout({
           {modal}
         </main>
       </TooltipProvider>
-      <ShopFooter />
+      {/* <ShopFooter /> */}
     </div>
   )
 }
