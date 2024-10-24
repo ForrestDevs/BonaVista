@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { anyone, authenticated } from '@payload/access'
 import { BLOG_CATEGORY_SLUG } from '../constants'
+import { slugField } from '@/payload/fields/slug-new'
 
 const BlogCategory: CollectionConfig = {
   slug: BLOG_CATEGORY_SLUG,
@@ -11,6 +12,7 @@ const BlogCategory: CollectionConfig = {
     update: authenticated,
   },
   admin: {
+    group: 'Blog',
     useAsTitle: 'title',
   },
   fields: [
@@ -19,6 +21,15 @@ const BlogCategory: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    {
+      name: 'showInFilter',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    ...slugField()
   ],
 } as const
 

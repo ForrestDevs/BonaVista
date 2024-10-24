@@ -12,17 +12,17 @@ import type { Post } from '@/payload-types'
 import { PostHero } from '@/components/payload/heros/PostHero'
 import { generateMeta } from '@/lib/utils/generateMeta'
 
-export async function generateStaticParams() {
-  const payload = await getPayloadHMR({ config: configPromise })
-  const posts = await payload.find({
-    collection: 'posts',
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-  })
+// export async function generateStaticParams() {
+//   const payload = await getPayloadHMR({ config: configPromise })
+//   const posts = await payload.find({
+//     collection: 'posts',
+//     draft: false,
+//     limit: 1000,
+//     overrideAccess: false,
+//   })
 
-  return posts.docs?.map(({ slug }) => slug)
-}
+//   return posts.docs?.map(({ slug }) => slug)
+// }
 
 type Params = Promise<{ slug: string | undefined }>
 
@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
-  // const { isEnabled: draft } = draftMode()
+  const { isEnabled: draft } = await draftMode()
 
   const payload = await getPayloadHMR({ config: configPromise })
 
@@ -74,7 +74,7 @@ const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
     collection: 'posts',
     // draft,
     limit: 1,
-    overrideAccess: true,
+    overrideAccess: draft,
     where: {
       slug: {
         equals: slug,

@@ -29,58 +29,56 @@ export default function MobileNav({ header }: { header: Header }) {
       <SheetContent side="right" className="bg-blue-100">
         <nav className="flex flex-col gap-6">
           {header.siteHeader.navItems.map((item, index) => (
-            <>
-              {item.navItem.type === 'single' ? (
-                <Link
-                  key={index}
-                  href={item.navItem.singleLink.url || '/'}
-                  className={cn(
-                    buttonVariants({
-                      size: 'sm',
-                      variant: 'link',
-                    }),
-                    'justify-start',
-                  )}
-                >
-                  {item.navItem.singleLink.label}
-                </Link>
-              ) : (
-                <Accordion type="single" collapsible key={index} className='mb-6'>
-                  <AccordionItem value={item.navItem.linkGroup.title}>
-                    <AccordionTrigger
-                      className={cn(
-                        buttonVariants({
-                          size: 'sm',
-                          variant: 'link',
-                        }),
-                        'justify-between',
-                      )}
-                    >
-                      {item.navItem.linkGroup.title}
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="flex flex-col gap-2 mt-6">
-                        {item.navItem.linkGroup.links.map((link, index) => (
-                          <Link
-                            key={index}
-                            href={link.url || '/'}
-                            className={cn(
-                              buttonVariants({
-                                size: 'sm',
-                                variant: 'link',
-                              }),
-                              'justify-start',
-                            )}
-                          >
-                            {link.title}
-                          </Link>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              )}
-            </>
+            item.navItem.type === 'single' ? (
+              <Link
+                key={index}
+                href={item.navItem.singleLink.url || '/'}
+                className={cn(
+                  buttonVariants({
+                    size: 'sm',
+                    variant: 'link',
+                  }),
+                  'justify-start',
+                )}
+              >
+                {item.navItem.singleLink.label}
+              </Link>
+            ) : (
+              <Accordion type="single" collapsible key={index} className='mb-6'>
+                <AccordionItem value={item.navItem.linkGroup.title}>
+                  <AccordionTrigger
+                    className={cn(
+                      buttonVariants({
+                        size: 'sm',
+                        variant: 'link',
+                      }),
+                      'justify-between',
+                    )}
+                  >
+                    {item.navItem.linkGroup.title}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="flex flex-col gap-2 mt-6">
+                      {item.navItem.linkGroup.links.map((link, index) => (
+                        <Link
+                          key={index}
+                          href={link.url || '/'}
+                          className={cn(
+                            buttonVariants({
+                              size: 'sm',
+                              variant: 'link',
+                            }),
+                            'justify-start',
+                          )}
+                        >
+                          {link.title}
+                        </Link>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            )
           ))}
         </nav>
       </SheetContent>

@@ -32,6 +32,7 @@ const Products: CollectionConfig = {
     update: admins,
   },
   admin: {
+    group: 'Shop',
     defaultColumns: ['title', 'stripeProductID', '_status'],
     livePreview: {
       url: ({ data }) => {

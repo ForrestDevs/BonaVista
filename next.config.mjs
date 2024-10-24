@@ -32,7 +32,7 @@ const nextConfig = {
     buildActivity: true,
     appIsrStatus: true,
   },
-  reactStrictMode: true,
+  // reactStrictMode: true,
   redirects,
 }
 

@@ -11,6 +11,7 @@ const Cart: CollectionConfig = {
     delete: admins,
   },
   admin: {
+    group: 'Shop',
     useAsTitle: 'id',
   },
   fields: [

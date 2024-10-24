@@ -15,6 +15,7 @@ const Orders: CollectionConfig = {
     update: admins,
   },
   admin: {
+    group: 'Shop',
     defaultColumns: ['createdAt', 'orderedBy'],
     preview: (doc) => `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/orders/${doc.id}`,
     useAsTitle: 'createdAt',

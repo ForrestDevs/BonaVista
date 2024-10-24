@@ -768,6 +768,9 @@ export interface Page {
 export interface BlogCategory {
   id: string;
   title: string;
+  showInFilter?: boolean | null;
+  slug?: string | null;
+  slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }

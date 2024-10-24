@@ -14,6 +14,7 @@ const Customers: CollectionConfig = {
     update: authenticated,
   },
   admin: {
+    group: 'Shop',
     useAsTitle: 'email',
   },
   endpoints: [
