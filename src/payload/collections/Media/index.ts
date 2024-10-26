@@ -9,7 +9,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 import { anyone, authenticated } from '@payload/access'
-import { MEDIA_SLUG } from '../constants'
+import { GALLERIES_SLUG, MEDIA_SLUG } from '../constants'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -27,6 +27,13 @@ const Media: CollectionConfig = {
       name: 'alt',
       type: 'text',
       required: true,
+      hooks: {
+        beforeValidate: [
+          ({ data }) => {
+            return data?.filename
+          },
+        ],
+      },
     },
     {
       name: 'caption',
@@ -47,18 +54,6 @@ const Media: CollectionConfig = {
         position: 'centre',
       },
       {
-        name: 'tour_gallery_1',
-        width: undefined,
-        height: 320,
-        position: 'centre',
-      },
-      {
-        name: 'tour_card',
-        width: 320,
-        height: undefined,
-        position: 'centre',
-      },
-      {
         name: 'tour_gallery',
         width: undefined,
         height: 797,
@@ -75,24 +70,6 @@ const Media: CollectionConfig = {
         width: 1470,
         height: undefined,
         position: 'centre',
-      },
-      {
-        name: 'appointment_contact_image',
-        width: 547,
-        height: undefined,
-        position: 'centre',
-      },
-      {
-        height: undefined,
-        width: 525,
-        crop: 'center',
-        name: 'doctorImage',
-      },
-      {
-        height: undefined,
-        width: 1296,
-        crop: 'center',
-        name: 'blogImage',
       },
     ],
     focalPoint: false,

@@ -17,12 +17,16 @@ export const hero: Field = {
     {
       name: 'type',
       type: 'select',
-      defaultValue: 'lowImpact',
+      defaultValue: 'standard',
       label: 'Type',
       options: [
         {
           label: 'None',
           value: 'none',
+        },
+        {
+          label: 'Standard',
+          value: 'standard',
         },
         {
           label: 'High Impact',
@@ -56,13 +60,56 @@ export const hero: Field = {
           ]
         },
       }),
+      admin: {
+        condition: (_, { type } = {}) =>
+          ['parallax', 'highImpact', 'mediumImpact', 'lowImpact'].includes(type),
+      },
       label: false,
     },
     linkGroup({
       overrides: {
+        admin: {
+          condition: (_, { type } = {}) =>
+            ['parallax', 'highImpact', 'mediumImpact', 'lowImpact'].includes(type),
+        },
         maxRows: 2,
       },
     }),
+    {
+      label: 'Hero Title',
+      name: 'title',
+      type: 'text',
+      admin: {
+        condition: (_, { type } = {}) => ['standard'].includes(type),
+      },
+    },
+    {
+      label: 'Hero Subtitle',
+      name: 'subtitle',
+      type: 'text',
+      admin: {
+        condition: (_, { type } = {}) => ['standard'].includes(type),
+      },
+    },
+    {
+      label: 'Hero Size',
+      name: 'size',
+      type: 'select',
+      defaultValue: 'medium',
+      options: ['large', 'medium', 'small'],
+      admin: {
+        condition: (_, { type } = {}) => ['standard'].includes(type),
+      },
+    },
+    {
+      label: 'Background Image',
+      name: 'background',
+      type: 'upload',
+      relationTo: MEDIA_SLUG,
+      admin: {
+        condition: (_, { type } = {}) => ['standard'].includes(type),
+      },
+    },
     {
       name: 'media',
       type: 'upload',

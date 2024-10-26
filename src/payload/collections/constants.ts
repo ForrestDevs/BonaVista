@@ -17,3 +17,4 @@ export const CUSTOMER_SLUG = 'customers' as const
 export const CART_SLUG = 'cart' as const
 export const TESTIMONIALS_SLUG = 'testimonials' as const
 export const SPA_SLUG = 'spas' as const
+export const GALLERIES_SLUG = 'galleries' as const

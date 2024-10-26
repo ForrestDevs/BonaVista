@@ -59,6 +59,7 @@ export interface Config {
     customers: Customer;
     testimonials: Testimonial;
     spas: Spa;
+    galleries: Gallery;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -430,22 +431,6 @@ export interface Media {
       filesize?: number | null;
       filename?: string | null;
     };
-    tour_gallery_1?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    tour_card?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
     tour_gallery?: {
       url?: string | null;
       width?: number | null;
@@ -470,30 +455,6 @@ export interface Media {
       filesize?: number | null;
       filename?: string | null;
     };
-    appointment_contact_image?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    doctorImage?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    blogImage?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
   };
 }
 /**
@@ -504,7 +465,7 @@ export interface Page {
   id: string;
   title: string;
   hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact' | 'parallax';
+    type: 'none' | 'standard' | 'highImpact' | 'mediumImpact' | 'lowImpact' | 'parallax';
     richText?: {
       root: {
         type: string;
@@ -536,6 +497,10 @@ export interface Page {
           id?: string | null;
         }[]
       | null;
+    title?: string | null;
+    subtitle?: string | null;
+    size?: ('large' | 'medium' | 'small') | null;
+    background?: (string | null) | Media;
     media?: (string | null) | Media;
   };
   layout: (
@@ -1152,6 +1117,61 @@ export interface Spa {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "galleries".
+ */
+export interface Gallery {
+  id: string;
+  hero: {
+    type: 'none' | 'standard' | 'highImpact' | 'mediumImpact' | 'lowImpact' | 'parallax';
+    richText?: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    links?:
+      | {
+          link: {
+            type?: ('reference' | 'custom') | null;
+            newTab?: boolean | null;
+            reference?: {
+              relationTo: 'pages';
+              value: string | Page;
+            } | null;
+            url?: string | null;
+            label: string;
+            appearance?: ('default' | 'outline') | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    title?: string | null;
+    subtitle?: string | null;
+    size?: ('large' | 'medium' | 'small') | null;
+    background?: (string | null) | Media;
+    media?: (string | null) | Media;
+  };
+  title?: string | null;
+  subtitle?: string | null;
+  description?: string | null;
+  slug?: string | null;
+  slugLock?: boolean | null;
+  images?: (string | Media)[] | null;
+  showCaptions?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1256,6 +1276,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'spas';
         value: string | Spa;
+      } | null)
+    | ({
+        relationTo: 'galleries';
+        value: string | Gallery;
       } | null)
     | ({
         relationTo: 'redirects';

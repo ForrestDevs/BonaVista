@@ -17,7 +17,7 @@ export default function BlogFiltersClient({ categories }: { categories: BlogCate
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const { replace } = useRouter()
-  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
 
   function handleCategoryChange(category: string) {
     const params = new URLSearchParams(searchParams)
