@@ -65,7 +65,7 @@ const generateSeedPosts = (): SeedPost[] => {
   return posts
 }
 
-export const blogSeedData = generateSeedPosts()
+const blogSeedData = generateSeedPosts()
 
 import getPayload from '@/lib/utils/getPayload'
 
