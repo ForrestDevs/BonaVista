@@ -112,4 +112,5 @@ export const ProductArchive: Block = {
     plural: 'Product Archives',
     singular: 'Product Archive',
   },
+  interfaceName: 'ProductArchiveBlock',
 }

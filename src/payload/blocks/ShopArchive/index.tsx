@@ -10,7 +10,7 @@ import { SHOP_ARCHIVE_BLOCK_SLUG } from '@payload/blocks/constants'
 
 export const ShopArchive: Block = {
   slug: SHOP_ARCHIVE_BLOCK_SLUG,
-  interfaceName: 'ShopArchive',
+  interfaceName: 'ShopArchiveBlock',
   fields: [
     {
       label: 'Intro Content',

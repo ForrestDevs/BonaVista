@@ -29,4 +29,5 @@ export const Code: Block = {
       required: true,
     },
   ],
+  interfaceName: 'CodeBlock',
 }

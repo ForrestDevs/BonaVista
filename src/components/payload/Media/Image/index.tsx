@@ -23,7 +23,7 @@ export const Image: React.FC<MediaProps> = (props) => {
     priority,
     resource,
     size: sizeFromProps,
-    src: srcFromProps,
+    src: srcFromProps = null,
     width: widthFromProps,
   } = props
 
@@ -32,7 +32,7 @@ export const Image: React.FC<MediaProps> = (props) => {
   let width: number | undefined
   let height: number | undefined
   let alt = altFromProps
-  let src: StaticImageData | string = srcFromProps || ''
+  let src: StaticImageData | string | null = srcFromProps || null
 
   if (!src && resource && typeof resource !== 'string') {
     const {

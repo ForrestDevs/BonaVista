@@ -29,6 +29,10 @@ export const hero: Field = {
           value: 'standard',
         },
         {
+          label: 'Slider',
+          value: 'slider',
+        },
+        {
           label: 'High Impact',
           value: 'highImpact',
         },
@@ -118,6 +122,60 @@ export const hero: Field = {
       },
       relationTo: MEDIA_SLUG,
       required: true,
+    },
+    {
+      name: 'slides',
+      type: 'array',
+      fields: [
+        {
+          name: 'pretitle',
+          type: 'text',
+        },
+        {
+          name: 'title',
+          type: 'text',
+        },
+        {
+          name: 'description',
+          type: 'text',
+        },
+        linkGroup({
+          overrides: {
+            maxRows: 1,
+          },
+        }),
+        {
+          name: 'background',
+          type: 'upload',
+          relationTo: MEDIA_SLUG,
+        },
+      ],
+      admin: {
+        condition: (_, { type } = {}) => ['slider'].includes(type),
+      },
+    },
+    {
+      name: 'autoplay',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: {
+        condition: (_, { type } = {}) => ['slider'].includes(type),
+      },
+    },
+    {
+      name: 'delay',
+      type: 'number',
+      admin: {
+        condition: (_, { type } = {}) => ['slider'].includes(type),
+      },
+    },
+    {
+      name: 'fade',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: {
+        condition: (_, { type } = {}) => ['slider'].includes(type),
+      },
     },
   ],
   label: false,

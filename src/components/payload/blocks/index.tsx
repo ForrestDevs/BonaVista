@@ -1,15 +1,16 @@
 import React, { Fragment } from 'react'
-
 import type { Page } from '@payload-types'
 import { ArchiveBlock } from '@components/payload/blocks/ArchiveBlock'
 import { CallToActionBlock } from '@components/payload/blocks/CallToAction'
 import { ContentBlock } from '@components/payload/blocks/Content'
 import { FormBlock } from '@components/payload/blocks/Form'
 import { MediaBlock } from '@components/payload/blocks/MediaBlock'
-import { toKebabCase } from '@lib/utils/toKebabCase'
 import { ShopArchiveBlock } from '@components/payload/blocks/ShopArchive'
 import { TestimonialBlock } from './TestimonialBlock'
 import { ContactBlock } from './ContactBlock'
+import { TypographyBlock } from './Typography'
+import { LatestPostsBlock } from './LatestPosts'
+import { ServicesBlock } from './ServicesBlock'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -20,7 +21,10 @@ const blockComponents = {
   'shop-archive': ShopArchiveBlock,
   testimonials: TestimonialBlock,
   contact: ContactBlock,
-}
+  typography: TypographyBlock,
+  'latest-posts': LatestPostsBlock,
+  services: ServicesBlock,
+} as const
 
 export const RenderBlocks: React.FC<{
   blocks: Page['layout'][0][]
@@ -33,19 +37,13 @@ export const RenderBlocks: React.FC<{
       <Fragment>
         {blocks.map((block, index) => {
           const { blockType } = block
+          const Block = blockComponents[blockType]
 
-          if (blockType && blockType in blockComponents) {
-            const Block = blockComponents[blockType]
-
-            if (Block) {
-              return (
-                <div className="my-16" key={index}>
-                  <Block {...(block as any)} id={block.id?.toString()} />
-                </div>
-              )
-            }
-          }
-          return null
+          return Block ? (
+            <div className="" key={index}>
+              <Block {...block} id={block.id?.toString()} />
+            </div>
+          ) : null
         })}
       </Fragment>
     )

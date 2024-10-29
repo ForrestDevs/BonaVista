@@ -1,28 +1,28 @@
+import React, { cache } from 'react'
 import type { Metadata } from 'next'
+import getPayload from '@lib/utils/getPayload'
 
 import { RelatedPosts } from '@/components/payload/blocks/RelatedPosts'
 import { PayloadRedirects } from '@/components/payload/PayloadRedirects'
-import configPromise from '@payload-config'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { draftMode, headers } from 'next/headers'
-import React, { cache } from 'react'
+
 import RichText from '@/components/payload/RichText'
 import type { Post } from '@/payload-types'
 
 import { PostHero } from '@/components/payload/heros/PostHero'
 import { generateMeta } from '@/lib/utils/generateMeta'
 
-// export async function generateStaticParams() {
-//   const payload = await getPayloadHMR({ config: configPromise })
-//   const posts = await payload.find({
-//     collection: 'posts',
-//     draft: false,
-//     limit: 1000,
-//     overrideAccess: false,
-//   })
+export async function generateStaticParams() {
+  const payload = await getPayload()
+  const posts = await payload.find({
+    collection: 'posts',
+    draft: false,
+    limit: 1000,
+    overrideAccess: false,
+  })
 
-//   return posts.docs?.map(({ slug }) => slug)
-// }
+  return posts.docs?.map(({ slug }) => slug)
+}
 
 type Params = Promise<{ slug: string | undefined }>
 
@@ -68,11 +68,11 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
   const { isEnabled: draft } = await draftMode()
 
-  const payload = await getPayloadHMR({ config: configPromise })
+  const payload = await getPayload()
 
   const result = await payload.find({
     collection: 'posts',
-    // draft,
+    draft,
     limit: 1,
     overrideAccess: draft,
     where: {

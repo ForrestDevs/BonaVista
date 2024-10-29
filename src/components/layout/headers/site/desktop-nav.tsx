@@ -1,7 +1,7 @@
 import React from 'react'
 import { Header } from '@payload-types'
 import Image from 'next/image'
-import Link from 'next/link'
+import { OptimizedLink as Link } from '@/components/payload/Link/optimized-link'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -29,56 +29,48 @@ export default function DesktopNav({ header }: { header: Header }) {
           <NavigationMenuContent>
             <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[1fr_1fr]">
               <li>
-                <NavigationMenuLink>
-                  <Link
-                    href="/hot-tubs"
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                  >
-                    <div className="text-sm font-medium leading-none">Hot Tubs</div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                      Relax and unwind in our premium hot tubs
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
+                <Link
+                  href="/hot-tubs"
+                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                >
+                  <div className="text-sm font-medium leading-none">Hot Tubs</div>
+                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    Relax and unwind in our premium hot tubs
+                  </p>
+                </Link>
               </li>
               <li>
-                <NavigationMenuLink>
-                  <Link
-                    href="/swim-spas"
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                  >
-                    <div className="text-sm font-medium leading-none">Swim Spas</div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                      Exercise and relax in our versatile swim spas
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
+                <Link
+                  href="/swim-spas"
+                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                >
+                  <div className="text-sm font-medium leading-none">Swim Spas</div>
+                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    Exercise and relax in our versatile swim spas
+                  </p>
+                </Link>
               </li>
               <li>
-                <NavigationMenuLink>
-                  <Link
-                    href="/outdoor-living"
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                  >
-                    <div className="text-sm font-medium leading-none">Outdoor Living</div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                      Enhance your outdoor space with our living products
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
+                <Link
+                  href="/outdoor-living"
+                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                >
+                  <div className="text-sm font-medium leading-none">Outdoor Living</div>
+                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    Enhance your outdoor space with our living products
+                  </p>
+                </Link>
               </li>
               <li>
-                <NavigationMenuLink>
-                  <Link
-                    href="/water-care"
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                  >
-                    <div className="text-sm font-medium leading-none">Water Care</div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                      Maintain crystal clear water with our care products
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
+                <Link
+                  href="/water-care"
+                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                >
+                  <div className="text-sm font-medium leading-none">Water Care</div>
+                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    Maintain crystal clear water with our care products
+                  </p>
+                </Link>
               </li>
             </ul>
           </NavigationMenuContent>
@@ -89,17 +81,15 @@ export default function DesktopNav({ header }: { header: Header }) {
           <NavigationMenuContent>
             <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
               <li className="row-span-3">
-                <NavigationMenuLink>
-                  <Link
-                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    href="/gallery"
-                  >
-                    <div className="mb-2 mt-4 text-lg font-medium">Gallery</div>
-                    <p className="text-sm leading-tight text-muted-foreground">
-                      Our best work in luxury backyard escapes.
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
+                <Link
+                  className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                  href="/gallery"
+                >
+                  <div className="mb-2 mt-4 text-lg font-medium">Gallery</div>
+                  <p className="text-sm leading-tight text-muted-foreground">
+                    Our best work in luxury backyard escapes.
+                  </p>
+                </Link>
               </li>
               <ListItem href="/about" title="About Us">
                 Our team, our story.
@@ -153,20 +143,18 @@ const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWit
   ({ className, title, children, href, ...props }, ref) => {
     return (
       <li>
-        <NavigationMenuLink>
-          <Link
-            ref={ref}
-            className={cn(
-              'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-              className,
-            )}
-            href={href}
-            {...props}
-          >
-            <div className="text-sm font-medium leading-none">{title}</div>
-            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{children}</p>
-          </Link>
-        </NavigationMenuLink>
+        <Link
+          ref={ref}
+          className={cn(
+            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+            className,
+          )}
+          href={href}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{children}</p>
+        </Link>
       </li>
     )
   },

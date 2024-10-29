@@ -1,30 +1,21 @@
 import type { Block } from 'payload'
-import {
-  FixedToolbarFeature,
-  HeadingFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
 import { TESTIMONIALS_BLOCK_SLUG } from '@payload/blocks/constants'
+import { link } from '@/payload/fields/link'
 
 export const Testimonials: Block = {
   slug: TESTIMONIALS_BLOCK_SLUG,
   fields: [
     {
-      label: 'Title Content',
-      name: 'introContent',
-      type: 'richText',
-      editor: lexicalEditor({
-        features: ({ rootFeatures }) => {
-          return [
-            ...rootFeatures,
-            HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-            FixedToolbarFeature(),
-            InlineToolbarFeature(),
-          ]
-        },
-      }),
+      name: 'title',
+      type: 'text',
+      label: 'Title',
     },
+    {
+      name: 'body',
+      type: 'textarea',
+      label: 'Body',
+    },
+    link(),
     {
       name: 'populateBy',
       type: 'select',
@@ -65,4 +56,5 @@ export const Testimonials: Block = {
     plural: 'Testimonials',
     singular: 'Testimonial',
   },
+  interfaceName: 'TestimonialsBlock',
 }

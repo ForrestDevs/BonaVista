@@ -1,11 +1,22 @@
 import type { Field } from 'payload'
 
 import deepMerge from '../utilities/deepMerge'
-import { PAGE_SLUG } from '../collections/constants';
+import { PAGE_SLUG } from '../collections/constants'
 
-export type LinkAppearances = 'default' | 'outline'
+export type LinkAppearances =
+  | 'default'
+  | 'outline'
+  | 'none'
+  | 'secondary'
+  | 'destructive'
+  | 'ghost'
+  | 'link'
 
 export const appearanceOptions: Record<LinkAppearances, { label: string; value: string }> = {
+  none: {
+    label: 'None',
+    value: 'none',
+  },
   default: {
     label: 'Default',
     value: 'default',
@@ -13,6 +24,22 @@ export const appearanceOptions: Record<LinkAppearances, { label: string; value: 
   outline: {
     label: 'Outline',
     value: 'outline',
+  },
+  secondary: {
+    label: 'Secondary',
+    value: 'secondary',
+  },
+  destructive: {
+    label: 'Destructive',
+    value: 'destructive',
+  },
+  ghost: {
+    label: 'Ghost',
+    value: 'ghost',
+  },
+  link: {
+    label: 'Link',
+    value: 'link',
   },
 }
 

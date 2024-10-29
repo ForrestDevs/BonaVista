@@ -64,7 +64,6 @@ const Pages: CollectionConfig = {
               name: 'layout',
               type: 'blocks',
               blocks: pageBlocks,
-              required: true,
             },
           ],
           label: 'Content',

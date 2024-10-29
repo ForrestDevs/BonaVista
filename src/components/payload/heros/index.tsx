@@ -6,6 +6,7 @@ import { MediumImpactHero } from '@components/payload/heros/MediumImpact'
 import { ParallaxHero } from '@components/payload/heros/Parallax'
 import { PostHero } from '@components/payload/heros/PostHero'
 import { StandardHero } from './Standard'
+import { SliderHero } from './SliderHero'
 
 const heroes = {
   highImpact: HighImpactHero,
@@ -14,6 +15,7 @@ const heroes = {
   postHero: PostHero,
   parallax: ParallaxHero,
   standard: StandardHero,
+  slider: SliderHero,
 }
 
 export const RenderHero: React.FC<Page['hero']> = (props) => {

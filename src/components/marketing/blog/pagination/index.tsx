@@ -1,110 +1,47 @@
-'use client'
-
 import React from 'react'
+import configPromise from '@payload-config'
+import { getPayloadHMR } from '@payloadcms/next/utilities'
+import { Pagination } from '@/components/marketing/blog/pagination/pagination'
+import { PostArchive } from '@/components/marketing/blog/post-archive'
+import { PageRange } from '@/components/marketing/blog/pagination/page-range'
 
-import { cn } from '@/lib/utils/cn'
-import { usePathname, useSearchParams, useRouter } from 'next/navigation'
-import {
-  Pagination as PaginationComponent,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination'
+type Props = {
+  category?: string
+  page?: number
+}
 
-export const Pagination: React.FC<{
-  className?: string
-  page: number
-  totalPages: number
-}> = (props) => {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+export default async function FilteredPagination({ category, page }: Props) {
+  const payload = await getPayloadHMR({ config: configPromise })
 
-  const { className, page, totalPages } = props
-  const hasNextPage = page < totalPages
-  const hasPrevPage = page > 1
-  const hasExtraPrevPages = page - 1 > 1
-  const hasExtraNextPages = page + 1 < totalPages
-
-  const createPageUrl = (pageNumber: number) => {
-    const params = new URLSearchParams(searchParams)
-    params.set('page', pageNumber.toString())
-    return `${pathname}?${params.toString()}`
-  }
+  const posts = await payload.find({
+    collection: 'posts',
+    depth: 1,
+    limit: 9,
+    ...(category && {
+      where: {
+        categories: {
+          in: [category],
+        },
+      },
+    }),
+    ...(page && {
+      page,
+    }),
+  })
 
   return (
-    <div className={cn('my-12', className)}>
-      <PaginationComponent>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              disabled={!hasPrevPage}
-              onClick={() => {
-                router.push(createPageUrl(page - 1), { scroll: false })
-              }}
-            />
-          </PaginationItem>
+    <div className="flex flex-col container">
+      <PageRange
+        collection="posts"
+        currentPage={posts.page}
+        limit={9}
+        totalDocs={posts.totalDocs}
+        className="mb-6"
+      />
 
-          {hasExtraPrevPages && (
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-          )}
+      <PostArchive posts={posts.docs} />
 
-          {hasPrevPage && (
-            <PaginationItem>
-              <PaginationLink
-                onClick={() => {
-                  router.push(createPageUrl(page - 1), { scroll: false })
-                }}
-              >
-                {page - 1}
-              </PaginationLink>
-            </PaginationItem>
-          )}
-
-          <PaginationItem>
-            <PaginationLink
-              isActive
-              onClick={() => {
-                router.push(createPageUrl(page), { scroll: false })
-              }}
-            >
-              {page}
-            </PaginationLink>
-          </PaginationItem>
-
-          {hasNextPage && (
-            <PaginationItem>
-              <PaginationLink
-                onClick={() => {
-                  router.push(createPageUrl(page + 1), { scroll: false })
-                }}
-              >
-                {page + 1}
-              </PaginationLink>
-            </PaginationItem>
-          )}
-
-          {hasExtraNextPages && (
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-          )}
-
-          <PaginationItem>
-            <PaginationNext
-              disabled={!hasNextPage}
-              onClick={() => {
-                router.push(createPageUrl(page + 1), { scroll: false })
-              }}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </PaginationComponent>
+      {posts.totalPages > 1 && <Pagination totalPages={posts.totalPages} />}
     </div>
   )
 }

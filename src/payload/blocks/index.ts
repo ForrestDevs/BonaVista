@@ -9,6 +9,35 @@ import { ShopArchive } from './ShopArchive'
 import { ServicesBlock } from './ServicesBlock'
 import { Testimonials } from './Testimonials'
 import { Contact } from './Contact'
+import { Typography } from './Typography'
+import { LatestPosts } from './LatestPosts'
+
+import {
+  ArchiveBlock as ArchiveBlockType,
+  BannerBlock as BannerBlockType,
+  CallToActionBlock as CallToActionBlockType,
+  CodeBlock as CodeBlockType,
+  ContentBlock as ContentBlockType,
+  FormBlock as FormBlockType,
+  MediaBlock as MediaBlockType,
+  ShopArchiveBlock as ShopArchiveBlockType,
+  ServicesBlock as ServicesBlockType,
+  TestimonialsBlock as TestimonialsBlockType,
+} from '@payload-types'
+
+export type BlockTypes = {
+  archive: ArchiveBlockType
+  banner: BannerBlockType
+  cta: CallToActionBlockType
+  code: CodeBlockType
+  content: ContentBlockType
+  formBlock: FormBlockType
+  mediaBlock: MediaBlockType
+  'shop-archive': ShopArchiveBlockType
+  services: ServicesBlockType
+  testimonials: TestimonialsBlockType
+  
+}
 
 export const pageBlocks = [
   Archive,
@@ -22,6 +51,8 @@ export const pageBlocks = [
   ServicesBlock,
   Testimonials,
   Contact,
+  Typography,
+  LatestPosts,
 ]
 
 export const postBlocks = [
@@ -47,4 +78,9 @@ export const inlineBlocks = [
   ShopArchive,
   ServicesBlock,
   Testimonials,
+]
+
+export const contentBlocks = [
+  // Form,
+  Media,
 ]

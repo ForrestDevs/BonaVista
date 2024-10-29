@@ -7,16 +7,27 @@ export const ServicesBlock: React.FC<
   ServicesBlockProps & {
     id?: string
   }
-> = async (props) => {
-  const { id, title, offerings } = props
+> = (props) => {
+  
+  const { id, title, subtitle, body, link, offerings } = props
 
   return (
     <div className="py-16" id={`block-${id}`}>
       <div className="container mx-auto px-8">
-        <h2 className="text-4xl font-light text-center mb-16 text-charcoal">{title}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {offerings.map((offering) => (
-            <OfferingCard key={offering.id} offering={offering} />
+        <h3 className="text-sm font-thin tracking-widest text-gray-600 mb-2 uppercase">
+          {subtitle}
+        </h3>
+        <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{title}</h2>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-start mb-6">
+          <p className="text-gray-700 md:mb-0 max-w-2xl">{body}</p>
+          <div className="mt-6 md:mt-0 md:ml-6 flex-shrink-0">
+            <CMSLink {...link} className="rounded-none" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {offerings.map((offering, index) => (
+            <OfferingCard key={index} offering={offering} />
           ))}
         </div>
       </div>
@@ -30,27 +41,22 @@ interface OfferingCardProps {
 
 function OfferingCard({ offering }: OfferingCardProps) {
   return (
-    // <CMSLink {...offering.link} >
-
-    // </CMSLink>
-    <div className="group relative overflow-hidden">
-      {/* <img
-          src={image}
-          alt={title}
-          className="w-full h-[600px] object-cover transition duration-300 group-hover:scale-105"
-        /> */}
-      <Media
-        resource={offering.image}
-        className="w-full h-[600px] object-cover transition duration-300 group-hover:scale-105"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition duration-300">
-        <div className="absolute bottom-0 left-0 p-8 text-white">
-          <h3 className="text-3xl font-light mb-2">{offering.title}</h3>
-          <p className="text-sm opacity-0 group-hover:opacity-100 transition duration-300 delay-100">
-            {offering.description}
-          </p>
-        </div>
+    <div className="relative h-[300px] md:h-[400px] rounded-lg overflow-hidden group">
+      <Media resource={offering.image} fill imgClassName="object-cover" />
+      <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-6 transition-opacity duration-300 opacity-100 group-hover:opacity-90">
+        <h3 className="text-xl md:text-2xl font-semibold text-white mb-2">{offering.title}</h3>
+        <p className="text-sm md:text-base text-white mb-4 line-clamp-3">{offering.description}</p>
+        <CMSLink {...offering.link} className="rounded-none" />
       </div>
     </div>
   )
+}
+{
+  /* <Button variant="default" size="sm" asChild className="self-start rounded-none">
+                  //{' '}
+                  <Link href={product.href} className="text-white hover:text-black">
+                    // Learn More //{' '}
+                  </Link>
+                  //{' '}
+                </Button> */
 }

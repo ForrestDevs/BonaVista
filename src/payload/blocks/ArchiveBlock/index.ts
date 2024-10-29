@@ -91,4 +91,5 @@ export const Archive: Block = {
     plural: 'Archives',
     singular: 'Archive',
   },
+  interfaceName: 'ArchiveBlock',
 }

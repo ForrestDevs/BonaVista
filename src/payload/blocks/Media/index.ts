@@ -26,4 +26,5 @@ export const Media: Block = {
       required: true,
     },
   ],
+  interfaceName: 'MediaBlock',
 }

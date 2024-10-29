@@ -45,7 +45,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
       )}
     >
       {position === 'fullscreen' && (
-        <div className="relative">
+        <div className="relative aspect-[4/3] w-full">
           <Media resource={media} src={staticImage} />
         </div>
       )}

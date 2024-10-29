@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/carousel'
 import Autoplay from 'embla-carousel-autoplay'
 import Fade from 'embla-carousel-fade'
+import { cn } from '@lib/utils/cn'
 
 export default function TestHome() {
   const plugin = React.useRef(Autoplay({ delay: 6000, stopOnInteraction: true }))
@@ -69,104 +70,133 @@ export default function TestHome() {
     },
   ]
 
+  const colsSpanClasses = {
+    full: '12',
+    half: '6',
+    oneThird: '4',
+    twoThirds: '8',
+  }
+
+  const alignClasses = {
+    start: 'self-start',
+    center: 'self-center',
+    end: 'self-end',
+  }
+
+  const align = 'center'
+
+  const columns = [
+    {
+      size: 'full',
+      bgColor: 'red-500',
+      content: (
+        <div className="h-fit">
+          <h3 className="text-sm font-light tracking-widest text-gray-600 mb-2 uppercase">
+            WHO WE ARE
+          </h3>
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            Welcome to BonaVista LeisureScapes
+          </h2>
+          <p className="text-gray-700 mb-6">
+            BonaVista Leisurescapes is your premier destination for creating the ultimate outdoor
+            living experience. With years of expertise in hot tubs, swim spas, and outdoor living,
+            we're dedicated to transforming your backyard into a personal oasis. Our commitment to
+            quality products and exceptional customer service ensures that your journey to
+            relaxation and wellness is seamless and enjoyable.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button variant="default" size="lg" asChild className="rounded-none">
+              <Link href="/about-us">Learn More About Us</Link>
+            </Button>
+            <Button variant="secondary" size="lg" asChild className="rounded-none">
+              <Link href="/contact">Contact Us</Link>
+            </Button>
+          </div>
+        </div>
+      ),
+    },
+    {
+      size: 'half',
+      bgColor: 'red-500',
+      content: (
+        <div className="h-fit">
+          <h3 className="text-sm font-light tracking-widest text-gray-600 mb-2 uppercase">
+            WHO WE ARE
+          </h3>
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            Welcome to BonaVista LeisureScapes
+          </h2>
+          <p className="text-gray-700 mb-6">
+            BonaVista Leisurescapes is your premier destination for creating the ultimate outdoor
+            living experience. With years of expertise in hot tubs, swim spas, and outdoor living,
+            we're dedicated to transforming your backyard into a personal oasis. Our commitment to
+            quality products and exceptional customer service ensures that your journey to
+            relaxation and wellness is seamless and enjoyable.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button variant="default" size="lg" asChild className="rounded-none">
+              <Link href="/about-us">Learn More About Us</Link>
+            </Button>
+            <Button variant="secondary" size="lg" asChild className="rounded-none">
+              <Link href="/contact">Contact Us</Link>
+            </Button>
+          </div>
+        </div>
+      ),
+    },
+    {
+      size: 'half',
+      bgColor: 'blue-500',
+      image: '/728.jpg',
+    },
+  ]
+
+  const ygap = '8'
+  const xgap = '8'
+
   return (
     <div>
-      <section className="relative w-full">
-        <Carousel
-          opts={{
-            loop: true,
-          }}
-          plugins={[plugin.current, Fade()]}
+      <section className="container w-full bg-white">
+        <div
+          className={cn('grid grid-cols-4 lg:grid-cols-12', {
+            [`gap-y-${ygap}`]: ygap,
+            [`gap-x-${xgap}`]: xgap,
+          })}
         >
-          <CarouselContent>
-            <CarouselItem>
-              <section className="relative flex items-center justify-start min-h-[95vh]">
-                <Image
-                  src="/dew.jpg"
-                  alt="Hero image 1"
-                  fill
-                  priority
-                  className="object-cover object-center"
-                />
+          {columns &&
+            columns.length > 0 &&
+            columns.map((col, index) => {
+              const { size, bgColor, content, image } = col
 
-                <div className="absolute inset-0 bg-black opacity-50"></div>
-                <div className="container relative z-10 text-left text-white max-w-3xl ml-8 md:ml-16 lg:ml-24">
-                  <p className="text-lg md:text-xl font-thin mb-2">Hot Tubs</p>
-                  <h1 className="text-5xl md:text-6xl mb-4">Create Your Own Personal Oasis</h1>
-                  <p className="text-lg md:text-xl mb-6">
-                    Entertain, relax, and spend time with loved ones in the comfort of your home and
-                    backyard oasis.
-                  </p>
-                  <Button variant="default" size="lg" className="rounded-none">
-                    Explore Hot Tubs
-                  </Button>
+              return (
+                <div
+                  className={cn(
+                    `bg-${bgColor} self-center col-span-4 lg:col-span-${colsSpanClasses[size!]}`,
+                    {
+                      'md:col-span-2': size !== 'full',
+                    },
+                  )}
+                  key={index}
+                >
+                  {content}
+                  {image && (
+                    <div className="relative w-full">
+                      <Image
+                        src={image}
+                        width={1000}
+                        height={1000}
+                        alt="BonaVista Leisurescapes"
+                        className="object-cover aspect-[4/3]"
+                      />
+                    </div>
+                  )}
                 </div>
-              </section>
-            </CarouselItem>
-            <CarouselItem>
-              <section className="relative flex items-center justify-center min-h-[95vh]">
-                <Image
-                  src="/ning.jpg"
-                  alt="Hero image 1"
-                  fill
-                  priority
-                  className="object-cover object-center"
-                />
-
-                <div className="absolute inset-0 bg-black opacity-50"></div>
-                <div className="container relative z-10 text-left text-white max-w-3xl ml-8 md:ml-16 lg:ml-24">
-                  <p className="text-lg md:text-xl font-thin mb-2">Swim Spas</p>
-                  <h1 className="text-5xl md:text-6xl mb-4">
-                    Enjoy Backyard Bliss With A Swim Spa
-                  </h1>
-                  <p className="text-lg md:text-xl mb-6">
-                    The perfect adition to any home, family, and lifestyle.
-                  </p>
-                  <Button variant="default" size="lg" className="rounded-none">
-                    Explore Swim Spas
-                  </Button>
-                </div>
-              </section>
-            </CarouselItem>
-            <CarouselItem>
-              <section className="relative flex items-center justify-center min-h-[95vh]">
-                <Image
-                  src="/mant.jpg"
-                  alt="Hero image 1"
-                  fill
-                  priority
-                  className="object-cover object-center"
-                />
-
-                <div className="absolute inset-0 bg-black opacity-50"></div>
-                <div className="container relative z-10 text-left text-white max-w-3xl ml-8 md:ml-16 lg:ml-24">
-                  <p className="text-lg md:text-xl font-thin mb-2">Outdoor Living</p>
-                  <h1 className="text-5xl md:text-6xl mb-4">
-                    Transform Your Backyard With A Hot Tub
-                  </h1>
-                  <p className="text-lg md:text-xl mb-6">
-                    The perfect adition to any home, family, and lifestyle.
-                  </p>
-                  <Button variant="default" size="lg" className="rounded-none">
-                    Explore Swim Spas
-                  </Button>
-                </div>
-              </section>
-            </CarouselItem>
-          </CarouselContent>
-
-          <CarouselPrevious
-            variant="none"
-            className="absolute left-2 top-1/2 transform -translate-y-1/2"
-          />
-          <CarouselNext
-            variant="none"
-            className="absolute right-2 top-1/2 transform -translate-y-1/2"
-          />
-        </Carousel>
+              )
+            })}
+        </div>
       </section>
 
-      <section className="w-full py-16 bg-white">
+      <section className="w-full bg-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center">
             {/* Left Column - Image */}
@@ -184,7 +214,7 @@ export default function TestHome() {
 
             {/* Right Column - Text Content */}
             <div className="w-full lg:w-1/2 lg:pl-12">
-              <h3 className="text-sm font-thin tracking-widest text-gray-600 mb-2 uppercase">
+              <h3 className="text-sm font-light tracking-widest text-gray-600 mb-2 uppercase">
                 WHO WE ARE
               </h3>
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
@@ -209,6 +239,96 @@ export default function TestHome() {
           </div>
         </div>
       </section>
+
+      <Carousel
+        opts={{
+          loop: true,
+        }}
+        plugins={[plugin.current, Fade()]}
+        className="relative w-full"
+      >
+        <CarouselContent>
+          <CarouselItem>
+            <section className="relative flex items-center justify-start min-h-[95vh]">
+              <Image
+                src="/dew.jpg"
+                alt="Hero image 1"
+                fill
+                priority
+                className="object-cover object-center"
+              />
+
+              <div className="absolute inset-0 bg-black opacity-50"></div>
+              <div className="container relative z-10 text-left text-white max-w-3xl ml-8 md:ml-16 lg:ml-24">
+                <p className="text-lg md:text-xl font-thin mb-2">Hot Tubs</p>
+                <h1 className="text-5xl md:text-6xl mb-4">Create Your Own Personal Oasis</h1>
+                <p className="text-lg md:text-xl mb-6">
+                  Entertain, relax, and spend time with loved ones in the comfort of your home and
+                  backyard oasis.
+                </p>
+                <Button variant="default" size="lg" className="rounded-none">
+                  Explore Hot Tubs
+                </Button>
+              </div>
+            </section>
+          </CarouselItem>
+          <CarouselItem>
+            <section className="relative flex items-center justify-center min-h-[95vh]">
+              <Image
+                src="/ning.jpg"
+                alt="Hero image 1"
+                fill
+                priority
+                className="object-cover object-center"
+              />
+
+              <div className="absolute inset-0 bg-black opacity-50"></div>
+              <div className="container relative z-10 text-left text-white max-w-3xl ml-8 md:ml-16 lg:ml-24">
+                <p className="text-lg md:text-xl font-thin mb-2">Swim Spas</p>
+                <h1 className="text-5xl md:text-6xl mb-4">Enjoy Backyard Bliss With A Swim Spa</h1>
+                <p className="text-lg md:text-xl mb-6">
+                  The perfect adition to any home, family, and lifestyle.
+                </p>
+                <Button variant="default" size="lg" className="rounded-none">
+                  Explore Swim Spas
+                </Button>
+              </div>
+            </section>
+          </CarouselItem>
+          <CarouselItem>
+            <section className="relative flex items-center justify-center min-h-[95vh]">
+              <Image
+                src="/mant.jpg"
+                alt="Hero image 1"
+                fill
+                priority
+                className="object-cover object-center"
+              />
+
+              <div className="absolute inset-0 bg-black opacity-50"></div>
+              <div className="container relative z-10 text-left text-white max-w-3xl ml-8 md:ml-16 lg:ml-24">
+                <p className="text-lg md:text-xl font-thin mb-2">Outdoor Living</p>
+                <h1 className="text-5xl md:text-6xl mb-4">Transform Your Backyard</h1>
+                <p className="text-lg md:text-xl mb-6">
+                  Relax by the fire or entertain with friends and family.
+                </p>
+                <Button variant="default" size="lg" className="rounded-none">
+                  Explore Outdoor Living
+                </Button>
+              </div>
+            </section>
+          </CarouselItem>
+        </CarouselContent>
+
+        <CarouselPrevious
+          variant="none"
+          className="absolute left-2 top-1/2 transform -translate-y-1/2"
+        />
+        <CarouselNext
+          variant="none"
+          className="absolute right-2 top-1/2 transform -translate-y-1/2"
+        />
+      </Carousel>
 
       <section className="w-full py-16 bg-white">
         <div className="container mx-auto px-4">

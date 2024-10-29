@@ -47,4 +47,5 @@ export const Form: Block = {
     plural: 'Form Blocks',
     singular: 'Form Block',
   },
+  interfaceName: 'FormBlock',
 }

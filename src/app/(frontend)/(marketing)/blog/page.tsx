@@ -1,43 +1,42 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import type { Metadata } from 'next/types'
 import BlogFilters from '@/components/marketing/blog/filter'
-import FilteredPagination from '@/components/marketing/blog/filtered-pagination'
+import FilteredPagination from '@/components/marketing/blog/pagination'
 import getPayload from '@/lib/utils/getPayload'
+import { blogFiltersCache } from '@/components/marketing/blog/searchParams'
 
 // export const dynamic = 'force-static'
 export const revalidate = 600
 
 type Args = {
-  searchParams?: Promise<{ category?: string; page?: string }>
+  searchParams: Promise<{
+    [key: string]: string | undefined
+  }>
 }
 
 export default async function Page({ searchParams }: Args) {
   const searchParams_ = await searchParams
-  const category = searchParams_?.category || null
+  const { category, page } = blogFiltersCache.parse(searchParams_)
   const payload = await getPayload()
-  const categories =
-    category &&
-    (await payload.find({
-      collection: 'blog-categories',
-      depth: 0,
-      ...(category && {
-        where: {
-          slug: {
-            equals: category,
-          },
-        },
-      }),
-    }))
 
-  const categoryId = (category && categories?.docs?.[0]?.id) || null
-  const currentPage = Number(searchParams_?.page) || 1
+  const categories = await payload.find({
+    collection: 'blog-categories',
+    depth: 0,
+    where: {
+      showInFilter: {
+        equals: true,
+      },
+    },
+  })
+
+  const categoryId = categories.docs?.find((result) => result.slug === category)?.id
 
   return (
     <div className="flex flex-col min-h-screen space-y-16">
       <HeroSmall />
       <BlogIntro />
-      <BlogFilters />
-      <FilteredPagination category={categoryId} page={currentPage} />
+      <BlogFilters categories={categories.docs} />
+      <FilteredPagination category={categoryId} page={page} />
     </div>
   )
 }
@@ -47,10 +46,16 @@ function BlogIntro() {
     <section className="w-full">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-primary text-lg font-light uppercase tracking-wider mb-3">Dive into Our World</p>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Explore the Latest in Hot Tub Lifestyle</h2>
+          <p className="text-primary text-lg font-light uppercase tracking-wider mb-3">
+            Dive into Our World
+          </p>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Explore the Latest in Hot Tub Lifestyle
+          </h2>
           <p className="text-xl text-gray-700 leading-relaxed">
-            Welcome to our blog, where we share expert insights, maintenance tips, and inspiring stories about the joys of hot tub ownership. Whether you're a seasoned enthusiast or just starting your journey, there's something here for everyone.
+            Welcome to our blog, where we share expert insights, maintenance tips, and inspiring
+            stories about the joys of hot tub ownership. Whether you're a seasoned enthusiast or
+            just starting your journey, there's something here for everyone.
           </p>
         </div>
       </div>
@@ -75,11 +80,11 @@ function HeroSmall() {
   )
 }
 
-export function generateMetadata(): Metadata {
-  return {
-    title: `Payload Website Template Posts`,
-  }
-}
+// export function generateMetadata(): Metadata {
+//   return {
+//     title: `Payload Website Template Posts`,
+//   }
+// }
 
 // {/* <section className="py-16">
 //         <div className="container mx-auto px-4">

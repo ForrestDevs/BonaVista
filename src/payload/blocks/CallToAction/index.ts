@@ -38,4 +38,5 @@ export const CallToAction: Block = {
     plural: 'Calls to Action',
     singular: 'Call to Action',
   },
+  interfaceName: 'CallToActionBlock',
 }

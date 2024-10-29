@@ -14,4 +14,5 @@ export const Contact: Block = {
       required: true,
     },
   ],
+  interfaceName: 'ContactBlock',
 }
