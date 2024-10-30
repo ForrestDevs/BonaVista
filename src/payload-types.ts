@@ -419,6 +419,8 @@ export interface CallToActionBlock {
  */
 export interface Page {
   id: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
   title: string;
   hero: {
     type: 'none' | 'standard' | 'slider' | 'highImpact' | 'mediumImpact' | 'lowImpact' | 'parallax';
@@ -502,6 +504,47 @@ export interface Page {
         | ContactBlock
         | TypographyBlock
         | LatestPostsBlock
+        | CardBlock
+        | {
+            gridStyle: 'basic' | 'masonry' | 'responsive';
+            columns?: number | null;
+            gap?: number | null;
+            content?:
+              | {
+                  contentType?: ('blocks' | 'richText') | null;
+                  richText?: {
+                    root: {
+                      type: string;
+                      children: {
+                        type: string;
+                        version: number;
+                        [k: string]: unknown;
+                      }[];
+                      direction: ('ltr' | 'rtl') | null;
+                      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                      indent: number;
+                      version: number;
+                    };
+                    [k: string]: unknown;
+                  } | null;
+                  blocks?:
+                    | (
+                        | ArchiveBlock
+                        | BannerBlock
+                        | CallToActionBlock
+                        | CodeBlock
+                        | MediaBlock
+                        | TypographyBlock
+                        | CardBlock
+                      )[]
+                    | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'grid';
+          }
       )[]
     | null;
   meta?: {
@@ -510,7 +553,6 @@ export interface Page {
     description?: string | null;
   };
   publishedAt?: string | null;
-  slug?: string | null;
   parent?: (string | null) | Page;
   breadcrumbs?:
     | {
@@ -680,7 +722,57 @@ export interface ContentBlock {
           };
           [k: string]: unknown;
         } | null;
-        blocks?: (ArchiveBlock | BannerBlock | CallToActionBlock | CodeBlock | MediaBlock | TypographyBlock)[] | null;
+        blocks?:
+          | (
+              | ArchiveBlock
+              | BannerBlock
+              | CallToActionBlock
+              | CodeBlock
+              | MediaBlock
+              | TypographyBlock
+              | CardBlock
+              | {
+                  gridStyle: 'basic' | 'masonry' | 'responsive';
+                  columns?: number | null;
+                  gap?: number | null;
+                  content?:
+                    | {
+                        contentType?: ('blocks' | 'richText') | null;
+                        richText?: {
+                          root: {
+                            type: string;
+                            children: {
+                              type: string;
+                              version: number;
+                              [k: string]: unknown;
+                            }[];
+                            direction: ('ltr' | 'rtl') | null;
+                            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                            indent: number;
+                            version: number;
+                          };
+                          [k: string]: unknown;
+                        } | null;
+                        blocks?:
+                          | (
+                              | ArchiveBlock
+                              | BannerBlock
+                              | CallToActionBlock
+                              | CodeBlock
+                              | MediaBlock
+                              | TypographyBlock
+                              | CardBlock
+                            )[]
+                          | null;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'grid';
+                }
+            )[]
+          | null;
         link?: {
           type?: ('reference' | 'custom') | null;
           newTab?: boolean | null;
@@ -757,6 +849,33 @@ export interface TypographyBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'typography';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CardBlock".
+ */
+export interface CardBlock {
+  type?: ('icon' | 'product' | 'service') | null;
+  icon?:
+    | (
+        | 'moon'
+        | 'heart-eyes'
+        | 'swimming'
+        | 'walking'
+        | 'wave'
+        | 'theater-masks'
+        | 'heart'
+        | 'sleeping'
+        | 'stress'
+        | 'aches'
+        | 'sick'
+      )
+    | null;
+  title?: string | null;
+  description?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'card';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1163,15 +1282,11 @@ export interface Spa {
   id: string;
   slug?: string | null;
   title: string;
+  description?: string | null;
   type: 'hot_tub' | 'swim_spa';
   family: 'self-cleaning' | 'serenity';
-  description?: string | null;
-  images?:
-    | {
-        image: string | Media;
-        id?: string | null;
-      }[]
-    | null;
+  thumbnail: string | Media;
+  topdown: string | Media;
   features?:
     | {
         feature?: string | null;

@@ -1,52 +1,64 @@
-// 'use client'
+'use client'
 
-// import React from 'react'
+import React from 'react'
 
-// import {
-//   Select,
-//   useFormFields,
-//   SelectField,
-//   SelectInput,
-//   SelectFieldProps,
-//   Options,
-// } from '@payloadcms/ui'
+import {
+  Select,
+  useFormFields,
+  SelectField,
+  SelectInput,
+  ReactSelectOption,
+  useFieldProps,
+} from '@payloadcms/ui'
 
-// import { useField } from '@payloadcms/ui'
+import { useField } from '@payloadcms/ui'
 
-// import { icons } from 'lucide-react'
+import { icons } from 'lucide-react'
 
-// export function generateLucideIconOptions(): Options[] {
-//   const lucideIconOptions: Options[] = []
+export function generateLucideIconOptions(): ReactSelectOption[] {
+  const lucideIconOptions: ReactSelectOption[] = []
 
-//   Object.keys(icons).forEach((icon) => {
-//     lucideIconOptions.push({
-//       hasRows: true,
-//     })
-//   })
+  Object.keys(icons).forEach((icon) => {
+    lucideIconOptions.push({
+      label: icon,
+      value: icon,
+    })
+  })
 
-//   return lucideIconOptions
-// }
+  return lucideIconOptions
+}
 
-// interface LucideProps {
-//   name: string
-//   color: string
-//   size: number
-// }
+interface LucideProps {
+  name: string
+  color: string
+  size: number
+}
 
-// export const LucideIcon = ({ name, color, size }: LucideProps) => {
-//   const LucideIcon = icons[name]
+export const LucideIcon = ({ name, color, size }: LucideProps) => {
+  if (!name) return null
 
-//   return <LucideIcon color={color} size={size} />
-// }
+  const LucideIcon = icons[name as keyof typeof icons]
 
-// export function CustomIconSelect() {
-//   const { value, setValue, path } = useField({ })
+  return <LucideIcon color={color} size={size} />
+}
 
-//   return (
-//     <div>
-//       <Select options={generateLucideIconOptions} />
-//       <h3>Preview</h3>
-//       <LucideIcon name={value ?? 'Plus'} color={'white'} size={48} />
-//     </div>
-//   )
-// }
+export function CustomIconSelect() {
+  const { path } = useFieldProps()
+  const { value, setValue } = useField({ path })
+
+  return (
+    <div>
+      {path}
+      {value as string}
+      <Select
+        options={generateLucideIconOptions()}
+        onChange={(value) => setValue(value)}
+        // @ts-ignore
+        // value={value}
+      />
+      <h3>Preview</h3>
+      {/* @ts-ignore */}
+      <LucideIcon name={value} color={'black'} size={48} />
+    </div>
+  )
+}

@@ -1,12 +1,13 @@
 import { Field } from 'payload'
-// import { CustomIconSelect } from './ui'
 
-export const IconSelect: Field = {
-  name: 'lucideIcon',
+export const iconField: Field = {
+  name: 'icon',
   type: 'text',
-//   admin: {
-//     components: {
-//       Field: CustomIconSelect,
-//     },
-//   },
+  admin: {
+    components: {
+      Field: {
+        path: 'src/payload/fields/icon/ui/#CustomIconSelect',
+      }
+    },
+  },
 }

@@ -11,6 +11,8 @@ import { Testimonials } from './Testimonials'
 import { Contact } from './Contact'
 import { Typography } from './Typography'
 import { LatestPosts } from './LatestPosts'
+import { Card } from './Card'
+import { Grid } from './Grid'
 
 import {
   ArchiveBlock as ArchiveBlockType,
@@ -36,7 +38,6 @@ export type BlockTypes = {
   'shop-archive': ShopArchiveBlockType
   services: ServicesBlockType
   testimonials: TestimonialsBlockType
-  
 }
 
 export const pageBlocks = [
@@ -53,6 +54,8 @@ export const pageBlocks = [
   Contact,
   Typography,
   LatestPosts,
+  Card,
+  Grid,
 ]
 
 export const postBlocks = [

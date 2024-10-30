@@ -4,6 +4,7 @@ import MobileNav from './mobile-nav'
 import DesktopNav from './desktop-nav'
 import { Logo } from '@/components/payload/Logo'
 import Link from 'next/link'
+import { Submenus } from './submenu'
 
 export default async function MarketingHeader() {
   const header = await getCachedGlobal<'header'>('header')
@@ -18,6 +19,7 @@ export default async function MarketingHeader() {
           <Logo />
         </Link>
         <MobileNav header={header} />
+        {/* <Submenus /> */}
         <DesktopNav header={header} />
       </div>
       </div>

@@ -19,6 +19,10 @@ export const Spas: CollectionConfig = {
       required: true,
     },
     {
+      name: 'description',
+      type: 'textarea',
+    },
+    {
       name: 'type',
       type: 'select',
       options: [
@@ -37,20 +41,16 @@ export const Spas: CollectionConfig = {
       required: true,
     },
     {
-      name: 'description',
-      type: 'textarea',
+      name: 'thumbnail',
+      type: 'upload',
+      relationTo: 'media',
+      required: true,
     },
     {
-      name: 'images',
-      type: 'array',
-      fields: [
-        {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-          required: true,
-        },
-      ],
+      name: 'topdown',
+      type: 'upload',
+      relationTo: 'media',
+      required: true,
     },
     {
       name: 'features',

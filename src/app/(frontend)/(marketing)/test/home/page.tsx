@@ -15,6 +15,8 @@ import {
 import Autoplay from 'embla-carousel-autoplay'
 import Fade from 'embla-carousel-fade'
 import { cn } from '@lib/utils/cn'
+import { Submenus } from '@/components/layout/headers/site/submenu'
+import { Col, Grid } from '@/components/ui/grid'
 
 export default function TestHome() {
   const plugin = React.useRef(Autoplay({ delay: 6000, stopOnInteraction: true }))
@@ -329,6 +331,68 @@ export default function TestHome() {
           className="absolute right-2 top-1/2 transform -translate-y-1/2"
         />
       </Carousel>
+
+      <Grid cols={1} colsMd={2} colsLg={4} className="container w-full gap-2 lg:px-8 mx-auto mt-2">
+        <Col>
+          <Card>
+            <CardHeader>
+              <CardTitle>Title</CardTitle>
+            </CardHeader>
+            <CardContent>KPI 1</CardContent>
+          </Card>
+        </Col>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Title</CardTitle>
+          </CardHeader>
+          <CardContent>KPI 2</CardContent>
+        </Card>
+
+        <Col>
+          <Card>
+            <CardHeader>
+              <CardTitle>Title</CardTitle>
+            </CardHeader>
+            <CardContent>KPI 3</CardContent>
+          </Card>
+        </Col>
+        <Card>
+          <CardHeader>
+            <CardTitle>Title</CardTitle>
+          </CardHeader>
+          <CardContent>KPI 4</CardContent>
+        </Card>
+      </Grid>
+
+      <div className="container w-full lg:px-8 mt-2">
+        <Grid cols={1} colsMd={2} colsLg={3} className="max-w-4xl mx-auto gap-2">
+          <Col>
+            <Card>
+              <CardHeader>
+                <CardTitle>Title</CardTitle>
+              </CardHeader>
+              <CardContent>KPI 1</CardContent>
+            </Card>
+          </Col>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Title</CardTitle>
+            </CardHeader>
+            <CardContent>KPI 2</CardContent>
+          </Card>
+
+          <Col>
+            <Card>
+              <CardHeader>
+                <CardTitle>Title</CardTitle>
+              </CardHeader>
+              <CardContent>KPI 3</CardContent>
+            </Card>
+          </Col>
+        </Grid>
+      </div>
 
       <section className="w-full py-16 bg-white">
         <div className="container mx-auto px-4">

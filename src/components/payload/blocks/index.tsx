@@ -11,6 +11,8 @@ import { ContactBlock } from './ContactBlock'
 import { TypographyBlock } from './Typography'
 import { LatestPostsBlock } from './LatestPosts'
 import { ServicesBlock } from './ServicesBlock'
+import { CardBlock } from './CardBlock'
+import { GridBlock } from './GridBlock'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -24,6 +26,8 @@ const blockComponents = {
   typography: TypographyBlock,
   'latest-posts': LatestPostsBlock,
   services: ServicesBlock,
+  card: CardBlock,
+  grid: GridBlock,
 } as const
 
 export const RenderBlocks: React.FC<{

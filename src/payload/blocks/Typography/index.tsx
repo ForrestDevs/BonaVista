@@ -4,6 +4,7 @@ import {
   FixedToolbarFeature,
   lexicalEditor,
   LinkFeature,
+  UnorderedListFeature,
 } from '@payloadcms/richtext-lexical'
 import { TYPOGRAPHY_BLOCK_SLUG } from '@payload/blocks/constants'
 import { linkGroup } from '@/payload/fields/linkGroup'
@@ -40,7 +41,7 @@ export const Typography: Block = {
             {
               name: 'align',
               type: 'select',
-              defaultValue: 'center',
+              defaultValue: 'left',
               options: [
                 { label: 'Left', value: 'left' },
                 { label: 'Center', value: 'center' },
@@ -71,7 +72,7 @@ export const Typography: Block = {
               name: 'body',
               type: 'richText',
               editor: lexicalEditor({
-                features: ({ rootFeatures }) => [...rootFeatures, FixedToolbarFeature()],
+                features: ({ rootFeatures }) => [...rootFeatures, FixedToolbarFeature(), UnorderedListFeature()],
               }),
               admin: {
                 condition: (_, { type } = {}) =>

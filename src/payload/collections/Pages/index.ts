@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { authenticated, authenticatedOrPublished } from '@payload/access'
 import { hero } from '@payload/fields/hero'
 import { pageBlocks } from '@/payload/blocks'
-import { slugField } from '@payload/fields/slug'
+import { slugField } from '@payload/fields/slug-new'
 import { populatePublishedAt } from '@payload/hooks/populatePublishedAt'
 import { generatePreviewPath } from '@payload/utilities/generatePreviewPath'
 import { revalidatePage } from './hooks/revalidatePage'
@@ -46,6 +46,7 @@ const Pages: CollectionConfig = {
     useAsTitle: 'title',
   },
   fields: [
+    ...slugField(),
     {
       name: 'title',
       type: 'text',
@@ -104,7 +105,6 @@ const Pages: CollectionConfig = {
         position: 'sidebar',
       },
     },
-    slugField(),
   ],
   hooks: {
     afterChange: [revalidatePage],

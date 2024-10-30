@@ -16,6 +16,8 @@ import { CallToAction } from '../CallToAction'
 import { Code } from '../Code'
 import { Media } from '../Media'
 import { Typography } from '../Typography'
+import { Card } from '../Card'
+import { Grid } from '../Grid'
 
 const columnFields: Field[] = [
   {
@@ -159,7 +161,7 @@ const columnFields: Field[] = [
           {
             name: 'blocks',
             type: 'blocks',
-            blocks: [Archive, Banner, CallToAction, Code, Media, Typography],
+            blocks: [Archive, Banner, CallToAction, Code, Media, Typography, Card, Grid],
             admin: {
               condition: (_, { type }) => type === 'blocks',
             },
