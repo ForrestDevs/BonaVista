@@ -36,12 +36,12 @@ export function Footer() {
               <p>Sunday: 11am - 5pm</p>
             </div>
             <div className="relative h-40 w-full rounded-md overflow-hidden">
-              <Image
+              {/* <Image
                 src="/placeholder.svg?height=128&width=256"
                 alt="Map of Leaside Hot Tubs location"
                 layout="fill"
                 objectFit="cover"
-              />
+              /> */}
             </div>
           </div>
 

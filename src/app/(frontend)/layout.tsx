@@ -42,6 +42,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       lang={locale}
       suppressHydrationWarning
     >
+      <head>
+        <link rel="stylesheet" href="https://use.typekit.net/rgs4hpy.css" />
+      </head>
       <body>
         <main className="flex min-h-full flex-col">
           <Providers>
