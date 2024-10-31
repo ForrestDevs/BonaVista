@@ -2,7 +2,7 @@
 
 module.exports = {
   content: ['./src/components/**/*.{ts,tsx}', './src/app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}'],
-  // darkMode: ['class', '[data-theme="dark"]'],
+  darkMode: ['class', '[data-theme="dark"]'],
   plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
   prefix: '',
   safelist: [

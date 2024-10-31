@@ -180,158 +180,158 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   // }, []) // Empty dependency array means this effect runs once on component mount
 
   // // Handle cart changes when user auth status changes
-  useEffect(() => {
-    console.log('Auth status changed, running cart logic', authStatus)
-    if (hasInitialized.current) {
-      if (authStatus === 'loggedIn' && user) {
-        const localCartId = localStorage.getItem('cart_id')
-        console.log('User logged in, local cart id:', localCartId)
-        if (localCartId) {
-          console.log('Local cart to merge, Case 3')
-          const mergeCarts = async () => {
-            if (typeof user.customer === 'object') {
-              console.log('User customer is an object')
-              if (!user.customer.cart) {
-                console.log('User customer doesnt have a cart, creating a new one')
-                const newCart = await createCartWithCustomer(user.customer.id)
-                if (newCart) {
-                  dispatchCart({ type: 'MERGE_CART', payload: newCart })
-                  // delete the local cart, before updating the local storage cart id
-                  await deleteCart(localCartId)
-                  // update the local storage cart id
-                  localStorage.setItem('cart_id', newCart.id)
-                }
-              } else {
-                console.log('User customer has a cart, merging the carts')
-                if (typeof user.customer.cart === 'object') {
-                  console.log('User customer cart is an object, merging the carts')
-                  dispatchCart({ type: 'MERGE_CART', payload: user?.customer?.cart })
-                  // delete the local cart, before updating the local storage cart id
-                  await deleteCart(localCartId)
-                  // update the local storage cart id
-                  localStorage.setItem('cart_id', user?.customer?.cart?.id)
-                } else if (typeof user.customer.cart === 'string') {
-                  console.log('User customer cart is a string, fetching the cart')
-                  const fetchedCart = await fetchCartById(user?.customer?.cart)
-                  if (fetchedCart) {
-                    dispatchCart({ type: 'MERGE_CART', payload: fetchedCart })
-                    // delete the local cart, before updating the local storage cart id
-                    await deleteCart(localCartId)
-                    // update the local storage cart id
-                    localStorage.setItem('cart_id', fetchedCart.id)
-                  }
-                }
-              }
-            } else if (typeof user.customer === 'string') {
-              console.log('User customer is a string')
-              const customer = await getCustomer(user.customer)
+  // useEffect(() => {
+  //   console.log('Auth status changed, running cart logic', authStatus)
+  //   if (hasInitialized.current) {
+  //     if (authStatus === 'loggedIn' && user) {
+  //       const localCartId = localStorage.getItem('cart_id')
+  //       console.log('User logged in, local cart id:', localCartId)
+  //       if (localCartId) {
+  //         console.log('Local cart to merge, Case 3')
+  //         const mergeCarts = async () => {
+  //           if (typeof user.customer === 'object') {
+  //             console.log('User customer is an object')
+  //             if (!user.customer.cart) {
+  //               console.log('User customer doesnt have a cart, creating a new one')
+  //               const newCart = await createCartWithCustomer(user.customer.id)
+  //               if (newCart) {
+  //                 dispatchCart({ type: 'MERGE_CART', payload: newCart })
+  //                 // delete the local cart, before updating the local storage cart id
+  //                 await deleteCart(localCartId)
+  //                 // update the local storage cart id
+  //                 localStorage.setItem('cart_id', newCart.id)
+  //               }
+  //             } else {
+  //               console.log('User customer has a cart, merging the carts')
+  //               if (typeof user.customer.cart === 'object') {
+  //                 console.log('User customer cart is an object, merging the carts')
+  //                 dispatchCart({ type: 'MERGE_CART', payload: user?.customer?.cart })
+  //                 // delete the local cart, before updating the local storage cart id
+  //                 await deleteCart(localCartId)
+  //                 // update the local storage cart id
+  //                 localStorage.setItem('cart_id', user?.customer?.cart?.id)
+  //               } else if (typeof user.customer.cart === 'string') {
+  //                 console.log('User customer cart is a string, fetching the cart')
+  //                 const fetchedCart = await fetchCartById(user?.customer?.cart)
+  //                 if (fetchedCart) {
+  //                   dispatchCart({ type: 'MERGE_CART', payload: fetchedCart })
+  //                   // delete the local cart, before updating the local storage cart id
+  //                   await deleteCart(localCartId)
+  //                   // update the local storage cart id
+  //                   localStorage.setItem('cart_id', fetchedCart.id)
+  //                 }
+  //               }
+  //             }
+  //           } else if (typeof user.customer === 'string') {
+  //             console.log('User customer is a string')
+  //             const customer = await getCustomer(user.customer)
 
-              if (!customer.cart) {
-                console.log('Customer doesnt have a cart, creating a new one')
-                // customer doesn't have a cart, create a new one
-                const newCart = await createCartWithCustomer(customer.id)
-                if (newCart) {
-                  dispatchCart({ type: 'MERGE_CART', payload: newCart })
-                  // delete the local cart, before updating the local storage cart id
-                  await deleteCart(localCartId)
-                  // update the local storage cart id
-                  localStorage.setItem('cart_id', newCart.id)
-                }
-              } else {
-                console.log('Customer has a cart')
-                // customer has a cart, merge the carts
-                if (typeof customer.cart === 'object') {
-                  console.log('Customer cart is an object, merging the carts')
-                  dispatchCart({ type: 'MERGE_CART', payload: customer.cart })
-                  // delete the local cart, before updating the local storage cart id
-                  await deleteCart(localCartId)
-                  // update the local storage cart id
-                  localStorage.setItem('cart_id', customer.cart.id)
-                } else if (typeof customer.cart === 'string') {
-                  console.log('Customer cart is a string, fetching the cart')
-                  const fetchedCart = await fetchCartById(customer.cart)
-                  if (fetchedCart) {
-                    dispatchCart({ type: 'MERGE_CART', payload: fetchedCart })
-                    // delete the local cart, before updating the local storage cart id
-                    await deleteCart(localCartId)
-                    // update the local storage cart id
-                    localStorage.setItem('cart_id', fetchedCart.id)
-                  } else {
-                    console.error('Failed to fetch cart')
-                  }
-                }
-              }
-            }
-          }
-          void mergeCarts()
-        } else if (!localCartId) {
-          console.log('No local cart to merge, setting user cart, Case 4')
-          // If there was no local cart to merge, just set the user's cart
-          const setCarts = async () => {
-            if (typeof user.customer === 'object') {
-              // customer is an object, now check if the cart is a string or object
-              if (typeof user.customer.cart === 'object') {
-                // cart is an object, set the cart
-                dispatchCart({ type: 'SET_CART', payload: user.customer.cart })
-                localStorage.setItem('cart_id', user.customer.cart.id)
-              } else if (typeof user.customer.cart === 'string') {
-                // cart is a string, fetch the cart
-                const fetchedCart = await fetchCartById(user.customer.cart)
-                if (fetchedCart) {
-                  dispatchCart({ type: 'SET_CART', payload: fetchedCart })
-                  localStorage.setItem('cart_id', fetchedCart.id)
-                }
-              }
-            } else if (typeof user.customer === 'string') {
-              // customer is a string, fetch the customer
-              const customer = await getCustomer(user.customer)
+  //             if (!customer.cart) {
+  //               console.log('Customer doesnt have a cart, creating a new one')
+  //               // customer doesn't have a cart, create a new one
+  //               const newCart = await createCartWithCustomer(customer.id)
+  //               if (newCart) {
+  //                 dispatchCart({ type: 'MERGE_CART', payload: newCart })
+  //                 // delete the local cart, before updating the local storage cart id
+  //                 await deleteCart(localCartId)
+  //                 // update the local storage cart id
+  //                 localStorage.setItem('cart_id', newCart.id)
+  //               }
+  //             } else {
+  //               console.log('Customer has a cart')
+  //               // customer has a cart, merge the carts
+  //               if (typeof customer.cart === 'object') {
+  //                 console.log('Customer cart is an object, merging the carts')
+  //                 dispatchCart({ type: 'MERGE_CART', payload: customer.cart })
+  //                 // delete the local cart, before updating the local storage cart id
+  //                 await deleteCart(localCartId)
+  //                 // update the local storage cart id
+  //                 localStorage.setItem('cart_id', customer.cart.id)
+  //               } else if (typeof customer.cart === 'string') {
+  //                 console.log('Customer cart is a string, fetching the cart')
+  //                 const fetchedCart = await fetchCartById(customer.cart)
+  //                 if (fetchedCart) {
+  //                   dispatchCart({ type: 'MERGE_CART', payload: fetchedCart })
+  //                   // delete the local cart, before updating the local storage cart id
+  //                   await deleteCart(localCartId)
+  //                   // update the local storage cart id
+  //                   localStorage.setItem('cart_id', fetchedCart.id)
+  //                 } else {
+  //                   console.error('Failed to fetch cart')
+  //                 }
+  //               }
+  //             }
+  //           }
+  //         }
+  //         void mergeCarts()
+  //       } else if (!localCartId) {
+  //         console.log('No local cart to merge, setting user cart, Case 4')
+  //         // If there was no local cart to merge, just set the user's cart
+  //         const setCarts = async () => {
+  //           if (typeof user.customer === 'object') {
+  //             // customer is an object, now check if the cart is a string or object
+  //             if (typeof user.customer.cart === 'object') {
+  //               // cart is an object, set the cart
+  //               dispatchCart({ type: 'SET_CART', payload: user.customer.cart })
+  //               localStorage.setItem('cart_id', user.customer.cart.id)
+  //             } else if (typeof user.customer.cart === 'string') {
+  //               // cart is a string, fetch the cart
+  //               const fetchedCart = await fetchCartById(user.customer.cart)
+  //               if (fetchedCart) {
+  //                 dispatchCart({ type: 'SET_CART', payload: fetchedCart })
+  //                 localStorage.setItem('cart_id', fetchedCart.id)
+  //               }
+  //             }
+  //           } else if (typeof user.customer === 'string') {
+  //             // customer is a string, fetch the customer
+  //             const customer = await getCustomer(user.customer)
 
-              if (!customer.cart) {
-                // customer doesn't have a cart, create a new one
-                const newCart = await createCartWithCustomer(customer.id)
-                if (newCart) {
-                  dispatchCart({ type: 'SET_CART', payload: newCart })
-                  localStorage.setItem('cart_id', newCart.id)
-                }
-              } else {
-                // customer has a cart, check if it's a string or object
-                if (typeof customer.cart === 'object') {
-                  // cart is an object, set the cart
-                  dispatchCart({ type: 'SET_CART', payload: customer.cart })
-                  localStorage.setItem('cart_id', customer.cart.id)
-                } else if (typeof customer.cart === 'string') {
-                  // cart is a string, fetch the cart
-                  const fetchedCart = await fetchCartById(customer.cart)
-                  if (fetchedCart) {
-                    dispatchCart({ type: 'SET_CART', payload: fetchedCart })
-                    localStorage.setItem('cart_id', fetchedCart.id)
-                  }
-                }
-              }
-            }
-          }
+  //             if (!customer.cart) {
+  //               // customer doesn't have a cart, create a new one
+  //               const newCart = await createCartWithCustomer(customer.id)
+  //               if (newCart) {
+  //                 dispatchCart({ type: 'SET_CART', payload: newCart })
+  //                 localStorage.setItem('cart_id', newCart.id)
+  //               }
+  //             } else {
+  //               // customer has a cart, check if it's a string or object
+  //               if (typeof customer.cart === 'object') {
+  //                 // cart is an object, set the cart
+  //                 dispatchCart({ type: 'SET_CART', payload: customer.cart })
+  //                 localStorage.setItem('cart_id', customer.cart.id)
+  //               } else if (typeof customer.cart === 'string') {
+  //                 // cart is a string, fetch the cart
+  //                 const fetchedCart = await fetchCartById(customer.cart)
+  //                 if (fetchedCart) {
+  //                   dispatchCart({ type: 'SET_CART', payload: fetchedCart })
+  //                   localStorage.setItem('cart_id', fetchedCart.id)
+  //                 }
+  //               }
+  //             }
+  //           }
+  //         }
 
-          void setCarts()
-        }
-      } else if (authStatus === 'loggedOut' || !user) {
-        console.log('User logged out or null, creating new cart')
-        const createNewCart = async () => {
-          try {
-            const newCart = await createCart()
-            if (newCart) {
-              dispatchCart({ type: 'SET_CART', payload: newCart })
-              localStorage.setItem('cart_id', newCart.id)
-            } else {
-              console.error('Failed to create new cart')
-            }
-          } catch (error) {
-            console.error('Error creating new cart:', error)
-          }
-        }
-        void createNewCart()
-      }
-    }
-  }, [authStatus, user]) // This effect runs when auth status or user changes
+  //         void setCarts()
+  //       }
+  //     } else if (authStatus === 'loggedOut' || !user) {
+  //       console.log('User logged out or null, creating new cart')
+  //       const createNewCart = async () => {
+  //         try {
+  //           const newCart = await createCart()
+  //           if (newCart) {
+  //             dispatchCart({ type: 'SET_CART', payload: newCart })
+  //             localStorage.setItem('cart_id', newCart.id)
+  //           } else {
+  //             console.error('Failed to create new cart')
+  //           }
+  //         } catch (error) {
+  //           console.error('Error creating new cart:', error)
+  //         }
+  //       }
+  //       void createNewCart()
+  //     }
+  //   }
+  // }, [authStatus, user]) // This effect runs when auth status or user changes
 
   const userCart = useRef<Cart | null>(null)
 

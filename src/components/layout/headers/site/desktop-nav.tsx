@@ -26,7 +26,7 @@ export default function DesktopNav({ header }: { header: Header }) {
       <NavigationMenuList className="space-x-5 lg:space-x-6">
         <NavigationMenuItem>
           <CustomNavigationMenuTrigger>Products</CustomNavigationMenuTrigger>
-          <NavigationMenuContent>
+          <NavigationMenuContent className='bg-white'>
             <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[1fr_1fr]">
               <li>
                 <Link
