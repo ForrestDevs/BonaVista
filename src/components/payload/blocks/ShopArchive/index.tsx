@@ -1,13 +1,17 @@
 import React from 'react'
 import RichText from '@components/payload/RichText'
 import getPayload from '@lib/utils/getPayload'
-import type { ShopCollection, ProductCategory, ShopArchive } from '@payload-types'
+import type {
+  ShopCollection,
+  ProductCategory,
+  ShopArchiveBlock as ShopArchiveBlockType,
+} from '@payload-types'
 import ProductCategoryCard from '@components/shop/layout/cards/product-category-card'
 import ProductCollectionCard from '@components/shop/layout/cards/product-collection-card'
 import { PRODUCT_CATEGORY_SLUG, SHOP_COLLECTION_SLUG } from '@payload/collections/constants'
 
 export const ShopArchiveBlock: React.FC<
-  ShopArchive & {
+  ShopArchiveBlockType & {
     id?: string
   }
 > = async (props) => {

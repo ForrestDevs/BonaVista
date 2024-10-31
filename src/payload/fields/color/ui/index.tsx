@@ -105,7 +105,15 @@ export const ColorSwatchComponent: React.FC<ColorSwatchProps> = ({
 
       getColorPreferences()
     }
-  }, [])
+  }, [
+    allowUserPreferences,
+    defaultPreferenceKey,
+    customPreferenceKey,
+    getPreference,
+    lockDefaultColors,
+    setDefaultColorOptions,
+    setCustomColorOptions,
+  ])
 
   const handleAddColor = useCallback(() => {
     // This can only run when 'allowUserPreferences' is true
@@ -124,7 +132,7 @@ export const ColorSwatchComponent: React.FC<ColorSwatchProps> = ({
 
     // Store the user color preferences for future use
     setPreference(customPreferenceKey, newOptions)
-  }, [value, colorToAdd, customColorOptions, setPreference])
+  }, [colorToAdd, customColorOptions, customPreferenceKey, setPreference, setValue])
 
   const handleRemoveColor = useCallback(() => {
     if (!lockDefaultColors && defaultColorOptions.includes(value as string)) {
@@ -152,7 +160,16 @@ export const ColorSwatchComponent: React.FC<ColorSwatchProps> = ({
     }
 
     setValue('')
-  }, [value, defaultColorOptions, customColorOptions, setPreference])
+  }, [
+    value,
+    defaultColorOptions,
+    defaultPreferenceKey,
+    customColorOptions,
+    customPreferenceKey,
+    lockDefaultColors,
+    setPreference,
+    setValue,
+  ])
 
   return (
     <div className={baseClass}>

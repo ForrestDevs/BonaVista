@@ -14,14 +14,21 @@ import { generateMeta } from '@/lib/utils/generateMeta'
 
 export async function generateStaticParams() {
   const payload = await getPayload()
-  const posts = await payload.find({
+
+  const { docs } = await payload.find({
     collection: 'posts',
     draft: false,
     limit: 1000,
     overrideAccess: false,
   })
 
-  return posts.docs?.map(({ slug }) => slug)
+  const postSlugs = docs.map((post) => {
+    return {
+      slug: post.slug ?? '',
+    }
+  })
+
+  return postSlugs
 }
 
 type Params = Promise<{ slug: string | undefined }>

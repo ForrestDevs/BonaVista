@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import GalleryFilters from '@/components/marketing/gallery/filter'
 import { GalleryArchive } from '@/components/marketing/gallery/gallery-archive'
 import getPayload from '@/lib/utils/getPayload'
@@ -9,9 +9,7 @@ import { queryPageBySlug } from '@/lib/utils/queryPageBySlug'
 
 export default async function GalleryHome() {
   const payload = await getPayload()
-
   const page = await queryPageBySlug({ slug: 'gallery' })
-
   const { docs } = await payload.find({
     collection: 'galleries',
     depth: 1,
@@ -23,8 +21,10 @@ export default async function GalleryHome() {
       <section className="container">
         <RenderBlocks blocks={page.layout} />
       </section>
-      <GalleryFilters collections={docs} />
-      <GalleryArchive collections={docs} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <GalleryFilters collections={docs} />
+        <GalleryArchive collections={docs} />
+      </Suspense>
     </div>
   )
 }

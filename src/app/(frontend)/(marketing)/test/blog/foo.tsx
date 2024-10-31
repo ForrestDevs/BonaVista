@@ -1,92 +1,55 @@
-import React, { Suspense } from 'react'
-import type { Metadata } from 'next/types'
-import BlogFilters from '@/components/marketing/blog/filter'
-import FilteredPagination from '@/components/marketing/blog/pagination'
-import getPayload from '@/lib/utils/getPayload'
-import { blogFiltersCache } from '@/components/marketing/blog/searchParams'
+// import React from 'react'
 
-// export const dynamic = 'force-static'
-export const revalidate = 600
+// export default function Blog() {
+//   return (
+//     <div className="flex flex-col min-h-screen">
+//       <section
+//         className="relative min-h-[400px] flex items-center justify-center bg-cover bg-center"
+//         style={{ backgroundImage: "url('/Avera.jpg')" }}
+//       >
+//         <div className="absolute inset-0 bg-black opacity-50"></div>
+//         <div className="relative z-10 text-center text-white">
+//           <h1 className="text-5xl md:text-6xl font-bold mb-4">Our Blog</h1>
+//           <p className="text-lg md:text-xl font-light uppercase tracking-widest">Latest news and insights</p>
+//         </div>
+//       </section>
 
-type Args = {
-  searchParams: Promise<{
-    [key: string]: string | undefined
-  }>
-}
+//       <section className="py-16 bg-white">
+//         <div className="mx-auto px-4 text-center flex flex-col items-center space-y-6">
+//           <p className="text-blue-600 font-light uppercase tracking-widest">Stay Informed</p>
+//           <h2 className="text-4xl font-bold">Welcome to Our Blog</h2>
+//           <p className="text-gray-600 max-w-2xl mx-auto">
+//             Discover the latest trends, tips, and insights about hot tubs, spas, and wellness. Our blog is your go-to resource for everything related to relaxation and luxury living.
+//           </p>
 
-export default async function Page({ searchParams }: Args) {
-  const searchParams_ = await searchParams
-  const { category, page } = blogFiltersCache.parse(searchParams_)
-  const payload = await getPayload()
+//           <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-4">
+//             <div className="hidden md:flex justify-center space-x-4">
+//               <button className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition">
+//                 All Posts
+//               </button>
+//               <button className="px-4 py-2 bg-gray-200 text-gray-800 hover:bg-gray-300 transition">
+//                 Hot Tub Care
+//               </button>
+//               <button className="px-4 py-2 bg-gray-200 text-gray-800 hover:bg-gray-300 transition">
+//                 Wellness Tips
+//               </button>
+//               <button className="px-4 py-2 bg-gray-200 text-gray-800 hover:bg-gray-300 transition">
+//                 Product Reviews
+//               </button>
+//             </div>
+//             <div className="md:hidden">
+//               <select className="w-full p-2 border border-gray-300 rounded">
+//                 <option>All Posts</option>
+//                 <option>Hot Tub Care</option>
+//                 <option>Wellness Tips</option>
+//                 <option>Product Reviews</option>
+//               </select>
+//             </div>
+//           </div>
+//         </div>
+//       </section>
 
-  const categories = await payload.find({
-    collection: 'blog-categories',
-    depth: 0,
-    where: {
-      showInFilter: {
-        equals: true,
-      },
-    },
-  })
-
-  const categoryId = categories.docs?.find((result) => result.slug === category)?.id
-
-  return (
-    <div className="flex flex-col min-h-screen space-y-16">
-      <HeroSmall />
-      <BlogIntro />
-      <BlogFilters categories={categories.docs} />
-      <FilteredPagination category={categoryId} page={page} />
-    </div>
-  )
-}
-
-function BlogIntro() {
-  return (
-    <section className="w-full">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-primary text-lg font-light uppercase tracking-wider mb-3">
-            Dive into Our World
-          </p>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Explore the Latest in Hot Tub Lifestyle
-          </h2>
-          <p className="text-xl text-gray-700 leading-relaxed">
-            Welcome to our blog, where we share expert insights, maintenance tips, and inspiring
-            stories about the joys of hot tub ownership. Whether you&apos;re a seasoned enthusiast
-            or just starting your journey, there&apos;s something here for everyone.
-          </p>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function HeroSmall() {
-  return (
-    <section
-      className="relative min-h-[400px] flex items-center justify-center bg-cover bg-center"
-      style={{ backgroundImage: "url('/Avera.jpg')" }}
-    >
-      <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="relative z-10 text-center text-white">
-        <h1 className="text-5xl md:text-6xl font-bold mb-4">Our Blog</h1>
-        <p className="text-lg md:text-xl font-light uppercase tracking-widest">
-          Latest news and insights
-        </p>
-      </div>
-    </section>
-  )
-}
-
-// export function generateMetadata(): Metadata {
-//   return {
-//     title: `Payload Website Template Posts`,
-//   }
-// }
-
-// {/* <section className="py-16">
+//       <section className="py-16">
 //         <div className="container mx-auto px-4">
 //           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 //             {/* Blog post 1 */}
@@ -206,6 +169,7 @@ function HeroSmall() {
 //               </div>
 //             </div>
 
+
 //              {/* Blog post 1 */}
 //              <div className="bg-white rounded-lg shadow-md overflow-hidden">
 //               <img src="/blog-post-1.jpg" alt="Blog post 1" className="w-full h-48 object-cover" />
@@ -287,4 +251,7 @@ function HeroSmall() {
 //             {/* Add more blog posts as needed */}
 //           </div>
 //         </div>
-//       </section> */}
+//       </section>
+//     </div>
+//   )
+// }

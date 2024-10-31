@@ -67,6 +67,30 @@ export interface Config {
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
+  collectionsSelect?: {
+    address: AddressSelect<false> | AddressSelect<true>;
+    'blog-categories': BlogCategoriesSelect<false> | BlogCategoriesSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
+    cart: CartSelect<false> | CartSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    'shop-collections': ShopCollectionsSelect<false> | ShopCollectionsSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
+    brands: BrandsSelect<false> | BrandsSelect<true>;
+    customers: CustomersSelect<false> | CustomersSelect<true>;
+    testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    spas: SpasSelect<false> | SpasSelect<true>;
+    galleries: GalleriesSelect<false> | GalleriesSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    forms: FormsSelect<false> | FormsSelect<true>;
+    'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
+    'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
+    'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
+    'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
+  };
   db: {
     defaultIDType: string;
   };
@@ -76,9 +100,19 @@ export interface Config {
     header: Header;
     footer: Footer;
   };
+  globalsSelect?: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'shop-settings': ShopSettingsSelect<false> | ShopSettingsSelect<true>;
+    header: HeaderSelect<false> | HeaderSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+  };
   locale: null;
   user: User & {
     collection: 'users';
+  };
+  jobs?: {
+    tasks: unknown;
+    workflows?: unknown;
   };
 }
 export interface UserAuthOperations {
@@ -1566,6 +1600,1603 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "address_select".
+ */
+export interface AddressSelect<T extends boolean = true> {
+  customer?: T;
+  company?: T;
+  first_name?: T;
+  last_name?: T;
+  address_1?: T;
+  address_2?: T;
+  city?: T;
+  country_code?: T;
+  province?: T;
+  postal_code?: T;
+  phone?: T;
+  metadata?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-categories_select".
+ */
+export interface BlogCategoriesSelect<T extends boolean = true> {
+  title?: T;
+  showInFilter?: T;
+  slug?: T;
+  slugLock?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        tour_gallery?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        blog_image_size2?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        blog_image_size3?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  firstName?: T;
+  lastName?: T;
+  name?: T;
+  phone?: T;
+  roles?: T;
+  customer?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cart_select".
+ */
+export interface CartSelect<T extends boolean = true> {
+  customer?: T;
+  billing_address?: T;
+  shipping_address?: T;
+  items?:
+    | T
+    | {
+        product?: T;
+        variant?: T;
+        quantity?: T;
+        url?: T;
+        id?: T;
+      };
+  payment_id?: T;
+  payment_session?: T;
+  payment_sessions?:
+    | T
+    | {
+        provider?: T;
+        status?: T;
+        id?: T;
+      };
+  type?: T;
+  completed_at?: T;
+  payment_authorized_at?: T;
+  metadata?: T;
+  payment?: T;
+  shipping_total?: T;
+  discount_total?: T;
+  raw_discount_total?: T;
+  item_tax_total?: T;
+  shipping_tax_total?: T;
+  tax_total?: T;
+  refunded_total?: T;
+  total?: T;
+  subtotal?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  orderedBy?: T;
+  stripePaymentIntentID?: T;
+  total?: T;
+  currency?: T;
+  items?:
+    | T
+    | {
+        product?: T;
+        variant?: T;
+        quantity?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  publishedOn?: T;
+  description?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  layout?:
+    | T
+    | {
+        cta?:
+          | T
+          | {
+              richText?: T;
+              links?:
+                | T
+                | {
+                    link?:
+                      | T
+                      | {
+                          type?: T;
+                          newTab?: T;
+                          reference?: T;
+                          url?: T;
+                          label?: T;
+                          appearance?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        content?:
+          | T
+          | {
+              gapX?: T;
+              gapY?: T;
+              columns?:
+                | T
+                | {
+                    type?: T;
+                    size?: T;
+                    height?: T;
+                    align?: T;
+                    enableLink?: T;
+                    enableBackgroundImage?: T;
+                    backgroundImage?: T;
+                    richText?: T;
+                    blocks?:
+                      | T
+                      | {
+                          archive?:
+                            | T
+                            | {
+                                introContent?: T;
+                                populateBy?: T;
+                                relationTo?: T;
+                                categories?: T;
+                                limit?: T;
+                                selectedDocs?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          banner?:
+                            | T
+                            | {
+                                style?: T;
+                                content?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          cta?:
+                            | T
+                            | {
+                                richText?: T;
+                                links?:
+                                  | T
+                                  | {
+                                      link?:
+                                        | T
+                                        | {
+                                            type?: T;
+                                            newTab?: T;
+                                            reference?: T;
+                                            url?: T;
+                                            label?: T;
+                                            appearance?: T;
+                                          };
+                                      id?: T;
+                                    };
+                                id?: T;
+                                blockName?: T;
+                              };
+                          code?:
+                            | T
+                            | {
+                                language?: T;
+                                code?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          mediaBlock?:
+                            | T
+                            | {
+                                position?: T;
+                                media?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          typography?:
+                            | T
+                            | {
+                                type?: T;
+                                enableLinks?: T;
+                                align?: T;
+                                title?: T;
+                                subTitle?: T;
+                                body?: T;
+                                links?:
+                                  | T
+                                  | {
+                                      link?:
+                                        | T
+                                        | {
+                                            type?: T;
+                                            newTab?: T;
+                                            reference?: T;
+                                            url?: T;
+                                            label?: T;
+                                            appearance?: T;
+                                          };
+                                      id?: T;
+                                    };
+                                titleFontColor?: T;
+                                subtitleFontColor?: T;
+                                bodyFontColor?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          card?:
+                            | T
+                            | {
+                                type?: T;
+                                icon?: T;
+                                title?: T;
+                                description?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          grid?:
+                            | T
+                            | {
+                                gridStyle?: T;
+                                columns?: T;
+                                gap?: T;
+                                content?:
+                                  | T
+                                  | {
+                                      contentType?: T;
+                                      richText?: T;
+                                      blocks?:
+                                        | T
+                                        | {
+                                            archive?:
+                                              | T
+                                              | {
+                                                  introContent?: T;
+                                                  populateBy?: T;
+                                                  relationTo?: T;
+                                                  categories?: T;
+                                                  limit?: T;
+                                                  selectedDocs?: T;
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                            banner?:
+                                              | T
+                                              | {
+                                                  style?: T;
+                                                  content?: T;
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                            cta?:
+                                              | T
+                                              | {
+                                                  richText?: T;
+                                                  links?:
+                                                    | T
+                                                    | {
+                                                        link?:
+                                                          | T
+                                                          | {
+                                                              type?: T;
+                                                              newTab?: T;
+                                                              reference?: T;
+                                                              url?: T;
+                                                              label?: T;
+                                                              appearance?: T;
+                                                            };
+                                                        id?: T;
+                                                      };
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                            code?:
+                                              | T
+                                              | {
+                                                  language?: T;
+                                                  code?: T;
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                            mediaBlock?:
+                                              | T
+                                              | {
+                                                  position?: T;
+                                                  media?: T;
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                            typography?:
+                                              | T
+                                              | {
+                                                  type?: T;
+                                                  enableLinks?: T;
+                                                  align?: T;
+                                                  title?: T;
+                                                  subTitle?: T;
+                                                  body?: T;
+                                                  links?:
+                                                    | T
+                                                    | {
+                                                        link?:
+                                                          | T
+                                                          | {
+                                                              type?: T;
+                                                              newTab?: T;
+                                                              reference?: T;
+                                                              url?: T;
+                                                              label?: T;
+                                                              appearance?: T;
+                                                            };
+                                                        id?: T;
+                                                      };
+                                                  titleFontColor?: T;
+                                                  subtitleFontColor?: T;
+                                                  bodyFontColor?: T;
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                            card?:
+                                              | T
+                                              | {
+                                                  type?: T;
+                                                  icon?: T;
+                                                  title?: T;
+                                                  description?: T;
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                          };
+                                      id?: T;
+                                    };
+                                id?: T;
+                                blockName?: T;
+                              };
+                        };
+                    link?:
+                      | T
+                      | {
+                          type?: T;
+                          newTab?: T;
+                          reference?: T;
+                          url?: T;
+                          label?: T;
+                          appearance?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        mediaBlock?:
+          | T
+          | {
+              position?: T;
+              media?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  enableVariants?: T;
+  baseProduct?:
+    | T
+    | {
+        sku?: T;
+        enableInventory?: T;
+        inventory?: T;
+        price?: T;
+      };
+  variants?:
+    | T
+    | {
+        options?:
+          | T
+          | {
+              label?: T;
+              slug?: T;
+              values?:
+                | T
+                | {
+                    label?: T;
+                    slug?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        variantProducts?:
+          | T
+          | {
+              options?: T;
+              sku?: T;
+              price?: T;
+              stock?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+      };
+  brand?: T;
+  collections?: T;
+  categories?: T;
+  relatedProducts?: T;
+  isSale?: T;
+  isBestSeller?: T;
+  isNewSeller?: T;
+  skipSync?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shop-collections_select".
+ */
+export interface ShopCollectionsSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  description?: T;
+  publishedOn?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  slug?: T;
+  slugLock?: T;
+  title?: T;
+  hero?:
+    | T
+    | {
+        type?: T;
+        richText?: T;
+        links?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                    appearance?: T;
+                  };
+              id?: T;
+            };
+        title?: T;
+        subtitle?: T;
+        size?: T;
+        background?: T;
+        media?: T;
+        slides?:
+          | T
+          | {
+              pretitle?: T;
+              title?: T;
+              description?: T;
+              links?:
+                | T
+                | {
+                    link?:
+                      | T
+                      | {
+                          type?: T;
+                          newTab?: T;
+                          reference?: T;
+                          url?: T;
+                          label?: T;
+                          appearance?: T;
+                        };
+                    id?: T;
+                  };
+              background?: T;
+              id?: T;
+            };
+        autoplay?: T;
+        delay?: T;
+        fade?: T;
+      };
+  layout?:
+    | T
+    | {
+        archive?:
+          | T
+          | {
+              introContent?: T;
+              populateBy?: T;
+              relationTo?: T;
+              categories?: T;
+              limit?: T;
+              selectedDocs?: T;
+              id?: T;
+              blockName?: T;
+            };
+        banner?:
+          | T
+          | {
+              style?: T;
+              content?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              richText?: T;
+              links?:
+                | T
+                | {
+                    link?:
+                      | T
+                      | {
+                          type?: T;
+                          newTab?: T;
+                          reference?: T;
+                          url?: T;
+                          label?: T;
+                          appearance?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        code?:
+          | T
+          | {
+              language?: T;
+              code?: T;
+              id?: T;
+              blockName?: T;
+            };
+        content?:
+          | T
+          | {
+              gapX?: T;
+              gapY?: T;
+              columns?:
+                | T
+                | {
+                    type?: T;
+                    size?: T;
+                    height?: T;
+                    align?: T;
+                    enableLink?: T;
+                    enableBackgroundImage?: T;
+                    backgroundImage?: T;
+                    richText?: T;
+                    blocks?:
+                      | T
+                      | {
+                          archive?:
+                            | T
+                            | {
+                                introContent?: T;
+                                populateBy?: T;
+                                relationTo?: T;
+                                categories?: T;
+                                limit?: T;
+                                selectedDocs?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          banner?:
+                            | T
+                            | {
+                                style?: T;
+                                content?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          cta?:
+                            | T
+                            | {
+                                richText?: T;
+                                links?:
+                                  | T
+                                  | {
+                                      link?:
+                                        | T
+                                        | {
+                                            type?: T;
+                                            newTab?: T;
+                                            reference?: T;
+                                            url?: T;
+                                            label?: T;
+                                            appearance?: T;
+                                          };
+                                      id?: T;
+                                    };
+                                id?: T;
+                                blockName?: T;
+                              };
+                          code?:
+                            | T
+                            | {
+                                language?: T;
+                                code?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          mediaBlock?:
+                            | T
+                            | {
+                                position?: T;
+                                media?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          typography?:
+                            | T
+                            | {
+                                type?: T;
+                                enableLinks?: T;
+                                align?: T;
+                                title?: T;
+                                subTitle?: T;
+                                body?: T;
+                                links?:
+                                  | T
+                                  | {
+                                      link?:
+                                        | T
+                                        | {
+                                            type?: T;
+                                            newTab?: T;
+                                            reference?: T;
+                                            url?: T;
+                                            label?: T;
+                                            appearance?: T;
+                                          };
+                                      id?: T;
+                                    };
+                                titleFontColor?: T;
+                                subtitleFontColor?: T;
+                                bodyFontColor?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          card?:
+                            | T
+                            | {
+                                type?: T;
+                                icon?: T;
+                                title?: T;
+                                description?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          grid?:
+                            | T
+                            | {
+                                gridStyle?: T;
+                                columns?: T;
+                                gap?: T;
+                                content?:
+                                  | T
+                                  | {
+                                      contentType?: T;
+                                      richText?: T;
+                                      blocks?:
+                                        | T
+                                        | {
+                                            archive?:
+                                              | T
+                                              | {
+                                                  introContent?: T;
+                                                  populateBy?: T;
+                                                  relationTo?: T;
+                                                  categories?: T;
+                                                  limit?: T;
+                                                  selectedDocs?: T;
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                            banner?:
+                                              | T
+                                              | {
+                                                  style?: T;
+                                                  content?: T;
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                            cta?:
+                                              | T
+                                              | {
+                                                  richText?: T;
+                                                  links?:
+                                                    | T
+                                                    | {
+                                                        link?:
+                                                          | T
+                                                          | {
+                                                              type?: T;
+                                                              newTab?: T;
+                                                              reference?: T;
+                                                              url?: T;
+                                                              label?: T;
+                                                              appearance?: T;
+                                                            };
+                                                        id?: T;
+                                                      };
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                            code?:
+                                              | T
+                                              | {
+                                                  language?: T;
+                                                  code?: T;
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                            mediaBlock?:
+                                              | T
+                                              | {
+                                                  position?: T;
+                                                  media?: T;
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                            typography?:
+                                              | T
+                                              | {
+                                                  type?: T;
+                                                  enableLinks?: T;
+                                                  align?: T;
+                                                  title?: T;
+                                                  subTitle?: T;
+                                                  body?: T;
+                                                  links?:
+                                                    | T
+                                                    | {
+                                                        link?:
+                                                          | T
+                                                          | {
+                                                              type?: T;
+                                                              newTab?: T;
+                                                              reference?: T;
+                                                              url?: T;
+                                                              label?: T;
+                                                              appearance?: T;
+                                                            };
+                                                        id?: T;
+                                                      };
+                                                  titleFontColor?: T;
+                                                  subtitleFontColor?: T;
+                                                  bodyFontColor?: T;
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                            card?:
+                                              | T
+                                              | {
+                                                  type?: T;
+                                                  icon?: T;
+                                                  title?: T;
+                                                  description?: T;
+                                                  id?: T;
+                                                  blockName?: T;
+                                                };
+                                          };
+                                      id?: T;
+                                    };
+                                id?: T;
+                                blockName?: T;
+                              };
+                        };
+                    link?:
+                      | T
+                      | {
+                          type?: T;
+                          newTab?: T;
+                          reference?: T;
+                          url?: T;
+                          label?: T;
+                          appearance?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        formBlock?:
+          | T
+          | {
+              form?: T;
+              enableIntro?: T;
+              introContent?: T;
+              id?: T;
+              blockName?: T;
+            };
+        mediaBlock?:
+          | T
+          | {
+              position?: T;
+              media?: T;
+              id?: T;
+              blockName?: T;
+            };
+        'shop-archive'?:
+          | T
+          | {
+              introContent?: T;
+              populateBy?: T;
+              showAllCollections?: T;
+              productCollections?: T;
+              productCategories?: T;
+              id?: T;
+              blockName?: T;
+            };
+        services?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              body?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                    appearance?: T;
+                  };
+              offerings?:
+                | T
+                | {
+                    title?: T;
+                    description?: T;
+                    image?: T;
+                    link?:
+                      | T
+                      | {
+                          type?: T;
+                          newTab?: T;
+                          reference?: T;
+                          url?: T;
+                          label?: T;
+                          appearance?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                    appearance?: T;
+                  };
+              populateBy?: T;
+              limit?: T;
+              selectedDocs?: T;
+              id?: T;
+              blockName?: T;
+            };
+        contact?:
+          | T
+          | {
+              title?: T;
+              message?: T;
+              id?: T;
+              blockName?: T;
+            };
+        typography?:
+          | T
+          | {
+              type?: T;
+              enableLinks?: T;
+              align?: T;
+              title?: T;
+              subTitle?: T;
+              body?: T;
+              links?:
+                | T
+                | {
+                    link?:
+                      | T
+                      | {
+                          type?: T;
+                          newTab?: T;
+                          reference?: T;
+                          url?: T;
+                          label?: T;
+                          appearance?: T;
+                        };
+                    id?: T;
+                  };
+              titleFontColor?: T;
+              subtitleFontColor?: T;
+              bodyFontColor?: T;
+              id?: T;
+              blockName?: T;
+            };
+        'latest-posts'?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              body?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                    appearance?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        card?:
+          | T
+          | {
+              type?: T;
+              icon?: T;
+              title?: T;
+              description?: T;
+              id?: T;
+              blockName?: T;
+            };
+        grid?:
+          | T
+          | {
+              gridStyle?: T;
+              columns?: T;
+              gap?: T;
+              content?:
+                | T
+                | {
+                    contentType?: T;
+                    richText?: T;
+                    blocks?:
+                      | T
+                      | {
+                          archive?:
+                            | T
+                            | {
+                                introContent?: T;
+                                populateBy?: T;
+                                relationTo?: T;
+                                categories?: T;
+                                limit?: T;
+                                selectedDocs?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          banner?:
+                            | T
+                            | {
+                                style?: T;
+                                content?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          cta?:
+                            | T
+                            | {
+                                richText?: T;
+                                links?:
+                                  | T
+                                  | {
+                                      link?:
+                                        | T
+                                        | {
+                                            type?: T;
+                                            newTab?: T;
+                                            reference?: T;
+                                            url?: T;
+                                            label?: T;
+                                            appearance?: T;
+                                          };
+                                      id?: T;
+                                    };
+                                id?: T;
+                                blockName?: T;
+                              };
+                          code?:
+                            | T
+                            | {
+                                language?: T;
+                                code?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          mediaBlock?:
+                            | T
+                            | {
+                                position?: T;
+                                media?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          typography?:
+                            | T
+                            | {
+                                type?: T;
+                                enableLinks?: T;
+                                align?: T;
+                                title?: T;
+                                subTitle?: T;
+                                body?: T;
+                                links?:
+                                  | T
+                                  | {
+                                      link?:
+                                        | T
+                                        | {
+                                            type?: T;
+                                            newTab?: T;
+                                            reference?: T;
+                                            url?: T;
+                                            label?: T;
+                                            appearance?: T;
+                                          };
+                                      id?: T;
+                                    };
+                                titleFontColor?: T;
+                                subtitleFontColor?: T;
+                                bodyFontColor?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          card?:
+                            | T
+                            | {
+                                type?: T;
+                                icon?: T;
+                                title?: T;
+                                description?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                        };
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
+  meta?:
+    | T
+    | {
+        overview?: T;
+        title?: T;
+        image?: T;
+        description?: T;
+        preview?: T;
+      };
+  publishedAt?: T;
+  parent?: T;
+  breadcrumbs?:
+    | T
+    | {
+        doc?: T;
+        url?: T;
+        label?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  content?: T;
+  relatedPosts?: T;
+  categories?: T;
+  meta?:
+    | T
+    | {
+        overview?: T;
+        title?: T;
+        image?: T;
+        description?: T;
+        preview?: T;
+      };
+  publishedAt?: T;
+  authors?: T;
+  populatedAuthors?:
+    | T
+    | {
+        id?: T;
+        name?: T;
+      };
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-categories_select".
+ */
+export interface ProductCategoriesSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brands_select".
+ */
+export interface BrandsSelect<T extends boolean = true> {
+  slug?: T;
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customers_select".
+ */
+export interface CustomersSelect<T extends boolean = true> {
+  email?: T;
+  has_account?: T;
+  account?: T;
+  stripeCustomerID?: T;
+  cart?: T;
+  skipSync?: T;
+  billing_address?: T;
+  shipping_addresses?: T;
+  orders?: T;
+  metadata?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials_select".
+ */
+export interface TestimonialsSelect<T extends boolean = true> {
+  title?: T;
+  content?: T;
+  author?: T;
+  rating?: T;
+  date?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "spas_select".
+ */
+export interface SpasSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  description?: T;
+  type?: T;
+  family?: T;
+  thumbnail?: T;
+  topdown?: T;
+  features?:
+    | T
+    | {
+        feature?: T;
+        id?: T;
+      };
+  seats?: T;
+  jets?: T;
+  dimensions?:
+    | T
+    | {
+        length?: T;
+        width?: T;
+        height?: T;
+      };
+  waterCapacity?: T;
+  weightFull?: T;
+  weightDry?: T;
+  additionalInformation?:
+    | T
+    | {
+        key?: T;
+        value?: T;
+        id?: T;
+      };
+  detailsLink?: T;
+  quoteLink?: T;
+  financingLink?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "galleries_select".
+ */
+export interface GalleriesSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        type?: T;
+        richText?: T;
+        links?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                    appearance?: T;
+                  };
+              id?: T;
+            };
+        title?: T;
+        subtitle?: T;
+        size?: T;
+        background?: T;
+        media?: T;
+        slides?:
+          | T
+          | {
+              pretitle?: T;
+              title?: T;
+              description?: T;
+              links?:
+                | T
+                | {
+                    link?:
+                      | T
+                      | {
+                          type?: T;
+                          newTab?: T;
+                          reference?: T;
+                          url?: T;
+                          label?: T;
+                          appearance?: T;
+                        };
+                    id?: T;
+                  };
+              background?: T;
+              id?: T;
+            };
+        autoplay?: T;
+        delay?: T;
+        fade?: T;
+      };
+  title?: T;
+  subtitle?: T;
+  description?: T;
+  slug?: T;
+  slugLock?: T;
+  images?: T;
+  showCaptions?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  to?:
+    | T
+    | {
+        type?: T;
+        reference?: T;
+        url?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms_select".
+ */
+export interface FormsSelect<T extends boolean = true> {
+  title?: T;
+  fields?:
+    | T
+    | {
+        checkbox?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              required?: T;
+              defaultValue?: T;
+              id?: T;
+              blockName?: T;
+            };
+        country?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        email?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        message?:
+          | T
+          | {
+              message?: T;
+              id?: T;
+              blockName?: T;
+            };
+        number?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              defaultValue?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        select?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              defaultValue?: T;
+              options?:
+                | T
+                | {
+                    label?: T;
+                    value?: T;
+                    id?: T;
+                  };
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        state?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        text?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              defaultValue?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+        textarea?:
+          | T
+          | {
+              name?: T;
+              label?: T;
+              width?: T;
+              defaultValue?: T;
+              required?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  submitButtonLabel?: T;
+  confirmationType?: T;
+  confirmationMessage?: T;
+  redirect?:
+    | T
+    | {
+        url?: T;
+      };
+  emails?:
+    | T
+    | {
+        emailTo?: T;
+        cc?: T;
+        bcc?: T;
+        replyTo?: T;
+        emailFrom?: T;
+        subject?: T;
+        message?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "form-submissions_select".
+ */
+export interface FormSubmissionsSelect<T extends boolean = true> {
+  form?: T;
+  submissionData?:
+    | T
+    | {
+        field?: T;
+        value?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-locked-documents_select".
+ */
+export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
+  document?: T;
+  globalSlug?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-preferences_select".
+ */
+export interface PayloadPreferencesSelect<T extends boolean = true> {
+  user?: T;
+  key?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-migrations_select".
+ */
+export interface PayloadMigrationsSelect<T extends boolean = true> {
+  name?: T;
+  batch?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
  */
 export interface Settings {
@@ -1713,6 +3344,165 @@ export interface Footer {
   };
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  productsPage?: T;
+  general?:
+    | T
+    | {
+        appName?: T;
+        appDescription?: T;
+      };
+  admin?:
+    | T
+    | {
+        email?: T;
+        phone_number?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shop-settings_select".
+ */
+export interface ShopSettingsSelect<T extends boolean = true> {
+  currency?: T;
+  paymentMethods?:
+    | T
+    | {
+        name?: T;
+        enabled?: T;
+        id?: T;
+      };
+  shippingMethods?:
+    | T
+    | {
+        name?: T;
+        enabled?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "header_select".
+ */
+export interface HeaderSelect<T extends boolean = true> {
+  siteHeader?:
+    | T
+    | {
+        logo?: T;
+        navItems?:
+          | T
+          | {
+              navItem?:
+                | T
+                | {
+                    type?: T;
+                    singleLink?:
+                      | T
+                      | {
+                          label?: T;
+                          type?: T;
+                          reference?: T;
+                          url?: T;
+                          newTab?: T;
+                        };
+                    linkGroup?:
+                      | T
+                      | {
+                          title?: T;
+                          links?:
+                            | T
+                            | {
+                                title?: T;
+                                description?: T;
+                                image?: T;
+                                type?: T;
+                                reference?: T;
+                                url?: T;
+                                newTab?: T;
+                                id?: T;
+                              };
+                        };
+                  };
+              id?: T;
+            };
+      };
+  shopHeader?:
+    | T
+    | {
+        navItems?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  siteFooter?:
+    | T
+    | {
+        navItems?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              id?: T;
+            };
+      };
+  shopFooter?:
+    | T
+    | {
+        navItems?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

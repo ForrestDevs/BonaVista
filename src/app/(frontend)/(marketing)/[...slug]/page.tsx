@@ -1,13 +1,12 @@
 import type { Metadata } from 'next'
 import { PayloadRedirects } from '@/components/payload/PayloadRedirects'
-import configPromise from '@payload-config'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
 import type { Page as PageType } from '@/payload-types'
 import { RenderBlocks } from '@components/payload/blocks'
 import { RenderHero } from '@components/payload/heros'
 import { generateMeta } from '@/lib/utils/generateMeta'
+import getPayload from '@/lib/utils/getPayload'
 
 type Args = {
   params: Promise<{
@@ -55,13 +54,18 @@ export async function generateMetadata({
     slug: lastSlug,
   })
 
-  return generateMeta({ doc: page, collectionSlug: 'pages' })
+  // return generateMeta({ doc: page, collectionSlug: 'pages' })
+
+  return {
+    title: page?.meta?.title,
+    description: page?.meta?.description,
+  }
 }
 
 const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
   const { isEnabled: draft } = await draftMode()
 
-  const payload = await getPayloadHMR({ config: configPromise })
+  const payload = await getPayload()
 
   const result = await payload.find({
     collection: 'pages',
@@ -78,48 +82,48 @@ const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
   return result.docs?.[0] || null
 })
 
-// export async function generateStaticParams() {
-//   let paths: { slug: string[] }[] = []
-//   const payload = await getPayloadHMR({ config: configPromise })
+export async function generateStaticParams() {
+  let paths: { slug: string[] }[] = []
+  const payload = await getPayload()
 
-//   const pages = await payload.find({
-//     collection: 'pages',
-//     draft: false,
-//     limit: 1000,
-//     overrideAccess: false,
-//   })
+  const pages = await payload.find({
+    collection: 'pages',
+    draft: false,
+    limit: 1000,
+    overrideAccess: false,
+  })
 
-//   if (pages && Array.isArray(pages) && pages.length > 0) {
-//     paths = pages.docs
-//       .filter((doc) => {
-//         return doc.slug !== 'home'
-//       })
-//       .map((page) => {
-//         const { slug, breadcrumbs } = page
+  if (pages && Array.isArray(pages) && pages.length > 0) {
+    paths = pages.docs
+      .filter((doc) => {
+        return doc.slug !== 'home'
+      })
+      .map((page) => {
+        const { slug, breadcrumbs } = page
 
-//         let slugs = [slug]
+        let slugs = [slug]
 
-//         const hasBreadcrumbs = breadcrumbs && Array.isArray(breadcrumbs) && breadcrumbs.length > 0
+        const hasBreadcrumbs = breadcrumbs && Array.isArray(breadcrumbs) && breadcrumbs.length > 0
 
-//         if (hasBreadcrumbs) {
-//           slugs = breadcrumbs
-//             .map((crumb) => {
-//               const { url } = crumb
-//               let slug: string = ''
+        if (hasBreadcrumbs) {
+          slugs = breadcrumbs
+            .map((crumb) => {
+              const { url } = crumb
+              let slug: string = ''
 
-//               if (url) {
-//                 const split = url.split('/')
-//                 slug = split[split.length - 1]
-//               }
+              if (url) {
+                const split = url.split('/')
+                slug = split[split.length - 1]
+              }
 
-//               return slug
-//             })
-//             ?.filter(Boolean)
-//         }
+              return slug
+            })
+            ?.filter(Boolean)
+        }
 
-//         return { slug: slugs }
-//       })
-//   }
+        return { slug: slugs }
+      })
+  }
 
-//   return paths
-// }
+  return paths
+}

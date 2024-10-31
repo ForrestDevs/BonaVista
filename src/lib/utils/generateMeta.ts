@@ -12,7 +12,8 @@ export const generateMeta = async (args: {
   const defaultMetaData = await generateMetadata()
 
   const ogImage =
-    typeof doc?.meta?.image === 'object' &&
+    doc?.meta?.image &&
+    typeof doc.meta.image === 'object' &&
     doc.meta.image !== null &&
     'url' in doc.meta.image &&
     `${process.env.NEXT_PUBLIC_SERVER_URL}${doc.meta.image.url}`

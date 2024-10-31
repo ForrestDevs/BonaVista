@@ -32,7 +32,7 @@ export function TestimonialsCarousel({ testimonials }: { testimonials: Testimoni
           >
             <div className="p-1 h-full">
               <Card className="h-full bg-gray-100 p-6 rounded-lg relative">
-                <div className="text-4xl text-gray-300 absolute top-2 left-2">"</div>
+                <div className="text-4xl text-gray-300 absolute top-2 left-2">&quot;</div>
                 <CardContent className="flex flex-col justify-between p-6 h-full">
                   <div>
                     <h3 className="font-bold text-lg mb-2">{testimonial.title}</h3>
