@@ -60,6 +60,7 @@ export interface Config {
     testimonials: Testimonial;
     spas: Spa;
     galleries: Gallery;
+    'media-folders': MediaFolder;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -84,6 +85,7 @@ export interface Config {
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     spas: SpasSelect<false> | SpasSelect<true>;
     galleries: GalleriesSelect<false> | GalleriesSelect<true>;
+    'media-folders': MediaFoldersSelect<false> | MediaFoldersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -345,6 +347,7 @@ export interface Product {
  */
 export interface Media {
   id: string;
+  folder?: (string | MediaFolder)[] | null;
   alt: string;
   caption?: {
     root: {
@@ -406,6 +409,21 @@ export interface Media {
       filename?: string | null;
     };
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media-folders".
+ */
+export interface MediaFolder {
+  id: string;
+  name: string;
+  media?: {
+    docs?: (string | Media)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
+  medias?: (string | Media)[] | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1315,35 +1333,47 @@ export interface Order {
 export interface Spa {
   id: string;
   slug?: string | null;
+  slugLock?: boolean | null;
+  type: 'hot-tub' | 'swim-spa';
+  hotTubCollection?: ('self-cleaning' | 'serenity') | null;
+  swimSpaCollection?: ('executive-trainer' | 'executive-sport' | 'aqua-trainer' | 'aqua-sport' | 'aqua-play') | null;
   title: string;
+  startingPrice?: number | null;
+  modelYear?: number | null;
   description?: string | null;
-  type: 'hot_tub' | 'swim_spa';
-  family: 'self-cleaning' | 'serenity';
-  thumbnail: string | Media;
-  topdown: string | Media;
-  features?:
-    | {
-        feature?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  seats?: number | null;
-  jets?: number | null;
-  dimensions?: {
-    length?: number | null;
-    width?: number | null;
-    height?: number | null;
-  };
-  waterCapacity?: number | null;
-  weightFull?: number | null;
-  weightDry?: number | null;
-  additionalInformation?:
-    | {
-        key?: string | null;
-        value?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  seatingDesign?: string | null;
+  seating?: string | null;
+  jets?: string | null;
+  volume?: string | null;
+  swimSystem?: string | null;
+  sizeCategory?: string | null;
+  energyEfficiency?: number | null;
+  hydroGuide?: string | null;
+  dimensions?: string | null;
+  height?: string | null;
+  weightFull?: string | null;
+  weightEmpty?: string | null;
+  swimArea?: string | null;
+  jetPumps?: string | null;
+  interiorLighting?: string | null;
+  exteriorLighting?: string | null;
+  waterFalls?: string | null;
+  selfCleaning?: boolean | null;
+  circulationPump?: boolean | null;
+  automatedWellness?: boolean | null;
+  pureWaterSystem?: ('optional' | 'standard') | null;
+  ezZonePure?: ('optional' | 'standard') | null;
+  oasisPackage?: ('optional' | 'not-available') | null;
+  hydroFlex?: ('optional' | 'not-available') | null;
+  iCommand?: ('optional' | 'not-available') | null;
+  northernFalls?: ('optional' | 'not-available') | null;
+  chromatherapy?: ('optional' | 'not-available') | null;
+  heater?: string | null;
+  electrical?: string | null;
+  warranty?: string | null;
+  thumbnail?: (string | null) | Media;
+  topdown?: (string | null) | Media;
+  threeDModel?: string | null;
   detailsLink?: string | null;
   quoteLink?: string | null;
   financingLink?: string | null;
@@ -1545,6 +1575,10 @@ export interface PayloadLockedDocument {
         value: string | Gallery;
       } | null)
     | ({
+        relationTo: 'media-folders';
+        value: string | MediaFolder;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: string | Redirect;
       } | null)
@@ -1635,6 +1669,7 @@ export interface BlogCategoriesSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  folder?: T;
   alt?: T;
   caption?: T;
   updatedAt?: T;
@@ -2894,37 +2929,47 @@ export interface TestimonialsSelect<T extends boolean = true> {
  */
 export interface SpasSelect<T extends boolean = true> {
   slug?: T;
-  title?: T;
-  description?: T;
+  slugLock?: T;
   type?: T;
-  family?: T;
+  hotTubCollection?: T;
+  swimSpaCollection?: T;
+  title?: T;
+  startingPrice?: T;
+  modelYear?: T;
+  description?: T;
+  seatingDesign?: T;
+  seating?: T;
+  jets?: T;
+  volume?: T;
+  swimSystem?: T;
+  sizeCategory?: T;
+  energyEfficiency?: T;
+  hydroGuide?: T;
+  dimensions?: T;
+  height?: T;
+  weightFull?: T;
+  weightEmpty?: T;
+  swimArea?: T;
+  jetPumps?: T;
+  interiorLighting?: T;
+  exteriorLighting?: T;
+  waterFalls?: T;
+  selfCleaning?: T;
+  circulationPump?: T;
+  automatedWellness?: T;
+  pureWaterSystem?: T;
+  ezZonePure?: T;
+  oasisPackage?: T;
+  hydroFlex?: T;
+  iCommand?: T;
+  northernFalls?: T;
+  chromatherapy?: T;
+  heater?: T;
+  electrical?: T;
+  warranty?: T;
   thumbnail?: T;
   topdown?: T;
-  features?:
-    | T
-    | {
-        feature?: T;
-        id?: T;
-      };
-  seats?: T;
-  jets?: T;
-  dimensions?:
-    | T
-    | {
-        length?: T;
-        width?: T;
-        height?: T;
-      };
-  waterCapacity?: T;
-  weightFull?: T;
-  weightDry?: T;
-  additionalInformation?:
-    | T
-    | {
-        key?: T;
-        value?: T;
-        id?: T;
-      };
+  threeDModel?: T;
   detailsLink?: T;
   quoteLink?: T;
   financingLink?: T;
@@ -2996,6 +3041,17 @@ export interface GalleriesSelect<T extends boolean = true> {
   slugLock?: T;
   images?: T;
   showCaptions?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media-folders_select".
+ */
+export interface MediaFoldersSelect<T extends boolean = true> {
+  name?: T;
+  media?: T;
+  medias?: T;
   updatedAt?: T;
   createdAt?: T;
 }

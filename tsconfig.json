@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "esModuleInterop": true,
-    "target": "ES2015",
+    "target": "ES2017",
     "lib": [
       "dom",
       "dom.iterable",
@@ -58,9 +58,11 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "next-env.d.ts",
     ".next/types/**/*.ts",
-    "redirects.js",
-    "next.config.mjs"
+    "redirects.mjs",
+    "next.config.mjs", 
+    "tailwind.config.ts"
   ],
   "exclude": [
     "node_modules"

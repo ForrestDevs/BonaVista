@@ -14,6 +14,7 @@ import Cart from './Cart'
 import Testimonials from './Testimonials'
 import Spas from './Spas'
 import Galleries from './Galleries'
+import MediaFolder from './MediaFolder'
 
 export const collections = [
   Address,
@@ -32,6 +33,7 @@ export const collections = [
   Testimonials,
   Spas,
   Galleries,
+  MediaFolder,
 ]
 
 export default collections

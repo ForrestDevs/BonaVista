@@ -9,7 +9,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 import { anyone, authenticated } from '@payload/access'
-import { GALLERIES_SLUG, MEDIA_SLUG } from '../constants'
+import { GALLERIES_SLUG, MEDIA_FOLDER_SLUG, MEDIA_SLUG } from '../constants'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -23,6 +23,12 @@ const Media: CollectionConfig = {
     update: authenticated,
   },
   fields: [
+    {
+      name: 'folder',
+      type: 'relationship',
+      hasMany: true,
+      relationTo: MEDIA_FOLDER_SLUG,
+    },
     {
       name: 'alt',
       type: 'text',
@@ -72,8 +78,24 @@ const Media: CollectionConfig = {
         position: 'centre',
       },
     ],
-    focalPoint: false,
-    crop: false,
+    bulkUpload: true,
+    disableLocalStorage: true,
+    focalPoint: true,
+    crop: true,
+    // formatOptions: {
+    //   format: 'webp',
+    //   options: {},
+    // },
+    // resizeOptions: {},
+  },
+  admin: {
+    components: {
+      views: {
+        list: {
+          Component: 'src/components/payload/AdminViews/Media/List',
+        },
+      },
+    },
   },
 } as const
 

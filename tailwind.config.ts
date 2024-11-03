@@ -2,7 +2,7 @@
 
 module.exports = {
   content: ['./src/components/**/*.{ts,tsx}', './src/app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}'],
-  darkMode: ['class', '[data-theme="dark"]'],
+  darkMode: ['selector', '[data-theme="dark"]', '.dark'],
   plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
   prefix: '',
   safelist: [
@@ -39,12 +39,13 @@ module.exports = {
       },
     },
     extend: {
-      backgroundImage: {
-        'header-gradient': 'linear-gradient(to bottom, rgba(27, 58, 87, 0.8) 0%, rgba(27, 58, 87, 0.4) 100%)',
-      },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+      },
+      backgroundImage: {
+        'header-gradient':
+          'linear-gradient(to bottom, rgba(27, 58, 87, 0.8) 0%, rgba(27, 58, 87, 0.4) 100%)',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -66,6 +67,7 @@ module.exports = {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
         },
+        error: 'hsl(var(--error))',
         foreground: 'hsl(var(--foreground))',
         input: 'hsl(var(--input))',
         muted: {
@@ -86,7 +88,7 @@ module.exports = {
           foreground: 'hsl(var(--secondary-foreground))',
         },
         success: 'hsl(var(--success))',
-        error: 'hsl(var(--error))',
+
         warning: 'hsl(var(--warning))',
       },
       fontFamily: {
@@ -103,8 +105,7 @@ module.exports = {
           to: { height: '0' },
         },
       },
-      // @ts-ignore
-      typography: ({ theme }) => ({
+      typography: () => ({
         DEFAULT: {
           css: {
             '--tw-prose-body': 'var(--text)',

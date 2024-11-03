@@ -1,0 +1,366 @@
+'use client'
+
+import type { PaginatedDocs } from 'payload'
+import { getTranslation } from '@payloadcms/translations'
+import {
+  Button,
+  DeleteMany,
+  EditMany,
+  Gutter,
+  ListControls,
+  ListHeader,
+  ListSelection,
+  Pagination,
+  PerPage,
+  PublishMany,
+  RelationshipProvider,
+  RenderComponent,
+  SelectionProvider,
+  SetViewActions,
+  StaggeredShimmers,
+  Table,
+  UnpublishMany,
+  useAuth,
+  useBulkUpload,
+  useEditDepth,
+  useListInfo,
+  useListQuery,
+  useSearchParams,
+  useModal,
+  useStepNav,
+  useTranslation,
+  useWindowInfo,
+  ViewDescription,
+  useTableColumns,
+} from '@payloadcms/ui'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { formatFilesize, isNumber } from 'payload/shared'
+import React, { Fragment, useEffect, useState } from 'react'
+import { Media, MediaFolder } from '@payload-types'
+import GridCard from './grid-card'
+import MultipleSelector from '@components/ui/multi-select'
+
+const baseClass = 'collection-list'
+
+type MediaListClientProps = {
+  folders: PaginatedDocs<MediaFolder>
+}
+
+export const MediaListClient: React.FC<MediaListClientProps> = ({
+  folders,
+}: MediaListClientProps) => {
+  const { user } = useAuth()
+  const router = useRouter()
+  const { i18n, t } = useTranslation()
+  const drawerDepth = useEditDepth()
+  const { setStepNav } = useStepNav()
+  const { data, defaultLimit, handlePageChange, handlePerPageChange, params, handleWhereChange } =
+    useListQuery()
+  const { openModal } = useModal()
+  const { setCollectionSlug, setOnSuccess } = useBulkUpload()
+  const { drawerSlug } = useBulkUpload()
+  const {
+    beforeActions,
+    collectionSlug,
+    disableBulkDelete,
+    disableBulkEdit,
+    hasCreatePermission,
+    Header,
+    newDocumentURL,
+    collectionConfig,
+  } = useListInfo()
+  const {
+    breakpoints: { s: smallBreak },
+  } = useWindowInfo()
+
+  const {
+    admin: {
+      components: {
+        afterList,
+        afterListTable,
+        beforeList,
+        beforeListTable,
+        Description,
+        views: {
+          list: { actions },
+        },
+      },
+      description,
+    },
+    fields,
+    labels,
+  } = collectionConfig
+
+  let docs = data.docs || []
+
+  const isUploadCollection = Boolean(collectionConfig.upload)
+
+  if (isUploadCollection) {
+    docs = docs?.map((doc) => {
+      return {
+        ...doc,
+        filesize: formatFilesize(doc.filesize),
+      }
+    })
+  }
+
+  const [selectedFolders, setSelectedFolders] = useState([])
+
+  const folderOptions = React.useMemo(() => {
+    return folders.docs.map((folder) => ({
+      value: folder.id,
+      label: folder.name,
+    }))
+  }, [folders])
+
+  useEffect(() => {
+    const buildWhereQuery = () => {
+      if (selectedFolders.length === 0) return {}
+
+      return {
+        folder: {
+          in: selectedFolders.map((f) => f.value),
+        },
+      }
+    }
+
+    handleWhereChange(buildWhereQuery())
+  }, [selectedFolders, handleWhereChange])
+
+  const openBulkUpload = React.useCallback(() => {
+    setCollectionSlug(collectionSlug)
+    openModal(drawerSlug)
+    setOnSuccess(() => router.refresh())
+  }, [router, collectionSlug, drawerSlug, openModal, setCollectionSlug, setOnSuccess])
+
+  useEffect(() => {
+    if (drawerDepth <= 1) {
+      setStepNav([
+        {
+          label: labels?.plural,
+        },
+      ])
+    }
+  }, [setStepNav, labels, drawerDepth])
+
+  const isBulkUploadEnabled = isUploadCollection && collectionConfig.upload.bulkUpload
+
+  const [showGrid, setShowGrid] = useState(true)
+  const [enableColumns, setEnableColumns] = useState(false)
+
+  const toggleGrid = () => {
+    setShowGrid(!showGrid)
+    setEnableColumns(!enableColumns)
+  }
+
+  return (
+    <div className={`${baseClass} ${baseClass}--${collectionSlug}`}>
+      <SetViewActions actions={actions} />
+      <SelectionProvider docs={data.docs} totalDocs={data.totalDocs} user={user}>
+        <RenderComponent mappedComponent={beforeList} />
+        <Gutter className={`${baseClass}__wrap`}>
+          {Header || (
+            <ListHeader heading={getTranslation(labels?.plural, i18n)}>
+              {hasCreatePermission && (
+                <>
+                  <Button
+                    aria-label={i18n.t('general:createNewLabel', {
+                      label: getTranslation(labels?.singular, i18n),
+                    })}
+                    buttonStyle="pill"
+                    el={'link'}
+                    Link={Link}
+                    size="small"
+                    to={newDocumentURL}
+                  >
+                    {i18n.t('general:createNew')}
+                  </Button>
+
+                  {isBulkUploadEnabled && (
+                    <Button
+                      aria-label={t('upload:bulkUpload')}
+                      buttonStyle="pill"
+                      onClick={openBulkUpload}
+                      size="small"
+                    >
+                      {t('upload:bulkUpload')}
+                    </Button>
+                  )}
+                  <Button
+                    buttonStyle="pill"
+                    size="small"
+                    onClick={toggleGrid}
+                    aria-label="Toggle View"
+                  >
+                    {enableColumns ? 'Grid View' : 'Table View'}
+                  </Button>
+                </>
+              )}
+              {!smallBreak && (
+                <ListSelection label={getTranslation(collectionConfig.labels.plural, i18n)} />
+              )}
+              {(description || Description) && (
+                <div className={`${baseClass}__sub-header`}>
+                  <ViewDescription Description={Description} description={description} />
+                </div>
+              )}
+            </ListHeader>
+          )}
+          <ListControls
+            collectionConfig={collectionConfig}
+            fields={fields}
+            enableColumns={enableColumns}
+          />
+          <RenderComponent mappedComponent={beforeListTable} />
+
+          {!data.docs && (
+            <StaggeredShimmers
+              className={[`${baseClass}__shimmer`, `${baseClass}__shimmer--rows`].join(' ')}
+              count={6}
+            />
+          )}
+
+          {/* <MultipleSelector
+            options={folderOptions}
+            value={selectedFolders}
+            onChange={setSelectedFolders}
+            placeholder="Filter by folders..."
+          /> */}
+
+          {showGrid
+            ? data.docs &&
+              data.docs.length > 0 && (
+                <RelationshipProvider>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+                    {data.docs.map((gridCell: Media, cellIndex) => (
+                      <GridCard key={cellIndex} data={gridCell} collectionSlug={collectionSlug} />
+                    ))}
+                  </div>
+                </RelationshipProvider>
+              )
+            : data.docs &&
+              data.docs.length > 0 && (
+                <RelationshipProvider>
+                  <Table
+                    customCellContext={{
+                      collectionSlug,
+                      uploadConfig: collectionConfig.upload,
+                    }}
+                    data={docs}
+                    fields={fields}
+                  />
+                </RelationshipProvider>
+              )}
+
+          {data.docs && data.docs.length === 0 && (
+            <div className={`${baseClass}__no-results`}>
+              <p>{i18n.t('general:noResults', { label: getTranslation(labels?.plural, i18n) })}</p>
+              {hasCreatePermission && newDocumentURL && (
+                <Button el="link" Link={Link} to={newDocumentURL}>
+                  {i18n.t('general:createNewLabel', {
+                    label: getTranslation(labels?.singular, i18n),
+                  })}
+                </Button>
+              )}
+            </div>
+          )}
+          <RenderComponent mappedComponent={afterListTable} />
+          {data.docs && data.docs.length > 0 && (
+            <div className={`${baseClass}__page-controls`}>
+              <Pagination
+                hasNextPage={data.hasNextPage}
+                hasPrevPage={data.hasPrevPage}
+                limit={data.limit}
+                nextPage={data.nextPage}
+                numberOfNeighbors={1}
+                onChange={(page) => void handlePageChange(page)}
+                page={data.page}
+                prevPage={data.prevPage}
+                totalPages={data.totalPages}
+              />
+              {data?.totalDocs > 0 && (
+                <Fragment>
+                  <div className={`${baseClass}__page-info`}>
+                    {data.page * data.limit - (data.limit - 1)}-
+                    {data.totalPages > 1 && data.totalPages !== data.page
+                      ? data.limit * data.page
+                      : data.totalDocs}{' '}
+                    {i18n.t('general:of')} {data.totalDocs}
+                  </div>
+                  <PerPage
+                    handleChange={(limit) => void handlePerPageChange(limit)}
+                    limit={isNumber(params?.limit) ? Number(params.limit) : defaultLimit}
+                    limits={collectionConfig?.admin?.pagination?.limits}
+                    resetPage={data.totalDocs <= data.pagingCounter}
+                  />
+                  {smallBreak && (
+                    <div className={`${baseClass}__list-selection`}>
+                      <ListSelection label={getTranslation(collectionConfig.labels.plural, i18n)} />
+                      <div className={`${baseClass}__list-selection-actions`}>
+                        {beforeActions && beforeActions}
+                        {!disableBulkEdit && (
+                          <Fragment>
+                            <EditMany collection={collectionConfig} fields={fields} />
+                            <PublishMany collection={collectionConfig} />
+                            <UnpublishMany collection={collectionConfig} />
+                          </Fragment>
+                        )}
+                        {!disableBulkDelete && <DeleteMany collection={collectionConfig} />}
+                      </div>
+                    </div>
+                  )}
+                </Fragment>
+              )}
+            </div>
+          )}
+        </Gutter>
+        <RenderComponent mappedComponent={afterList} />
+      </SelectionProvider>
+    </div>
+  )
+}
+
+// <div key={cellIndex}>
+//                         {filenameField && (
+//                           <Link
+//                             // className={`${baseClass}__cells__cell__filename`}
+//                             href={`${collectionSlug}/${gridCell.id}`}
+//                           >
+//                             {gridCell.filename}
+//                           </Link>
+//                         )}
+//                         {selectorField && (
+//                           <div className={`${baseClass}__cells__cell__selector`}>
+//                             <RenderComponent
+//                               clientProps={gridCell}
+//                               mappedComponent={selectorField.cellProps.field.admin.components.Cell}
+//                             />
+//                           </div>
+//                         )}
+//                         {columnsFromContext.map((col) => (
+//                           <div key={col.accessor}>{col.accessor}</div>
+//                         ))}
+//                         {/* <SelectRow /> */}
+//                         {/* <>Foo</> */}
+
+//                         <Button
+//                           //   key={doc.id}
+//                           // to={`${adminRoute}/collections/${collectionSlug}/${doc.id}`}
+//                           // el="link"
+//                           //   onClick={(e) => e.stopPropagation()}
+//                           // Link={Link}
+//                           //   onClick={}
+//                           buttonStyle="none"
+//                           className="relative flex flex-col max-h-[300px] border-2 border-[#1f1f1f] hover:border-[#2f2f2f] transition-colors duration-200"
+//                         >
+//                           {/* <div
+//                         className="absolute top-2 left-2 z-10"
+//                         onClick={(e) => e.stopPropagation()}
+//                       >
+//                         TODO: Selecting single row doesnt work as cant provide ID to it now it is provided by provider.
+//                         <SelectRow />
+//                       </div> */}
+
+//                         </Button>
+//                       </div>
