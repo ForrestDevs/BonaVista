@@ -23,7 +23,7 @@ export const PostTag: CollectionConfig = {
     maxPerDoc: 10,
   },
   fields: [
-    slugField(),
+    ...slugField(),
     {
       name: 'title',
       label: 'Title',

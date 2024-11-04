@@ -15,7 +15,7 @@ export const Brands: CollectionConfig = {
     update: admins,
   },
   fields: [
-    slugField(),
+    ...slugField(),
     {
       name: 'name',
       type: 'text',

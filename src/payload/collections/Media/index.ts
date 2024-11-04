@@ -1,18 +1,13 @@
 import type { CollectionConfig } from 'payload'
-
 import {
   FixedToolbarFeature,
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
 import { anyone, authenticated } from '@payload/access'
-import { GALLERIES_SLUG, MEDIA_FOLDER_SLUG, MEDIA_SLUG } from '../constants'
-
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
+import { MEDIA_FOLDER_SLUG, MEDIA_SLUG } from '../constants'
+import { formatFilenameHook } from './hooks/formatFilename'
+import { formatAltHook } from './hooks/formatAlt'
 
 const Media: CollectionConfig = {
   slug: MEDIA_SLUG,
@@ -34,11 +29,7 @@ const Media: CollectionConfig = {
       type: 'text',
       required: true,
       hooks: {
-        beforeValidate: [
-          ({ data }) => {
-            return data?.filename
-          },
-        ],
+        beforeValidate: [formatAltHook],
       },
     },
     {
@@ -51,42 +42,38 @@ const Media: CollectionConfig = {
       }),
     },
   ],
+  hooks: {
+    beforeValidate: [formatFilenameHook],
+  },
   upload: {
+    adminThumbnail: 'thumbnail',
     imageSizes: [
       {
         name: 'thumbnail',
-        width: 400,
-        height: 300,
-        position: 'centre',
-      },
-      {
-        name: 'tour_gallery',
-        width: undefined,
-        height: 797,
-        position: 'centre',
-      },
-      {
-        name: 'blog_image_size2',
-        width: 986,
-        height: undefined,
-        position: 'centre',
-      },
-      {
-        name: 'blog_image_size3',
-        width: 1470,
-        height: undefined,
-        position: 'centre',
+        fit: 'cover',
+        width: 500,
+        formatOptions: {
+          format: 'webp',
+          options: {
+            quality: 100,
+          },
+        },
       },
     ],
+    formatOptions: {
+      format: 'webp',
+      options: {
+        quality: 80,
+      },
+    },
+    resizeOptions: {
+      width: 2560,
+      withoutEnlargement: true,
+    },
     bulkUpload: true,
     disableLocalStorage: true,
     focalPoint: true,
     crop: true,
-    // formatOptions: {
-    //   format: 'webp',
-    //   options: {},
-    // },
-    // resizeOptions: {},
   },
   admin: {
     components: {

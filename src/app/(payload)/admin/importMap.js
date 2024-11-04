@@ -1,4 +1,4 @@
-import { SlugComponent as SlugComponent_7eb07ffee59edd81c139e2c131ef28b2 } from 'src/payload/fields/slug-new/SlugComponent'
+import { SlugComponent as SlugComponent_fd50a9b5d5d263a9fd55ddef3e5a03a1 } from 'src/payload/fields/slug/SlugComponent'
 import { RichTextCell as RichTextCell_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { RichTextField as RichTextField_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { getGenerateComponentMap as getGenerateComponentMap_ec38dd6bee95fe7974552968355b33ae } from '@payloadcms/richtext-lexical/generateComponentMap'
@@ -28,7 +28,7 @@ import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 
 export const importMap = {
-  "src/payload/fields/slug-new/SlugComponent#SlugComponent": SlugComponent_7eb07ffee59edd81c139e2c131ef28b2,
+  "src/payload/fields/slug/SlugComponent#SlugComponent": SlugComponent_fd50a9b5d5d263a9fd55ddef3e5a03a1,
   "@payloadcms/richtext-lexical/client#RichTextCell": RichTextCell_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#RichTextField": RichTextField_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/generateComponentMap#getGenerateComponentMap": getGenerateComponentMap_ec38dd6bee95fe7974552968355b33ae,

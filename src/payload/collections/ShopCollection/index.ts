@@ -31,7 +31,7 @@ const ShopCollection: CollectionConfig = {
     drafts: true,
   },
   fields: [
-    slugField(),
+    ...slugField(),
     {
       label: 'Title',
       name: 'title',

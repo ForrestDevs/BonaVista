@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { anyone, authenticated } from '@payload/access'
 import { GALLERIES_SLUG, MEDIA_SLUG } from '../constants'
 import { hero } from '@payload/fields/hero'
-import { slugField } from '@/payload/fields/slug-new'
+import { slugField } from '@/payload/fields/slug'
 
 const Galleries: CollectionConfig = {
   slug: GALLERIES_SLUG,

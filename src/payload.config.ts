@@ -113,9 +113,7 @@ export default buildConfig({
     },
   }),
   db: mongooseAdapter({
-    url:
-      process.env.DATABASE_URI ||
-      'mongodb+srv://adminUser:adminPassword@bvcluster.rj022dr.mongodb.net/?retryWrites=true&w=majority&appName=bvCluster',
+    url: process.env.DATABASE_URI || '',
   }),
   collections,
   globals,
@@ -234,18 +232,12 @@ export default buildConfig({
       collections: {
         ['media']: true,
       },
-      bucket: process.env.S3_BUCKET || 'bonavista',
+      bucket: process.env.S3_BUCKET || 'media',
       config: {
-        endpoint:
-          // process.env.S3_ENDPOINT ||
-          'https://0cfae28bf40e0c4d144f531d5343ec0b.r2.cloudflarestorage.com/bonavista',
+        endpoint: process.env.S3_ENDPOINT || '',
         credentials: {
-          accessKeyId:
-            // process.env.S3_ACCESS_KEY_ID ||
-            '12967cfdb3c3699eac9e04631ad60eed',
-          secretAccessKey:
-            // process.env.S3_SECRET_ACCESS_KEY ||
-            '762147e6fba455ad0fcfefecfbd39a5b043837b39b7dd29db21072a2e03d44b5',
+          accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
         },
         region: process.env.S3_REGION || '',
       },

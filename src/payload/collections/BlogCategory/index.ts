@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { anyone, authenticated } from '@payload/access'
 import { BLOG_CATEGORY_SLUG } from '../constants'
-import { slugField } from '@/payload/fields/slug-new'
+import { slugField } from '@/payload/fields/slug'
 
 const BlogCategory: CollectionConfig = {
   slug: BLOG_CATEGORY_SLUG,

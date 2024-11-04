@@ -204,7 +204,7 @@ const Posts: CollectionConfig = {
         },
       ],
     },
-    slugField(),
+    ...slugField(),
   ],
   hooks: {
     afterChange: [revalidatePost],

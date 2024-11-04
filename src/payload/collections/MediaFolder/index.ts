@@ -23,12 +23,6 @@ const MediaFolder: CollectionConfig = {
       on: 'folder',
       collection: MEDIA_SLUG,
     },
-    {
-      name: 'medias',
-      type: 'upload',
-      hasMany: true,
-      relationTo: MEDIA_SLUG,
-    },
   ],
   admin: {
     useAsTitle: 'name',

@@ -36,10 +36,12 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { formatFilesize, isNumber } from 'payload/shared'
-import React, { Fragment, useEffect, useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card'
+import React, { Fragment, useCallback, useEffect, useState } from 'react'
 import { Media, MediaFolder } from '@payload-types'
 import GridCard from './grid-card'
 import MultipleSelector from '@components/ui/multi-select'
+import { Folder } from 'lucide-react'
 
 const baseClass = 'collection-list'
 
@@ -109,26 +111,27 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
 
   const folderOptions = React.useMemo(() => {
     return folders.docs.map((folder) => ({
+      numItems: folder.media?.docs?.length,
       value: folder.id,
       label: folder.name,
     }))
   }, [folders])
 
-  useEffect(() => {
-    const buildWhereQuery = () => {
-      if (selectedFolders.length === 0) return {}
+  // useEffect(() => {
+  //   const buildWhereQuery = () => {
+  //     if (selectedFolders.length === 0) return {}
 
-      return {
-        folder: {
-          in: selectedFolders.map((f) => f.value),
-        },
-      }
-    }
+  //     return {
+  //       folder: {
+  //         in: selectedFolders.map((f) => f.value),
+  //       },
+  //     }
+  //   }
 
-    handleWhereChange(buildWhereQuery())
-  }, [selectedFolders, handleWhereChange])
+  //   handleWhereChange(buildWhereQuery())
+  // }, [selectedFolders, handleWhereChange])
 
-  const openBulkUpload = React.useCallback(() => {
+  const openBulkUpload = useCallback(() => {
     setCollectionSlug(collectionSlug)
     openModal(drawerSlug)
     setOnSuccess(() => router.refresh())
@@ -153,6 +156,8 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
     setShowGrid(!showGrid)
     setEnableColumns(!enableColumns)
   }
+
+  const [showFolders, setShowFolders] = useState(true)
 
   return (
     <div className={`${baseClass} ${baseClass}--${collectionSlug}`}>
@@ -195,6 +200,13 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
                   >
                     {enableColumns ? 'Grid View' : 'Table View'}
                   </Button>
+                  <Button
+                    buttonStyle="pill"
+                    size="small"
+                    onClick={() => setShowFolders(!showFolders)}
+                  >
+                    {showFolders ? 'Hide Folders' : 'Show Folders'}
+                  </Button>
                 </>
               )}
               {!smallBreak && (
@@ -227,6 +239,36 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
             onChange={setSelectedFolders}
             placeholder="Filter by folders..."
           /> */}
+
+          {folderOptions?.length > 0 && showFolders && (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-row items-center justify-between">
+                <h2 className="text-4xl font-medium">Folders</h2>
+                <Button buttonStyle="pill" size="small">
+                  Create Folder
+                </Button>
+              </div>
+
+              <div className="flex flex-wrap gap-4">
+                {folderOptions.map((folder, index) => (
+                  <Card
+                    key={index}
+                    className="bg-background text-foreground hover:bg-muted/50 transition-colors cursor-pointer rounded-xl shadow-lg border-4 border-muted-foreground"
+                  >
+                    <CardHeader>
+                      <div className="w-10 h-10 flex items-center justify-center">
+                        <Folder className="w-full h-full text-zinc-400" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <CardTitle>{folder.label}</CardTitle>
+                      <CardDescription>{folder.numItems} items</CardDescription>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
 
           {showGrid
             ? data.docs &&

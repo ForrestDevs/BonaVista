@@ -31,7 +31,7 @@ export const ProductCollection: CollectionConfig = {
     drafts: true,
   },
   fields: [
-    slugField(),
+    ...slugField(),
     {
       label: 'Title',
       name: 'title',

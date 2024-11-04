@@ -55,7 +55,7 @@ const Products: CollectionConfig = {
     useAsTitle: 'title',
   },
   fields: [
-    slugField(),
+    ...slugField(),
     {
       label: 'Title',
       name: 'title',

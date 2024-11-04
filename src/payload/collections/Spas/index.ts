@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { anyone, admins } from '@payload/access'
 import { SPA_SLUG } from '../constants'
-import { slugField } from '@payload/fields/slug-new'
+import { slugField } from '@/payload/fields/slug'
 
 export const Spas: CollectionConfig = {
   slug: SPA_SLUG,

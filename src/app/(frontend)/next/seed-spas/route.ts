@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
 import Papa from 'papaparse'
-import { formatSlug } from '@/payload/fields/slug-new/formatSlug'
+import { formatSlug } from '@/payload/fields/slug/formatSlug'
 
 // Constants for determining type and collection
 const TYPE_MAP: Record<string, 'hot-tub' | 'swim-spa'> = {

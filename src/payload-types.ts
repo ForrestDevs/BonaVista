@@ -281,6 +281,7 @@ export interface Cart {
 export interface Product {
   id: string;
   slug?: string | null;
+  slugLock?: boolean | null;
   title: string;
   publishedOn?: string | null;
   description?: {
@@ -384,30 +385,6 @@ export interface Media {
       filesize?: number | null;
       filename?: string | null;
     };
-    tour_gallery?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    blog_image_size2?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    blog_image_size3?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
   };
 }
 /**
@@ -421,7 +398,6 @@ export interface MediaFolder {
     docs?: (string | Media)[] | null;
     hasNextPage?: boolean | null;
   } | null;
-  medias?: (string | Media)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -703,6 +679,7 @@ export interface Post {
       }[]
     | null;
   slug?: string | null;
+  slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1154,6 +1131,7 @@ export interface ShopArchiveBlock {
 export interface ShopCollection {
   id: string;
   slug?: string | null;
+  slugLock?: boolean | null;
   title: string;
   description?: string | null;
   publishedOn?: string | null;
@@ -1168,6 +1146,7 @@ export interface ShopCollection {
 export interface ProductCategory {
   id: string;
   slug?: string | null;
+  slugLock?: boolean | null;
   title: string;
   description?: string | null;
   updatedAt: string;
@@ -1301,6 +1280,7 @@ export interface LatestPostsBlock {
 export interface Brand {
   id: string;
   slug?: string | null;
+  slugLock?: boolean | null;
   name: string;
   updatedAt: string;
   createdAt: string;
@@ -1696,36 +1676,6 @@ export interface MediaSelect<T extends boolean = true> {
               filesize?: T;
               filename?: T;
             };
-        tour_gallery?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        blog_image_size2?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        blog_image_size3?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
       };
 }
 /**
@@ -1818,6 +1768,7 @@ export interface OrdersSelect<T extends boolean = true> {
  */
 export interface ProductsSelect<T extends boolean = true> {
   slug?: T;
+  slugLock?: T;
   title?: T;
   publishedOn?: T;
   description?: T;
@@ -2172,6 +2123,7 @@ export interface ProductsSelect<T extends boolean = true> {
  */
 export interface ShopCollectionsSelect<T extends boolean = true> {
   slug?: T;
+  slugLock?: T;
   title?: T;
   description?: T;
   publishedOn?: T;
@@ -2866,6 +2818,7 @@ export interface PostsSelect<T extends boolean = true> {
         name?: T;
       };
   slug?: T;
+  slugLock?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -2876,6 +2829,7 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface ProductCategoriesSelect<T extends boolean = true> {
   slug?: T;
+  slugLock?: T;
   title?: T;
   description?: T;
   updatedAt?: T;
@@ -2888,6 +2842,7 @@ export interface ProductCategoriesSelect<T extends boolean = true> {
  */
 export interface BrandsSelect<T extends boolean = true> {
   slug?: T;
+  slugLock?: T;
   name?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3051,7 +3006,6 @@ export interface GalleriesSelect<T extends boolean = true> {
 export interface MediaFoldersSelect<T extends boolean = true> {
   name?: T;
   media?: T;
-  medias?: T;
   updatedAt?: T;
   createdAt?: T;
 }

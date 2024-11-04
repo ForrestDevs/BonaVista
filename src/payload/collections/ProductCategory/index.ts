@@ -31,7 +31,7 @@ const ProductCategory: CollectionConfig = {
     drafts: true,
   },
   fields: [
-    slugField(),
+    ...slugField(),
     {
       name: 'title',
       type: 'text',
