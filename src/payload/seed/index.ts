@@ -103,12 +103,14 @@
 //   let demoAuthorID: number | string = demoAuthor.id
 
 //   payload.logger.info(`— Seeding media...`)
+
 //   const image1Doc = await payload.create({
 //     collection: 'media',
 //     data: image1,
 //     filePath: path.resolve(dirname, 'image-post1.webp'),
 //     req,
 //   })
+
 //   const image2Doc = await payload.create({
 //     collection: 'media',
 //     data: image2,

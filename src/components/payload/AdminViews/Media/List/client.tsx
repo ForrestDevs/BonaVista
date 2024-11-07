@@ -32,18 +32,28 @@ import {
   useWindowInfo,
   ViewDescription,
   useTableColumns,
+  useListDrawer,
+  useDocumentDrawer,
 } from '@payloadcms/ui'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { formatFilesize, isNumber } from 'payload/shared'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card'
-import React, { Fragment, useCallback, useEffect, useState } from 'react'
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { Media, MediaFolder } from '@payload-types'
 import GridCard from './grid-card'
 import MultipleSelector from '@components/ui/multi-select'
 import { Folder } from 'lucide-react'
+import { useQueryState } from 'nuqs'
 
 const baseClass = 'collection-list'
+
+type FolderOption = {
+  numItems: number
+  value: string
+  label: string
+  id: string
+}
 
 type MediaListClientProps = {
   folders: PaginatedDocs<MediaFolder>
@@ -109,28 +119,6 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
 
   const [selectedFolders, setSelectedFolders] = useState([])
 
-  const folderOptions = React.useMemo(() => {
-    return folders.docs.map((folder) => ({
-      numItems: folder.media?.docs?.length,
-      value: folder.id,
-      label: folder.name,
-    }))
-  }, [folders])
-
-  // useEffect(() => {
-  //   const buildWhereQuery = () => {
-  //     if (selectedFolders.length === 0) return {}
-
-  //     return {
-  //       folder: {
-  //         in: selectedFolders.map((f) => f.value),
-  //       },
-  //     }
-  //   }
-
-  //   handleWhereChange(buildWhereQuery())
-  // }, [selectedFolders, handleWhereChange])
-
   const openBulkUpload = useCallback(() => {
     setCollectionSlug(collectionSlug)
     openModal(drawerSlug)
@@ -157,11 +145,60 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
     setEnableColumns(!enableColumns)
   }
 
+  const folderOptions = React.useMemo(() => {
+    return folders.docs.map(
+      (folder): FolderOption => ({
+        numItems: folder.media?.docs?.length,
+        value: folder.id,
+        label: folder.name,
+        id: folder.id,
+      }),
+    )
+  }, [folders])
+
   const [showFolders, setShowFolders] = useState(true)
+  const [selectedFolder, setSelectedFolder] = useState(null)
+
+  const handleFolderClick = (folder: FolderOption) => {
+    setSelectedFolder(folder)
+    handleWhereChange({
+      folder: {
+        in: [folder.id],
+      },
+    })
+  }
+
+  const handleFolderClear = () => {
+    setSelectedFolder(null)
+    handleWhereChange({})
+  }
+
+  const [DocumentDrawer, DocumentToggler, { openDrawer, closeDrawer, isDrawerOpen }] = useDocumentDrawer({
+    collectionSlug: 'media-folders',
+    // drawerDepth: 1,
+  })
+
+  // useEffect(() => {
+  //   const buildWhereQuery = () => {
+  //     if (selectedFolders.length === 0) return {}
+
+  //     return {
+  //       folder: {
+  //         in: selectedFolders.map((f) => f.value),
+  //       },
+  //     }
+  //   }
+
+  //   handleWhereChange(buildWhereQuery())
+  // }, [selectedFolders, handleWhereChange])
 
   return (
     <div className={`${baseClass} ${baseClass}--${collectionSlug}`}>
       <SetViewActions actions={actions} />
+      <div className="absolute top-0 left-50">
+        <DocumentDrawer />
+      </div>
+
       <SelectionProvider docs={data.docs} totalDocs={data.totalDocs} user={user}>
         <RenderComponent mappedComponent={beforeList} />
         <Gutter className={`${baseClass}__wrap`}>
@@ -240,60 +277,86 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
             placeholder="Filter by folders..."
           /> */}
 
-          {folderOptions?.length > 0 && showFolders && (
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-row items-center justify-between">
-                <h2 className="text-4xl font-medium">Folders</h2>
-                <Button buttonStyle="pill" size="small">
-                  Create Folder
-                </Button>
-              </div>
+          <div className="flex flex-col space-y-8">
+            {folderOptions?.length > 0 && showFolders && (
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-row items-center justify-start gap-4">
+                  {selectedFolder ? (
+                    <>
+                      <Button buttonStyle="pill" size="small" onClick={handleFolderClear}>
+                        Clear Folder
+                      </Button>
+                      <h2 className="text-3xl font-medium">
+                        {selectedFolder.label} ({selectedFolder.numItems} items)
+                      </h2>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="text-3xl font-medium">Folders</h2>
+                      <DocumentToggler drawerSlug="media-folders" />
+                      <Button buttonStyle="pill" size="small" onClick={openDrawer}>
+                        Create Folder
+                      </Button>
+                    </>
+                  )}
+                </div>
 
-              <div className="flex flex-wrap gap-4">
-                {folderOptions.map((folder, index) => (
-                  <Card
-                    key={index}
-                    className="bg-background text-foreground hover:bg-muted/50 transition-colors cursor-pointer rounded-xl shadow-lg border-4 border-muted-foreground"
-                  >
-                    <CardHeader>
-                      <div className="w-10 h-10 flex items-center justify-center">
-                        <Folder className="w-full h-full text-zinc-400" />
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <CardTitle>{folder.label}</CardTitle>
-                      <CardDescription>{folder.numItems} items</CardDescription>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {showGrid
-            ? data.docs &&
-              data.docs.length > 0 && (
-                <RelationshipProvider>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-                    {data.docs.map((gridCell: Media, cellIndex) => (
-                      <GridCard key={cellIndex} data={gridCell} collectionSlug={collectionSlug} />
+                {!selectedFolder && (
+                  <div className="flex flex-wrap gap-4">
+                    {folderOptions.map((folder, index) => (
+                      <Card
+                        key={index}
+                        className="bg-background text-foreground hover:bg-muted/50 transition-colors cursor-pointer rounded-xl shadow-lg"
+                        onClick={() => handleFolderClick(folder)}
+                      >
+                        <CardHeader>
+                          <div className="w-10 h-10 flex items-center justify-center">
+                            <Folder className="w-full h-full text-zinc-400" />
+                          </div>
+                        </CardHeader>
+                        <CardContent className="border border-red-400">
+                          <CardTitle>{folder.label}</CardTitle>
+                          <CardDescription>{folder.numItems} items</CardDescription>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
-                </RelationshipProvider>
-              )
-            : data.docs &&
-              data.docs.length > 0 && (
-                <RelationshipProvider>
-                  <Table
-                    customCellContext={{
-                      collectionSlug,
-                      uploadConfig: collectionConfig.upload,
-                    }}
-                    data={docs}
-                    fields={fields}
-                  />
-                </RelationshipProvider>
-              )}
+                )}
+              </div>
+            )}
+
+            {showGrid
+              ? data.docs &&
+                data.docs.length > 0 && (
+                  <div className="flex flex-col gap-4">
+                    {!selectedFolder && <h2 className="text-3xl font-medium">Documents</h2>}
+                    <RelationshipProvider>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+                        {data.docs.map((gridCell: Media, cellIndex) => (
+                          <GridCard
+                            key={cellIndex}
+                            data={gridCell}
+                            collectionSlug={collectionSlug}
+                          />
+                        ))}
+                      </div>
+                    </RelationshipProvider>
+                  </div>
+                )
+              : data.docs &&
+                data.docs.length > 0 && (
+                  <RelationshipProvider>
+                    <Table
+                      customCellContext={{
+                        collectionSlug,
+                        uploadConfig: collectionConfig.upload,
+                      }}
+                      data={docs}
+                      fields={fields}
+                    />
+                  </RelationshipProvider>
+                )}
+          </div>
 
           {data.docs && data.docs.length === 0 && (
             <div className={`${baseClass}__no-results`}>

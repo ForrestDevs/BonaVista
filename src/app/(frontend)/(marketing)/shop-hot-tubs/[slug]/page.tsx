@@ -21,17 +21,17 @@ export default async function HotTubProductPage({ params }: Args) {
 
   return (
     <div className="flex flex-col min-h-screen space-y-10">
+      <Specs product={product} />
+
       <div className="container">
-        <h3 className="text-center mb4">Experience the Serenity 4500 in 3D</h3>
+        <h3 className="text-center mb4">Experience the {product.title} in 3D</h3>
         <iframe
-          src="https://hydropool-configurator.web.app/eTP6uOVT3IOTiDpNELV5?lang=en&model_switcher=Oi40CzdGjvvK1UM9vqEt&cover"
+          src={product.threeDModel}
           width="100%"
           allow="clipboard-read; clipboard-write"
           height="700px"
         ></iframe>
       </div>
-
-      <Specs product={product} />
     </div>
   )
 }

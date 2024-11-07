@@ -23,6 +23,7 @@ const MediaFolder: CollectionConfig = {
       on: 'folder',
       collection: MEDIA_SLUG,
     },
+    
   ],
   admin: {
     useAsTitle: 'name',

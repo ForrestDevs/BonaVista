@@ -76,6 +76,11 @@ export const Spas: CollectionConfig = {
               label: 'Model Year',
             },
             {
+              name: 'model',
+              type: 'text',
+              label: 'Model',
+            },
+            {
               name: 'description',
               type: 'textarea',
             },

@@ -398,6 +398,15 @@ export interface MediaFolder {
     docs?: (string | Media)[] | null;
     hasNextPage?: boolean | null;
   } | null;
+  parent?: (string | null) | MediaFolder;
+  breadcrumbs?:
+    | {
+        doc?: (string | null) | MediaFolder;
+        url?: string | null;
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1320,6 +1329,7 @@ export interface Spa {
   title: string;
   startingPrice?: number | null;
   modelYear?: number | null;
+  model?: string | null;
   description?: string | null;
   seatingDesign?: string | null;
   seating?: string | null;
@@ -2891,6 +2901,7 @@ export interface SpasSelect<T extends boolean = true> {
   title?: T;
   startingPrice?: T;
   modelYear?: T;
+  model?: T;
   description?: T;
   seatingDesign?: T;
   seating?: T;
@@ -3006,6 +3017,15 @@ export interface GalleriesSelect<T extends boolean = true> {
 export interface MediaFoldersSelect<T extends boolean = true> {
   name?: T;
   media?: T;
+  parent?: T;
+  breadcrumbs?:
+    | T
+    | {
+        doc?: T;
+        url?: T;
+        label?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

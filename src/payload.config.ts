@@ -186,7 +186,7 @@ export default buildConfig({
       },
     }),
     nestedDocsPlugin({
-      collections: ['pages', 'categories'],
+      collections: ['pages', 'categories', 'media-folders'],
       generateLabel: (_, doc) => doc.title as string,
       generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
     }),
