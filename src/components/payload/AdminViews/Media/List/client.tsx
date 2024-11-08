@@ -45,22 +45,16 @@ import GridCard from './grid-card'
 import MultipleSelector from '@components/ui/multi-select'
 import { Folder } from 'lucide-react'
 import { useQueryState } from 'nuqs'
+import { FolderOption } from '.'
 
 const baseClass = 'collection-list'
 
-type FolderOption = {
-  numItems: number
-  value: string
-  label: string
-  id: string
-}
-
 type MediaListClientProps = {
-  folders: PaginatedDocs<MediaFolder>
+  folderOptions: FolderOption[]
 }
 
 export const MediaListClient: React.FC<MediaListClientProps> = ({
-  folders,
+  folderOptions,
 }: MediaListClientProps) => {
   const { user } = useAuth()
   const router = useRouter()
@@ -145,16 +139,24 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
     setEnableColumns(!enableColumns)
   }
 
-  const folderOptions = React.useMemo(() => {
-    return folders.docs.map(
-      (folder): FolderOption => ({
-        numItems: folder.media?.docs?.length,
-        value: folder.id,
-        label: folder.name,
-        id: folder.id,
-      }),
-    )
-  }, [folders])
+  // const folderOptions = useMemo(() => {
+  //   return folders.docs.map((folder): FolderOption => {
+  //     const media = data.docs.filter((doc: Media) =>
+  //       doc?.folder?.find(
+  //         (f) =>
+  //           (typeof f === 'string' && f === folder.id) ||
+  //           (typeof f === 'object' && f.id === folder.id),
+  //       ),
+  //     )
+
+  //     return {
+  //       numItems: media?.length || 0,
+  //       value: folder.id,
+  //       label: folder.name,
+  //       id: folder.id,
+  //     }
+  //   })
+  // }, [folders, data.docs])
 
   const [showFolders, setShowFolders] = useState(true)
   const [selectedFolder, setSelectedFolder] = useState(null)
@@ -173,10 +175,11 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
     handleWhereChange({})
   }
 
-  const [DocumentDrawer, DocumentToggler, { openDrawer, closeDrawer, isDrawerOpen }] = useDocumentDrawer({
-    collectionSlug: 'media-folders',
-    // drawerDepth: 1,
-  })
+  const [DocumentDrawer, DocumentToggler, { openDrawer, closeDrawer, isDrawerOpen }] =
+    useDocumentDrawer({
+      collectionSlug: 'media-folders',
+      // drawerDepth: 1,
+    })
 
   // useEffect(() => {
   //   const buildWhereQuery = () => {
@@ -284,7 +287,7 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
                   {selectedFolder ? (
                     <>
                       <Button buttonStyle="pill" size="small" onClick={handleFolderClear}>
-                        Clear Folder
+                        Back
                       </Button>
                       <h2 className="text-3xl font-medium">
                         {selectedFolder.label} ({selectedFolder.numItems} items)
