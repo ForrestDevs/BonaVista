@@ -31,6 +31,8 @@ export default async function ShopSwimSpasHome({ searchParams }: PageProps) {
     }),
   ])
 
+  console.log(page.layout)
+
   const filterSpas = (
     docs: Spa[],
     {

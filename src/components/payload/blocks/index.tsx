@@ -18,7 +18,7 @@ const blockComponents = {
   archive: ArchiveBlock,
   content: ContentBlock,
   cta: CallToActionBlock,
-  formBlock: FormBlock,
+  form: FormBlock,
   mediaBlock: MediaBlock,
   'shop-archive': ShopArchiveBlock,
   testimonials: TestimonialBlock,

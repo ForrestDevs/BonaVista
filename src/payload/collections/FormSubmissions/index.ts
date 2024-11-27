@@ -16,31 +16,49 @@ const FormSubmissions: CollectionConfig = {
           value: 'contact',
         },
       ],
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'firstName',
       type: 'text',
       required: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'lastName',
       type: 'text',
       required: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'email',
       type: 'email',
       required: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'phone',
       type: 'text',
       required: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'postalCode',
       type: 'text',
       required: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'interestedIn',
@@ -52,16 +70,25 @@ const FormSubmissions: CollectionConfig = {
           type: 'text',
         },
       ],
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'message',
       type: 'textarea',
       required: true,
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'subscribeToMailingList',
       type: 'checkbox',
       defaultValue: true,
+      admin: {
+        readOnly: true,
+      },
     },
   ],
 } as const

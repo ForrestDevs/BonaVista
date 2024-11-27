@@ -1,3 +1,6 @@
 import type { Page } from '@payload-types'
 
-export type ContactBlockProps = Extract<Page['layout'][0], { blockType: 'contact' }>
+export type ContactBlockProps = Extract<
+  NonNullable<Page['layout']>[number],
+  { blockType: 'contact' }
+>

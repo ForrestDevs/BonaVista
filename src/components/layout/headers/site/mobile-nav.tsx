@@ -21,7 +21,7 @@ export default function MobileNav({ header }: { header: Header }) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden" style={{ zIndex: 10 }}>
+        <Button variant="ghost" size="icon" className="lg:hidden" style={{ zIndex: 10 }}>
           <MenuIcon />
         </Button>
       </SheetTrigger>

@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/form'
 import { formSchema, interestedInOptions, type FormValues } from './formSchema'
 import { submitForm } from './actions'
+import RichText from '../../RichText'
 
 type FormBlockProps = {
   preTitle?: string
@@ -63,15 +64,15 @@ export const FormBlock: React.FC<FormBlockProps> = ({ preTitle, title, body }) =
   }
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        {preTitle && (
-          <p className="text-primary font-medium text-center mb-2">{preTitle}</p>
-        )}
-        <h2 className="text-3xl font-bold mb-4 text-center">{title}</h2>
-        {body && <div className="prose mb-8 text-center">{body}</div>}
+    <section className="bg-muted p-10">
+      <div className="container flex flex-col items-center max-w-3xl gap-6 mx-auto">
+        <div className="flex flex-col items-center text-center gap-2">
+          {preTitle && <p className="text-primary font-medium tracking-wide">{preTitle}</p>}
+          <h2 className="text-3xl font-medium">{title}</h2>
+          <RichText content={body} className='p-0 m-0'/>
+        </div>
 
-        <Card>
+        <Card className="w-full">
           <CardContent className="p-6">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -198,10 +199,7 @@ export const FormBlock: React.FC<FormBlockProps> = ({ preTitle, title, body }) =
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel>
@@ -212,11 +210,7 @@ export const FormBlock: React.FC<FormBlockProps> = ({ preTitle, title, body }) =
                   )}
                 />
 
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={form.formState.isSubmitting}
-                >
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                   {form.formState.isSubmitting ? 'Submitting...' : 'Submit'}
                 </Button>
               </form>
@@ -226,4 +220,4 @@ export const FormBlock: React.FC<FormBlockProps> = ({ preTitle, title, body }) =
       </div>
     </section>
   )
-} 
+}

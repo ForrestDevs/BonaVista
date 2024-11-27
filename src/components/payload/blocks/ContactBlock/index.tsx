@@ -1,18 +1,14 @@
 'use client'
 
 import React from 'react'
-import type { Testimonial } from '@payload-types'
-import RichText from '@components/payload/RichText'
-
 import { ContactBlockProps } from './types'
-import ContactForm from './form'
 import HoursTable from './hours'
 
 export const ContactBlock: React.FC<
   ContactBlockProps & {
     id?: string
   }
-> = async (props) => {
+> = (props) => {
   const { id } = props
 
   return (
@@ -43,16 +39,6 @@ export const ContactBlock: React.FC<
           <HoursTable />
         </div>
       </div>
-      <div className="bg-gray-100 p-6 rounded-lg mb-6">
-        <h2 className="text-2xl font-bold mb-4">
-          Thank you for your interest in BonaVista LeisureScapes!
-        </h2>
-        <p>
-          For questions about our services or to make an inquiry, contact us by phone or fill out
-          the form and we&apos;ll be in touch.
-        </p>
-      </div>
-      <ContactForm />
     </div>
   )
 }
