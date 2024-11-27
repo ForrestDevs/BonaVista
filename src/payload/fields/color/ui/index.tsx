@@ -6,7 +6,7 @@ import {
   Button,
   FieldLabel, // Re-use the built in Label component directly from Payload
   useField,
-  useFieldProps,
+  useParams,
   usePreferences,
 } from '@payloadcms/ui'
 
@@ -45,9 +45,11 @@ export const ColorSwatchComponent: React.FC<ColorSwatchProps> = ({
   tailwindColorWhitelist,
   allowHexColors,
   field,
+  path,
 }) => {
   const { label } = field
-  const { path, readOnly: readOnlyFromProps } = useFieldProps()
+  
+  // const { path, readOnly: readOnlyFromProps } = useFieldProps()
 
   const { value = '', setValue } = useField({ path })
 
@@ -173,7 +175,7 @@ export const ColorSwatchComponent: React.FC<ColorSwatchProps> = ({
 
   return (
     <div className={baseClass}>
-      <FieldLabel field={field} htmlFor={path} label={label} />
+      <FieldLabel htmlFor={path.toString()} label={label} />
 
       {isAdding && (
         <div>

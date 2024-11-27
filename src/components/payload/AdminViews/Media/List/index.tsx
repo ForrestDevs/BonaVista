@@ -47,5 +47,5 @@ export default async function MediaList(props: ServerProps) {
   const folders = await getFolders(payload)
   const folderOptions = await getFolderOptions(payload, folders.docs)
 
-  return <MediaListClient folderOptions={folderOptions} />
+  return <MediaListClient folderOptions={folderOptions} params={props.params} />
 }

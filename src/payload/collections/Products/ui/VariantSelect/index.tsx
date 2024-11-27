@@ -9,13 +9,15 @@ import { toKebabCase } from '@lib/utils/toKebabCase'
 // import { getTranslation } from '@payloadcms/translations'
 import type { EnsuredProduct, InfoType, RadioGroupProps } from '../types'
 import { sortOptionsByKey } from '@payload/collections/Products/utilities/sortOptionsByKey'
-import { useField, useFieldProps, useForm, useFormFields, useTranslation } from '@payloadcms/ui'
+import { useField, useForm, useFormFields, useTranslation, useParams } from '@payloadcms/ui'
 
 export default function VariantSelect(props: TextField) {
   const { label } = props
-  const { path } = useFieldProps()
-  const { setValue, value } = useField<string[]>({ path })
-  const [variantPath] = path.split(/\.(?=[^.]+$)/)
+  const { path } = useParams()
+  const sanitizedPath = path.toString()
+  // const { path } = useField()
+  const { setValue, value } = useField<string[]>({ path: sanitizedPath })
+  const [variantPath] = sanitizedPath.split(/\.(?=[^.]+$)/)
   const { getDataByPath } = useForm()
   // const variantInfoPath = path.includes('.') ? variantPath + '.info' : 'info'
 
@@ -86,7 +88,7 @@ export default function VariantSelect(props: TextField) {
                     fullArray={keys}
                     group={key as EnsuredProduct['variants']['options'][number]}
                     options={key.values ?? []}
-                    path={path}
+                    path={sanitizedPath}
                     setValue={handleUpdate}
                     value={value}
                   />

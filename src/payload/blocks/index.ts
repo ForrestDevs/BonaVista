@@ -3,7 +3,6 @@ import { Banner } from './Banner'
 import { CallToAction } from './CallToAction'
 import { Code } from './Code'
 import { Content } from './Content'
-import { Form } from './Form'
 import { Media } from './Media'
 import { ShopArchive } from './ShopArchive'
 import { ServicesBlock } from './ServicesBlock'
@@ -13,6 +12,7 @@ import { Typography } from './Typography'
 import { LatestPosts } from './LatestPosts'
 import { Card } from './Card'
 import { Grid } from './Grid'
+import { Form } from './Form'
 
 import {
   ArchiveBlock as ArchiveBlockType,

@@ -75,15 +75,15 @@ const Media: CollectionConfig = {
     focalPoint: true,
     crop: true,
   },
-  admin: {
-    components: {
-      views: {
-        list: {
-          Component: 'src/components/payload/AdminViews/Media/List',
-        },
-      },
-    },
-  },
+  // admin: {
+  //   components: {
+  //     views: {
+  //       list: {
+  //         Component: 'src/components/payload/AdminViews/Media/List/tclient',
+  //       },
+  //     },
+  //   },
+  // },
 } as const
 
 export default Media

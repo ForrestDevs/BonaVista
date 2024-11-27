@@ -1,9 +1,8 @@
 import jwt from 'jsonwebtoken'
 import { draftMode } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
-import configPromise from '@payload-config'
 import { CollectionSlug } from 'payload'
+import getPayload from '@/lib/utils/getPayload'
 
 const payloadToken = 'payload-token'
 
@@ -16,7 +15,7 @@ export async function GET(
     }
   },
 ): Promise<Response> {
-  const payload = await getPayloadHMR({ config: configPromise })
+  const payload = await getPayload()
   const token = req.cookies.get(payloadToken)?.value
   const { searchParams } = new URL(req.url)
   const path = searchParams.get('path')

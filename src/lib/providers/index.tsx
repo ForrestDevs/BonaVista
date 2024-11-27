@@ -1,6 +1,5 @@
 import React from 'react'
 import ThemeProvider from '@/lib/providers/Theme'
-import LocaleProvider from '@/lib/providers/i18n'
 import { Toaster } from 'sonner'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { CartProvider } from './Cart'
@@ -11,17 +10,15 @@ export const Providers: React.FC<{
   children: React.ReactNode
 }> = async ({ children }) => {
   return (
-    <LocaleProvider>
-      <ThemeProvider>
-        <AuthProvider>
-          <NuqsProvider>
-            <CartProvider>
-              {children}
-              <Toaster />
-            </CartProvider>
-          </NuqsProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </LocaleProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <NuqsProvider>
+          <CartProvider>
+            {children}
+            <Toaster />
+          </CartProvider>
+        </NuqsProvider>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }

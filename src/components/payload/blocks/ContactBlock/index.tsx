@@ -1,9 +1,7 @@
-'use cl'
+'use client'
 
 import React from 'react'
-import configPromise from '@payload-config'
 import type { Testimonial } from '@payload-types'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
 import RichText from '@components/payload/RichText'
 
 import { ContactBlockProps } from './types'

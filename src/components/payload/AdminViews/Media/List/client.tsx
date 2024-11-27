@@ -1,6 +1,6 @@
 'use client'
 
-import type { PaginatedDocs } from 'payload'
+import type { ClientCollectionConfig, PaginatedDocs } from 'payload'
 import { getTranslation } from '@payloadcms/translations'
 import {
   Button,
@@ -14,16 +14,14 @@ import {
   PerPage,
   PublishMany,
   RelationshipProvider,
-  RenderComponent,
+  RenderCustomComponent,
   SelectionProvider,
-  SetViewActions,
   StaggeredShimmers,
   Table,
   UnpublishMany,
   useAuth,
   useBulkUpload,
   useEditDepth,
-  useListInfo,
   useListQuery,
   useSearchParams,
   useModal,
@@ -34,6 +32,9 @@ import {
   useTableColumns,
   useListDrawer,
   useDocumentDrawer,
+  useClientFunctions,
+  useConfig,
+  useActions,
 } from '@payloadcms/ui'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -46,70 +47,73 @@ import MultipleSelector from '@components/ui/multi-select'
 import { Folder } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { FolderOption } from '.'
+import { RenderComponent } from '@payloadcms/ui/elements/RenderComponent'
 
 const baseClass = 'collection-list'
 
 type MediaListClientProps = {
   folderOptions: FolderOption[]
+  params: {
+    [key: string]: string | string[]
+  }
 }
 
 export const MediaListClient: React.FC<MediaListClientProps> = ({
   folderOptions,
+  params,
 }: MediaListClientProps) => {
   const { user } = useAuth()
   const router = useRouter()
-  const { i18n, t } = useTranslation()
-  const drawerDepth = useEditDepth()
-  const { setStepNav } = useStepNav()
-  const { data, defaultLimit, handlePageChange, handlePerPageChange, params, handleWhereChange } =
-    useListQuery()
   const { openModal } = useModal()
-  const { setCollectionSlug, setOnSuccess } = useBulkUpload()
-  const { drawerSlug } = useBulkUpload()
-  const {
-    beforeActions,
-    collectionSlug,
-    disableBulkDelete,
-    disableBulkEdit,
-    hasCreatePermission,
-    Header,
-    newDocumentURL,
-    collectionConfig,
-  } = useListInfo()
+  // const { i18n, t } = useTranslation()
+  const drawerDepth = useEditDepth()
+  const { getEntityConfig } = useConfig()
+  const { drawerSlug, collectionSlug, setCollectionSlug, setOnSuccess } = useBulkUpload()
+  const collectionConfig = getEntityConfig({ collectionSlug }) as ClientCollectionConfig
+  const { setStepNav } = useStepNav()
+  const { data, defaultLimit, handlePageChange, handlePerPageChange, handleWhereChange } =
+    useListQuery()
+
   const {
     breakpoints: { s: smallBreak },
   } = useWindowInfo()
 
-  const {
-    admin: {
-      components: {
-        afterList,
-        afterListTable,
-        beforeList,
-        beforeListTable,
-        Description,
-        views: {
-          list: { actions },
-        },
-      },
-      description,
-    },
-    fields,
-    labels,
-  } = collectionConfig
+  // const { Actions, setViewActions } = useActions()
+
+  // const { collectionSlug, collectionConfig } = useListInfo()
+
+  // const {
+  //   admin: {
+      
+  //     // components: {
+  //     //   afterList,
+  //     //   afterListTable,
+  //     //   beforeList,
+  //     //   beforeListTable,
+  //     //   Description,
+  //     //   views: {
+  //     //     list: { actions },
+  //     //   },
+  //     // },
+  //     description,
+      
+  //   },
+  //   fields,
+  //   labels,
+  // } = collectionConfig
 
   let docs = data.docs || []
 
-  const isUploadCollection = Boolean(collectionConfig.upload)
+  // const isUploadCollection = Boolean(collectionConfig.upload)
 
-  if (isUploadCollection) {
-    docs = docs?.map((doc) => {
-      return {
-        ...doc,
-        filesize: formatFilesize(doc.filesize),
-      }
-    })
-  }
+  // if (isUploadCollection) {
+  //   docs = docs?.map((doc) => {
+  //     return {
+  //       ...doc,
+  //       filesize: formatFilesize(doc.filesize),
+  //     }
+  //   })
+  // }
 
   const [selectedFolders, setSelectedFolders] = useState([])
 
@@ -119,17 +123,17 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
     setOnSuccess(() => router.refresh())
   }, [router, collectionSlug, drawerSlug, openModal, setCollectionSlug, setOnSuccess])
 
-  useEffect(() => {
-    if (drawerDepth <= 1) {
-      setStepNav([
-        {
-          label: labels?.plural,
-        },
-      ])
-    }
-  }, [setStepNav, labels, drawerDepth])
+  // useEffect(() => {
+  //   if (drawerDepth <= 1) {
+  //     setStepNav([
+  //       {
+  //         label: labels?.plural,
+  //       },
+  //     ])
+  //   }
+  // }, [setStepNav, labels, drawerDepth])
 
-  const isBulkUploadEnabled = isUploadCollection && collectionConfig.upload.bulkUpload
+  // const isBulkUploadEnabled = isUploadCollection && collectionConfig.upload.bulkUpload
 
   const [showGrid, setShowGrid] = useState(true)
   const [enableColumns, setEnableColumns] = useState(false)
@@ -197,16 +201,26 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
 
   return (
     <div className={`${baseClass} ${baseClass}--${collectionSlug}`}>
-      <SetViewActions actions={actions} />
+      {/* <RenderComponent Component={Actions.map((action) => action)} /> */}
+      {/* <SetViewActions actions={actions} /> */}
       <div className="absolute top-0 left-50">
         <DocumentDrawer />
       </div>
 
       <SelectionProvider docs={data.docs} totalDocs={data.totalDocs} user={user}>
-        <RenderComponent mappedComponent={beforeList} />
         <Gutter className={`${baseClass}__wrap`}>
-          {Header || (
-            <ListHeader heading={getTranslation(labels?.plural, i18n)}>
+          {/* {Header || (
+            <>
+              <ListHeader
+                smallBreak={smallBreak}
+                t={t}
+                newDocumentURL={newDocumentURL}
+                openBulkUpload={openBulkUpload}
+                collectionConfig={collectionConfig}
+                hasCreatePermission={hasCreatePermission}
+                i18n={i18n}
+                isBulkUploadEnabled={isBulkUploadEnabled}
+              />
               {hasCreatePermission && (
                 <>
                   <Button
@@ -254,17 +268,17 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
               )}
               {(description || Description) && (
                 <div className={`${baseClass}__sub-header`}>
-                  <ViewDescription Description={Description} description={description} />
+                  <ViewDescription description={description} />
                 </div>
               )}
-            </ListHeader>
-          )}
+            </>
+          )} */}
           <ListControls
+            collectionSlug={collectionSlug}
             collectionConfig={collectionConfig}
-            fields={fields}
             enableColumns={enableColumns}
           />
-          <RenderComponent mappedComponent={beforeListTable} />
+          {/* <RenderComponent Component={beforeListTable} /> */}
 
           {!data.docs && (
             <StaggeredShimmers
@@ -349,31 +363,24 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
               : data.docs &&
                 data.docs.length > 0 && (
                   <RelationshipProvider>
-                    <Table
-                      customCellContext={{
-                        collectionSlug,
-                        uploadConfig: collectionConfig.upload,
-                      }}
-                      data={docs}
-                      fields={fields}
-                    />
+                    <Table data={docs} />
                   </RelationshipProvider>
                 )}
           </div>
 
           {data.docs && data.docs.length === 0 && (
             <div className={`${baseClass}__no-results`}>
-              <p>{i18n.t('general:noResults', { label: getTranslation(labels?.plural, i18n) })}</p>
-              {hasCreatePermission && newDocumentURL && (
+              {/* <p>{i18n.t('general:noResults', { label: getTranslation(labels?.plural, i18n) })}</p> */}
+              {/* {hasCreatePermission && newDocumentURL && (
                 <Button el="link" Link={Link} to={newDocumentURL}>
                   {i18n.t('general:createNewLabel', {
                     label: getTranslation(labels?.singular, i18n),
                   })}
                 </Button>
-              )}
+              )} */}
             </div>
           )}
-          <RenderComponent mappedComponent={afterListTable} />
+          {/* <RenderComponent Component={afterListTable} /> */}
           {data.docs && data.docs.length > 0 && (
             <div className={`${baseClass}__page-controls`}>
               <Pagination
@@ -394,7 +401,7 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
                     {data.totalPages > 1 && data.totalPages !== data.page
                       ? data.limit * data.page
                       : data.totalDocs}{' '}
-                    {i18n.t('general:of')} {data.totalDocs}
+                    {/* {i18n.t('general:of')} {data.totalDocs} */}
                   </div>
                   <PerPage
                     handleChange={(limit) => void handlePerPageChange(limit)}
@@ -404,17 +411,17 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
                   />
                   {smallBreak && (
                     <div className={`${baseClass}__list-selection`}>
-                      <ListSelection label={getTranslation(collectionConfig.labels.plural, i18n)} />
+                      {/* <ListSelection label={getTranslation(collectionConfig.labels.plural, i18n)} /> */}
                       <div className={`${baseClass}__list-selection-actions`}>
-                        {beforeActions && beforeActions}
-                        {!disableBulkEdit && (
+                        {/* {beforeActions && beforeActions} */}
+                        {/* {!disableBulkEdit && (
                           <Fragment>
-                            <EditMany collection={collectionConfig} fields={fields} />
+                            <EditMany collection={collectionConfig} />
                             <PublishMany collection={collectionConfig} />
                             <UnpublishMany collection={collectionConfig} />
                           </Fragment>
-                        )}
-                        {!disableBulkDelete && <DeleteMany collection={collectionConfig} />}
+                        )} */}
+                        {/* {!disableBulkDelete && <DeleteMany collection={collectionConfig} />} */}
                       </div>
                     </div>
                   )}
@@ -423,7 +430,7 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
             </div>
           )}
         </Gutter>
-        <RenderComponent mappedComponent={afterList} />
+        {/* {afterList && <RenderComponent Component={afterList} />} */}
       </SelectionProvider>
     </div>
   )

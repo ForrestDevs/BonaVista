@@ -1,6 +1,5 @@
 import React from 'react'
-import configPromise from '@payload-config'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
+import getPayload from '@/lib/utils/getPayload'
 import { Pagination } from '@/components/marketing/blog/pagination/pagination'
 import { PostArchive } from '@/components/marketing/blog/post-archive'
 import { PageRange } from '@/components/marketing/blog/pagination/page-range'
@@ -11,7 +10,7 @@ type Props = {
 }
 
 export default async function FilteredPagination({ category, page }: Props) {
-  const payload = await getPayloadHMR({ config: configPromise })
+  const payload = await getPayload()
 
   const posts = await payload.find({
     collection: 'posts',

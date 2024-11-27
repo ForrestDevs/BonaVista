@@ -6,12 +6,11 @@ import { GridTileImage } from '@components/payload/grid/tile'
 import { Gallery } from '@components/shop/products/gallery'
 import { ProductDescription } from '@components/shop/products/product-description'
 // import { HIDDEN_PRODUCT_TAG } from '@lib/constants'
-import configPromise from '@payload-config'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { draftMode, headers } from 'next/headers'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React, { Suspense } from 'react'
+import getPayload from '@/lib/utils/getPayload'
 
 // export async function generateMetadata({
 //   params,
@@ -172,7 +171,7 @@ function RelatedProducts({ products }: { products: Product[] }) {
 const queryProductBySlug = async ({ slug }: { slug: string }) => {
   const { isEnabled: draft } = await draftMode()
 
-  const payload = await getPayloadHMR({ config: configPromise })
+  const payload = await getPayload()
   const authResult = draft ? await payload.auth({ headers: await headers() }) : undefined
 
   const user = authResult?.user

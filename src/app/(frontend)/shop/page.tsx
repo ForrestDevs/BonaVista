@@ -23,8 +23,6 @@ import {
   UserIcon,
   MenuIcon,
 } from 'lucide-react'
-import configPromise from '@payload-config'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { draftMode } from 'next/headers'
 import { generateMeta } from '@lib/utils/generateMeta'
 import { Page } from '@payload-types'

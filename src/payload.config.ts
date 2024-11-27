@@ -186,47 +186,13 @@ export default buildConfig({
       },
     }),
     nestedDocsPlugin({
-      collections: ['pages', 'categories', 'media-folders'],
+      collections: ['pages', 'media-folders'],
       generateLabel: (_, doc) => doc.title as string,
       generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
     }),
     seoPlugin({
       generateTitle,
       generateURL,
-    }),
-    formBuilderPlugin({
-      fields: {
-        payment: false,
-      },
-      formSubmissionOverrides: {
-        admin: {
-          group: 'Forms',
-        },
-      },
-      formOverrides: {
-        admin: {
-          group: 'Forms',
-        },
-        fields: ({ defaultFields }) => {
-          return defaultFields.map((field) => {
-            if ('name' in field && field.name === 'confirmationMessage') {
-              return {
-                ...field,
-                editor: lexicalEditor({
-                  features: ({ rootFeatures }) => {
-                    return [
-                      ...rootFeatures,
-                      FixedToolbarFeature(),
-                      HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                    ]
-                  },
-                }),
-              }
-            }
-            return field
-          })
-        },
-      },
     }),
     s3Storage({
       collections: {

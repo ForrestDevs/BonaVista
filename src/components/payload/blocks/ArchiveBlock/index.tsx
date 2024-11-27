@@ -1,11 +1,9 @@
 import React from 'react'
 import type { Post } from '@payload-types'
-import configPromise from '@payload-config'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
 import RichText from '@components/payload/RichText'
 import type { ArchiveBlockProps } from './types'
 import { CollectionArchive } from '@components/payload/CollectionArchive'
-
+import getPayload from '@/lib/utils/getPayload'
 export const ArchiveBlock: React.FC<
   ArchiveBlockProps & {
     id?: string
@@ -18,7 +16,7 @@ export const ArchiveBlock: React.FC<
   let posts: Post[] = []
 
   if (populateBy === 'collection') {
-    const payload = await getPayloadHMR({ config: configPromise })
+    const payload = await getPayload()
 
     const flattenedCategories = categories?.map((category) => {
       if (typeof category === 'object') return category.id

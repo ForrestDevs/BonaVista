@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 
 import {
+  useCellProps,
   useConfig,
   useDocumentDrawer,
   useListDrawer,
@@ -29,34 +30,39 @@ export default function GridCard({
 }) {
   const router = useRouter()
   const { config } = useConfig()
-  const { i18n, t } = useTranslation()
+  const { i18n } = useTranslation()
   const tableColumns = useTableColumns()
   const { setSelection, selected } = useSelection()
 
-  const {
-    routes: { admin: adminRoute },
-    admin: { dateFormat },
-  } = config
+  // const {
+  //   routes: { admin: adminRoute },
+  //   admin: { dateFormat },
+  // } = config
 
+  const { onClick } = useCellProps()
   // IF this field is present we can present the checkbox,
   // but also note that the onClick and link cell props will be shifted to index 1
   const selectorField = tableColumns.columns.find((col) => col.accessor === '_select')
 
   const handleItemClicked = () => {
-    const onClick = selectorField
-      ? tableColumns.cellProps?.[1]?.onClick
-      : tableColumns.cellProps?.[0]?.onClick
+
+    // const onClick = selectorField
+    // ? cellProps.onClick
+    // : tableColumns.cellProps?.[0]?.onClick
+    // const onClick = selectorField
+    //   ? tableColumns.cellProps?.[1]?.onClick
+    //   : tableColumns.cellProps?.[0]?.onClick
 
     if (typeof onClick === 'function') {
       // we are in "list-drawer" view, execute the onClick function
       onClick({
         cellData: undefined,
-        collectionSlug: collectionSlug,
+        collectionSlug: "media",
         rowData: data,
       })
     } else {
       // we are in "collection-admin" view, push the new route with next/navigation
-      void router.push(`${adminRoute}/collections/${collectionSlug}/${data.id}`)
+      // void router.push(`${adminRoute}/collections/${collectionSlug}/${data.id}`)
     }
   }
 
@@ -102,11 +108,11 @@ export default function GridCard({
           <div className="text-sm text-gray-500 space-y-1">
             <p className="break-words">{formatFilesize(data.filesize!)}</p>
             <p className="break-words font-light opacity-50">
-              {formatDate({
+              {/* {formatDate({
                 date: data.createdAt,
                 pattern: dateFormat,
                 i18n: i18n,
-              })}
+              })} */}
             </p>
           </div>
         </div>

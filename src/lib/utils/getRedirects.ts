@@ -1,9 +1,8 @@
-import configPromise from '@payload-config'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { unstable_cache } from 'next/cache'
+import getPayload from '@/lib/utils/getPayload'
 
 export async function getRedirects(depth = 1) {
-  const payload = await getPayloadHMR({ config: configPromise })
+  const payload = await getPayload()
 
   const { docs: redirects } = await payload.find({
     collection: 'redirects',

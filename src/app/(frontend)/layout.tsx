@@ -7,15 +7,13 @@ import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
 import { Providers } from '@/lib/providers'
 import { mergeOpenGraph } from '@/lib/utils/mergeOpenGraph'
-import config from '@payload-config'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
-import { getLocale } from 'next-intl/server'
 import { Footer } from '@/components/layout/footers/site'
 import { LivePreviewListener } from '@/components/payload/LivePreviewListener'
 import { AdminBar } from '@/components/payload/AdminBar'
+import getPayload from '@/lib/utils/getPayload'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const payload = await getPayloadHMR({ config })
+  const payload = await getPayload()
 
   const initData = await payload.findGlobal({
     slug: 'site-settings',
@@ -34,14 +32,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale()
-
   return (
-    <html
-      className={cn(GeistSans.variable, GeistMono.variable)}
-      lang={locale}
-      suppressHydrationWarning
-    >
+    <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/rgs4hpy.css" />
       </head>
