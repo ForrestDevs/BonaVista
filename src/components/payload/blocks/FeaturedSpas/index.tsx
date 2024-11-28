@@ -28,17 +28,17 @@ export const FeaturedSpas: React.FC<FeaturedSpasBlockProps> = ({
   }
   return (
     <section className="container py-24">
-      <div className="flex flex-col items-center text-center gap-4 mb-16">
+      <div className="flex flex-col gap-4 mb-16">
         <p className="text-md font-medium text-primary tracking-wide">{preTitle}</p>
         <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">{title}</h2>
         {body && (
-          <div className="mx-auto max-w-3xl text-lg text-muted-foreground">
-            <RichText content={body} />
+          <div className="max-w-3xl text-lg text-muted-foreground">
+            <RichText content={body} enableGutter={false} />
           </div>
         )}
       </div>
 
-      <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-12">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-12">
         {spasToShow.map((spa) => (
           <Card
             key={spa.id}

@@ -1,13 +1,12 @@
 'use client'
 
 import React, { useCallback, useEffect } from 'react'
-import type { OptionObject, TextField } from 'payload'
+import type { OptionObject, TextField, TextFieldClientProps } from 'payload'
 import type Stripe from 'stripe'
 
-import { useField, useFieldProps, useFormFields, withCondition } from '@payloadcms/ui'
+import { useField, useFormFields, withCondition } from '@payloadcms/ui'
 import { CopyToClipboard } from '@payloadcms/ui/elements/CopyToClipboard'
 import { SelectInput } from '@payloadcms/ui/fields/Select'
-
 
 import type { InfoType } from './types'
 
@@ -20,9 +19,11 @@ type ProductOption = {
   value: string
 }
 
-const Component: React.FC<TextField> = (props) => {
-  const { label, name } = props
-  const { path } = useFieldProps()
+type StripeProductSelectProps = TextField & TextFieldClientProps
+
+const Component: React.FC<StripeProductSelectProps> = (props) => {
+  const { label, name, path } = props
+
   const { setValue, value: stripeProductID } = useField<string>({ path })
 
   const [currentPath] = path.split(/\.(?=[^.]+$)/)
