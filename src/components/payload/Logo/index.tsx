@@ -9,10 +9,10 @@ export function Logo({ className }: { className?: string }) {
     <Image
       src={logo}
       alt="BonaVista Logo"
-      // width={300}
-      // height={200}
-      className={cn('w-auto h-auto max-w-full', className)}
-      style={{ objectFit: 'contain' }}
+      width={200}
+      height={160}
+      className={cn('object-contain aspect-auto', className)}
+      priority
     />
   )
 }

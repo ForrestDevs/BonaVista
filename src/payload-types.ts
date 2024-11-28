@@ -585,6 +585,40 @@ export interface Page {
             blockName?: string | null;
             blockType: 'grid';
           }
+        | {
+            preTitle: string;
+            title: string;
+            body?: {
+              root: {
+                type: string;
+                children: {
+                  type: string;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            spas: (string | Spa)[];
+            link: {
+              type?: ('reference' | 'custom') | null;
+              newTab?: boolean | null;
+              reference?: {
+                relationTo: 'pages';
+                value: string | Page;
+              } | null;
+              url?: string | null;
+              label: string;
+              appearance?: ('default' | 'outline') | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'featured-spas';
+          }
       )[]
     | null;
   meta?: {
@@ -1124,39 +1158,6 @@ export interface LatestPostsBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "brands".
- */
-export interface Brand {
-  id: string;
-  slug?: string | null;
-  slugLock?: boolean | null;
-  name: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "orders".
- */
-export interface Order {
-  id: string;
-  orderedBy?: (string | null) | Customer;
-  stripePaymentIntentID?: string | null;
-  total: number;
-  currency: string;
-  items?:
-    | {
-        product: string | Product;
-        variant?: string | null;
-        quantity?: number | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "spas".
  */
 export interface Spa {
@@ -1207,6 +1208,39 @@ export interface Spa {
   detailsLink?: string | null;
   quoteLink?: string | null;
   financingLink?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brands".
+ */
+export interface Brand {
+  id: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: string;
+  orderedBy?: (string | null) | Customer;
+  stripePaymentIntentID?: string | null;
+  total: number;
+  currency: string;
+  items?:
+    | {
+        product: string | Product;
+        variant?: string | null;
+        quantity?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2614,6 +2648,26 @@ export interface PagesSelect<T extends boolean = true> {
                               };
                         };
                     id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        'featured-spas'?:
+          | T
+          | {
+              preTitle?: T;
+              title?: T;
+              body?: T;
+              spas?: T;
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                    appearance?: T;
                   };
               id?: T;
               blockName?: T;

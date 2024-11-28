@@ -5,6 +5,9 @@ import { slugField } from '@/payload/fields/slug'
 
 export const Spas: CollectionConfig = {
   slug: SPA_SLUG,
+  admin: {
+    useAsTitle: 'title',
+  },
   access: {
     create: admins,
     delete: admins,

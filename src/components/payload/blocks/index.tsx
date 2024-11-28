@@ -13,6 +13,7 @@ import { LatestPostsBlock } from './LatestPosts'
 import { ServicesBlock } from './ServicesBlock'
 import { CardBlock } from './CardBlock'
 import { GridBlock } from './GridBlock'
+import { FeaturedSpas } from './FeaturedSpas'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -28,6 +29,7 @@ const blockComponents = {
   services: ServicesBlock,
   card: CardBlock,
   grid: GridBlock,
+  'featured-spas': FeaturedSpas,
 } as const
 
 export const RenderBlocks: React.FC<{

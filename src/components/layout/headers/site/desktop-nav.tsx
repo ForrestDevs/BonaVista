@@ -1,204 +1,249 @@
-import React from 'react'
-import { Header } from '@payload-types'
-import Image from 'next/image'
-import { OptimizedLink as Link } from '@/components/payload/Link/optimized-link'
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
-  NavigationMenuIndicator,
-  navigationMenuTriggerStyle,
-  CustomNavigationMenuTrigger,
-} from '@/components/ui/navigation-menu'
-import { CMSLink } from '@/components/payload/Link'
-import { navItems } from '@/lib/config/site'
-import { cn } from '@/lib/utils/cn'
+import * as React from 'react'
 import * as NavigationMenuPrimitive from '@radix-ui/react-navigation-menu'
+import { cn } from '@/lib/utils/cn'
+import { OptimizedLink as Link } from '@/components/payload/Link/optimized-link'
 import { ChevronDown } from 'lucide-react'
 
-export default function DesktopNav({ header }: { header: Header }) {
+type MenuItem = {
+  label: string
+  href: string
+  submenu?: {
+    label: string
+    href: string
+    submenu?: {
+      label: string
+      href: string
+    }[]
+  }[]
+}
+
+type MenuConfig = {
+  [key: string]: MenuItem
+}
+
+const menuConfig: MenuConfig = {
+  products: {
+    label: 'Products',
+    href: '/products',
+    submenu: [
+      {
+        label: 'Hot Tubs',
+        href: '/hot-tubs',
+        submenu: [
+          {
+            label: 'Shop All Hot Tubs',
+            href: '/shop-hot-tubs',
+          },
+          {
+            label: 'Hot Tub Features',
+            href: '/hot-tub-features',
+          },
+          {
+            label: 'Health Benefits',
+            href: '/hot-tub-health-benefits',
+          },
+          {
+            label: 'Hot Tub Covers',
+            href: '/hot-tub-covers',
+          },
+        ],
+      },
+      {
+        label: 'Swim Spas',
+        href: '/swim-spas',
+        submenu: [
+          {
+            label: 'Shop All Swim Spas',
+            href: '/shop-swim-spas',
+          },
+          {
+            label: 'Swim Spa Features',
+            href: '/swim-spa-features',
+          },
+          {
+            label: 'Swim Spa Covers',
+            href: '/swim-spa-covers',
+          },
+        ],
+      },
+      {
+        label: 'Outdoor Living',
+        href: '/outdoor-living',
+        submenu: [
+          {
+            label: 'Kitchens',
+            href: '/outdoor-kitchens',
+          },
+          {
+            label: 'Lighting',
+            href: '/outdoor-lighting',
+          },
+          {
+            label: 'Fire',
+            href: '/outdoor-fire',
+          },
+        ],
+      },
+      {
+        label: 'Water Care',
+        href: '/water-care',
+        submenu: [
+          {
+            label: 'Shop All Water Care',
+            href: '/shop-water-care',
+          },
+          {
+            label: 'Water Testing',
+            href: '/water-testing',
+          },
+          {
+            label: 'Online Assessment',
+            href: '/water-assessment',
+          },
+        ],
+      },
+    ],
+  },
+  discover: {
+    label: 'Discover',
+    href: '/discover',
+    submenu: [
+      {
+        label: 'Gallery',
+        href: '/gallery',
+      },
+      {
+        label: 'About Us',
+        href: '/about',
+      },
+      {
+        label: 'Blog',
+        href: '/blog',
+      },
+      {
+        label: 'Resources',
+        href: '/resources',
+      },
+    ],
+  },
+  shop: {
+    label: 'Shop',
+    href: '/shop',
+  },
+  contact: {
+    label: 'Contact',
+    href: '/contact',
+  },
+}
+
+export const DesktopNav: React.FC<{ className?: string }> = ({ className }) => {
   return (
-    <NavigationMenu className="hidden md:flex">
-      <NavigationMenuList className="space-x-5 lg:space-x-6">
-        <NavigationMenuItem>
-          <CustomNavigationMenuTrigger>Products</CustomNavigationMenuTrigger>
-          <NavigationMenuContent className='bg-white'>
-            <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[1fr_1fr]">
-              <li>
-                <Link
-                  href="/hot-tubs"
-                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                >
-                  <div className="text-sm font-medium leading-none">Hot Tubs</div>
-                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                    Relax and unwind in our premium hot tubs
-                  </p>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/swim-spas"
-                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                >
-                  <div className="text-sm font-medium leading-none">Swim Spas</div>
-                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                    Exercise and relax in our versatile swim spas
-                  </p>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/outdoor-living"
-                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                >
-                  <div className="text-sm font-medium leading-none">Outdoor Living</div>
-                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                    Enhance your outdoor space with our living products
-                  </p>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/water-care"
-                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                >
-                  <div className="text-sm font-medium leading-none">Water Care</div>
-                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                    Maintain crystal clear water with our care products
-                  </p>
-                </Link>
-              </li>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <CustomNavigationMenuTrigger>Discover</CustomNavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-              <li className="row-span-3">
-                <Link
-                  className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                  href="/gallery"
-                >
-                  <div className="mb-2 mt-4 text-lg font-medium">Gallery</div>
-                  <p className="text-sm leading-tight text-muted-foreground">
-                    Our best work in luxury backyard escapes.
-                  </p>
-                </Link>
-              </li>
-              <ListItem href="/about" title="About Us">
-                Our team, our story.
-              </ListItem>
-              <ListItem href="/blog" title="Blog">
-                Read about owning luxury.
-              </ListItem>
-              <ListItem href="/resources" title="Resources">
-                Find more information.
-              </ListItem>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <SingleLink href="/shop" title="Shop" />
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <SingleLink href="/contact" title="Contact" />
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
+    <NavigationMenuPrimitive.Root className={className}>
+      <NavigationMenuPrimitive.List className="flex flex-1 list-none items-center justify-center space-x-5 lg:space-x-6">
+        {Object.entries(menuConfig).map(([key, value]) => (
+          <NavigationMenuPrimitive.Item key={key}>
+            {value.submenu ? (
+              <>
+                <Trigger>{value.label}</Trigger>
+                <NavigationMenuPrimitive.Content className={submenusContentClass()}>
+                  <NavigationMenuPrimitive.Sub className="w-full">
+                    <NavigationMenuPrimitive.List className="flex flex-row gap-8 items-start justify-center h-fit">
+                      {value.submenu.map((item) => (
+                        <NavigationMenuPrimitive.Item key={item.label} className="relative">
+                          <Trigger
+                            showChevron={item.submenu?.length > 0}
+                            className="py-2 flex items-center gap-1 hover:underline font-medium"
+                          >
+                            <Link href={item.href} className="text-gray-800">
+                              {item.label}
+                            </Link>
+                          </Trigger>
+                          {item.submenu && (
+                            <NavigationMenuPrimitive.Content className="absolute top-full left-0 mt-8 p-4 bg-white shadow-lg border border-gray-200 min-w-[200px]">
+                              <ul className="flex flex-col gap-2">
+                                {item.submenu.map((subItem) => (
+                                  <li key={subItem.label}>
+                                    <SingleLink
+                                      href={subItem.href}
+                                      title={subItem.label}
+                                      variant="sm"
+                                    />
+                                  </li>
+                                ))}
+                              </ul>
+                            </NavigationMenuPrimitive.Content>
+                          )}
+                        </NavigationMenuPrimitive.Item>
+                      ))}
+                    </NavigationMenuPrimitive.List>
+                  </NavigationMenuPrimitive.Sub>
+                </NavigationMenuPrimitive.Content>
+              </>
+            ) : (
+              <SingleLink href={value.href} title={value.label} />
+            )}
+          </NavigationMenuPrimitive.Item>
+        ))}
+      </NavigationMenuPrimitive.List>
+    </NavigationMenuPrimitive.Root>
   )
 }
 
-function GroupLink({ href, title }: { href: string; title: string }) {
-  return (
-    <Link
-      href={href}
-      className="text-black text-base lg:text-lg xl:text-xl hover:text-gray-700 transition-colors duration-300 relative group"
-    >
-      {title}
-    </Link>
-  )
-}
+const Trigger = React.forwardRef<
+  React.ComponentRef<typeof NavigationMenuPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Trigger> & { showChevron?: boolean }
+>(({ className, children, showChevron = true, ...props }, ref) => (
+  <NavigationMenuPrimitive.Trigger
+    ref={ref}
+    className={
+      'relative group text-base lg:text-lg xl:text-xl hover:text-gray-700 transition-colors duration-200 flex items-center'
+    }
+    {...props}
+  >
+    {children}{' '}
+    {showChevron && (
+      <ChevronDown
+        className="relative top-[1px] ml-1 h-4 w-4 transition duration-200 group-data-[state=open]:rotate-180"
+        aria-hidden="true"
+      />
+    )}
+    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-200 group-data-[state=open]:w-full"></span>
+  </NavigationMenuPrimitive.Trigger>
+))
+Trigger.displayName = NavigationMenuPrimitive.Trigger.displayName
 
-function SingleLink({ href, title }: { href: string; title: string }) {
+const SingleLink = React.forwardRef<
+  React.ComponentRef<typeof Link>,
+  React.ComponentPropsWithoutRef<typeof Link> & { variant?: 'sm' | 'md' | 'lg' }
+>(({ href, title, variant = 'md', ...props }, ref) => {
+  const sizeClasses = {
+    sm: 'text-sm lg:text-base xl:text-lg',
+    md: 'text-base lg:text-lg xl:text-xl',
+    lg: 'text-lg lg:text-xl xl:text-2xl',
+  }
+
   return (
     <Link
+      ref={ref}
       href={href}
-      className="text-black text-base lg:text-lg xl:text-xl hover:text-gray-700 transition-colors duration-200 relative group"
+      className={cn(
+        'text-black hover:text-gray-700 transition-colors duration-200 relative group',
+        sizeClasses[variant],
+      )}
+      {...props}
     >
       {title}
       <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-200 group-hover:w-full"></span>
     </Link>
   )
-}
+})
+SingleLink.displayName = 'SingleLink'
 
-const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWithoutRef<'a'>>(
-  ({ className, title, children, href, ...props }, ref) => {
-    return (
-      <li>
-        <Link
-          ref={ref}
-          className={cn(
-            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-            className,
-          )}
-          href={href}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{children}</p>
-        </Link>
-      </li>
-    )
-  },
-)
-
-ListItem.displayName = 'ListItem'
-
-// {navItems.map((item, index) => (
-//   <NavigationMenuItem key={index}>
-//     {item.navItem?.type === 'single' ? (
-//       <Link href={item.navItem.singleLink?.url || ''} legacyBehavior passHref>
-//         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-//           {item.navItem.singleLink?.title}
-//         </NavigationMenuLink>
-//       </Link>
-//     ) : (
-//       <>
-//         <NavigationMenuTrigger>{item.navItem?.linkGroup?.title}</NavigationMenuTrigger>
-//         <NavigationMenuContent>
-//           <ul className="grid gap-3 p-4 md:grid-cols-2">
-//             {item.navItem?.linkGroup?.links?.map((link, linkIndex) => (
-//               <li key={linkIndex}>
-//                 <NavigationMenuLink asChild>
-//                   {/* <CMSLink {...link}  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-//                       <div className="text-sm font-medium leading-none">{link.title}</div>
-//                       <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-//                         {link.description}
-//                       </p>
-//                     </CMSLink> */}
-//                   <Link
-//                     href={link.url || ''}
-//                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-//                   >
-//                     <div className="text-sm font-medium leading-none">{link.title}</div>
-//                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-//                       {link.description}
-//                     </p>
-//                   </Link>
-//                 </NavigationMenuLink>
-//               </li>
-//             ))}
-//           </ul>
-//         </NavigationMenuContent>
-//       </>
-//     )}
-//   </NavigationMenuItem>
-// ))}
+const submenusContentClass = () =>
+  cn(
+    'fixed left-0 top-[83px] w-full bg-white shadow-lg border-b border-gray-200 pb-6 pt-4',
+    'data-[motion=from-start]:animate-enterFromLeft',
+    'data-[motion=from-end]:animate-enterFromRight',
+    'data-[motion=to-start]:animate-exitToLeft',
+    'data-[motion=to-end]:animate-exitToRight',
+  )

@@ -10,6 +10,7 @@ export const CARD_BLOCK_SLUG = 'card' as const
 export const GRID_BLOCK_SLUG = 'grid' as const
 export const CONTACT_FORM_BLOCK_SLUG = 'contact-form' as const
 export const FORM_BLOCK_SLUG = 'form' as const
+export const FEATURED_SPAS_BLOCK_SLUG = 'featured-spas' as const
 // Add other block slugs here as they are created
 // For example:
 // export const CONTENT_BLOCK_SLUG = 'content-block'

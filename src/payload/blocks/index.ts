@@ -13,6 +13,7 @@ import { LatestPosts } from './LatestPosts'
 import { Card } from './Card'
 import { Grid } from './Grid'
 import { Form } from './Form'
+import { FeaturedSpas } from './FeaturedSpas'
 
 import {
   ArchiveBlock as ArchiveBlockType,
@@ -56,6 +57,7 @@ export const pageBlocks = [
   LatestPosts,
   Card,
   Grid,
+  FeaturedSpas,
 ]
 
 export const postBlocks = [
