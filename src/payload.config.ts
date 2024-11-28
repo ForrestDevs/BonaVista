@@ -8,8 +8,10 @@ import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
+import { payloadAiPlugin } from '@ai-stack/payloadcms';
+import { PayloadAiPluginLexicalEditorFeature } from '@ai-stack/payloadcms/fields'
 import { stripePlugin } from '@payloadcms/plugin-stripe'
-import { UnderlineFeature, IndentFeature, AlignFeature } from '@payloadcms/richtext-lexical'
+import { UnderlineFeature, IndentFeature, AlignFeature, OrderedListFeature, UnorderedListFeature } from '@payloadcms/richtext-lexical'
 import {
   BoldFeature,
   FixedToolbarFeature,
@@ -82,6 +84,9 @@ export default buildConfig({
     // This config helps us configure global or default features that the other editors can inherit
     features: () => {
       return [
+        // PayloadAiPluginLexicalEditorFeature(),
+        OrderedListFeature(),
+        UnorderedListFeature(),
         AlignFeature(),
         IndentFeature(),
         UnderlineFeature(),
@@ -208,6 +213,14 @@ export default buildConfig({
         region: process.env.S3_REGION || '',
       },
     }),
+    // payloadAiPlugin({
+    //   generatePromptOnInit: true,
+    //   collections: {
+    //     ["posts"]: true,
+    //     ["pages"]: true,
+    //   },
+    //   debugging: true,
+    // }),
   ],
   secret: process.env.PAYLOAD_SECRET || 'default',
   sharp,

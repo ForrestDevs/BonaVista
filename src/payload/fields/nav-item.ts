@@ -3,9 +3,7 @@ import type { Field } from 'payload'
 import deepMerge from '../utilities/deepMerge'
 import { MEDIA_SLUG, PAGE_SLUG } from '../collections/constants'
 
-type NavItemType = (options?: {
-  overrides?: Record<string, unknown>
-}) => Field
+type NavItemType = (options?: { overrides?: Record<string, unknown> }) => Field
 
 export const navItem: NavItemType = ({ overrides = {} } = {}) => {
   const linkFields: Field[] = [
@@ -54,81 +52,77 @@ export const navItem: NavItemType = ({ overrides = {} } = {}) => {
     },
   ]
 
-  const groupLinkFields: Field[] = [
-    {
-      name: 'title',
-      type: 'text',
-      label: 'Link Title',
-      required: true,
-    },
-    {
-      name: 'description',
-      type: 'textarea',
-      label: 'Link Description',
-    },
-    {
-      name: 'image',
-      type: 'upload',
-      relationTo: MEDIA_SLUG,
-      label: 'Link Image (optional)',
-    },
-    ...linkFields,
-  ]
-
   const navItemResult: Field = {
     name: 'navItem',
     type: 'group',
     fields: [
       {
-        name: 'type',
-        type: 'radio',
-        defaultValue: 'single',
-        options: [
-          {
-            label: 'Single Link',
-            value: 'single',
-          },
-          {
-            label: 'Link Group',
-            value: 'group',
-          },
-        ],
+        name: 'label',
+        type: 'text',
+        required: true,
       },
       {
-        name: 'singleLink',
+        name: 'isLink',
+        type: 'checkbox',
+        label: 'Is Link',
+        defaultValue: false,
+      },
+      {
+        name: 'link',
         type: 'group',
+        label: 'Link',
+        fields: linkFields,
         admin: {
-          condition: (_, siblingData) => siblingData?.type === 'single',
+          condition: (_, siblingData) => siblingData?.isLink,
         },
+      },
+      {
+        label: 'Submenu Items',
+        labels: {
+          singular: 'Submenu Item',
+          plural: 'Submenu Items',
+        },
+        admin: {
+          condition: (_, siblingData) => !siblingData?.isLink,
+        },
+        name: 'submenu',
+        type: 'array',
         fields: [
           {
             name: 'label',
             type: 'text',
-            label: 'Label',
-            required: true,
-          },
-          ...linkFields,
-        ],
-      },
-      {
-        name: 'linkGroup',
-        type: 'group',
-        admin: {
-          condition: (_, siblingData) => siblingData?.type === 'group',
-        },
-        fields: [
-          {
-            name: 'title',
-            type: 'text',
-            label: 'Group Title',
             required: true,
           },
           {
-            name: 'links',
+            name: 'isLink',
+            type: 'checkbox',
+            label: 'Is Link',
+            defaultValue: false,
+          },
+          {
+            name: 'link',
+            type: 'group',
+            label: 'Link',
+            fields: linkFields,
+            admin: {
+              condition: (_, siblingData) => siblingData?.isLink,
+            },
+          },
+          {
+            labels: {
+              singular: 'Sublink',
+              plural: 'Sublinks',
+            },
+            name: 'sublinks',
             type: 'array',
-            label: 'Links',
-            minRows: 1,
-            fields: groupLinkFields,
+            fields: [
+              {
+                name: 'label',
+                type: 'text',
+                required: true,
+              },
+              ...linkFields,
+            ],
           },
         ],
       },

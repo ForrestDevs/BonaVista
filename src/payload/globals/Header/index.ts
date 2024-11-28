@@ -20,7 +20,7 @@ export const Header: GlobalConfig = {
           fields: [
             {
               name: 'logo',
-              type: 'relationship',
+              type: 'upload',
               relationTo: 'media',
             },
             {

@@ -3,6 +3,8 @@ import * as NavigationMenuPrimitive from '@radix-ui/react-navigation-menu'
 import { cn } from '@/lib/utils/cn'
 import { OptimizedLink as Link } from '@/components/payload/Link/optimized-link'
 import { ChevronDown } from 'lucide-react'
+import { Header } from '@payload-types'
+import { CMSLink } from '@/components/payload/Link'
 
 type MenuItem = {
   label: string
@@ -136,38 +138,53 @@ const menuConfig: MenuConfig = {
   },
 }
 
-export const DesktopNav: React.FC<{ className?: string }> = ({ className }) => {
+export const DesktopNav: React.FC<{ className?: string; header: Header }> = ({
+  className,
+  header,
+}) => {
+  // console.log(header.siteHeader.navItems)
   return (
+    // <div className="flex gap-4">
+    //   {header.siteHeader.navItems.map((item) => (
+    //     <div key={item.navItem.label}>
+    //       <span>{item.navItem.label}</span>
+    //       {item.navItem.submenu.map((subItem) => (
+    //         <div key={subItem.label}>
+    //           <span>{subItem.label}</span>
+    //           {subItem.sublinks?.map((subSubItem) => (
+    //             <div key={subSubItem.label}>
+    //               <span>{subSubItem.label}</span>
+    //             </div>
+    //           ))}
+    //         </div>
+    //       ))}
+    //     </div>
+    //   ))}
+    // </div>
     <NavigationMenuPrimitive.Root className={className}>
       <NavigationMenuPrimitive.List className="flex flex-1 list-none items-center justify-center space-x-5 lg:space-x-6">
-        {Object.entries(menuConfig).map(([key, value]) => (
-          <NavigationMenuPrimitive.Item key={key}>
-            {value.submenu ? (
+        {header.siteHeader.navItems.map((item, index) => (
+          <NavigationMenuPrimitive.Item key={index}>
+            {item.navItem.submenu?.length > 0 ? (
               <>
-                <Trigger>{value.label}</Trigger>
+                <Trigger>{item.navItem.label}</Trigger>
                 <NavigationMenuPrimitive.Content className={submenusContentClass()}>
                   <NavigationMenuPrimitive.Sub className="w-full">
                     <NavigationMenuPrimitive.List className="flex flex-row gap-8 items-start justify-center h-fit">
-                      {value.submenu.map((item) => (
-                        <NavigationMenuPrimitive.Item key={item.label} className="relative">
+                      {item.navItem.submenu.map((subItem) => (
+                        <NavigationMenuPrimitive.Item key={subItem.label} className="relative">
                           <Trigger
-                            showChevron={item.submenu?.length > 0}
+                            showChevron={subItem.sublinks?.length > 0}
                             className="py-2 flex items-center gap-1 hover:underline font-medium"
                           >
-                            <Link href={item.href} className="text-gray-800">
-                              {item.label}
-                            </Link>
+                            <SingleLink link={subItem.link} title={subItem.label} variant="none" />
                           </Trigger>
-                          {item.submenu && (
+                          {subItem.sublinks && (
                             <NavigationMenuPrimitive.Content className="absolute top-full left-0 mt-8 p-4 bg-white shadow-lg border border-gray-200 min-w-[200px]">
                               <ul className="flex flex-col gap-2">
-                                {item.submenu.map((subItem) => (
-                                  <li key={subItem.label}>
-                                    <SingleLink
-                                      href={subItem.href}
-                                      title={subItem.label}
-                                      variant="sm"
-                                    />
+                                {subItem.sublinks.map((subLink) => (
+                                  <li key={subLink.label}>
+                                    <SingleLink link={subLink} title={subLink.label} variant="sm" />
                                   </li>
                                 ))}
                               </ul>
@@ -180,7 +197,7 @@ export const DesktopNav: React.FC<{ className?: string }> = ({ className }) => {
                 </NavigationMenuPrimitive.Content>
               </>
             ) : (
-              <SingleLink href={value.href} title={value.label} />
+              <SingleLink link={item.navItem.link} title={item.navItem.label} />
             )}
           </NavigationMenuPrimitive.Item>
         ))}
@@ -212,32 +229,33 @@ const Trigger = React.forwardRef<
 ))
 Trigger.displayName = NavigationMenuPrimitive.Trigger.displayName
 
-const SingleLink = React.forwardRef<
-  React.ComponentRef<typeof Link>,
-  React.ComponentPropsWithoutRef<typeof Link> & { variant?: 'sm' | 'md' | 'lg' }
->(({ href, title, variant = 'md', ...props }, ref) => {
+interface SingleLinkProps {
+  link: Header['siteHeader']['navItems'][number]['navItem']['link']
+  title: string
+  variant?: 'sm' | 'md' | 'lg' | 'none'
+}
+
+const SingleLink: React.FC<SingleLinkProps> = ({ link, title, variant = 'md' }) => {
   const sizeClasses = {
     sm: 'text-sm lg:text-base xl:text-lg',
     md: 'text-base lg:text-lg xl:text-xl',
     lg: 'text-lg lg:text-xl xl:text-2xl',
+    none: '',
   }
 
-  return (
-    <Link
-      ref={ref}
-      href={href}
-      className={cn(
-        'text-black hover:text-gray-700 transition-colors duration-200 relative group',
-        sizeClasses[variant],
-      )}
-      {...props}
-    >
-      {title}
-      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-200 group-hover:w-full"></span>
-    </Link>
+  const styleClasses = cn(
+    variant !== 'none'
+      ? 'text-black hover:text-gray-700 transition-colors duration-200 relative group'
+      : '',
+    sizeClasses[variant],
   )
-})
-SingleLink.displayName = 'SingleLink'
+
+  return (
+    <CMSLink {...link} label={title} className={styleClasses} isNavItem>
+      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-200 group-hover:w-full"></span>
+    </CMSLink>
+  )
+}
 
 const submenusContentClass = () =>
   cn(

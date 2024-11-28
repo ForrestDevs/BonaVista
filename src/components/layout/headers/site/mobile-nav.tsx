@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
-import { Menu as MenuIcon } from 'lucide-react'
+import { ChevronDown, Menu as MenuIcon } from 'lucide-react'
 import { Header } from '@payload-types'
 import {
   Accordion,
@@ -14,6 +14,7 @@ import {
 import { buttonVariants } from '@/components/ui/button'
 import Link from 'next/link'
 import { cn } from '@lib/utils/cn'
+import { CMSLink } from '@/components/payload/Link'
 
 export default function MobileNav({ header }: { header: Header }) {
   const [open, setOpen] = useState(false)
@@ -27,58 +28,100 @@ export default function MobileNav({ header }: { header: Header }) {
       </SheetTrigger>
 
       <SheetContent side="right" className="bg-blue-100">
-        <nav className="flex flex-col gap-6">
+        <nav className="flex flex-col gap-4 py-6">
           {header.siteHeader.navItems.map((item, index) => (
-            item.navItem.type === 'single' ? (
-              <Link
-                key={index}
-                href={item.navItem.singleLink.url || '/'}
-                className={cn(
-                  buttonVariants({
-                    size: 'sm',
-                    variant: 'link',
-                  }),
-                  'justify-start',
-                )}
-              >
-                {item.navItem.singleLink.label}
-              </Link>
-            ) : (
-              <Accordion type="single" collapsible key={index} className='mb-6'>
-                <AccordionItem value={item.navItem.linkGroup.title}>
-                  <AccordionTrigger
-                    className={cn(
-                      buttonVariants({
-                        size: 'sm',
-                        variant: 'link',
-                      }),
-                      'justify-between',
-                    )}
-                  >
-                    {item.navItem.linkGroup.title}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="flex flex-col gap-2 mt-6">
-                      {item.navItem.linkGroup.links.map((link, index) => (
-                        <Link
-                          key={index}
-                          href={link.url || '/'}
-                          className={cn(
-                            buttonVariants({
-                              size: 'sm',
-                              variant: 'link',
-                            }),
-                            'justify-start',
-                          )}
-                        >
-                          {link.title}
-                        </Link>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            )
+            <div key={index}>
+              {item.navItem.isLink ? (
+                <CMSLink
+                  {...item.navItem.link}
+                  className={cn(
+                    buttonVariants({
+                      variant: 'ghost',
+                      size: 'lg',
+                    }),
+                    'w-full justify-start font-medium',
+                  )}
+                  isNavItem
+                >
+                  {item.navItem.label}
+                </CMSLink>
+              ) : (
+                <Accordion type="single" collapsible>
+                  <AccordionItem value={item.navItem.label} className="border-none">
+                    <AccordionTrigger className="py-2 px-4 hover:bg-blue-50 rounded-lg font-medium">
+                      {item.navItem.label}
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-0">
+                      <div className="flex flex-col space-y-1 pl-4">
+                        {item.navItem.submenu?.map((subItem, subIndex) => (
+                          <div key={subIndex}>
+                            <div className="flex flex-col">
+                              <div className="flex flex-col">
+                                <div className="flex flex-col">
+                                  <div className="flex items-center justify-between py-2 px-4 hover:bg-blue-50 rounded-lg font-medium">
+                                    {subItem.isLink ? (
+                                      <CMSLink
+                                        {...subItem.link}
+                                        className={cn(
+                                          buttonVariants({
+                                            variant: 'ghost',
+                                            size: 'sm',
+                                          }),
+                                          'w-full justify-start font-medium'
+                                        )}
+                                        isNavItem
+                                      >
+                                        {subItem.label}
+                                      </CMSLink>
+                                    ) : (
+                                      <span>{subItem.label}</span>
+                                    )}
+                                    {subItem.sublinks && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          const content = e.currentTarget.parentElement?.nextElementSibling;
+                                          if (content) {
+                                            content.classList.toggle('hidden');
+                                          }
+                                        }}
+                                        className="p-1"
+                                      >
+                                        <ChevronDown className="h-4 w-4" />
+                                      </button>
+                                    )}
+                                  </div>
+                                  {subItem.sublinks && (
+                                    <div className="hidden pl-4 flex-col space-y-1">
+                                      {subItem.sublinks.map((sublink, sublinkIndex) => (
+                                        <CMSLink
+                                          key={sublinkIndex}
+                                          {...sublink}
+                                          className={cn(
+                                            buttonVariants({
+                                              variant: 'ghost',
+                                              size: 'sm',
+                                            }),
+                                            'w-full justify-start'
+                                          )}
+                                          isNavItem
+                                        >
+                                          {sublink.label}
+                                        </CMSLink>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              )}
+            </div>
           ))}
         </nav>
       </SheetContent>

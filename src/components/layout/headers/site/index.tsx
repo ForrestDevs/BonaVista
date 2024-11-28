@@ -20,7 +20,7 @@ export default async function MarketingHeader() {
             </Link>
           </div>
           <div className="col-span-1 items-center justify-center h-full hidden lg:flex">
-            <DesktopNav />
+            <DesktopNav header={header} />
           </div>
           <div className="col-span-1 flex items-center justify-end h-full">
             <MobileNav header={header} />

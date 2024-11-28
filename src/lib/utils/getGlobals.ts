@@ -6,7 +6,7 @@ type Global = keyof Config['globals']
 
 export async function getGlobal<T extends Global>(
   slug: T,
-  depth = 0,
+  depth = 1,
 ): Promise<Config['globals'][T] | null> {
   const payload = await getPayload()
 

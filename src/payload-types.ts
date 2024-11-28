@@ -713,8 +713,8 @@ export interface Post {
   categories?: (string | BlogCategory)[] | null;
   meta?: {
     title?: string | null;
-    image?: (string | null) | Media;
     description?: string | null;
+    image?: (string | null) | Media;
   };
   publishedAt?: string | null;
   authors?: (string | User)[] | null;
@@ -2707,8 +2707,8 @@ export interface PostsSelect<T extends boolean = true> {
     | T
     | {
         title?: T;
-        image?: T;
         description?: T;
+        image?: T;
       };
   publishedAt?: T;
   authors?: T;
@@ -3042,10 +3042,10 @@ export interface Header {
     logo?: (string | null) | Media;
     navItems?:
       | {
-          navItem?: {
-            type?: ('single' | 'group') | null;
-            singleLink?: {
-              label: string;
+          navItem: {
+            label: string;
+            isLink?: boolean | null;
+            link?: {
               type?: ('reference' | 'custom') | null;
               reference?: {
                 relationTo: 'pages';
@@ -3054,13 +3054,11 @@ export interface Header {
               url?: string | null;
               newTab?: boolean | null;
             };
-            linkGroup?: {
-              title: string;
-              links?:
-                | {
-                    title: string;
-                    description?: string | null;
-                    image?: (string | null) | Media;
+            submenu?:
+              | {
+                  label: string;
+                  isLink?: boolean | null;
+                  link?: {
                     type?: ('reference' | 'custom') | null;
                     reference?: {
                       relationTo: 'pages';
@@ -3068,10 +3066,23 @@ export interface Header {
                     } | null;
                     url?: string | null;
                     newTab?: boolean | null;
-                    id?: string | null;
-                  }[]
-                | null;
-            };
+                  };
+                  sublinks?:
+                    | {
+                        label: string;
+                        type?: ('reference' | 'custom') | null;
+                        reference?: {
+                          relationTo: 'pages';
+                          value: string | Page;
+                        } | null;
+                        url?: string | null;
+                        newTab?: boolean | null;
+                        id?: string | null;
+                      }[]
+                    | null;
+                  id?: string | null;
+                }[]
+              | null;
           };
           id?: string | null;
         }[]
@@ -3201,32 +3212,40 @@ export interface HeaderSelect<T extends boolean = true> {
               navItem?:
                 | T
                 | {
-                    type?: T;
-                    singleLink?:
+                    label?: T;
+                    isLink?: T;
+                    link?:
                       | T
                       | {
-                          label?: T;
                           type?: T;
                           reference?: T;
                           url?: T;
                           newTab?: T;
                         };
-                    linkGroup?:
+                    submenu?:
                       | T
                       | {
-                          title?: T;
-                          links?:
+                          label?: T;
+                          isLink?: T;
+                          link?:
                             | T
                             | {
-                                title?: T;
-                                description?: T;
-                                image?: T;
+                                type?: T;
+                                reference?: T;
+                                url?: T;
+                                newTab?: T;
+                              };
+                          sublinks?:
+                            | T
+                            | {
+                                label?: T;
                                 type?: T;
                                 reference?: T;
                                 url?: T;
                                 newTab?: T;
                                 id?: T;
                               };
+                          id?: T;
                         };
                   };
               id?: T;
