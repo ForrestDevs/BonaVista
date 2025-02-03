@@ -1,9 +1,13 @@
-/** @type {import('tailwindcss').Config} */
+import { type Config } from 'tailwindcss'
 
-module.exports = {
+export default {
   content: ['./src/components/**/*.{ts,tsx}', './src/app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}'],
-  darkMode: ['selector', '[data-theme="dark"]', '.dark'],
-  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
+  darkMode: ['class'],
+  plugins: [
+    require('tailwindcss-animate'),
+    require('@tailwindcss/typography'),
+    require('tailwind-scrollbar'),
+  ],
   prefix: '',
   safelist: [
     'lg:col-span-4',
@@ -120,4 +124,4 @@ module.exports = {
       }),
     },
   },
-}
+} satisfies Config

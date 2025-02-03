@@ -120,8 +120,8 @@ export const MediaListClient: React.FC<MediaListClientProps> = ({
   const openBulkUpload = useCallback(() => {
     setCollectionSlug(collectionSlug)
     openModal(drawerSlug)
-    setOnSuccess(() => router.refresh())
-  }, [router, collectionSlug, drawerSlug, openModal, setCollectionSlug, setOnSuccess])
+    // setOnSuccess(() => router.refresh())
+  }, [collectionSlug, drawerSlug, openModal, setCollectionSlug])
 
   // useEffect(() => {
   //   if (drawerDepth <= 1) {

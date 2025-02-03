@@ -1,6 +1,7 @@
 import { CollectionConfig } from 'payload'
 import { admins, anyone } from '@payload/access'
 import { CART_SLUG, ADDRESS_SLUG, CUSTOMER_SLUG } from '../constants'
+import Stripe from 'stripe'
 
 const Cart: CollectionConfig = {
   slug: CART_SLUG,
@@ -22,16 +23,14 @@ const Cart: CollectionConfig = {
       hasMany: false,
     },
     {
+      label: 'Billing Address',
       name: 'billing_address',
-      type: 'relationship',
-      relationTo: ADDRESS_SLUG,
-      hasMany: false,
+      type: 'text',
     },
     {
+      label: 'Shipping Address',
       name: 'shipping_address',
-      type: 'relationship',
-      relationTo: ADDRESS_SLUG,
-      hasMany: false,
+      type: 'text',
     },
     {
       label: 'Items',
@@ -46,12 +45,30 @@ const Cart: CollectionConfig = {
               name: 'product',
               type: 'relationship',
               relationTo: 'products',
+              hasMany: false,
+              required: true,
+            },
+            {
+              name: 'isVariant',
+              type: 'checkbox',
+              defaultValue: false,
             },
             {
               name: 'variant',
-              type: 'text',
+              type: 'array',
+              fields: [
+                {
+                  name: 'option',
+                  type: 'text',
+                },
+              ],
             },
           ],
+        },
+        {
+          name: 'price',
+          type: 'number',
+          required: true,
         },
         {
           name: 'quantity',
@@ -60,12 +77,18 @@ const Cart: CollectionConfig = {
             step: 1,
           },
           min: 0,
+          required: true,
         },
         {
           name: 'url',
           type: 'text',
         },
       ],
+    },
+    {
+      name: 'payment_intent',
+      type: 'json',
+      required: true,
     },
     {
       name: 'payment_id',
@@ -108,6 +131,10 @@ const Cart: CollectionConfig = {
         { label: 'Payment Link', value: 'payment_link' },
         { label: 'Claim', value: 'claim' },
       ],
+    },
+    {
+      name: 'taxCalculationId',
+      type: 'text',
     },
     {
       name: 'completed_at',

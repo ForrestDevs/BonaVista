@@ -5,22 +5,21 @@ import type { User } from '@payload-types'
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { createUser, loginUser, getCurrentUser, resetPassword, forgotPassword } from './actions'
 
-// eslint-disable-next-line no-unused-vars
 export type ResetPassword = (args: {
   password: string
   passwordConfirm: string
   token: string
 }) => Promise<void>
 
-export type ForgotPassword = (args: { email: string }) => Promise<void> // eslint-disable-line no-unused-vars
+export type ForgotPassword = (args: { email: string }) => Promise<void> 
 
 export type Create = (args: {
   email: string
   password: string
   passwordConfirm: string
-}) => Promise<User | null> // eslint-disable-line no-unused-vars
+}) => Promise<User | null> 
 
-export type Login = (args: { email: string; password: string }) => Promise<User> // eslint-disable-line no-unused-vars
+export type Login = (args: { email: string; password: string }) => Promise<User>
 
 export type Logout = () => Promise<void>
 
@@ -30,7 +29,7 @@ export type AuthContext = {
   login: Login
   logout: Logout
   resetPassword: ResetPassword
-  setUser: (user: User | null) => void // eslint-disable-line no-unused-vars
+  setUser: (user: User | null) => void 
   status: 'loggedIn' | 'loggedOut' | undefined
   user?: User | null
 }
@@ -126,11 +125,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(meUser || null)
           setStatus(meUser ? 'loggedIn' : undefined)
         } else {
-          throw new Error('An error occurred while fetching your account.')
+          // throw new Error('An error occurred while fetching your account.')
         }
       } catch (e) {
         setUser(null)
-        throw new Error('An error occurred while fetching your account.')
+        // throw new Error('An error occurred while fetching your account.')
       }
     }
 
@@ -208,6 +207,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   )
 }
 
-type UseAuth<T = User> = () => AuthContext // eslint-disable-line no-unused-vars
+type UseAuth<T = User> = () => AuthContext
 
 export const useAuth: UseAuth = () => useContext(Context)

@@ -19,7 +19,7 @@ type PageProps = {
 export default async function ShopSwimSpasHome({ searchParams }: PageProps) {
   const [payload, page, { search, seats, price, collections }, { docs }] = await Promise.all([
     getPayload(),
-    queryPageBySlug({ slug: 'shop-swim-spas' }),
+    queryPageBySlug('shop-swim-spas'),
     filterParamsCache.parse(searchParams),
     (await getPayload()).find({
       collection: 'spas',
@@ -30,8 +30,6 @@ export default async function ShopSwimSpasHome({ searchParams }: PageProps) {
       limit: 25,
     }),
   ])
-
-  console.log(page.layout)
 
   const filterSpas = (
     docs: Spa[],

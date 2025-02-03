@@ -19,11 +19,6 @@ export const Header: GlobalConfig = {
           label: 'Site Header',
           fields: [
             {
-              name: 'logo',
-              type: 'upload',
-              relationTo: 'media',
-            },
-            {
               name: 'navItems',
               type: 'array',
               fields: [navItem()],
@@ -38,11 +33,7 @@ export const Header: GlobalConfig = {
             {
               name: 'navItems',
               type: 'array',
-              fields: [
-                link({
-                  appearances: false,
-                }),
-              ],
+              fields: [navItem()],
               maxRows: 6,
             },
           ],

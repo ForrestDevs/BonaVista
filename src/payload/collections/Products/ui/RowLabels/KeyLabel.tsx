@@ -1,10 +1,10 @@
 'use client'
-import { useRowLabel } from '@payloadcms/ui'
+import { RowLabelProps, useRowLabel } from '@payloadcms/ui'
 import React, { useEffect, useState } from 'react'
 
 import type { OptionKey } from '../types'
 
-export default function KeyLabel() {
+export const KeyLabel: React.FC<RowLabelProps> = () => {
   const { data, rowNumber } = useRowLabel<OptionKey>()
   const [label, setLabel] = useState(`Key ${rowNumber}`)
 

@@ -127,6 +127,7 @@ async function getBaseProducts({ slug, searchValue }: BaseProductsProps) {
       SHOP_COLLECTION_SLUG,
       slug,
     )
+    console.log('collection', collection)
     if (!collection) {
       notFound()
     }

@@ -1,26 +1,51 @@
 import 'server-only'
-
 import { cookies } from 'next/headers'
+import { safeJsonParse } from '@lib/utils/safeJSONParse'
 
-export async function getCartCookie(): Promise<string | null> {
-  const cookiestore = await cookies()
-  const value = cookiestore.get('_cart_id')?.value
+export const CART_COOKIE = '_cart_id'
 
-  if (!value) {
+export type CartCookieJson = { id: string; linesCount: number }
+
+// export async function getCartCookie(): Promise<string | null> {
+//   const cookiestore = await cookies()
+//   const value = cookiestore.get('_cart_id')?.value
+
+//   if (!value) {
+//     return null
+//   }
+
+//   return value
+// }
+
+export async function getCartCookie(): Promise<null | CartCookieJson> {
+  const cookiesValue = await cookies()
+  const cartCookieJson = safeJsonParse(cookiesValue.get(CART_COOKIE)?.value)
+
+  if (
+    !cartCookieJson ||
+    typeof cartCookieJson !== 'object' ||
+    !('id' in cartCookieJson) ||
+    !('linesCount' in cartCookieJson) ||
+    typeof cartCookieJson.id !== 'string' ||
+    typeof cartCookieJson.linesCount !== 'number'
+  ) {
     return null
   }
-
-  return value
+  return cartCookieJson as CartCookieJson
 }
 
-export const setCartCookie = async (cartId: string) => {
+export const setCartCookie = async (cartCookieJson: CartCookieJson) => {
   const cookiestore = await cookies()
-  cookiestore.set('_cart_id', cartId, {
-    maxAge: 60 * 60 * 24 * 7, // This is 7 days in seconds (604800 seconds)
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'production',
-  })
+  try {
+    cookiestore.set(CART_COOKIE, JSON.stringify(cartCookieJson), {
+      maxAge: 60 * 60 * 24 * 7, // This is 7 days in seconds (604800 seconds)
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    })
+  } catch (error) {
+    console.error('Failed to set cart cookie', error)
+  }
 }
 
 export const removeCartCookie = async () => {
@@ -29,3 +54,9 @@ export const removeCartCookie = async () => {
   const cookiestore = await cookies()
   cookiestore.delete('_cart_id')
 }
+
+// export async function clearCartCookie(): Promise<void> {
+// 	(await cookies()).set(CART_COOKIE, "", {
+// 		maxAge: 0,
+// 	});
+// }

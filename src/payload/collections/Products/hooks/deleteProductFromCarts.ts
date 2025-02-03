@@ -1,39 +1,33 @@
-// import type { CollectionAfterDeleteHook } from 'payload'
+import type { CollectionAfterDeleteHook } from 'payload'
 
-// import type { Product } from '@payload-types'
+import type { Product } from '@/payload-types'
 
-// export const deleteProductFromCarts: CollectionAfterDeleteHook<Product> = async ({ id, req }) => {
-//   const usersWithProductInCart = await req.payload.find({
-//     collection: 'users',
-//     overrideAccess: true,
-//     where: {
-//       'cart.items.product': {
-//         equals: id,
-//       },
-//     },
-//   })
+export const deleteProductFromCarts: CollectionAfterDeleteHook<Product> = async ({ id, req }) => {
+  const cartsWithProductInCart = await req.payload.find({
+    collection: 'cart',
+    overrideAccess: true,
+    where: {
+      'items.product': {
+        equals: id,
+      },
+    },
+  })
 
-//   if (usersWithProductInCart.totalDocs > 0) {
-//     await Promise.all(
-//       usersWithProductInCart.docs.map(async (user) => {
-//         const cart = user.cart
-//         const itemsWithoutProduct = cart?.items?.filter((item) => item.product !== id)
-//         const cartWithoutProduct = {
-//           ...cart,
-//           items: itemsWithoutProduct?.map(item => ({
-//             ...item,
-//             product: typeof item.product === 'string' ? item.product : item.product?.id
-//           }))
-//         }
+  if (cartsWithProductInCart.totalDocs > 0) {
+    await Promise.all(
+      cartsWithProductInCart.docs.map(async (cart) => {
+        if (cart?.items?.length) {
+          const itemsWithoutProduct = cart.items.filter((item) => item.product !== id)
 
-//         return req.payload.update({
-//           id: user.id,
-//           collection: 'users',
-//           data: {
-//             cart: cartWithoutProduct,
-//           },
-//         })
-//       }),
-//     )
-//   }
-// }
+          return req.payload.update({
+            id: cart.id,
+            collection: 'cart',
+            data: {
+              items: itemsWithoutProduct,
+            },
+          })
+        }
+      }),
+    )
+  }
+}

@@ -84,13 +84,10 @@ const Customers: CollectionConfig = {
       },
       label: 'Skip Sync',
     },
-
     {
       label: 'Billing Address',
       name: 'billing_address',
-      type: 'relationship',
-      relationTo: ADDRESS_SLUG,
-      hasMany: false,
+      type: 'json',
     },
     {
       label: {
@@ -98,9 +95,13 @@ const Customers: CollectionConfig = {
         plural: 'Shipping Addresses',
       },
       name: 'shipping_addresses',
-      type: 'relationship',
-      relationTo: ADDRESS_SLUG,
-      hasMany: true,
+      type: 'array',
+      fields: [
+        {
+          name: 'address',
+          type: 'json',
+        },
+      ],
     },
     {
       name: 'orders',

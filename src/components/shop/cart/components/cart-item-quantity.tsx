@@ -27,12 +27,12 @@ export function CartItemQuantity({ item }: CartItemQuantityProps) {
 
   const handleDecreaseQuantity = () => {
     setOptimisticQuantity(-1)
-    decreaseCartItemQuantity(item.id)
+    // decreaseCartItemQuantity(item.id)
   }
 
   const handleIncreaseQuantity = () => {
     setOptimisticQuantity(1)
-    increaseCartItemQuantity(item.id, 1)
+    // increaseCartItemQuantity(item.id, 1)
   }
 
   return (

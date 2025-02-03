@@ -20,7 +20,7 @@ export function CartPreview({ items }: CartPreviewProps) {
       })}
     >
       <Table>
-        <TableBody data-testid="items-table">
+        <TableBody>
           {items
             ? items
                 .sort((a, b) => {

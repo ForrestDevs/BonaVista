@@ -1,7 +1,7 @@
 'use client'
-
+import { RowLabelProps, useRowLabel } from '@payloadcms/ui'
 import React, { useEffect, useState } from 'react'
-import { useRowLabel } from '@payloadcms/ui'
+
 import type { InfoType } from '../types'
 
 type RowData = {
@@ -12,7 +12,7 @@ type RowData = {
   stripeProductID: string
 }
 
-export default function VariantLabel() {
+export const VariantLabel: React.FC<RowLabelProps> = () => {
   const { data, rowNumber } = useRowLabel<RowData>()
   const [label, setLabel] = useState(`Variant ${rowNumber}`)
 
@@ -23,7 +23,7 @@ export default function VariantLabel() {
       const labels: string[] = []
 
       info.options.forEach((option) => {
-        labels.push(option.label)
+        if (option.label) labels.push(option.label)
       })
 
       setLabel(labels.join(' '))

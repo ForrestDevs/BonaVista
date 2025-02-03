@@ -121,7 +121,7 @@ export async function register(data: RegisterSchema) {
   }
 }
 
-export async function getCurrentUser() {
+export async function getCurrentUser(): Promise<User | null> {
   const payload = await getPayload()
   const headers = await getHeaders()
 

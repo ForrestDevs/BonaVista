@@ -39,9 +39,52 @@ export const ProductCollection: CollectionConfig = {
       required: true,
     },
     {
+      type: 'select',
+      name: 'collectionType',
+      options: [
+        {
+          label: 'Seasonal',
+          value: 'seasonal',
+        },
+        {
+          label: 'Promotional',
+          value: 'promotional',
+        },
+        {
+          label: 'Curated',
+          value: 'curated',
+        },
+      ],
+      required: true,
+      admin: {
+        description: 'The collection type determines how the products are displayed.',
+      }
+    },
+    {
       label: 'Description',
       name: 'description',
       type: 'text',
+    },
+    {
+      type: 'number',
+      name: 'priority',
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'startDate',
+      type: 'date',
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'endDate',
+      type: 'date',
+      admin: {
+        position: 'sidebar',
+      },
     },
     {
       name: 'publishedOn',
@@ -66,3 +109,5 @@ export const ProductCollection: CollectionConfig = {
   ],
   timestamps: true,
 } as const
+
+export default ProductCollection

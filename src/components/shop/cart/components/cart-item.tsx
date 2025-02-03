@@ -47,7 +47,7 @@ export function CartItem({ item, type = 'full' }: ItemProps) {
     : product.baseProduct.price
 
   return (
-    <TableRow className="w-full" data-testid="product-row">
+    <TableRow className="w-full">
       <TableCell className="!pl-0 p-4 w-24">
         <YnsLink
           href={`/products/${product.slug}`}
@@ -56,12 +56,12 @@ export function CartItem({ item, type = 'full' }: ItemProps) {
             'small:w-24 w-12': type === 'full',
           })}
         >
-          <Media resource={product.gallery[0].image} size="sm" />
+          {/* <Media resource={product.gallery[0].image} size="sm" /> */}
         </YnsLink>
       </TableCell>
 
       <TableCell className="text-left">
-        <span className="text-base font-medium text-gray-900" data-testid="product-title">
+        <span className="text-base font-medium text-gray-900">
           {product.title}
         </span>
         {/* <LineItemOptions variant={item.variant} data-testid="product-variant" /> */}

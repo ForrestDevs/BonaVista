@@ -9,7 +9,7 @@ import { queryPageBySlug } from '@/lib/utils/queryPageBySlug'
 
 export default async function GalleryHome() {
   const payload = await getPayload()
-  const page = await queryPageBySlug({ slug: 'gallery' })
+  const page = await queryPageBySlug('gallery')
   const { docs } = await payload.find({
     collection: 'galleries',
     depth: 1,

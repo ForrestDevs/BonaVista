@@ -17,29 +17,61 @@ const Orders: CollectionConfig = {
   admin: {
     group: 'Shop',
     defaultColumns: ['createdAt', 'orderedBy'],
-    preview: (doc) => `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/orders/${doc.id}`,
+    // preview: (doc) => `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/orders/${doc.id}`,
     useAsTitle: 'createdAt',
   },
   fields: [
     {
+      name: 'status',
+      type: 'select',
+      options: [
+        'canceled',
+        'processing',
+        'requires_action',
+        'requires_capture',
+        'requires_confirmation',
+        'requires_payment_method',
+        'succeeded',
+      ],
+      defaultValue: 'requires_action',
+    },
+    {
       name: 'orderedBy',
       type: 'relationship',
+      relationTo: CUSTOMER_SLUG,
       // hooks: {
       //   beforeChange: [populateOrderedBy],
       // },
-      relationTo: CUSTOMER_SLUG,
     },
     {
       name: 'stripePaymentIntentID',
       type: 'text',
       admin: {
         components: {
-          Field: "src/payload/collections/Orders/ui/LinkToPaymentIntent"
+          Field: 'src/payload/collections/Orders/ui/LinkToPaymentIntent',
           // Field: LinkToPaymentIntent,
         },
         position: 'sidebar',
       },
       label: 'Stripe Payment Intent ID',
+    },
+    {
+      name: 'shippingRate',
+      type: 'group',
+      fields: [
+        {
+          name: 'displayName',
+          type: 'text',
+        },
+        {
+          name: 'rate',
+          type: 'number',
+        },
+      ],
+      admin: {
+        position: 'sidebar',
+      },
+      label: 'Shipping Rate',
     },
     {
       type: 'row',
@@ -58,6 +90,7 @@ const Orders: CollectionConfig = {
       ],
     },
     {
+      label: 'Items',
       name: 'items',
       type: 'array',
       fields: [
@@ -68,24 +101,53 @@ const Orders: CollectionConfig = {
               name: 'product',
               type: 'relationship',
               relationTo: 'products',
+              hasMany: false,
               required: true,
             },
             {
+              name: 'isVariant',
+              type: 'checkbox',
+              defaultValue: false,
+            },
+            {
               name: 'variant',
-              type: 'text',
+              type: 'array',
+              fields: [
+                {
+                  name: 'option',
+                  type: 'text',
+                },
+              ],
             },
           ],
         },
         {
+          name: 'price',
+          type: 'number',
+          required: true,
+        },
+        {
           name: 'quantity',
           type: 'number',
+          admin: {
+            step: 1,
+          },
           min: 0,
+          required: true,
+        },
+        {
+          name: 'url',
+          type: 'text',
         },
       ],
     },
+    {
+      name: 'paymentIntent',
+      type: 'json',
+    },
   ],
   hooks: {
-    afterChange: [updateUserOrders, clearUserCart],
+    // afterChange: [updateUserOrders, clearUserCart],
   },
 } as const
 

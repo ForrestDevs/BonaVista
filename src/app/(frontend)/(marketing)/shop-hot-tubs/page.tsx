@@ -19,7 +19,7 @@ type PageProps = {
 export default async function ShopHotTubsHome({ searchParams }: PageProps) {
   const [payload, page, { search, seats, price, collections }, { docs }] = await Promise.all([
     getPayload(),
-    queryPageBySlug({ slug: 'shop-hot-tubs' }),
+    queryPageBySlug('shop-hot-tubs'),
     filterParamsCache.parse(searchParams),
     (await getPayload()).find({
       collection: 'spas',

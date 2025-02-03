@@ -2,33 +2,34 @@
 
 import classes from './index.module.scss'
 
+import type { Product } from '@/payload-types'
+import type { TextFieldClientProps } from 'payload'
+import { toKebabCase } from '@/lib/utils/toKebabCase'
+import { getTranslation } from '@payloadcms/translations'
+import { useField, useForm, useFormFields, useTranslation } from '@payloadcms/ui'
 import React, { useCallback } from 'react'
+import { sortOptionsByKey } from '../../utilities/sortOptionsByKey'
+import type { InfoType, RadioGroupProps } from '../types'
 
-import type { TextField } from 'payload'
-import { toKebabCase } from '@lib/utils/toKebabCase'
-// import { getTranslation } from '@payloadcms/translations'
-import type { EnsuredProduct, InfoType, RadioGroupProps } from '../types'
-import { sortOptionsByKey } from '@payload/collections/Products/utilities/sortOptionsByKey'
-import { useField, useForm, useFormFields, useTranslation, useParams } from '@payloadcms/ui'
+export const VariantSelect: React.FC<TextFieldClientProps> = (props) => {
+  const {
+    field: { label },
+    path,
+  } = props
 
-export default function VariantSelect(props: TextField) {
-  const { label } = props
-  const { path } = useParams()
-  const sanitizedPath = path.toString()
-  // const { path } = useField()
-  const { setValue, value } = useField<string[]>({ path: sanitizedPath })
-  const [variantPath] = sanitizedPath.split(/\.(?=[^.]+$)/)
+  const { setValue, value } = useField<string[]>({ path })
+  const [variantPath] = path.split(/\.(?=[^.]+$)/)
   const { getDataByPath } = useForm()
-  // const variantInfoPath = path.includes('.') ? variantPath + '.info' : 'info'
+  const variantInfoPath = path.includes('.') ? variantPath + '.info' : 'info'
 
-  const keys: EnsuredProduct['variants']['options'] = getDataByPath('variants.options')
+  const keys: any = getDataByPath('variants.options')
 
-  // const { dispatchFields } = useFormFields(([dispatchFields]) => ({
-  //   dispatchFields,
-  //   // infoField: fields[variantInfoPath],
-  // }))
+  const { dispatchFields, infoField } = useFormFields(([fields, dispatchFields]) => ({
+    dispatchFields,
+    infoField: fields[variantInfoPath],
+  }))
 
-  // const variantInfo = infoField.value
+  const variantInfo = infoField.value
 
   const { i18n } = useTranslation()
 
@@ -38,7 +39,7 @@ export default function VariantSelect(props: TextField) {
 
       newValue.forEach((value: string) => {
         keys.forEach((group) => {
-          group.values?.forEach((option) => {
+          group.values.forEach((option) => {
             if (option.slug === value) {
               options.push({
                 slug: option.slug,
@@ -53,22 +54,22 @@ export default function VariantSelect(props: TextField) {
         })
       })
 
-      // const existingVariantInfo = variantInfo ? (variantInfo as InfoType) : {}
+      const existingVariantInfo = variantInfo ? (variantInfo as InfoType) : {}
 
-      // const newVariantInfo: Partial<InfoType> = {
-      //   ...existingVariantInfo,
-      //   options,
-      // }
+      const newVariantInfo: Partial<InfoType> = {
+        ...existingVariantInfo,
+        options,
+      }
 
-      // dispatchFields({
-      //   type: 'UPDATE',
-      //   path: variantInfoPath,
-      //   value: newVariantInfo,
-      // })
+      dispatchFields({
+        type: 'UPDATE',
+        path: variantInfoPath,
+        value: newVariantInfo,
+      })
 
       setValue(newValue)
     },
-    [setValue, keys],
+    [variantInfo, dispatchFields, variantInfoPath, setValue, keys],
   )
 
   return (
@@ -80,15 +81,15 @@ export default function VariantSelect(props: TextField) {
             return (
               <div className={classes.group} key={toKebabCase(key.slug)}>
                 <div className={classes.groupLabel}>
-                  {/* {getTranslation(key.label, i18n)}{' '} */}
+                  {getTranslation(key.label, i18n)}{' '}
                   <span className={classes.requiredIndicator}>*</span>
                 </div>
                 <div className={classes.groupItems}>
                   <RadioGroup
                     fullArray={keys}
-                    group={key as EnsuredProduct['variants']['options'][number]}
-                    options={key.values ?? []}
-                    path={sanitizedPath}
+                    group={key}
+                    options={key.values}
+                    path={path}
                     setValue={handleUpdate}
                     value={value}
                   />
@@ -146,7 +147,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
               type="radio"
               value={item.slug}
             />
-            {/* <label htmlFor={id}>{getTranslation(item.label, i18n)} </label> */}
+            <label htmlFor={id}>{getTranslation(item.label, i18n)} </label>
           </div>
         )
       })}

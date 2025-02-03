@@ -23,7 +23,7 @@ type Props = BaseProps & (PriceFixed | PriceRange)
 const Price = ({
   amount,
   className,
-  currencyCode = 'USD',
+  currencyCode = 'CAD',
   highestAmount,
   lowestAmount,
 }: Props & React.ComponentProps<'p'>) => {
@@ -34,7 +34,7 @@ const Price = ({
           currency: currencyCode,
           currencyDisplay: 'narrowSymbol',
           style: 'currency',
-        }).format(amount / 100)}`}
+        }).format(amount)}`}
       </p>
     )
   }
@@ -46,11 +46,11 @@ const Price = ({
           currency: currencyCode,
           currencyDisplay: 'narrowSymbol',
           style: 'currency',
-        }).format(lowestAmount / 100)} - ${new Intl.NumberFormat(undefined, {
+        }).format(lowestAmount)} - ${new Intl.NumberFormat(undefined, {
           currency: currencyCode,
           currencyDisplay: 'narrowSymbol',
           style: 'currency',
-        }).format(highestAmount / 100)}`}
+        }).format(highestAmount)}`}
       </p>
     )
   }
@@ -62,7 +62,7 @@ const Price = ({
             currency: currencyCode,
             currencyDisplay: 'narrowSymbol',
             style: 'currency',
-          }).format(lowestAmount / 100)}`
+          }).format(lowestAmount)}`
         : 'Price not available'}
     </p>
   )

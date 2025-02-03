@@ -44,7 +44,7 @@ export default function Register({ setCurrentView }: Props) {
   }, [state, router])
 
   return (
-    <div className="max-w-sm w-full flex flex-col items-center" data-testid="register-page">
+    <div className="max-w-sm w-full flex flex-col items-center">
       <h1 className="text-large-semi uppercase mb-6">Create an Account</h1>
       <p className="text-center text-base-regular text-ui-fg-base mb-8">
         Sign up to enjoy an enhanced shopping experience.
@@ -59,7 +59,7 @@ export default function Register({ setCurrentView }: Props) {
               <FormItem>
                 <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <Input {...field} type="text" data-testid="firstName-input" />
+                  <Input {...field} type="text" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -72,7 +72,7 @@ export default function Register({ setCurrentView }: Props) {
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input {...field} type="text" data-testid="lastName-input" />
+                  <Input {...field} type="text"/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -85,7 +85,7 @@ export default function Register({ setCurrentView }: Props) {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input {...field} type="email" data-testid="email-input" />
+                  <Input {...field} type="email" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -98,7 +98,7 @@ export default function Register({ setCurrentView }: Props) {
               <FormItem>
                 <FormLabel>Phone</FormLabel>
                 <FormControl>
-                  <Input {...field} type="tel" data-testid="phone-input" />
+                  <Input {...field} type="tel" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -111,7 +111,7 @@ export default function Register({ setCurrentView }: Props) {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input {...field} type="password" data-testid="password-input" />
+                  <Input {...field} type="password"/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -124,14 +124,14 @@ export default function Register({ setCurrentView }: Props) {
               <FormItem>
                 <FormLabel>Confirm Password</FormLabel>
                 <FormControl>
-                  <Input {...field} type="password" data-testid="passwordConfirm-input" />
+                  <Input {...field} type="password" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           {state.status === 'error' && (
-            <p className="text-red-500 text-sm mt-2" data-testid="register-error-message">
+            <p className="text-red-500 text-sm mt-2">
               {state.message}
             </p>
           )}
@@ -150,7 +150,7 @@ export default function Register({ setCurrentView }: Props) {
             type="submit"
             className="w-full mt-6"
             disabled={isPending || !form.formState.isValid}
-            data-testid="register-button"
+
           >
             {isPending ? 'Creating Account...' : 'Create Account'}
           </Button>
@@ -162,7 +162,7 @@ export default function Register({ setCurrentView }: Props) {
         <button
           onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
           className="underline"
-          data-testid="login-button"
+          
         >
           Sign in
         </button>

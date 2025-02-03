@@ -23,7 +23,7 @@ export function CartTotals({ cart }: { cart: Cart }) {
               </TooltipContent>
             </TooltipProvider> */}
           </span>
-          <span data-testid="cart-subtotal" data-value={subtotal || 0}>
+          <span>
             {/* {getAmount(subtotal)} */}
           </span>
         </div>
@@ -32,8 +32,7 @@ export function CartTotals({ cart }: { cart: Cart }) {
             <span>Discount</span>
             <span
               className="text-ui-fg-interactive"
-              data-testid="cart-discount"
-              data-value={discount_total || 0}
+             
             >
               {/* - {getAmount(discount_total)} */}
             </span>
@@ -41,13 +40,13 @@ export function CartTotals({ cart }: { cart: Cart }) {
         )}
         <div className="flex items-center justify-between">
           <span>Shipping</span>
-          <span data-testid="cart-shipping" data-value={shipping_total || 0}>
+          <span>
             {/* {getAmount(shipping_total)} */}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="flex gap-x-1 items-center ">Taxes</span>
-          <span data-testid="cart-taxes" data-value={tax_total || 0}>
+          <span>
             {/* {getAmount(tax_total)} */}
           </span>
         </div>
@@ -55,7 +54,7 @@ export function CartTotals({ cart }: { cart: Cart }) {
       <div className="h-px w-full border-b border-muted my-4" />
       <div className="flex items-center justify-between text-ui-fg-base mb-2 txt-medium ">
         <span>Total</span>
-        <span className="txt-xlarge-plus" data-testid="cart-total" data-value={total || 0}>
+        <span className="txt-xlarge-plus">
           {/* {getAmount(total)} */}
         </span>
       </div>

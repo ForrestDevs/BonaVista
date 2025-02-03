@@ -14,7 +14,6 @@ type FilterRadioGroupProps = {
   }[]
   value: any
   handleChange: (...args: any[]) => void
-  'data-testid'?: string
 }
 
 const FilterRadioGroup = ({
@@ -22,13 +21,12 @@ const FilterRadioGroup = ({
   items,
   value,
   handleChange,
-  'data-testid': dataTestId,
 }: FilterRadioGroupProps) => {
   return (
     <div className="flex gap-x-3 flex-col gap-y-3">
       <h1>{title}</h1>
       {/* <Text className="txt-compact-small-plus text-ui-fg-muted">{title}</Text> */}
-      <RadioGroup data-testid={dataTestId}>
+      <RadioGroup>
         {items?.map((i) => (
           <div
             key={i.value}
@@ -53,7 +51,6 @@ const FilterRadioGroup = ({
                   'text-ui-fg-base': i.value === value,
                 },
               )}
-              data-testid="radio-label"
               data-active={i.value === value}
             >
               {i.label}

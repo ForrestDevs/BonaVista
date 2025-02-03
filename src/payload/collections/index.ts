@@ -16,6 +16,8 @@ import Spas from './Spas'
 import Galleries from './Galleries'
 import MediaFolder from './MediaFolder'
 import FormSubmissions from './FormSubmissions'
+import ProductCollection from './ProductCollection'
+import { ShippingOptions } from './ShippingOption'
 
 export const collections = [
   Address,
@@ -29,6 +31,7 @@ export const collections = [
   Pages,
   Posts,
   ProductCategory,
+  ProductCollection,
   Brands,
   Customers,
   Testimonials,
@@ -36,6 +39,7 @@ export const collections = [
   Galleries,
   MediaFolder,
   FormSubmissions,
+  ShippingOptions,
 ]
 
 export default collections

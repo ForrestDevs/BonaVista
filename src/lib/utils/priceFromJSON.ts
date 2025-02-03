@@ -22,7 +22,7 @@ export const priceFromJSON = (priceJSON: string, quantity: number = 1, raw?: boo
         }`
       }
     } catch (e) {
-      console.error(`Cannot parse priceJSON`) // eslint-disable-line no-console
+      console.error(`Cannot parse priceJSON`) 
     }
   }
 

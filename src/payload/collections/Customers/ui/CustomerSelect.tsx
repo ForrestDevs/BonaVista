@@ -48,7 +48,7 @@ export const CustomerSelect: React.FC<TextField> = (props) => {
           setOptions(fetchedCustomers)
         }
       } catch (error) {
-        console.error(error) // eslint-disable-line no-console
+        console.error(error)
       }
     }
 

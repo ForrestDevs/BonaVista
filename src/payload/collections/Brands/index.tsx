@@ -7,6 +7,7 @@ export const Brands: CollectionConfig = {
   slug: BRAND_SLUG,
   admin: {
     group: 'Shop',
+    useAsTitle: 'name',
   },
   access: {
     create: admins,

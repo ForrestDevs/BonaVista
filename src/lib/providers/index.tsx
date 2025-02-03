@@ -2,7 +2,7 @@ import React from 'react'
 import ThemeProvider from '@/lib/providers/Theme'
 import { Toaster } from 'sonner'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { CartProvider } from './Cart'
+// import { CartProvider } from './Cart'
 import { AuthProvider } from './Auth'
 import { NuqsProvider } from './Nuqs'
 
@@ -13,10 +13,10 @@ export const Providers: React.FC<{
     <ThemeProvider>
       <AuthProvider>
         <NuqsProvider>
-          <CartProvider>
-            {children}
-            <Toaster />
-          </CartProvider>
+          {/* <CartProvider> */}
+          {children}
+          <Toaster />
+          {/* </CartProvider> */}
         </NuqsProvider>
       </AuthProvider>
     </ThemeProvider>

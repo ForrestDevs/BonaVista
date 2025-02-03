@@ -1,23 +1,23 @@
 import { draftMode } from 'next/headers'
-import { cache } from 'react'
 import getPayload from './getPayload'
+import { cache } from '@/lib/utils/cache'
 
-export const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = await draftMode()
+export const queryPageBySlug = cache(
+  async (slug: string) => {
+    const { isEnabled: draft } = await draftMode()
+    const payload = await getPayload()
 
-  const payload = await getPayload()
-
-  const result = await payload.find({
-    collection: 'pages',
-    draft,
-    limit: 1,
-    overrideAccess: draft,
-    where: {
-      slug: {
-        equals: slug,
-      },
-    },
-  })
-
-  return result.docs?.[0] || null
-})
+    const { docs } = await payload.find({
+      collection: 'pages',
+      draft,
+      limit: 1,
+      overrideAccess: draft,
+      where: { slug: { equals: slug } },
+    })
+    return docs?.[0] || null
+  },
+  {
+    tags: (pathname) => [pathname],
+    revalidate: 3600,
+  },
+)

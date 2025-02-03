@@ -1,71 +1,71 @@
-import type { StripeWebhookHandler } from '@payloadcms/plugin-stripe/types'
-import type Stripe from 'stripe'
+// import type { StripeWebhookHandler } from '@payloadcms/plugin-stripe/types'
+// import type Stripe from 'stripe'
 
-const logs = false
+// const logs = false
 
-export const priceUpdated: StripeWebhookHandler<{
-  data: {
-    object: Stripe.Price
-  }
-}> = async (args) => {
-  const { event, payload, stripe } = args
+// export const priceUpdated: StripeWebhookHandler<{
+//   data: {
+//     object: Stripe.Price
+//   }
+// }> = async (args) => {
+//   const { event, payload, stripe } = args
 
-  const stripeProduct = event.data.object.product
-  const stripeProductID = typeof stripeProduct === 'string' ? stripeProduct : stripeProduct.id
+//   const stripeProduct = event.data.object.product
+//   const stripeProductID = typeof stripeProduct === 'string' ? stripeProduct : stripeProduct.id
 
-  if (logs)
-    payload.logger.info(
-      `🪝 A price was created or updated in Stripe on product ID: ${stripeProductID}, syncing to Payload...`,
-    )
+//   if (logs)
+//     payload.logger.info(
+//       `🪝 A price was created or updated in Stripe on product ID: ${stripeProductID}, syncing to Payload...`,
+//     )
 
-  let payloadProductID
+//   let payloadProductID
 
-  // First lookup the product in Payload
-  try {
-    if (logs) payload.logger.info(`- Looking up existing Payload product...`)
+//   // First lookup the product in Payload
+//   try {
+//     if (logs) payload.logger.info(`- Looking up existing Payload product...`)
 
-    const productQuery = await payload.find({
-      collection: 'products',
-      where: {
-        stripeProductID: {
-          equals: stripeProductID,
-        },
-      },
-    })
+//     const productQuery = await payload.find({
+//       collection: 'products',
+//       where: {
+//         stripeProductID: {
+//           equals: stripeProductID,
+//         },
+//       },
+//     })
 
-    payloadProductID = productQuery.docs?.[0]?.id
+//     payloadProductID = productQuery.docs?.[0]?.id
 
-    if (payloadProductID) {
-      if (logs)
-        payload.logger.info(
-          `- Found existing product with Stripe ID: ${stripeProductID}, saving price...`,
-        )
-    }
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Unknown error'
-    payload.logger.error(`Error finding product ${msg}`)
-  }
+//     if (payloadProductID) {
+//       if (logs)
+//         payload.logger.info(
+//           `- Found existing product with Stripe ID: ${stripeProductID}, saving price...`,
+//         )
+//     }
+//   } catch (err: unknown) {
+//     const msg = err instanceof Error ? err.message : 'Unknown error'
+//     payload.logger.error(`Error finding product ${msg}`)
+//   }
 
-  try {
-    // find all stripe prices that are assigned to "payloadProductID"
-    const stripePrices = await stripe.prices.list({
-      limit: 100,
-      product: stripeProductID,
-    })
+//   try {
+//     // find all stripe prices that are assigned to "payloadProductID"
+//     const stripePrices = await stripe.prices.list({
+//       limit: 100,
+//       product: stripeProductID,
+//     })
 
-    if (payloadProductID) {
-      await payload.update({
-        id: payloadProductID,
-        collection: 'products',
-        data: {
-          // priceJSON: JSON.stringify(stripePrices),
-          skipSync: true,
-        },
-      })
-    }
+//     if (payloadProductID) {
+//       await payload.update({
+//         id: payloadProductID,
+//         collection: 'products',
+//         data: {
+//           // priceJSON: JSON.stringify(stripePrices),
+//           skipSync: true,
+//         },
+//       })
+//     }
 
-    if (logs) payload.logger.info(`✅ Successfully updated product price.`)
-  } catch (error: unknown) {
-    payload.logger.error(`- Error updating product price: ${error}`)
-  }
-}
+//     if (logs) payload.logger.info(`✅ Successfully updated product price.`)
+//   } catch (error: unknown) {
+//     payload.logger.error(`- Error updating product price: ${error}`)
+//   }
+// }

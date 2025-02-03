@@ -60,8 +60,8 @@
     "**/*.tsx",
     "next-env.d.ts",
     ".next/types/**/*.ts",
-    "redirects.mjs",
-    "next.config.mjs", 
+    "redirects.js",
+    "next.config.js", 
     "tailwind.config.ts"
   ],
   "exclude": [

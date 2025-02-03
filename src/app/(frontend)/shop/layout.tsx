@@ -1,24 +1,20 @@
-import { ShopFooter } from '@components/layout/footers/shop'
-import { ShopHeader } from '@components/layout/headers/shop'
 import { TooltipProvider } from '@components/ui/tooltip'
+import { ShopHeader } from '@components/layout/headers/shop'
+import { CartModalPage } from '@components/shop/cart/drawer/cart-modal'
+import { CartModalProvider } from '@components/shop/cart/context/cart-context'
 
-export default async function StoreLayout({
-  children,
-  modal,
-}: Readonly<{
-  children: React.ReactNode
-  modal: React.ReactNode
-}>) {
+export default async function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div>
-      <ShopHeader />
-      <TooltipProvider>
-        <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-6 pt-6 sm:px-6 lg:px-8">
-          {children}
-          {modal}
-        </main>
-      </TooltipProvider>
-      {/* <ShopFooter /> */}
+    <div className="min-h-screen flex flex-col">
+      <CartModalProvider>
+        <ShopHeader />
+        <TooltipProvider>
+          <main className="flex-1 pt-[84.5px]">
+            {children}
+            <CartModalPage />
+          </main>
+        </TooltipProvider>
+      </CartModalProvider>
     </div>
   )
 }

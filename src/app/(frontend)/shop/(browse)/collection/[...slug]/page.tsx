@@ -14,7 +14,8 @@ type Props = {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const slug = await params
+  const { slug } = await params
+  console.log('slugMEta', slug)
   const collection = await getCachedDocument<typeof SHOP_COLLECTION_SLUG>(
     SHOP_COLLECTION_SLUG,
     slug[0],
@@ -36,7 +37,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
     <React.Fragment>
       <div className="container flex flex-col gap-8 my-16 pb-4 text-black md:flex-row dark:text-white">
         <Suspense fallback={<ResultsSkeleton />}>
-          <FilteredProducts slug={slug} category={category} sort={sort} />
+          <FilteredProducts slug={slug[0]} category={category} sort={sort} />
         </Suspense>
 
         <div className="order-none flex-none md:order-last md:w-[125px]">

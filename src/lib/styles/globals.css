@@ -6,6 +6,20 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --removed-body-scroll-bar-size: 0px;
+  }
+
+  body {
+    overflow-y: scroll;
+    width: 100vw;
+    /* Prevent content shift by always showing scrollbar */
+    overflow-x: hidden;
+    -ms-overflow-style: scrollbar;
+  }
+} 
+
+@layer base {
   /* Typography */
   h1,
   h2,

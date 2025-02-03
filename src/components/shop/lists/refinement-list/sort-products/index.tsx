@@ -8,7 +8,6 @@ export type SortOptions = 'price_asc' | 'price_desc' | 'created_at'
 type SortProductsProps = {
   sortBy: SortOptions
   setQueryParams: (name: string, value: SortOptions) => void
-  'data-testid'?: string
 }
 
 const sortOptions = [
@@ -26,7 +25,7 @@ const sortOptions = [
   },
 ]
 
-const SortProducts = ({ 'data-testid': dataTestId, sortBy, setQueryParams }: SortProductsProps) => {
+const SortProducts = ({ sortBy, setQueryParams }: SortProductsProps) => {
   const handleChange = (e: ChangeEvent<HTMLButtonElement>) => {
     const newSortBy = e.target.value as SortOptions
     setQueryParams('sortBy', newSortBy)
@@ -38,7 +37,6 @@ const SortProducts = ({ 'data-testid': dataTestId, sortBy, setQueryParams }: Sor
       items={sortOptions}
       value={sortBy}
       handleChange={handleChange}
-      data-testid={dataTestId}
     />
   )
 }

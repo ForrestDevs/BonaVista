@@ -1,51 +1,35 @@
+import React from 'react'
 import type { Metadata } from 'next'
-import React, { cache, Suspense } from 'react'
-import Link from 'next/link'
-import { Button } from '@components/ui/button'
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@components/ui/carousel'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs'
-import {
-  ShoppingCartIcon,
-  StarIcon,
-  TruckIcon,
-  ShieldCheckIcon,
-  ArrowRightIcon,
-} from 'lucide-react'
-// import { ProductCard } from '@/components/shop/products/product-card'
-// import { ProductVariant } from '@lib/types/product'
 import { getCachedDocument } from '@lib/utils/getDocument'
 import { PRODUCT_SLUG } from '@payload/collections/constants'
-// import { AddToCartButton } from '@components/shop/layout/add-to-cart'
 import { notFound } from 'next/navigation'
-// import { RelatedProducts } from '@components/payload/blocks/related-products'
-// import { Price } from '@components/shop/layout/price'
-import { Media } from '@components/payload/Media'
-import { Media as MediaType } from '@payload-types'
-import { getProduct } from '../../../actions'
-import ProductPage from './test'
+import { ProductCard } from '@/components/shop/products/product-card'
+import RichText from '@/components/payload/RichText'
+import Link from 'next/link'
+import { ProductProvider } from './context/product-context'
+import { VariantSelector } from './components/variant-selector'
+import { ProductGallery } from './components/product-gallery'
+import { AddToCartButton } from './components/add-to-cart-button'
+import { ProductPrice } from './components/product-price'
+import { Gallery } from '@/components/shop/products/gallery'
 
 type Props = {
   params: Promise<{ slug: string }>
 }
 
-// export async function generateMetadata({ params }: Props): Promise<Metadata> {
-//   const product = await getCachedDocument<typeof PRODUCT_SLUG>(PRODUCT_SLUG, params.slug)
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const product = await getCachedDocument<typeof PRODUCT_SLUG>(PRODUCT_SLUG, slug)
 
-//   if (!product) {
-//     notFound()
-//   }
+  if (!product) {
+    notFound()
+  }
 
-//   return {
-//     title: `${product.title} | BonaVista Leisurescapes`,
-//     // description: product.description || `${product.title} product`,
-//   }
-// }
+  return {
+    title: `${product.title} | BonaVista Leisurescapes`,
+    description: product.description,
+  }
+}
 
 export default async function ProductDetail({ params }: Props) {
   const { slug } = await params
@@ -55,206 +39,155 @@ export default async function ProductDetail({ params }: Props) {
     notFound()
   }
 
+  const brands = product.brand?.map((brand) => (typeof brand === 'string' ? brand : brand.name))
+  const price = product.enableVariants
+    ? product.variants.variantProducts[0].price
+    : product.baseProduct.price
+  const image = product.enableVariants
+    ? product.variants.variantProducts[0].images[0].image
+    : product.baseProduct.images[0].image
+
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    description: product.description,
+    image: image,
+    offers: {
+      '@type': 'AggregateOffer',
+      //   availability: hasStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      price: price,
+      priceCurrency: 'CAD',
+    },
+  }
+
   return (
-    <ProductPage params={{ slug }} />
-    // <div className="container mx-auto px-4 py-8">
-    //   <div className="grid md:grid-cols-2 gap-8">
-    //     <div>
-    //       <Carousel className="w-full max-w-xs mx-auto">
-    //         <CarouselContent>
-    //           {product.gallery?.map((image, index) => (
-    //             <CarouselItem key={index}>
-    //               <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
-    //                 {typeof image.image === 'string' ? (
-    //                   <div className="h-full w-full bg-gray-200">No image</div>
-    //                 ) : (
-    //                   <Media
-    //                     resource={image.image as MediaType}
-    //                     imgClassName="h-full w-full object-cover object-center"
-    //                   />
-    //                 )}
-    //               </div>
-    //             </CarouselItem>
-    //           ))}
-    //         </CarouselContent>
-    //         <CarouselPrevious />
-    //         <CarouselNext />
-    //       </Carousel>
-    //     </div>
-    //     <div>
-    //       <h1 className="text-3xl font-bold">{product.title}</h1>
-    //       <div className="flex items-center mt-2">
-    //         {[...Array(5)].map((_, i) => (
-    //           <StarIcon
-    //             key={i}
-    //             className={`h-5 w-5 ${i < Math.round(product.reviews.reduce((acc, review) => acc + review.rating, 0) / product.reviews.length) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-    //           />
-    //         ))}
-    //         <span className="ml-2 text-sm text-gray-500">{product.reviews.length} reviews</span>
-    //       </div>
-    //       <p className="mt-4 text-lg text-gray-700">{product.description}</p>
-    //       <Price product={product} />
-    //       <AddToCartButton product={product} />
+    <React.Fragment>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(productJsonLd),
+        }}
+        type="application/ld+json"
+      />
+      <ProductProvider product={product}>
+        <div className="container mx-auto px-4 py-8">
+          {/* Breadcrumb */}
+          <nav className="mb-8">
+            <ol className="flex text-sm">
+              <li className="hover:text-blue-600">
+                <Link href="/shop">Shop</Link>
+              </li>
+              <span className="mx-2">/</span>
+              <li className="text-gray-500">{product.title}</li>
+            </ol>
+          </nav>
 
-    //       <div className="mt-6 space-y-2">
-    //         <div className="flex items-center text-green-600">
-    //           <TruckIcon className="h-5 w-5 mr-2" />
-    //           <span>Free shipping on orders over $50</span>
-    //         </div>
-    //         <div className="flex items-center text-blue-600">
-    //           <ShieldCheckIcon className="h-5 w-5 mr-2" />
-    //           <span>30-day money-back guarantee</span>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </div>
+          <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8">
+            {/* Left Column - Gallery & Details */}
+            <div className="lg:col-span-8 order-2 lg:order-1">
+              <div className="space-y-8">
+                <Gallery />
+                {/* <ProductGallery /> */}
 
-    //   <div className="mt-12">
-    //     <Tabs defaultValue="description">
-    //       <TabsList>
-    //         <TabsTrigger value="description">Description</TabsTrigger>
-    //         <TabsTrigger value="specs">Specifications</TabsTrigger>
-    //         <TabsTrigger value="reviews">Reviews</TabsTrigger>
-    //       </TabsList>
-    //       <TabsContent value="description" className="mt-4">
-    //         <p>{product.description}</p>
-    //       </TabsContent>
-    //       <TabsContent value="specs" className="mt-4">
-    //         <ul className="space-y-2">
-    //           {Object.entries(product.specs).map(([key, value]) => (
-    //             <li key={key} className="flex">
-    //               <span className="font-semibold w-1/3">{key}:</span>
-    //               <span>{value}</span>
-    //             </li>
-    //           ))}
-    //         </ul>
-    //       </TabsContent>
-    //       <TabsContent value="reviews" className="mt-4">
-    //         <div className="space-y-4">
-    //           {product.reviews.map((review, i) => (
-    //             <div key={i} className="border-b pb-4">
-    //               <div className="flex items-center">
-    //                 <span className="font-bold">{review.user}</span>
-    //                 <div className="ml-2">
-    //                   {[...Array(5)].map((_, i) => (
-    //                     <StarIcon
-    //                       key={i}
-    //                       className={`inline h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-    //                     />
-    //                   ))}
-    //                 </div>
-    //               </div>
-    //               <p className="mt-2">{review.comment}</p>
-    //             </div>
-    //           ))}
-    //         </div>
-    //       </TabsContent>
-    //     </Tabs>
-    //   </div>
+                {/* Product Details Tabs */}
+                <div className="border-t border-gray-200">
+                  <div className="space-y-8 py-6">
+                    <div>
+                      <h3 className="text-lg font-medium">Description</h3>
+                      <RichText content={product.moreInfo} />
+                    </div>
 
-    //   <div className="mt-16">
-    //     <h2 className="text-2xl font-bold mb-2">Related Products</h2>
-    //     <p className="text-gray-600 mb-6">
-    //       Complete your water care routine with these recommended products
-    //     </p>
-    //     <RelatedProducts docs={product.relatedProducts ?? []} />
-    //   </div>
+                    <div>
+                      <h3 className="text-lg font-medium">Specifications</h3>
+                      <div className="mt-4 prose prose-sm max-w-none">
+                        {product.baseProduct.sku}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-    //   <div className="mt-16 bg-blue-50 rounded-lg p-6">
-    //     <h2 className="text-2xl font-bold mb-4">Need Help?</h2>
-    //     <p className="mb-4">
-    //       Our water care experts are here to assist you in choosing the right products for your spa
-    //       or hot tub.
-    //     </p>
-    //     <Button>
-    //       <Link href="/contact" className="flex items-center">
-    //         Contact an Expert
-    //         <ArrowRightIcon className="ml-2 h-4 w-4" />
-    //       </Link>
-    //     </Button>
-    //   </div>
+            {/* Right Column - Purchase Info */}
+            <div className="lg:col-span-4 order-1 lg:order-2">
+              <div className="top-8">
+                <div className="mt-8 lg:mt-0">
+                  <h1 className="text-2xl font-bold">{product.title}</h1>
 
-    // </div>
+                  {product.brand && (
+                    <div className="mt-2">
+                      <span className="text-gray-600">Brand: </span>
+                      <span className="font-medium">{brands.join(', ')}</span>
+                    </div>
+                  )}
+
+                  <h2 className="text-xl font-medium">{product.description}</h2>
+
+                  <ProductPrice />
+                  <VariantSelector />
+
+                  <div className="mt-6">
+                    <AddToCartButton />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Related Products */}
+          {product.relatedProducts && product.relatedProducts.length > 0 && (
+            <div className="mt-16">
+              <h2 className="text-2xl font-bold mb-8">Related Products</h2>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {product.relatedProducts.map(
+                  (relatedProduct) =>
+                    typeof relatedProduct !== 'string' && (
+                      <ProductCard key={relatedProduct.id} product={relatedProduct} />
+                    ),
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </ProductProvider>
+    </React.Fragment>
   )
 }
 
-// type Product = {
-//   id: string
-//   name: string
-//   description: string
-//   longDescription: string
-//   images: string[]
-//   variants: ProductVariant[]
-//   specs: Record<string, string>
-// //   quickSteps: string[]
-// //   relatedResources: string[]
-//   reviews: Array<{ user: string; rating: number; comment: string }>
-//   relatedProducts: Array<{
-//     id: string
-//     name: string
-//     description: string
-//     price: number
-//     image: string
-//   }>
+// const getProductDTO = (product: Product) => {
+//   const enableVariants = product.enableVariants
+//   const hasVariants = enableVariants && (product?.variants?.variantProducts?.length ?? 0) > 1
+//   const variantOptions = enableVariants ? product.variants.options : []
+//   const variantProducts = enableVariants ? product.variants.variantProducts : []
+//   const baseProduct = product.baseProduct
+//   const baseProductPrice = baseProduct.price
+//   const baseProductImages = baseProduct.images
+//   const gallery = product.gallery
+//   const relatedProducts =
+//     product.relatedProducts?.filter((relatedProduct) => typeof relatedProduct !== 'string') ?? []
 // }
 
-// const product: Product = {
-//   id: '1',
-//   name: 'PH+ Increaser',
-//   description: 'Raises the pH level of your spa water.',
-//   longDescription:
-//     "Our PH+ Increaser is specially formulated to safely raise the pH level of your spa or hot tub water. Maintaining the proper pH balance is crucial for bather comfort and equipment longevity. This premium product dissolves quickly and is highly effective in adjusting your water's pH to the ideal range.",
-//   images: [
-//     '/ph-increaser-1.jpg',
-//     '/ph-increaser-2.jpg',
-//     '/ph-increaser-3.jpg',
-//     '/ph-increaser-4.jpg',
-//   ],
-//   variants: [
-//     { size: '2 lbs', price: 12.99, sku: 'PH-PLUS-2' },
-//     { size: '5 lbs', price: 24.99, sku: 'PH-PLUS-5' },
-//     { size: '25 lbs', price: 89.99, sku: 'PH-PLUS-25' },
-//   ],
-//   specs: {
-//     activeIngredient: 'Sodium Carbonate',
-//     form: 'Granular',
-//     pHRange: '7.2 - 7.8',
-//     usage: '1 tbsp per 500 gallons',
-//     compatibility: 'All types of spas and hot tubs',
-//   },
-//   reviews: [
-//     { user: 'John D.', rating: 5, comment: 'Works great, easy to use!' },
-//     { user: 'Sarah M.', rating: 4, comment: 'Good product, but packaging could be improved.' },
-//     { user: 'Mike R.', rating: 5, comment: 'Quickly balanced my spa water. Highly recommend!' },
-//   ],
-//   relatedProducts: [
-//     {
-//       id: '2',
-//       name: 'PH- Decreaser',
-//       description: 'Lowers the pH level of your spa water.',
-//       price: 14.99,
-//       image: '/ph-decreaser.jpg',
+// const queryProductBySlug = async ({ slug }: { slug: string }) => {
+//   const { isEnabled: draft } = await draftMode()
+
+//   const payload = await getPayload()
+//   const authResult = draft ? await payload.auth({ headers: await headers() }) : undefined
+
+//   const user = authResult?.user
+
+//   const result = await payload.find({
+//     collection: 'products',
+//     depth: 2,
+//     draft,
+//     limit: 1,
+//     overrideAccess: false,
+//     user,
+//     where: {
+//       slug: {
+//         equals: slug,
+//       },
 //     },
-//     {
-//       id: '3',
-//       name: 'Alkalinity Up',
-//       description: 'Increases the alkalinity of your spa water.',
-//       price: 16.99,
-//       image: '/alkalinity-up.jpg',
-//     },
-//     {
-//       id: '4',
-//       name: 'Chlorine Tablets',
-//       description: 'Sanitizes your spa water.',
-//       price: 29.99,
-//       image: '/chlorine-tablets.jpg',
-//     },
-//     {
-//       id: '5',
-//       name: 'Test Strips',
-//       description: 'Accurately test your spa water chemistry.',
-//       price: 9.99,
-//       image: '/test-strips.jpg',
-//     },
-//   ],
+//   })
+
+//   return result.docs?.[0] || null
 // }

@@ -74,16 +74,22 @@ const Media: CollectionConfig = {
     disableLocalStorage: true,
     focalPoint: true,
     crop: true,
+    pasteURL: {
+      allowList: [
+        {
+          hostname: 'payloadcms.com', // required
+          pathname: '',
+          port: '',
+          protocol: 'https',
+          search: '',
+        },
+        {
+          hostname: 'drive.google.com',
+          protocol: 'https',
+        },
+      ],
+    },
   },
-  // admin: {
-  //   components: {
-  //     views: {
-  //       list: {
-  //         Component: 'src/components/payload/AdminViews/Media/List/tclient',
-  //       },
-  //     },
-  //   },
-  // },
 } as const
 
 export default Media

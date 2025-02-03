@@ -40,7 +40,7 @@ export default function Login({ setCurrentView }: Props) {
   }, [state, router])
 
   return (
-    <div className="max-w-sm w-full flex flex-col items-center" data-testid="login-page">
+    <div className="max-w-sm w-full flex flex-col items-center">
       <h1 className="text-large-semi uppercase mb-6">Welcome back</h1>
       <p className="text-center text-base-regular text-ui-fg-base mb-8">
         Sign in to access an enhanced shopping experience.
@@ -55,7 +55,7 @@ export default function Login({ setCurrentView }: Props) {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input {...field} type="" data-testid="email-input" />
+                  <Input {...field} type="" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -68,14 +68,14 @@ export default function Login({ setCurrentView }: Props) {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input {...field} type="" data-testid="password-input" />
+                  <Input {...field} type="" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           {state.status === 'error' && (
-            <p className="text-red-500 text-sm mt-2" data-testid="login-error-message">
+            <p className="text-red-500 text-sm mt-2">
               {state.message}
             </p>
           )}
@@ -83,7 +83,7 @@ export default function Login({ setCurrentView }: Props) {
             type="submit"
             className="w-full mt-6"
             disabled={isPending || !form.formState.isValid}
-            data-testid="sign-in-button"
+           
           >
             {isPending ? 'Signing in...' : 'Sign in'}
           </Button>
@@ -95,7 +95,7 @@ export default function Login({ setCurrentView }: Props) {
         <button
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
           className="underline"
-          data-testid="register-button"
+        
         >
           Join us
         </button>

@@ -20,7 +20,13 @@ import { slugField } from '@payload/fields/slug'
 // import { beforeProductChange } from './hooks/beforeChange'
 // import { deleteProductFromCarts } from './hooks/deleteProductFromCarts'
 import { revalidateProduct } from './hooks/revalidateProduct'
-import { PRODUCT_CATEGORY_SLUG, SHOP_COLLECTION_SLUG, PRODUCT_SLUG, BRAND_SLUG } from '../constants'
+import {
+  PRODUCT_CATEGORY_SLUG,
+  SHOP_COLLECTION_SLUG,
+  PRODUCT_SLUG,
+  BRAND_SLUG,
+  PRODUCT_COLLECTION_SLUG,
+} from '../constants'
 import { TableFeatureClient } from '@payloadcms/richtext-lexical/client'
 
 const Products: CollectionConfig = {
@@ -57,10 +63,46 @@ const Products: CollectionConfig = {
   fields: [
     ...slugField(),
     {
-      label: 'Title',
       name: 'title',
       type: 'text',
       required: true,
+      label: 'Title',
+    },
+    {
+      name: 'description',
+      type: 'text',
+      label: 'Description',
+    },
+    {
+      label: 'Related Products',
+      name: 'relatedProducts',
+      type: 'relationship',
+      relationTo: PRODUCT_SLUG,
+      hasMany: true,
+      filterOptions: ({ id }) => {
+        return {
+          id: {
+            not_in: [id],
+          },
+        }
+      },
+    },
+    {
+      label: 'Additional Info',
+      name: 'moreInfo',
+      type: 'richText',
+      editor: lexicalEditor({
+        features: ({ rootFeatures }) => {
+          return [
+            ...rootFeatures,
+            HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+            FixedToolbarFeature(),
+            InlineToolbarFeature(),
+            HorizontalRuleFeature(),
+          ]
+        },
+      }),
+      required: false,
     },
     {
       name: 'publishedOn',
@@ -85,49 +127,6 @@ const Products: CollectionConfig = {
     {
       type: 'tabs',
       tabs: [
-        {
-          label: 'Content',
-          fields: [
-            {
-              name: 'description',
-              type: 'richText',
-              editor: lexicalEditor({
-                features: ({ rootFeatures }) => {
-                  return [
-                    ...rootFeatures,
-                    HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                    FixedToolbarFeature(),
-                    InlineToolbarFeature(),
-                    HorizontalRuleFeature(),
-                  ]
-                },
-              }),
-              label: false,
-              required: false,
-            },
-            {
-              name: 'gallery',
-              type: 'array',
-              fields: [
-                {
-                  name: 'image',
-                  type: 'upload',
-                  relationTo: 'media',
-                  required: true,
-                },
-              ],
-              labels: {
-                plural: 'Images',
-                singular: 'Image',
-              },
-            },
-            {
-              name: 'layout',
-              type: 'blocks',
-              blocks: [CallToAction, Content, Media],
-            },
-          ],
-        },
         {
           label: 'Product Details',
           fields: [
@@ -184,6 +183,17 @@ const Products: CollectionConfig = {
                     description: 'Define the price for this product.',
                   },
                 },
+                {
+                  name: 'images',
+                  type: 'array',
+                  fields: [
+                    {
+                      name: 'image',
+                      type: 'upload',
+                      relationTo: 'media',
+                    },
+                  ],
+                },
               ],
             },
             {
@@ -201,7 +211,7 @@ const Products: CollectionConfig = {
                   minRows: 1,
                   admin: {
                     components: {
-                      RowLabel: 'src/payload/collections/Products/ui/RowLabels/KeyLabel',
+                      RowLabel: '@/payload/collections/Products/ui/RowLabels/KeyLabel#KeyLabel',
                     },
                     initCollapsed: true,
                   },
@@ -226,7 +236,8 @@ const Products: CollectionConfig = {
                       type: 'array',
                       admin: {
                         components: {
-                          RowLabel: 'src/payload/collections/Products/ui/RowLabels/OptionLabel',
+                          RowLabel:
+                            '@/payload/collections/Products/ui/RowLabels/OptionLabel#OptionLabel',
                         },
                         initCollapsed: true,
                       },
@@ -258,9 +269,11 @@ const Products: CollectionConfig = {
                   interfaceName: 'ProductVariant',
                   name: 'variantProducts',
                   type: 'array',
+                  minRows: 1,
                   admin: {
                     components: {
-                      RowLabel: 'src/payload/collections/Products/ui/RowLabels/VariantLabel',
+                      RowLabel:
+                        '@/payload/collections/Products/ui/RowLabels/VariantLabel#VariantLabel',
                     },
                     condition: (data) => {
                       return Boolean(data?.variants?.options?.length)
@@ -272,7 +285,7 @@ const Products: CollectionConfig = {
                       type: 'text',
                       admin: {
                         components: {
-                          Field: 'src/payload/collections/Products/ui/VariantSelect',
+                          Field: '@/payload/collections/Products/ui/VariantSelect#VariantSelect',
                         },
                       },
                       hasMany: true,
@@ -306,6 +319,14 @@ const Products: CollectionConfig = {
                       required: true,
                     },
                     {
+                      name: 'info',
+                      type: 'json',
+                      admin: {
+                        hidden: true,
+                        readOnly: true,
+                      },
+                    },
+                    {
                       name: 'images',
                       type: 'array',
                       fields: [
@@ -317,19 +338,30 @@ const Products: CollectionConfig = {
                       ],
                     },
                   ],
-                  minRows: 1,
+                  validate: (_, { siblingData }: { siblingData: any }) => {
+                    console.log('siblingData', siblingData)
+                    if (siblingData.variantProducts.length) {
+                      const hasDuplicate = siblingData.variantProducts.some(
+                        (variant: ProductVariant, index) => {
+                          // Check this against other variants
+                          //@ts-ignore
+                          const dedupedArray = [...siblingData.variantProducts].filter(
+                            (_, i) => i !== index,
+                          )
 
-                  validate: (_, { data }) => {
-                    //@ts-ignore
-                    if (data.variants.variantProducts.length > 1) {
-                      //@ts-ignore
-                      const optionSets = data.variants.variantProducts.map((variant) =>
-                        variant.options.sort().join('|'),
+                          // Join the arrays then compare the strings, note that we sort the array before it's saved in the custom component
+                          const test = dedupedArray.find((otherOption: ProductVariant) => {
+                            const firstOption = otherOption?.options?.join('')
+                            const secondOption = variant?.options?.join('')
+
+                            return firstOption === secondOption
+                          })
+
+                          return Boolean(test)
+                        },
                       )
 
-                      const uniqueOptionSets = new Set(optionSets)
-
-                      if (uniqueOptionSets.size !== optionSets.length) {
+                      if (hasDuplicate) {
                         return 'There is a duplicate variant'
                       }
                     }
@@ -364,7 +396,7 @@ const Products: CollectionConfig = {
       },
       name: 'collections',
       type: 'relationship',
-      relationTo: SHOP_COLLECTION_SLUG,
+      relationTo: PRODUCT_COLLECTION_SLUG,
       hasMany: true,
       admin: {
         position: 'sidebar',
@@ -380,64 +412,45 @@ const Products: CollectionConfig = {
       type: 'relationship',
       relationTo: PRODUCT_CATEGORY_SLUG,
       hasMany: true,
+      required: false,
+      filterOptions: () => ({ isLeaf: { equals: true } }),
       admin: {
         position: 'sidebar',
         sortOptions: 'title',
       },
-    },
-    {
-      label: {
-        singular: 'Related Product',
-        plural: 'Related Products',
-      },
-      name: 'relatedProducts',
-      type: 'relationship',
-      relationTo: PRODUCT_SLUG,
-      hasMany: true,
-      admin: {
-        position: 'sidebar',
-      },
-      filterOptions: ({ id }) => {
-        return {
-          id: {
-            not_in: [id],
+      validate: async (value, { req: { payload } }) => {
+        if (!value) return true
+
+        const categories = await payload.find({
+          collection: PRODUCT_CATEGORY_SLUG,
+          where: {
+            id: { in: value },
+            isLeaf: { equals: true },
           },
+        })
+
+        // If the number of leaf categories does not match the number of selected values,
+        // then at least one non-leaf category is being used.
+        if (categories.totalDocs !== value.length) {
+          return 'Products can only be added to leaf categories'
         }
+        return true
       },
     },
     {
-      name: 'isSale',
-      type: 'checkbox',
-      defaultValue: false,
+      name: 'compatibility',
+      type: 'select',
+      hasMany: true,
+      required: false,
+      options: [
+        { label: 'SwimSpa', value: 'swimspa' },
+        { label: 'Hot Tub', value: 'hottub' },
+        { label: 'Pool', value: 'pool' },
+      ],
       admin: {
+        description: 'Select which equipment types this product is compatible with',
         position: 'sidebar',
       },
-    },
-    {
-      name: 'isBestSeller',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'isNewSeller',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'skipSync',
-      type: 'checkbox',
-      admin: {
-        hidden: true,
-        position: 'sidebar',
-        readOnly: true,
-      },
-      label: 'Skip Sync',
     },
   ],
   hooks: {

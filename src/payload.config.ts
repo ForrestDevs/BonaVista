@@ -3,15 +3,13 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 import { buildConfig } from 'payload'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
-import { s3Storage } from '@payloadcms/storage-s3'
-import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
-import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
-import { redirectsPlugin } from '@payloadcms/plugin-redirects'
-import { seoPlugin } from '@payloadcms/plugin-seo'
-import { payloadAiPlugin } from '@ai-stack/payloadcms';
-import { PayloadAiPluginLexicalEditorFeature } from '@ai-stack/payloadcms/fields'
-import { stripePlugin } from '@payloadcms/plugin-stripe'
-import { UnderlineFeature, IndentFeature, AlignFeature, OrderedListFeature, UnorderedListFeature } from '@payloadcms/richtext-lexical'
+import {
+  UnderlineFeature,
+  IndentFeature,
+  AlignFeature,
+  OrderedListFeature,
+  UnorderedListFeature,
+} from '@payloadcms/richtext-lexical'
 import {
   BoldFeature,
   FixedToolbarFeature,
@@ -20,42 +18,16 @@ import {
   LinkFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
-import { Page, Post } from '@payload-types'
-import { revalidateRedirects } from '@payload/hooks/revalidateRedirects'
-import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
-import { createPaymentIntent } from '@payload/endpoints/create-payment-intent'
-import { customersProxy } from '@payload/endpoints/customers'
-import { productsProxy } from '@payload/endpoints/products'
-import { productUpdated } from '@payload/stripe/webhooks/productUpdated'
-import { priceUpdated } from '@payload/stripe/webhooks/priceUpdated'
-import { pricesProxy } from '@payload/endpoints/prices'
-import Users from '@payload/collections/Users'
-import globals from '@payload/globals'
-import collections from '@payload/collections'
+import Users from './payload/collections/Users'
+import globals from './payload/globals'
+import collections from './payload/collections'
+import { plugins } from './payload/plugins'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
-}
-
-const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
-  return doc?.slug
-    ? `${process.env.NEXT_PUBLIC_SERVER_URL}/${doc.slug}`
-    : process.env.NEXT_PUBLIC_SERVER_URL || ''
-}
-
 export default buildConfig({
   admin: {
-    components: {
-      // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
-      // Feel free to delete this at any time. Simply remove the line below and the import `BeforeLogin` statement on line 15.
-      // beforeLogin: [BeforeLogin],
-      // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
-      // Feel free to delete this at any time. Simply remove the line below and the import `BeforeDashboard` statement on line 15.
-      // beforeDashboard: [BeforeDashboard],
-    },
     user: Users.slug,
     livePreview: {
       breakpoints: [
@@ -81,7 +53,6 @@ export default buildConfig({
     },
   },
   editor: lexicalEditor({
-    // This config helps us configure global or default features that the other editors can inherit
     features: () => {
       return [
         // PayloadAiPluginLexicalEditorFeature(),
@@ -119,32 +90,33 @@ export default buildConfig({
   }),
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || '',
+    transactionOptions: false,
   }),
   collections,
   globals,
   cors: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ''].filter(Boolean),
   csrf: [process.env.PAYLOAD_PUBLIC_SERVER_URL || ''].filter(Boolean),
   endpoints: [
-    {
-      handler: createPaymentIntent,
-      method: 'post',
-      path: '/create-payment-intent',
-    },
-    {
-      handler: customersProxy,
-      method: 'get',
-      path: '/stripe/customers',
-    },
-    {
-      handler: productsProxy,
-      method: 'get',
-      path: '/stripe/products',
-    },
-    {
-      handler: pricesProxy,
-      method: 'get',
-      path: '/stripe/prices',
-    },
+    // {
+    //   handler: createPaymentIntent,
+    //   method: 'post',
+    //   path: '/create-payment-intent',
+    // },
+    // {
+    //   handler: customersProxy,
+    //   method: 'get',
+    //   path: '/stripe/customers',
+    // },
+    // {
+    //   handler: productsProxy,
+    //   method: 'get',
+    //   path: '/stripe/products',
+    // },
+    // {
+    //   handler: pricesProxy,
+    //   method: 'get',
+    //   path: '/stripe/prices',
+    // },
     // The seed endpoint is used to populate the database with some example data
     // You should delete this endpoint before deploying your site to production
     // {
@@ -153,75 +125,7 @@ export default buildConfig({
     //   path: '/seed',
     // },
   ],
-  plugins: [
-    stripePlugin({
-      stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
-      stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOKS_SIGNING_SECRET,
-      isTestKey: Boolean(process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY),
-      rest: false,
-      webhooks: {
-        'price.updated': priceUpdated,
-        'product.created': productUpdated,
-        'product.updated': productUpdated,
-      },
-    }),
-    redirectsPlugin({
-      collections: ['pages', 'posts'],
-      overrides: {
-        admin: {
-          group: 'Forms',
-        },
-        // @ts-expect-error
-        fields: ({ defaultFields }) => {
-          return defaultFields.map((field) => {
-            if ('name' in field && field.name === 'from') {
-              return {
-                ...field,
-                admin: {
-                  description: 'You will need to rebuild the website when changing this field.',
-                },
-              }
-            }
-            return field
-          })
-        },
-        hooks: {
-          afterChange: [revalidateRedirects],
-        },
-      },
-    }),
-    nestedDocsPlugin({
-      collections: ['pages', 'media-folders'],
-      generateLabel: (_, doc) => doc.title as string,
-      generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
-    }),
-    seoPlugin({
-      generateTitle,
-      generateURL,
-    }),
-    s3Storage({
-      collections: {
-        ['media']: true,
-      },
-      bucket: process.env.S3_BUCKET || 'media',
-      config: {
-        endpoint: process.env.S3_ENDPOINT || '',
-        credentials: {
-          accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
-        },
-        region: process.env.S3_REGION || '',
-      },
-    }),
-    // payloadAiPlugin({
-    //   generatePromptOnInit: true,
-    //   collections: {
-    //     ["posts"]: true,
-    //     ["pages"]: true,
-    //   },
-    //   debugging: true,
-    // }),
-  ],
+  plugins: [...plugins],
   secret: process.env.PAYLOAD_SECRET || 'default',
   sharp,
   typescript: {

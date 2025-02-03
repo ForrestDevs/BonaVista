@@ -27,7 +27,7 @@ export const updateUserOrders: CollectionAfterChangeHook<Order> = async ({
         collection: CUSTOMER_SLUG,
         data: {
           orders: [
-            ...(user?.orders?.map((order) => (typeof order === 'object' ? order.id : order)) || []), // eslint-disable-line function-paren-newline
+            ...(user?.orders?.map((order) => (typeof order === 'object' ? order.id : order)) || []),
             doc.id,
           ],
         },

@@ -3,14 +3,14 @@ import type { Product } from '@payload-types'
 // Ensure Product type has the correct structure
 export type EnsuredProduct = Product & {
   variants: {
-    options: { label: string; slug: string; values: { label: string; slug: string; }[] }[];
-    variants: any[]; // Adjust this type if needed
-  };
-};
+    options: { label: string; slug: string; values: { label: string; slug: string }[] }[]
+    variants: any[] // Adjust this type if needed
+  }
+}
 
 export type OptionKey = EnsuredProduct['variants']['options'][number]
 export type Option = OptionKey['values'][number]
-export type ProductVariant = EnsuredProduct['variants']['variants'][number]
+export type ProductVariant = EnsuredProduct['variants']['variantProducts'][number]
 
 export type KeysFieldValue = {
   options: (Option & { key: OptionKey })[]

@@ -14,12 +14,12 @@ import { LinkFeatureClient as LinkFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { default as default_6317f72e199ff0f85640d0105c12aad9 } from 'src/payload/collections/Orders/ui/LinkToPaymentIntent'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { HeadingFeatureClient as HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { OptionLabel as OptionLabel_3d272d6fec42bd3cfa7f3594711dccd5 } from '@/payload/collections/Products/ui/RowLabels/OptionLabel'
+import { KeyLabel as KeyLabel_68aa4e107c322a52b733cc511d4a6a80 } from '@/payload/collections/Products/ui/RowLabels/KeyLabel'
+import { VariantSelect as VariantSelect_dd767e0fb3bf296c5e7729e988c2d4b7 } from '@/payload/collections/Products/ui/VariantSelect'
+import { VariantLabel as VariantLabel_c477b7d2719fdf0209ba21b4bf409af1 } from '@/payload/collections/Products/ui/RowLabels/VariantLabel'
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ColorSwatchComponent as ColorSwatchComponent_cd3604d5dade4d24adede9a2f7f38290 } from '@payload/fields/color/ui/'
-import { default as default_075d5097c72c5a909944f35fc62d2af2 } from 'src/payload/collections/Products/ui/RowLabels/OptionLabel'
-import { default as default_ebbe54fc164152fff318d8e8b651258a } from 'src/payload/collections/Products/ui/RowLabels/KeyLabel'
-import { default as default_9a474707af3edc4942747bdaef869dd8 } from 'src/payload/collections/Products/ui/VariantSelect'
-import { default as default_c64a79975cd665914d9b2a4f5f9a1572 } from 'src/payload/collections/Products/ui/RowLabels/VariantLabel'
 import { UploadFeatureClient as UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BlockquoteFeatureClient as BlockquoteFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { RelationshipFeatureClient as RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
@@ -52,12 +52,12 @@ export const importMap = {
   "src/payload/collections/Orders/ui/LinkToPaymentIntent#default": default_6317f72e199ff0f85640d0105c12aad9,
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#HeadingFeatureClient": HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/payload/collections/Products/ui/RowLabels/OptionLabel#OptionLabel": OptionLabel_3d272d6fec42bd3cfa7f3594711dccd5,
+  "@/payload/collections/Products/ui/RowLabels/KeyLabel#KeyLabel": KeyLabel_68aa4e107c322a52b733cc511d4a6a80,
+  "@/payload/collections/Products/ui/VariantSelect#VariantSelect": VariantSelect_dd767e0fb3bf296c5e7729e988c2d4b7,
+  "@/payload/collections/Products/ui/RowLabels/VariantLabel#VariantLabel": VariantLabel_c477b7d2719fdf0209ba21b4bf409af1,
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payload/fields/color/ui/#ColorSwatchComponent": ColorSwatchComponent_cd3604d5dade4d24adede9a2f7f38290,
-  "src/payload/collections/Products/ui/RowLabels/OptionLabel#default": default_075d5097c72c5a909944f35fc62d2af2,
-  "src/payload/collections/Products/ui/RowLabels/KeyLabel#default": default_ebbe54fc164152fff318d8e8b651258a,
-  "src/payload/collections/Products/ui/VariantSelect#default": default_9a474707af3edc4942747bdaef869dd8,
-  "src/payload/collections/Products/ui/RowLabels/VariantLabel#default": default_c64a79975cd665914d9b2a4f5f9a1572,
   "@payloadcms/richtext-lexical/client#UploadFeatureClient": UploadFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BlockquoteFeatureClient": BlockquoteFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#RelationshipFeatureClient": RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,

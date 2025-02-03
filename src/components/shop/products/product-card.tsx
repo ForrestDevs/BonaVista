@@ -18,6 +18,10 @@ import Image from 'next/image'
 import { Media } from '@components/payload/Media'
 import { Media as MediaType } from '@payload-types'
 import Price from '@components/payload/Price'
+import { addToCart } from '@/lib/data/cart'
+import { CartItem } from '@/lib/types/cart'
+import { uniqueId } from 'lodash'
+import { useRouter } from 'next/navigation'
 
 // type ProductVariant = {
 //   size: string
@@ -33,10 +37,22 @@ import Price from '@components/payload/Price'
 //   variants: ProductVariant[]
 // }
 
+type EnhancedProductVariant = Omit<ProductVariant[number], 'info'> & {
+  info: {
+    options: Array<{
+      label: string
+      id: string
+    }>
+  }
+}
+
 export function ProductCard({ product }: { product: Product }) {
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant[number] | null>(() => {
+  const router = useRouter()
+  const [selectedVariant, setSelectedVariant] = useState<EnhancedProductVariant | null>(() => {
     if (product.variants && product.variants.variantProducts.length > 0) {
-      return product.variants.variantProducts[0]
+      const variant = product.variants.variantProducts[0]
+      console.log(variant)
+      return variant as EnhancedProductVariant
     }
     return null
   })
@@ -44,75 +60,108 @@ export function ProductCard({ product }: { product: Product }) {
   const hasVariants =
     product.enableVariants && (product?.variants?.variantProducts?.length ?? 0) > 1
 
-  const price = hasVariants
-    ? selectedVariant?.price
-    : product.baseProduct.price
+  const price = hasVariants ? selectedVariant?.price : product.baseProduct.price
+  const thumbnail = hasVariants
+    ? (product?.variants.variantProducts[0]?.images[0]?.image ?? null)
+    : (product?.baseProduct?.images[0]?.image ?? null)
 
-  const handleAddToCart = (variant: ProductVariant[number] | null) => {
+  const handleAddToCart = (variant: EnhancedProductVariant | null) => {
     if (hasVariants) {
       if (variant) {
         console.log(`Added to cart: ${product.title} - ${JSON.stringify(variant)}`)
-        // Here you would call your actual add to cart function
+        const cartItem: CartItem = {
+          product: product,
+          isVariant: true,
+          variant: variant.info.options.map((o) => ({
+            option: o.label,
+            id: o.id,
+          })),
+          quantity: 1,
+          price: variant.price,
+          url: `/product/${product.slug}`,
+          id: uniqueId('cart-item-'),
+        }
+        addToCart(cartItem)
       }
     } else {
       console.log(`Added to cart: ${product.title} - ${product.baseProduct.price}`)
+      addToCart({
+        product: product,
+        isVariant: false,
+        quantity: 1,
+        price: product.baseProduct.price,
+        url: `/product/${product.slug}`,
+        id: uniqueId('cart-item-'),
+      })
     }
   }
 
   return (
-    <div>
-      <Card className="cursor-pointer group transition-all duration-300 hover:shadow-lg">
-        <CardHeader className="p-0 relative overflow-hidden">
-          <Media
-            resource={product.gallery?.[0]?.image as MediaType}
-            imgClassName="object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-          <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <InfoIcon className="h-5 w-5 text-blue-600" />
-          </div>
-        </CardHeader>
-        <CardContent className="p-4">
-          <CardTitle className="text-lg group-hover:text-blue-600 transition-colors duration-300">
-            {product.title}
-          </CardTitle>
-          <Price amount={price} currencyCode="CAD" />
-        </CardContent>
-        <CardFooter className="p-4">
-          {hasVariants ? (
+    <Card
+      className="cursor-pointer group transition-all duration-300 hover:shadow-lg"
+      onClick={() => {
+        router.push(`/shop/product/${product.slug}`)
+      }}
+    >
+      <CardHeader className="p-0 relative overflow-hidden">
+        <Media
+          resource={thumbnail}
+          imgClassName="object-cover transition-transform duration-300 group-hover:scale-105 rounded-lg"
+        />
+        <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <InfoIcon className="h-5 w-5 text-blue-600" />
+        </div>
+      </CardHeader>
+      <CardContent className="p-4">
+        <CardTitle className="text-lg group-hover:text-blue-600 transition-colors duration-300">
+          {product.title}
+        </CardTitle>
+        <Price amount={price} currencyCode="CAD" />
+      </CardContent>
+      <CardFooter className="p-4">
+        {hasVariants ? (
+          <div className="grid grid-cols-2 gap-2 w-full">
             <Popover>
               <PopoverTrigger asChild>
-                <Button className="w-full" onClick={() => handleAddToCart(selectedVariant)}>
-                  <ShoppingCartIcon className="mr-2 h-4 w-4" />
-                  {selectedVariant ? `Add ${selectedVariant.options} to Cart` : 'Select Variant'}
+                <Button variant="outline" className="col-span-1">
+                  {selectedVariant ? selectedVariant.info.options[0].label : 'Select Variant'}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-56">
                 <div className="grid gap-4">
                   <h4 className="font-medium leading-none">Select Variant</h4>
-                  {product.variants?.variantProducts?.map((variant) => (
+                  {product.variants?.variantProducts?.map((variant: EnhancedProductVariant) => (
                     <Button
                       key={variant.id}
                       variant="outline"
                       onClick={() => {
                         setSelectedVariant(variant)
-                        // handleAddToCart(variant)
                       }}
                     >
-                      {variant.sku}
+                      {variant.info.options[0].label}
                     </Button>
                   ))}
                 </div>
               </PopoverContent>
             </Popover>
-          ) : (
-            <Button className="w-full" onClick={() => handleAddToCart(null)}>
+
+            <Button
+              className="col-span-1"
+              disabled={!selectedVariant}
+              onClick={() => handleAddToCart(selectedVariant)}
+            >
               <ShoppingCartIcon className="mr-2 h-4 w-4" />
               Add to Cart
             </Button>
-          )}
-        </CardFooter>
-      </Card>
-    </div>
+          </div>
+        ) : (
+          <Button className="w-full" onClick={() => handleAddToCart(null)}>
+            <ShoppingCartIcon className="mr-2 h-4 w-4" />
+            Add to Cart
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
   )
 }
 
