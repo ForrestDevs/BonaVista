@@ -87,6 +87,10 @@ const Media: CollectionConfig = {
           hostname: 'drive.google.com',
           protocol: 'https',
         },
+        {
+          hostname: 'www.bonavistaleisurescapes.com',
+          protocol: 'https',
+        },
       ],
     },
   },
