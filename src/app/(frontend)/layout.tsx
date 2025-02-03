@@ -11,6 +11,7 @@ import { Footer } from '@/components/layout/footers/site'
 import { LivePreviewListener } from '@/components/payload/LivePreviewListener'
 import { AdminBar } from '@/components/payload/AdminBar'
 import getPayload from '@/lib/utils/getPayload'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export async function generateMetadata(): Promise<Metadata> {
   const payload = await getPayload()
@@ -22,7 +23,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: initData?.general?.appName as string,
     description: initData?.general?.appDescription as string,
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL || 'https://bonavistaleisurescapes.com'),
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_SERVER_URL || 'https://bonavistaleisurescapes.com',
+    ),
     openGraph: mergeOpenGraph(),
     twitter: {
       card: 'summary_large_image',
@@ -33,15 +36,20 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html className={cn(GeistSans.variable, GeistMono.variable, "!scroll-smooth")} lang="en" suppressHydrationWarning>
+    <html
+      className={cn(GeistSans.variable, GeistMono.variable, '!scroll-smooth')}
+      lang="en"
+      suppressHydrationWarning
+    >
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/rgs4hpy.css" />
       </head>
-      <body className='scrollbar-gutter-stable overflow-y-scroll overflow-x-hidden'>
+      <body className="scrollbar-gutter-stable overflow-y-scroll overflow-x-hidden">
         <main className="flex min-h-full flex-col">
           <Providers>
             {/* <AdminBar /> */}
             <LivePreviewListener />
+            <SpeedInsights />
             {children}
             <Footer />
           </Providers>
