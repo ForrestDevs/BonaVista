@@ -8,6 +8,7 @@ import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { revalidateRedirects } from '../hooks/revalidateRedirects'
 import { s3Storage } from '@payloadcms/storage-s3'
+import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
@@ -51,20 +52,29 @@ export const plugins: Plugin[] = [
     generateTitle,
     generateURL,
   }),
-  s3Storage({
+  vercelBlobStorage({
     collections: {
-      ['media']: true,
-    },
-    bucket: process.env.S3_BUCKET || 'media',
-    config: {
-      endpoint: process.env.S3_ENDPOINT || '',
-      credentials: {
-        accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+      ['media']: {
+        prefix: 'bonavista/',
       },
-      region: process.env.S3_REGION || '',
     },
+    // Token provided by Vercel once Blob storage is added to your Vercel project
+    token: process.env.BLOB_READ_WRITE_TOKEN,
   }),
+  // s3Storage({
+  //   collections: {
+  //     ['media']: true,
+  //   },
+  //   bucket: process.env.S3_BUCKET || 'media',
+  //   config: {
+  //     endpoint: process.env.S3_ENDPOINT || '',
+  //     credentials: {
+  //       accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+  //       secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+  //     },
+  //     region: process.env.S3_REGION || '',
+  //   },
+  // }),
   // stripePlugin({
   //   stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
   //   stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOKS_SIGNING_SECRET,
@@ -76,7 +86,6 @@ export const plugins: Plugin[] = [
   //     'product.updated': productUpdated,
   //   },
   // }),
-
   // payloadAiPlugin({
   //   generatePromptOnInit: true,
   //   collections: {
