@@ -16,6 +16,8 @@ export const CartLink = ({ children }: { children: ReactNode }) => {
         if (pathname === '/cart') {
           return
         }
+        const buttonElement = document.activeElement as HTMLElement // Get the currently focused element
+        buttonElement.blur()
         setOpen(true)
       }}
       scroll={false}

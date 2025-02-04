@@ -91,6 +91,10 @@ const Media: CollectionConfig = {
           hostname: 'www.bonavistaleisurescapes.com',
           protocol: 'https',
         },
+        {
+          hostname: 'www.acdcfeeds.com',
+          protocol: 'https',
+        },
       ],
     },
   },

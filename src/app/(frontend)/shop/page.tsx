@@ -115,10 +115,10 @@ const mineraluxeSteps = [
 ]
 
 const categories = [
-  { name: 'Hot Tubs', image: '/placeholder.svg?height=400&width=400' },
-  { name: 'Pools', image: '/placeholder.svg?height=400&width=400' },
-  { name: 'Swim Spas', image: '/placeholder.svg?height=400&width=400' },
-  { name: 'Accessories', image: '/placeholder.svg?height=400&width=400' },
+  { name: 'Hot Tubs', image: '/mineraluxe.jpg' },
+  { name: 'Pools', image: '/mineraluxe.jpg' },
+  { name: 'Swim Spas', image: '/mineraluxe.jpg' },
+  { name: 'Accessories', image: '/mineraluxe.jpg' },
 ]
 
 export default async function StoreHome() {

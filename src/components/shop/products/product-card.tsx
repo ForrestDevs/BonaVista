@@ -1,47 +1,28 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { Button } from '@components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@components/ui/card'
 import { Popover, PopoverContent, PopoverTrigger } from '@components/ui/popover'
 import { InfoIcon, ShoppingCartIcon } from 'lucide-react'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@components/ui/select'
 import { Product, ProductVariant } from '@payload-types'
-import Image from 'next/image'
 import { Media } from '@components/payload/Media'
-import { Media as MediaType } from '@payload-types'
 import Price from '@components/payload/Price'
 import { addToCart } from '@/lib/data/cart'
 import { CartItem } from '@/lib/types/cart'
 import { uniqueId } from 'lodash'
 import { useRouter } from 'next/navigation'
 
-// type ProductVariant = {
-//   size: string
-//   price: number
-//   sku: string
-// }
-
-// type Product = {
-//   id: string
-//   name: string
-//   description: string
-//   image: string
-//   variants: ProductVariant[]
-// }
-
 type EnhancedProductVariant = Omit<ProductVariant[number], 'info'> & {
   info: {
     options: Array<{
       label: string
       id: string
+      slug: string
+      key: {
+        slug: string
+        label: string
+      }
     }>
   }
 }
@@ -51,8 +32,28 @@ export function ProductCard({ product }: { product: Product }) {
   const [selectedVariant, setSelectedVariant] = useState<EnhancedProductVariant | null>(() => {
     if (product.variants && product.variants.variantProducts.length > 0) {
       const variant = product.variants.variantProducts[0]
-      console.log(variant)
-      return variant as EnhancedProductVariant
+      const newVariant: EnhancedProductVariant = {
+        ...variant,
+        info: {
+          options: [
+            {
+              // @ts-ignore
+              label: variant.info.options[0].label,
+              id: variant.id,
+              // @ts-ignore
+              slug: variant.info.options[0].slug,
+              // @ts-ignore
+              key: {
+                // @ts-ignore
+                slug: variant.info.options[0].key.slug,
+                // @ts-ignore
+                label: variant.info.options[0].key.label,
+              },
+            },
+          ],
+        },
+      }
+      return newVariant
     }
     return null
   })
@@ -62,7 +63,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   const price = hasVariants ? selectedVariant?.price : product.baseProduct.price
   const thumbnail = hasVariants
-    ? (product?.variants.variantProducts[0]?.images[0]?.image ?? null)
+    ? (selectedVariant?.images[0]?.image ?? null)
     : (product?.baseProduct?.images[0]?.image ?? null)
 
   const handleAddToCart = (variant: EnhancedProductVariant | null) => {
@@ -97,28 +98,33 @@ export function ProductCard({ product }: { product: Product }) {
   }
 
   return (
-    <Card
-      className="cursor-pointer group transition-all duration-300 hover:shadow-lg"
-      onClick={() => {
-        router.push(`/shop/product/${product.slug}`)
-      }}
-    >
-      <CardHeader className="p-0 relative overflow-hidden">
+    <Card className="cursor-pointer group transition-all duration-300 hover:shadow-lg h-full flex flex-col">
+      <CardHeader
+        className="p-0 relative overflow-hidden"
+        onClick={() => {
+          router.push(`/shop/product/${product.slug}`)
+        }}
+      >
         <Media
           resource={thumbnail}
-          imgClassName="object-cover transition-transform duration-300 group-hover:scale-105 rounded-lg"
+          imgClassName="object-cover transition-transform duration-300 group-hover:scale-105 rounded-lg w-full aspect-square sm:h-[300px] md:h-[250px] lg:h-[300px]"
         />
         <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <InfoIcon className="h-5 w-5 text-blue-600" />
         </div>
       </CardHeader>
-      <CardContent className="p-4">
-        <CardTitle className="text-lg group-hover:text-blue-600 transition-colors duration-300">
+      <CardContent className="p-4 flex flex-col gap-2">
+        <CardTitle className="text-lg font-semibold line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
           {product.title}
         </CardTitle>
-        <Price amount={price} currencyCode="CAD" />
+        <div className="flex items-center gap-2">
+          <Price amount={price} currencyCode="CAD" className="text-lg font-bold text-blue-600" />
+        </div>
+        {product.description && (
+          <p className="text-sm text-gray-600 line-clamp-2">{product.description}</p>
+        )}
       </CardContent>
-      <CardFooter className="p-4">
+      <CardFooter className="p-4 mt-auto">
         {hasVariants ? (
           <div className="grid grid-cols-2 gap-2 w-full">
             <Popover>

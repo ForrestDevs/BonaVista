@@ -9,6 +9,7 @@ import { CartAsideDrawer } from './cart-aside-drawer'
 import { TrashIcon } from 'lucide-react'
 import { MinusIcon } from 'lucide-react'
 import { PlusIcon } from 'lucide-react'
+import { CartItem } from '@/lib/types/cart'
 
 export async function CartModalPage() {
   const cart = await getCart(2)
@@ -32,54 +33,9 @@ export async function CartModalPage() {
 
           <div className="mt-8">
             <ul role="list" className="-my-6 divide-y divide-neutral-200">
-              {cart.items.map((line) => {
-                const product = typeof line.product === 'object' ? line.product : null
-                const productTitle =
-                  typeof line.product === 'object' ? line.product.title : line.product
-                const isVariant = line.isVariant
-                const variantOptions = isVariant
-                  ? line.variant.map((v) => v.option).join(', ')
-                  : null
-                // const thumbnail = isVariant
-                //   ? product?.variants.variantProducts.find((v) =>
-                //       v.options.every((o, i) => o === line.variant[i].option),
-                //     )?.images[0]?.image
-                //   : product?.baseProduct?.images[0]?.image
-
-                return (
-                  <li
-                    key={line.id}
-                    className="grid grid-cols-[4rem,1fr,max-content] grid-rows-[auto,auto] gap-x-4 gap-y-2 py-6"
-                  >
-                    {/* {thumbnail ? (
-                      <div className="relative h-16 w-16">
-                        <Media resource={thumbnail} />
-                      </div>
-                    ) : (
-                      <div className="col-span-1 row-span-2" />
-                    )} */}
-
-                    <h3 className="-mt-1 font-semibold leading-tight">
-                      {productTitle} {isVariant ? `- ${variantOptions}` : ''}
-                    </h3>
-                    <p className="text-sm font-medium leading-none">$ {line.price.toFixed(2)}</p>
-                    <p className="self-end text-sm font-medium text-muted-foreground">
-                      Qty: {line.quantity}
-                    </p>
-
-                    <Button variant="ghost" size="icon">
-                      <PlusIcon className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <MinusIcon className="h-4 w-4" />
-                    </Button>
-
-                    <Button variant="ghost" size="icon">
-                      <TrashIcon className="h-4 w-4" />
-                    </Button>
-                  </li>
-                )
-              })}
+              {cart.items.map((line) => (
+                <CartItemRow key={line.id} line={line} />
+              ))}
             </ul>
           </div>
         </div>
@@ -100,5 +56,53 @@ export async function CartModalPage() {
 
       {/* {searchParams.add && <CartModalAddSideEffect productId={searchParams.add} />} } */}
     </CartAsideDrawer>
+  )
+}
+
+function CartItemRow({ line }: { line: CartItem }) {
+  const product = typeof line.product === 'object' ? line.product : null
+  const productTitle = typeof line.product === 'object' ? line.product.title : line.product
+  const isVariant = line.isVariant
+  const variantOptions = isVariant ? line.variant.map((v) => v.option).join(', ') : null
+  const thumbnail = isVariant
+    ? product?.variants.variantProducts.find((v) => v.id === line.variant[0].id)?.images[0]?.image
+    : product?.baseProduct?.images[0]?.image
+
+  return (
+    <li className="flex items-center gap-4 py-6">
+      {thumbnail ? (
+        <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-neutral-200">
+          <Media resource={thumbnail} className="h-full w-full object-cover object-center" />
+        </div>
+      ) : (
+        <div className="h-24 w-24 flex-shrink-0 rounded-md bg-neutral-100" />
+      )}
+
+      <div className="flex flex-1 flex-col">
+        <div className="flex justify-between">
+          <div>
+            <h3 className="font-medium text-neutral-900">
+              {productTitle}
+              {isVariant && (
+                <span className="ml-1 text-sm text-neutral-500">({variantOptions})</span>
+              )}
+            </h3>
+            <p className="mt-1 text-sm text-neutral-500">${line.price.toFixed(2)}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <MinusIcon className="h-4 w-4" />
+            </Button>
+            <span className="min-w-[2rem] text-center">{line.quantity}</span>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <PlusIcon className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600">
+              <TrashIcon className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </li>
   )
 }

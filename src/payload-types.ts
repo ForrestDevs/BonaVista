@@ -36,9 +36,21 @@ export type ProductVariant =
       sku: string;
       price: number;
       /**
-       * Define stock for this variant. A stock of 0 disables checkout for this variant.
+       * Shows or hides the product from the shop. Default is true.
        */
-      stock: number;
+      productActive: boolean;
+      /**
+       * Allows the product to be sold online. Default is true.
+       */
+      soldOnline: boolean;
+      /**
+       * Check this if you want to track inventory for this product
+       */
+      enableInventory?: boolean | null;
+      /**
+       * Define stock for this product. A stock of 0 disables checkout for this product.
+       */
+      inventory?: number | null;
       info?:
         | {
             [k: string]: unknown;
@@ -374,6 +386,14 @@ export interface Product {
   enableVariants?: boolean | null;
   baseProduct?: {
     sku: string;
+    /**
+     * Shows or hides the product from the shop. Default is true.
+     */
+    productActive: boolean;
+    /**
+     * Allows the product to be sold online. Default is true.
+     */
+    soldOnline: boolean;
     /**
      * Check this if you want to track inventory for this product
      */
@@ -1953,6 +1973,8 @@ export interface ProductsSelect<T extends boolean = true> {
     | T
     | {
         sku?: T;
+        productActive?: T;
+        soldOnline?: T;
         enableInventory?: T;
         inventory?: T;
         price?: T;
@@ -1998,7 +2020,10 @@ export interface ProductVariantSelect<T extends boolean = true> {
   options?: T;
   sku?: T;
   price?: T;
-  stock?: T;
+  productActive?: T;
+  soldOnline?: T;
+  enableInventory?: T;
+  inventory?: T;
   info?: T;
   images?:
     | T

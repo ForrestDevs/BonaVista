@@ -72,7 +72,7 @@ export function SearchBar() {
         <span className="sr-only">Search</span>
       </Button>
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-10">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-10">
           <div ref={searchRef} className="bg-white p-4 rounded-lg shadow-lg w-full max-w-2xl mx-4">
             <form onSubmit={handleSubmit} className="flex items-center">
               <Input

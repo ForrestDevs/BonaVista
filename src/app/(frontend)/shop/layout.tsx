@@ -9,10 +9,10 @@ export default async function StoreLayout({ children }: { children: React.ReactN
       <CartModalProvider>
         <ShopHeader />
         <TooltipProvider>
-          <main className="flex-1 pt-[84.5px]">
+          <div className="flex-1">
             {children}
             <CartModalPage />
-          </main>
+          </div>
         </TooltipProvider>
       </CartModalProvider>
     </div>

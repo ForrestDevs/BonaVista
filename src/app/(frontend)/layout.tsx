@@ -8,10 +8,7 @@ import { GeistSans } from 'geist/font/sans'
 import { Providers } from '@/lib/providers'
 import { mergeOpenGraph } from '@/lib/utils/mergeOpenGraph'
 import { Footer } from '@/components/layout/footers/site'
-import { LivePreviewListener } from '@/components/payload/LivePreviewListener'
-import { AdminBar } from '@/components/payload/AdminBar'
 import getPayload from '@/lib/utils/getPayload'
-import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export async function generateMetadata(): Promise<Metadata> {
   const payload = await getPayload()
@@ -37,19 +34,17 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
-      className={cn(GeistSans.variable, GeistMono.variable, '!scroll-smooth')}
+      // className={cn(GeistSans.variable, GeistMono.variable, '!scroll-smooth')}
       lang="en"
       suppressHydrationWarning
+      className="!scroll-smooth"
     >
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/rgs4hpy.css" />
       </head>
-      <body className="scrollbar-gutter-stable overflow-y-scroll overflow-x-hidden">
-        <main className="flex min-h-full flex-col">
+      <body className="antialiased">
+        <main>
           <Providers>
-            {/* <AdminBar /> */}
-            <LivePreviewListener />
-            <SpeedInsights />
             {children}
             <Footer />
           </Providers>

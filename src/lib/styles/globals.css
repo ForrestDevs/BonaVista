@@ -8,6 +8,7 @@
 @layer base {
   :root {
     --removed-body-scroll-bar-size: 0px;
+    --shop-header-height: 84.5px;
   }
 
   body {

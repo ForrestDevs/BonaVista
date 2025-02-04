@@ -154,6 +154,31 @@ const Products: CollectionConfig = {
                   type: 'row',
                   fields: [
                     {
+                      label: 'Product Active',
+                      name: 'productActive',
+                      type: 'checkbox',
+                      defaultValue: true,
+                      admin: {
+                        description: 'Shows or hides the product from the shop. Default is true.',
+                      },
+                      required: true,
+                    },
+                    {
+                      label: 'Sold Online',
+                      name: 'soldOnline',
+                      type: 'checkbox',
+                      defaultValue: true,
+                      admin: {
+                        description: 'Allows the product to be sold online. Default is true.',
+                      },
+                      required: true,
+                    },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
                       label: 'Enable Inventory',
                       name: 'enableInventory',
                       type: 'checkbox',
@@ -308,15 +333,57 @@ const Products: CollectionConfig = {
                       ],
                     },
                     {
-                      name: 'stock',
-                      type: 'number',
-                      admin: {
-                        description:
-                          'Define stock for this variant. A stock of 0 disables checkout for this variant.',
-                        width: '50%',
-                      },
-                      defaultValue: 0,
-                      required: true,
+                      type: 'row',
+                      fields: [
+                        {
+                          label: 'Product Active',
+                          name: 'productActive',
+                          type: 'checkbox',
+                          defaultValue: true,
+                          admin: {
+                            description:
+                              'Shows or hides the product from the shop. Default is true.',
+                          },
+                          required: true,
+                        },
+                        {
+                          label: 'Sold Online',
+                          name: 'soldOnline',
+                          type: 'checkbox',
+                          defaultValue: true,
+                          admin: {
+                            description: 'Allows the product to be sold online. Default is true.',
+                          },
+                          required: true,
+                        },
+                      ],
+                    },
+                    {
+                      type: 'row',
+                      fields: [
+                        {
+                          label: 'Enable Inventory',
+                          name: 'enableInventory',
+                          type: 'checkbox',
+                          admin: {
+                            description:
+                              'Check this if you want to track inventory for this product',
+                          },
+                          defaultValue: false,
+                        },
+                        {
+                          label: 'Inventory',
+                          name: 'inventory',
+                          type: 'number',
+                          admin: {
+                            condition: (_, siblingData) => siblingData.enableInventory,
+                            description:
+                              'Define stock for this product. A stock of 0 disables checkout for this product.',
+                          },
+                          required: true,
+                          defaultValue: 0,
+                        },
+                      ],
                     },
                     {
                       name: 'info',
@@ -339,7 +406,6 @@ const Products: CollectionConfig = {
                     },
                   ],
                   validate: (_, { siblingData }: { siblingData: any }) => {
-                    console.log('siblingData', siblingData)
                     if (siblingData.variantProducts.length) {
                       const hasDuplicate = siblingData.variantProducts.some(
                         (variant: ProductVariant, index) => {

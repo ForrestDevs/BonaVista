@@ -1,340 +1,512 @@
-// import { getPayload } from 'payload'
-// import config from '@payload-config'
-// import Stripe from 'stripe'
-// import { Product } from '@payload-types'
+import { BasePayload } from 'payload'
+import config from '@payload-config'
+import Papa from 'papaparse'
+import { Product, Media, Brand, ProductCategory } from '@payload-types'
+import {
+  BRAND_SLUG,
+  MEDIA_SLUG,
+  PRODUCT_CATEGORY_SLUG,
+  PRODUCT_SLUG,
+} from '@/payload/collections/constants'
+import fs from 'fs'
+import getPayload from '../utils/getPayload'
+import { createHeadlessEditor } from '@lexical/headless'
+import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical'
 
-// const stripe = new Stripe(process.env.STRIPE_API_KEY ?? '', {})
+interface Cache {
+  brands: Map<string, string>
+  categories: Map<string, string>
+}
 
-// const poolProducts: Partial<Product>[] = [
-//   {
-//     slug: 'chlorine-tablets',
-//     title: 'Chlorine Tablets',
-//     description: '3-inch stabilized chlorine tablets for pool sanitization',
-//     images: [],
-//     hasVariants: true,
-//     variants: [
-//       {
-//         title: '5 lb bucket',
-//         description: '5 lb bucket of chlorine tablets',
-//         priceJSON: '{"amount": 1499, "currency": "cad"}',
-//       },
-//       {
-//         title: '25 lb bucket',
-//         description: '25 lb bucket of chlorine tablets',
-//         priceJSON: '{"amount": 2699, "currency": "cad"}',
-//       },
-//     ],
-//     _status: 'published',
-//   },
-//   {
-//     slug: 'bromine-tablets',
-//     title: 'Bromine Tablets',
-//     description: '3-inch stabilized bromine tablets for hot tub sanitization',
-//     images: [],
-//     hasVariants: true,
-//     variants: [
-//       {
-//         title: '5 lb bucket',
-//         description: '5 lb bucket of bromine tablets',
-//         priceJSON: '{"amount": 1499, "currency": "cad"}',
-//       },
-//       {
-//         title: '25 lb bucket',
-//         description: '25 lb bucket of bromine tablets',
-//         priceJSON: '{"amount": 2699, "currency": "cad"}',
-//       },
-//     ],
-//     _status: 'published',
-//   },
-//   {
-//     slug: 'ph-plus',
-//     title: 'pH Plus',
-//     description: 'Raises pH levels in pools and spas',
-//     images: [],
-//     hasVariants: true,
-//     variants: [
-//       {
-//         title: '500 gram bag',
-//         description: '500 gram bag of pH Plus',
-//         priceJSON: '{"amount": 799, "currency": "cad"}',
-//       },
-//       {
-//         title: '1 kg bag',
-//         description: '1 kg bag of pH Plus',
-//         priceJSON: '{"amount": 1499, "currency": "cad"}',
-//       },
-//     ],
-//     _status: 'published',
-//   },
-//   {
-//     slug: 'ph-minus',
-//     title: 'pH Minus',
-//     description: 'Lowers pH levels in pools and spas',
-//     images: [],
-//     hasVariants: true,
-//     variants: [
-//       {
-//         title: '500 gram bag',
-//         description: '500 gram bag of pH Minus',
-//         priceJSON: '{"amount": 799, "currency": "cad"}',
-//       },
-//       {
-//         title: '1 kg bag',
-//         description: '1 kg bag of pH Minus',
-//         priceJSON: '{"amount": 1499, "currency": "cad"}',
-//       },
-//     ],
-//     _status: 'published',
-//   },
-//   {
-//     slug: 'pool-shock',
-//     title: 'Pool Shock Treatment',
-//     description: 'Fast-acting chlorine shock treatment',
-//     images: [],
-//     hasVariants: true,
-//     variants: [
-//       {
-//         title: '1 lb bag',
-//         description: '1 lb bag of pool shock treatment',
-//         priceJSON: '{"amount": 1499, "currency": "cad"}',
-//       },
-//       {
-//         title: '5 lb bucket',
-//         description: '5 lb bucket of pool shock treatment',
-//         priceJSON: '{"amount": 2699, "currency": "cad"}',
-//       },
-//     ],
-//     _status: 'published',
-//   },
-//   {
-//     slug: 'algaecide',
-//     title: 'Algaecide',
-//     description: 'Prevents and treats algae growth in pools',
-//     images: [],
-//     hasVariants: false,
-//     priceJSON: '{"amount": 1499, "currency": "cad"}',
-//     _status: 'published',
-//   },
-//   {
-//     slug: 'test-strips',
-//     title: 'Pool Water Test Strips',
-//     description: 'Quick and easy way to test pool water chemistry',
-//     images: [],
-//     hasVariants: true,
-//     variants: [
-//       {
-//         title: '50 strips',
-//         description: '50 strips of pool water test strips',
-//         priceJSON: '{"amount": 1499, "currency": "cad"}',
-//       },
-//       {
-//         title: '100 strips',
-//         description: '100 strips of pool water test strips',
-//         priceJSON: '{"amount": 1499, "currency": "cad"}',
-//       },
-//     ],
-//     _status: 'published',
-//   },
-//   {
-//     slug: 'pool-brush',
-//     title: 'Pool Brush',
-//     description: 'Durable brush for cleaning pool walls and floor',
-//     images: [],
-//     hasVariants: false,
-//     priceJSON: '{"amount": 1499, "currency": "cad"}',
-//     _status: 'published',
-//   },
-//   {
-//     slug: 'pool-skimmer',
-//     title: 'Pool Skimmer Net',
-//     description: 'Fine mesh net for removing debris from pool surface',
-//     images: [],
-//     hasVariants: false,
-//     priceJSON: '{"amount": 1499, "currency": "cad"}',
-//     _status: 'published',
-//   },
-//   {
-//     slug: 'pool-filter-sand',
-//     title: 'Pool Filter Sand',
-//     description: 'High-quality silica sand for pool sand filters',
-//     images: [],
-//     hasVariants: true,
-//     variants: [
-//       {
-//         title: '25 lb bag',
-//         description: '25 lb bag of pool filter sand',
-//         priceJSON: '{"amount": 1499, "currency": "cad"}',
-//       },
-//       {
-//         title: '50 lb bag',
-//         description: '50 lb bag of pool filter sand',
-//         priceJSON: '{"amount": 1499, "currency": "cad"}',
-//       },
-//     ],
-//     _status: 'published',
-//   },
-//   {
-//     slug: 'hot-tub-defoamer',
-//     title: 'Hot Tub Defoamer',
-//     description: 'Eliminates foam in hot tubs and spas',
-//     images: [],
-//     hasVariants: false,
-//     priceJSON: '{"amount": 1499, "currency": "cad"}',
-//     _status: 'published',
-//   },
-//   {
-//     slug: 'pool-cover',
-//     title: 'Winter Pool Cover',
-//     description: 'Durable cover to protect your pool during off-season',
-//     images: [],
-//     hasVariants: true,
-//     variants: [
-//       {
-//         title: '15x30 ft',
-//         description: '15x30 ft pool cover',
-//         priceJSON: '{"amount": 1499, "currency": "cad"}',
-//       },
-//       {
-//         title: '20x40 ft',
-//         description: '20x40 ft pool cover',
-//         priceJSON: '{"amount": 1499, "currency": "cad"}',
-//       },
-//     ],
-//     _status: 'published',
-//   },
-// ]
+const cache: Cache = {
+  brands: new Map(),
+  categories: new Map(),
+}
 
-// const seedProducts = async () => {
-//   const payload = await getPayload({ config })
+const lexicalEditor = createHeadlessEditor({
+  namespace: 'Editor',
+  nodes: [],
+  onError: console.error,
+})
 
-//   // Delete all Stripe products and prices
-//   //   const stripeProducts = await stripe.products.list({ limit: 100 })
-//   //   for (const product of stripeProducts.data) {
-//   //     const prices = await stripe.prices.list({ product: product.id })
-//   //     for (const price of prices.data) {
-//   //       await stripe.prices.update(price.id, { active: false })
-//   //     }
-//   //     await stripe.products.del(product.id)
-//   //   }
-//   //   console.log('Deleted all Stripe products and prices')
+async function plainTextToLexicalState(text: string): Promise<string> {
+  return new Promise((resolve) => {
+    lexicalEditor.registerUpdateListener(({ editorState }) => {
+      resolve(JSON.stringify(editorState))
+    })
 
-//   // Delete all Payload products
-//   const existingProducts = await payload.find({
-//     collection: 'products',
-//     limit: 1000, // Adjust if you have more products
-//   })
+    lexicalEditor.update(() => {
+      const paragraph = $createParagraphNode()
+      const textNode = $createTextNode(text)
 
-//   for (const product of existingProducts.docs) {
-//     await payload.delete({
-//       collection: 'products',
-//       id: product.id,
-//     })
-//   }
-//   console.log('Deleted all Payload products')
+      paragraph.append(textNode)
 
-//   for (const product of poolProducts) {
-//     // Create product in Stripe
-//     const stripeProduct = await stripe.products.create({
-//       name: product.title ?? '',
-//       description: product.description ?? '',
-//     })
+      $getRoot().clear().append(paragraph)
+    })
+  })
+}
 
-//     let stripePriceId = null
-//     let variants = null
+async function initializeBrands(payload: BasePayload) {
+  payload.logger.info('— Initializing brands...')
 
-//     if (product.hasVariants && product.variants && product.variants.length > 0) {
-//       variants = await Promise.all(
-//         product.variants.map(async (variant) => {
-//           const price = await stripe.prices.create({
-//             product: stripeProduct.id,
-//             unit_amount: JSON.parse(variant.priceJSON ?? '{}').amount,
-//             currency: JSON.parse(variant.priceJSON ?? '{}').currency,
-//           })
+  const existingBrands = await payload.find({
+    collection: BRAND_SLUG,
+    limit: 1000,
+  })
 
-//           return {
-//             ...variant,
-//             stripePriceID: price.id,
-//           }
-//         }),
-//       )
-//     } else {
-//       // Create a default price for products without variants
-//       const price = await stripe.prices.create({
-//         product: stripeProduct.id,
-//         unit_amount: JSON.parse(product.priceJSON ?? '{}').amount,
-//         currency: JSON.parse(product.priceJSON ?? '{}').currency,
-//       })
-//       stripePriceId = price.id
-//     }
+  existingBrands.docs.forEach((brand) => {
+    cache.brands.set(brand.name, brand.id)
+  })
 
-//     // Create product in Payload
+  payload.logger.info(`— Cached ${existingBrands.docs.length} existing brands`)
+}
+
+async function initializeCategories(payload: BasePayload) {
+  payload.logger.info('— Initializing categories...')
+
+  const existingCategories = await payload.find({
+    collection: PRODUCT_CATEGORY_SLUG,
+    limit: 1000, // Adjust based on your needs
+  })
+
+  existingCategories.docs.forEach((category) => {
+    cache.categories.set(category.title, category.id)
+  })
+
+  payload.logger.info(`— Cached ${existingCategories.docs.length} existing categories`)
+}
+
+function standardizeBrandName(name: string): string {
+  // Split by spaces while preserving special characters
+  return name
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+}
+
+function getCachedBrand(brandName: string, payload: BasePayload): string | undefined {
+  let standardizedName: string
+
+  if (brandName === 'NatChem' || brandName === 'A&B') {
+    standardizedName = brandName
+  } else {
+    standardizedName = standardizeBrandName(brandName)
+  }
+
+  const brandId = cache.brands.get(standardizedName)
+
+  if (!brandId) {
+    payload.logger.warn(`— Brand not found in cache: ${standardizedName}`)
+    return undefined
+  }
+
+  payload.logger.info(`— Found cached brand: ${standardizedName}`)
+  return brandId
+}
+
+function getCachedCategory(categoryName: string, payload: BasePayload): string | undefined {
+  const categoryId = cache.categories.get(categoryName.trim())
+
+  if (!categoryId) {
+    payload.logger.warn(`— Category not found in cache: ${categoryName}`)
+    return undefined
+  }
+
+  payload.logger.info(`— Found cached category: ${categoryName}`)
+  return categoryId
+}
+
+async function createMedia(
+  imageUrl: string,
+  title: string,
+  size: string,
+  payload: BasePayload,
+): Promise<string> {
+  payload.logger.info(`— Creating media for: ${title}`)
+
+  const validatedUrl = validate_image_url(imageUrl)
+
+  try {
+    const media = await payload.create({
+      collection: MEDIA_SLUG,
+      data: {
+        alt: title,
+        url: validatedUrl,
+        filename: title + ' ' + size,
+      },
+    })
+    return media.id
+  } catch (error) {
+    payload.logger.error(`— Error creating media for: ${title}`, error)
+    return null
+  }
+}
+
+function getBaseProductTitle(title: string): string {
+  return title.replace(/\s+\d+(\.\d+)?\s*(kg|g|ml|l)\s*$/i, '').trim()
+}
+
+function validate_image_url(url: string): string {
+  if (url.includes('drive.google.com')) {
+    // Split URL to get the ID part
+    if (url.includes('/open?id=')) {
+      // Convert from /open?id= format to /uc?export=download&id= format
+      const base_url = 'https://drive.google.com/uc?export=download&id='
+      const file_id = url.split('/open?id=')[1]
+      return `${base_url}${file_id}`
+    } else if (url.includes('/uc?export=download&id=')) {
+      // URL is already in correct format
+      return url
+    }
+  }
+
+  // Return original URL if it's not a Google Drive URL
+  return url
+}
+
+function extractVariantInfo(
+  size: string,
+  payload: BasePayload,
+): { label: string; value: string } | null {
+  payload.logger.info(`— Extracting variant info for: ${size}`)
+
+  if (!size) {
+    payload.logger.info(`— No size provided`)
+    return null
+  }
+
+  // First try to match weight/volume patterns
+  const weightMatch = size.match(/(\d+(?:\.\d+)?)\s*(kg|g|gm|ml|l|lb)\s*$/i)
+  if (weightMatch) {
+    // Standardize unit to lowercase and handle variations
+    let unit = weightMatch[2].toLowerCase()
+    switch (unit) {
+      case 'gm':
+        unit = 'g'
+        break
+      case 'l':
+        unit = 'L'
+        break
+      case 'ml':
+        unit = 'mL'
+        break
+      case 'kg':
+        unit = 'kg'
+        break
+      case 'lb':
+        unit = 'lb'
+        break
+      default:
+        payload.logger.error(`— Unknown unit: ${unit}`)
+        unit = weightMatch[2]
+        break
+    }
+    payload.logger.info(`— Weight Match found: ${weightMatch[1]} ${unit}`)
+    return {
+      label: 'Size',
+      value: `${weightMatch[1]} ${unit}`,
+    }
+  }
+
+  // Try to match pack/box patterns
+  const packMatch = size.match(/(\d+)\s*(pack|box)/i)
+  if (packMatch) {
+    payload.logger.info(`— Pack Match found: ${packMatch[1]} ${packMatch[2].toLowerCase()}`)
+    return {
+      label: 'Package',
+      value: `${packMatch[1]} ${packMatch[2].toLowerCase()}`,
+    }
+  }
+
+  // If size exists but doesn't match our patterns, use it as is
+  if (size.trim()) {
+    payload.logger.info(`— Size Match found: ${size.trim()}`)
+    return {
+      label: 'Size',
+      value: size.trim(),
+    }
+  }
+
+  payload.logger.info(`— No recognized size pattern found`)
+  return null
+}
+
+function determineCompatibility(categories: string[]): ('swimspa' | 'hottub' | 'pool')[] {
+  const compatibility: ('swimspa' | 'hottub' | 'pool')[] = []
+  const categoryStr = categories.join(' ').toLowerCase()
+
+  if (categoryStr.includes('pool')) compatibility.push('pool')
+  if (categoryStr.includes('swim spa') || categoryStr.includes('swimspa'))
+    compatibility.push('swimspa')
+  if (categoryStr.includes('hot tub') || categoryStr.includes('hottub'))
+    compatibility.push('hottub')
+
+  return compatibility
+}
+
+async function getOrCreateMedia(
+  imageUrl: string,
+  title: string,
+  size: string,
+  payload: BasePayload,
+): Promise<string> {
+  payload.logger.info(`— Checking media for: ${title}`)
+
+  // First try to find existing media
+  const existingMedia = await payload.find({
+    collection: MEDIA_SLUG,
+    where: {
+      alt: {
+        equals: title + ' ' + size,
+      },
+    },
+  })
+
+  if (existingMedia.docs.length > 0) {
+    payload.logger.info(`— Found existing media for: ${title}`)
+    return existingMedia.docs[0].id
+  }
+
+  payload.logger.info(`— Creating new media for: ${title}`)
+  const validatedUrl = validate_image_url(imageUrl)
+
+  try {
+    const media = await payload.create({
+      collection: MEDIA_SLUG,
+      data: {
+        alt: title + ' ' + size,
+        url: validatedUrl,
+        filename: title + ' ' + size,
+      },
+    })
+    return media.id
+  } catch (error) {
+    payload.logger.error(`— Error creating media for: ${title}`, error)
+    return null
+  }
+}
+
+async function seedProducts() {
+  const payload = await getPayload()
+  payload.logger.info('— Starting product seeding process')
+
+  await initializeBrands(payload)
+  await initializeCategories(payload)
+
+  // Fetch CSV data
+  const response = await fetch(
+    'https://docs.google.com/spreadsheets/d/e/2PACX-1vQWhQK-G9A66WjSl753kkok8R1jQZLVt3apg3SJ2pNgIvomLL2rBnsfJNWe7Rbxro7veHBwpWI-mRKM/pub?gid=845501447&single=true&output=csv',
+  )
+  const csvText = await response.text()
+
+  const { data } = Papa.parse(csvText, {
+    header: true,
+    skipEmptyLines: true,
+  })
+
+  // Group variants
+  const productGroups = new Map<string, any[]>()
+
+  data
+    .filter((row: any) => row.active === 'T')
+    .forEach((row: any) => {
+      const baseTitle = getBaseProductTitle(row.name)
+      if (!productGroups.has(baseTitle)) {
+        productGroups.set(baseTitle, [])
+      }
+      productGroups.get(baseTitle)!.push(row)
+    })
+
+  payload.logger.info(`— Found ${productGroups.size} unique products`)
+
+  let productCount = 0
+  let variantCount = 0
+  let mediaCount = 0
+  let products = []
+
+  for (const [baseTitle, variants] of productGroups) {
+    // payload.logger.info(`— Processing product: ${baseTitle}`)
+
+    const brandId = getCachedBrand(variants[0].brand, payload)
+
+    const categoryIds = await Promise.all(
+      variants[0].shop_category
+        .split(',')
+        .map((cat) => cat.trim())
+        .filter(Boolean)
+        .map((cat) => getCachedCategory(cat, payload)),
+    )
+
+    const compatibility = determineCompatibility(variants[0].shop_category.split(','))
+
+    const hasVariants = variants.length > 1
+
+    if (hasVariants) {
+      payload.logger.info(`— Product ${baseTitle} has variants: ${variants.length}`)
+    }
+
+    const moreInfoState = await plainTextToLexicalState(variants[0].long_description)
+
+    const productData: Partial<Product> = {
+      title: baseTitle,
+      description: variants[0].short_description,
+      //@ts-ignore
+      moreInfo: moreInfoState,
+      //   moreInfo: {
+      //     root: {
+      //       children: [
+      //         {
+      //           children: [
+      //             {
+      //               detail: 0,
+      //               format: 0,
+      //               mode: 'normal',
+      //               style: '',
+      //               text: variants[0].long_description,
+      //               type: 'text',
+      //               version: 1,
+      //             },
+      //           ],
+      //           direction: 'ltr',
+      //           format: '',
+      //           indent: 0,
+      //           type: 'paragraph',
+      //           version: 1,
+      //           textFormat: 0,
+      //           textStyle: '',
+      //         },
+      //       ],
+      //       direction: 'ltr',
+      //       format: '',
+      //       indent: 0,
+      //       type: 'root',
+      //       version: 1,
+      //     },
+      //   },
+      enableVariants: hasVariants,
+      brand: [brandId],
+      categories: categoryIds,
+      compatibility,
+      _status: 'published',
+    }
+
+    if (!hasVariants) {
+      // Single product
+      const mediaId = await getOrCreateMedia(
+        variants[0].image,
+        variants[0].name,
+        variants[0].size,
+        payload,
+      )
+      productData.baseProduct = {
+        soldOnline: variants[0].sold_online === 'Y',
+        sku: variants[0].sku,
+        productActive: true,
+        price: parseFloat(variants[0].retail_price.replace(/[$,]/g, '')),
+        images: [{ image: mediaId }],
+      }
+    } else {
+      // Process all variant info upfront
+      const variantsInfo = variants.map((v) => ({
+        ...v,
+        variantInfo: extractVariantInfo(v.size, payload),
+      }))
+
+      const firstVariantInfo = variantsInfo[0].variantInfo
+      if (!firstVariantInfo) {
+        payload.logger.error(`— No variant info found for: ${variants[0].name}`)
+        continue
+      }
+
+      productData.variants = {
+        options: [
+          {
+            label: firstVariantInfo.label,
+            slug: firstVariantInfo.label.toLowerCase(),
+            values: variantsInfo.map((v) => ({
+              label: v.variantInfo?.value || '',
+              slug: v.variantInfo?.value.toLowerCase().replace(/\s+/g, '-') || '',
+            })),
+          },
+        ],
+        variantProducts: await Promise.all(
+          variantsInfo.map(async (variant) => {
+            const mediaId = await getOrCreateMedia(
+              variant.image,
+              variant.name,
+              variant.size,
+              payload,
+            )
+            return {
+              options: [variant.variantInfo?.value.toLowerCase().replace(/\s+/g, '-') || ''],
+              sku: variant.sku,
+              price: parseFloat(variant.retail_price.replace(/[$,]/g, '')),
+              productActive: true,
+              soldOnline: variant.sold_online === 'Y',
+              images: [{ image: mediaId }],
+            }
+          }),
+        ),
+      }
+    }
+
+    productCount++
+    variantCount += hasVariants ? variants.length : 1
+    mediaCount += hasVariants ? variants.length : 1
+    products.push(productData)
+  }
+  payload.logger.info(
+    `— Created data for ${productCount} products, ${variantCount} variants, and ${mediaCount} media`,
+  )
+
+  fs.writeFileSync('products.json', JSON.stringify(products, null, 2))
+
+  // Create products
+//   const len = products.length
+//   for (const [index, product] of products.entries()) {
+//     payload.logger.info(`— Creating product ${index + 1} of ${len}: ${product.title}`)
 //     await payload.create({
-//       collection: 'products',
-//       data: {
-//         title: product.title ?? '',
-//         description: product.description ?? '',
-//         layout: [
-//           {
-//             richText: {
-//               root: {
-//                 type: 'root',
-//                 children: [
-//                   {
-//                     tag: 'h3',
-//                     type: 'heading',
-//                     version: 1,
-//                     indent: 0,
-//                     format: '',
-//                     direction: 'ltr',
-//                     children: [
-//                       {
-//                         type: 'text',
-//                         version: 1,
-//                         text: product.title ?? '',
-//                         style: '',
-//                         mode: 'normal',
-//                         format: 0,
-//                         detail: 0,
-//                       },
-//                     ],
-//                   },
-//                 ],
-//                 direction: 'ltr',
-//                 version: 1,
-//                 format: '',
-//                 indent: 0,
-//               },
-//             },
-//             'link-groups': [],
-//             blockType: 'cta',
-//           },
-//         ],
-//         hasVariants: product.hasVariants,
-//         variants: variants?.map((variant) => ({
-//           title: variant.title ?? '',
-//           description: variant.description ?? '',
-//           useParentMeta: false,
-//           stripePriceID: variant.stripePriceID ?? '',
-//         })),
-//         stripeProductID: stripeProduct.id,
-//         updatedAt: new Date().toISOString(),
-//         createdAt: new Date().toISOString(),
-//         _status: product._status,
-//       },
+//       collection: PRODUCT_SLUG,
+//       data: product,
 //     })
-
-//     console.log(`Created product: ${product.title}`)
 //   }
+  payload.logger.info('— Seeding completed successfully')
+}
 
-//   console.log('Product seeding completed')
-// }
+async function seedFromJson() {
+  const payload = await getPayload()
+  const products = JSON.parse(fs.readFileSync('products.json', 'utf8'))
 
-// seedProducts()
+  let productObjects = []
+  for (const product of products) {
+    productObjects.push(product)
+  }
+
+  const len = productObjects.length
+  for (const [index, product] of products.entries()) {
+    payload.logger.info(`— Creating product ${index + 1} of ${len}: ${product.title}`)
+    await payload.create({
+      collection: PRODUCT_SLUG,
+      data: product,
+    })
+  }
+  payload.logger.info('— Seeding completed successfully')
+}
+
+// seedFromJson()
 //   .then(() => {
-//     console.log('Seeding script finished')
 //     process.exit(0)
 //   })
 //   .catch((error) => {
-//     console.error('Error in seeding script:', error)
+//     console.error('Seeding failed:', error)
 //     process.exit(1)
 //   })
+
+seedProducts()
+  .then(() => {
+    process.exit(0)
+  })
+  .catch((error) => {
+    console.error('Seeding failed:', error)
+    process.exit(1)
+  })

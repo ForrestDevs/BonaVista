@@ -1,10 +1,11 @@
 import React from 'react'
 import ThemeProvider from '@/lib/providers/Theme'
 import { Toaster } from 'sonner'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-// import { CartProvider } from './Cart'
 import { AuthProvider } from './Auth'
 import { NuqsProvider } from './Nuqs'
+import { AdminBar } from '@/components/payload/AdminBar'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import { LivePreviewListener } from '@/components/payload/LivePreviewListener'
 
 export const Providers: React.FC<{
   children: React.ReactNode
@@ -13,10 +14,11 @@ export const Providers: React.FC<{
     <ThemeProvider>
       <AuthProvider>
         <NuqsProvider>
-          {/* <CartProvider> */}
+          {/* <AdminBar /> */}
           {children}
           <Toaster />
-          {/* </CartProvider> */}
+          <SpeedInsights />
+          <LivePreviewListener />
         </NuqsProvider>
       </AuthProvider>
     </ThemeProvider>
