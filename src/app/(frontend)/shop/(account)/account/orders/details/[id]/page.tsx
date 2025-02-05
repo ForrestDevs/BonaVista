@@ -71,7 +71,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
           <div key={item.id} className="flex items-center justify-between border-b pb-4">
             <div className="flex items-center gap-x-4">
               <div className="h-20 w-20 rounded-lg border">
-                <CartItemThumbnail item={item} />
+                <CartItemThumbnail line={item} />
                 {/* {item.image && (
                   <img
                     src={item.image}

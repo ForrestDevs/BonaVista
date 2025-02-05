@@ -63,7 +63,7 @@ function OrderOverview({ orders }: { orders: Order[] }) {
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:grid-cols-6">
               {order.items?.slice(0, 3).map((item) => (
                 <div key={item.id} className="aspect-square relative">
-                  <CartItemThumbnail item={item} />
+                  <CartItemThumbnail line={item} />
                   {/* {item.image && (
                     <img
                       src={item.image}

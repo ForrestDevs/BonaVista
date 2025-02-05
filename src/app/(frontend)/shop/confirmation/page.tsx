@@ -75,7 +75,7 @@ export default async function OrderDetailsPage(props: {
                 <CartItemDetails item={item} />
                 {/* {item.product.title} - {item.variant.map((v) => v.option).join(', ')} */}
               </h3>
-              <CartItemThumbnail item={item} />
+              <CartItemThumbnail line={item} />
               <div className="prose row-start-2 text-secondary-foreground">
                 {/* <Markdown source={line.product.description || ''} /> */}
               </div>
@@ -283,7 +283,6 @@ const PaymentStatus = async ({ status }: { status: PaymentIntent.Status }) => {
   )
 }
 
-
 // import React from 'react'
 // import { Metadata } from 'next'
 // import { mergeOpenGraph } from '@lib/utils/mergeOpenGraph'
@@ -305,7 +304,6 @@ const PaymentStatus = async ({ status }: { status: PaymentIntent.Status }) => {
 //   }),
 // }
 
-
 // export default async function OrderConfirmedPage({
 //   params,
 //   searchParams,
@@ -321,7 +319,7 @@ const PaymentStatus = async ({ status }: { status: PaymentIntent.Status }) => {
 //   if (!orderId) {
 //     return notFound() // Handle case where orderId is undefined
 //   }
-  
+
 //   const payload = await getPayload()
 
 //   const order = await payload.findByID({
@@ -391,4 +389,3 @@ const PaymentStatus = async ({ status }: { status: PaymentIntent.Status }) => {
 //     </div>
 //   )
 // }
-
