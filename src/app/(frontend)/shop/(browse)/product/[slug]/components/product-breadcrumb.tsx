@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils/cn'
 import { Product } from '@payload-types'
 import Link from 'next/link'
 
@@ -74,25 +75,33 @@ export default function ProductBreadcrumb({
   }
 
   return (
-    <nav aria-label="Breadcrumb">
-      <ol className="flex items-center space-x-2">
-        <li>
-          <Link href="/shop">Shop</Link>
+    <nav aria-label="Breadcrumb" className="overflow-x-auto">
+      <ol className="flex items-center whitespace-nowrap min-w-0 text-sm text-muted-foreground">
+        <li className="flex items-center">
+          <Link href="/shop" className="hover:text-foreground transition-colors">
+            Shop
+          </Link>
         </li>
         {currentPath?.categories?.map((category, index) => (
-          <li key={category.fullSlug}>
-            <span className="mx-2">/</span>
+          <li key={category.fullSlug} className="flex items-center">
+            <span className="mx-2 text-muted-foreground/50">/</span>
             <Link
               href={`/shop/category/${category.fullSlug}`}
-              className={index === currentPath?.categories?.length - 1 ? 'font-semibold' : ''}
+              className={cn(
+                "hover:text-foreground transition-colors truncate max-w-[150px] sm:max-w-[200px]",
+                index === currentPath?.categories?.length - 1 && "font-medium text-foreground"
+              )}
+              title={category.title}
             >
               {category.title}
             </Link>
           </li>
         ))}
-        <li>
-          <span className="mx-2">/</span>
-          <span className="font-semibold">{product.title}</span>
+        <li className="flex items-center">
+          <span className="mx-2 text-muted-foreground/50">/</span>
+          <span className="font-medium text-foreground truncate max-w-[150px] sm:max-w-[200px]" title={product.title}>
+            {product.title}
+          </span>
         </li>
       </ol>
     </nav>

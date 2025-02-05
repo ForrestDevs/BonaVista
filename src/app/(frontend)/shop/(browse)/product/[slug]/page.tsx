@@ -11,8 +11,11 @@ import { VariantSelector } from './components/variant-selector'
 import { ProductGallery } from './components/product-gallery'
 import { AddToCartButton } from './components/add-to-cart-button'
 import { ProductPrice } from './components/product-price'
-import { Gallery } from '@/components/shop/products/gallery'
+import { ProductInfo } from './components/product-info'
 import ProductBreadcrumb from './components/product-breadcrumb'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -72,58 +75,60 @@ export default async function ProductDetail({ params }: Props) {
       />
       <ProductProvider product={product}>
         <div className="container mx-auto px-4 py-8">
-          {/* Breadcrumb */}
           <ProductBreadcrumb product={product} searchParams={{ from: '' }} />
-
-          <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8">
-            {/* Left Column - Gallery & Details */}
-            <div className="lg:col-span-8 order-2 lg:order-1">
-              <div className="space-y-8">
-                <Gallery />
-                {/* <ProductGallery /> */}
-
-                {/* Product Details Tabs */}
-                <div className="border-t border-gray-200">
-                  <div className="space-y-8 py-6">
-                    <div>
-                      <h3 className="text-lg font-medium">Description</h3>
-                      <RichText content={product.moreInfo} />
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-medium">Specifications</h3>
-                      <div className="mt-4 prose prose-sm max-w-none">
-                        {product.baseProduct.sku}
-                      </div>
-                    </div>
+          <div className="mt-8 grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-2">
+            <div className="lg:row-span-2">
+              <ProductGallery />
+            </div>
+            <div className="lg:max-w-lg">
+              <div className="space-y-6">
+                {product.brand && (
+                  <div className="flex items-center gap-2">
+                    {brands.map((brand) => (
+                      <Badge key={brand} variant="secondary" className="text-sm">
+                        {brand}
+                      </Badge>
+                    ))}
                   </div>
+                )}
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight">{product.title}</h1>
+                  <p className="mt-3 text-lg text-muted-foreground">{product.description}</p>
                 </div>
+                <ProductPrice />
+                <VariantSelector />
+                <AddToCartButton />
+                <Separator className="my-8" />
+                <ProductInfo />
               </div>
             </div>
 
-            {/* Right Column - Purchase Info */}
-            <div className="lg:col-span-4 order-1 lg:order-2">
-              <div className="top-8">
-                <div className="mt-8 lg:mt-0">
-                  <h1 className="text-2xl font-bold">{product.title}</h1>
-
-                  {product.brand && (
-                    <div className="mt-2">
-                      <span className="text-gray-600">Brand: </span>
-                      <span className="font-medium">{brands.join(', ')}</span>
-                    </div>
+            <Separator className="lg:col-span-2" />
+            <div className="lg:col-span-2">
+              <Tabs defaultValue="description">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="description">More Info</TabsTrigger>
+                  <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                  <TabsTrigger value="seller">Seller Info</TabsTrigger>
+                </TabsList>
+                <TabsContent value="description" className="mt-8 lg:col-span-2">
+                  {product.moreInfo.root.children.length > 1 ? (
+                    <RichText content={product.moreInfo} enableGutter={false} />
+                  ) : (
+                    <p>No more info available</p>
                   )}
-
-                  <h2 className="text-xl font-medium">{product.description}</h2>
-
-                  <ProductPrice />
-                  <VariantSelector />
-
-                  <div className="mt-6">
-                    <AddToCartButton />
+                </TabsContent>
+                <TabsContent value="reviews" className="mt-8">
+                  <div className="prose prose-sm max-w-none">
+                    <p>Reviews coming soon...</p>
                   </div>
-                </div>
-              </div>
+                </TabsContent>
+                <TabsContent value="seller" className="mt-8">
+                  <div className="prose prose-sm max-w-none">
+                    <p>Seller information coming soon...</p>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
 
@@ -146,41 +151,3 @@ export default async function ProductDetail({ params }: Props) {
     </React.Fragment>
   )
 }
-
-// const getProductDTO = (product: Product) => {
-//   const enableVariants = product.enableVariants
-//   const hasVariants = enableVariants && (product?.variants?.variantProducts?.length ?? 0) > 1
-//   const variantOptions = enableVariants ? product.variants.options : []
-//   const variantProducts = enableVariants ? product.variants.variantProducts : []
-//   const baseProduct = product.baseProduct
-//   const baseProductPrice = baseProduct.price
-//   const baseProductImages = baseProduct.images
-//   const gallery = product.gallery
-//   const relatedProducts =
-//     product.relatedProducts?.filter((relatedProduct) => typeof relatedProduct !== 'string') ?? []
-// }
-
-// const queryProductBySlug = async ({ slug }: { slug: string }) => {
-//   const { isEnabled: draft } = await draftMode()
-
-//   const payload = await getPayload()
-//   const authResult = draft ? await payload.auth({ headers: await headers() }) : undefined
-
-//   const user = authResult?.user
-
-//   const result = await payload.find({
-//     collection: 'products',
-//     depth: 2,
-//     draft,
-//     limit: 1,
-//     overrideAccess: false,
-//     user,
-//     where: {
-//       slug: {
-//         equals: slug,
-//       },
-//     },
-//   })
-
-//   return result.docs?.[0] || null
-// }

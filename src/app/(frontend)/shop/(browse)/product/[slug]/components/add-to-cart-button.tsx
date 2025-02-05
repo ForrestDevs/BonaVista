@@ -52,16 +52,33 @@ export function AddToCartButton() {
   }
 
   return (
-    <div className="flex items-center space-x-4">
-      <QuantitySelector />
-      <Button className="flex-1" size="lg" onClick={handleAddToCart} disabled={isLoading}>
-        {isLoading ? (
-          <Loader2Icon className="mr-2 h-5 w-5 animate-spin" />
-        ) : (
-          <ShoppingCartIcon className="mr-2 h-5 w-5" />
-        )}
-        {isLoading ? 'Adding...' : 'Add to Cart'}
-      </Button>
+    <div className="mt-6 space-y-4">
+      <div className="flex items-center gap-4">
+        <div className="flex-shrink-0">
+          <QuantitySelector />
+        </div>
+        <Button
+          className="flex-1"
+          size="lg"
+          onClick={handleAddToCart}
+          disabled={isLoading || (product.enableVariants && !isVariantSelected)}
+        >
+          {isLoading ? (
+            <>
+              <Loader2Icon className="mr-2 h-5 w-5 animate-spin" />
+              Adding to Cart...
+            </>
+          ) : (
+            <>
+              <ShoppingCartIcon className="mr-2 h-5 w-5" />
+              Add to Cart
+            </>
+          )}
+        </Button>
+      </div>
+      {product.enableVariants && !isVariantSelected && (
+        <p className="text-sm text-muted-foreground">Please select a variant to continue</p>
+      )}
     </div>
   )
 }

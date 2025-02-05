@@ -1,24 +1,20 @@
 'use client'
 
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useMemo } from 'react'
 import type { Media, Product } from '@payload-types'
-
-type SelectedVariant = {
-  sku: string
-  price: number
-  images: Array<{ image?: (string | null) | Media; id?: string | null }>
-  info: string | number | boolean | { [k: string]: unknown } | unknown[]
-}
+import { EnhancedProductVariant } from '@/lib/types/product'
 
 type ProductContextType = {
   product: Product
-  selectedVariant: SelectedVariant | null
-  setSelectedVariant: (variant: SelectedVariant | null) => void
+  selectedVariant: EnhancedProductVariant | null
+  setSelectedVariant: (variant: EnhancedProductVariant | null) => void
   currentPrice: number
   currentImages: Array<{ image?: (string | null) | Media; id?: string | null }>
+  allImages: Array<{ image?: (string | null) | Media; id?: string | null }>
   isVariantSelected: boolean
   quantity: number
   setQuantity: (quantity: number) => void
+  currentSku: string
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined)
@@ -30,27 +26,43 @@ export function ProductProvider({
   children: React.ReactNode
   product: Product
 }) {
-  const [selectedVariant, setSelectedVariant] = useState<SelectedVariant | null>(
-    product.enableVariants && product.variants?.variantProducts?.length
-      ? {
-          sku: product.variants.variantProducts[0].sku,
-          price: product.variants.variantProducts[0].price,
-          images: product.variants.variantProducts[0].images,
-          info: product.variants.variantProducts[0].info,
-        }
-      : null,
-  )
+  const [selectedVariant, setSelectedVariant] = useState<EnhancedProductVariant | null>(() => {
+    if (product.variants && product.variants.variantProducts.length > 0) {
+      const variant = product.variants.variantProducts[0] as EnhancedProductVariant
+      return {
+        ...variant,
+      }
+    }
+    return null
+  })
   const [quantity, setQuantity] = useState(1)
 
   // Reset quantity when variant changes
-  const handleVariantChange = (variant: SelectedVariant | null) => {
+  const handleVariantChange = (variant: EnhancedProductVariant | null) => {
     setSelectedVariant(variant)
     setQuantity(1)
   }
 
   const currentPrice = selectedVariant?.price ?? product.baseProduct.price
   const currentImages = selectedVariant?.images ?? product.baseProduct.images
+  const currentSku = selectedVariant?.sku ?? product.baseProduct.sku
+
   const isVariantSelected = Boolean(selectedVariant)
+
+  // Combine all images from base product and variants
+  const allImages = useMemo(() => {
+    const baseImages = product.baseProduct?.images || []
+    const variantImages = product.enableVariants
+      ? product.variants?.variantProducts?.flatMap((variant) => variant.images || []) || []
+      : []
+
+    // Remove duplicates based on image id
+    const uniqueImages = [...baseImages, ...variantImages].filter(
+      (image, index, self) => index === self.findIndex((t) => t.image === image.image),
+    )
+
+    return uniqueImages
+  }, [product])
 
   return (
     <ProductContext.Provider
@@ -60,9 +72,11 @@ export function ProductProvider({
         setSelectedVariant: handleVariantChange,
         currentPrice,
         currentImages,
+        allImages,
         isVariantSelected,
         quantity,
         setQuantity,
+        currentSku,
       }}
     >
       {children}

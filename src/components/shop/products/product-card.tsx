@@ -12,49 +12,17 @@ import { addToCart } from '@/lib/data/cart'
 import { CartItem } from '@/lib/types/cart'
 import { uniqueId } from 'lodash'
 import { useRouter } from 'next/navigation'
-
-type EnhancedProductVariant = Omit<ProductVariant[number], 'info'> & {
-  info: {
-    options: Array<{
-      label: string
-      id: string
-      slug: string
-      key: {
-        slug: string
-        label: string
-      }
-    }>
-  }
-}
+import { EnhancedProductVariant } from '@/lib/types/product'
 
 export function ProductCard({ product }: { product: Product }) {
   const router = useRouter()
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   const [selectedVariant, setSelectedVariant] = useState<EnhancedProductVariant | null>(() => {
     if (product.variants && product.variants.variantProducts.length > 0) {
-      const variant = product.variants.variantProducts[0]
-      const newVariant: EnhancedProductVariant = {
+      const variant = product.variants.variantProducts[0] as EnhancedProductVariant
+      return {
         ...variant,
-        info: {
-          options: [
-            {
-              // @ts-ignore
-              label: variant.info.options[0].label,
-              id: variant.id,
-              // @ts-ignore
-              slug: variant.info.options[0].slug,
-              // @ts-ignore
-              key: {
-                // @ts-ignore
-                slug: variant.info.options[0].key.slug,
-                // @ts-ignore
-                label: variant.info.options[0].key.label,
-              },
-            },
-          ],
-        },
       }
-      return newVariant
     }
     return null
   })

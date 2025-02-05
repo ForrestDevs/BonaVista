@@ -8,36 +8,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
+import { EnhancedProductVariant } from '@/lib/types/product'
 
 export function VariantSelector() {
-  const { product, setSelectedVariant } = useProduct()
+  const { product, setSelectedVariant, selectedVariant } = useProduct()
 
   if (!product.enableVariants || !product.variants?.variantProducts?.length) {
     return null
   }
 
   const handleVariantChange = (variantId: string) => {
-    const variant = product.variants.variantProducts.find((v) => v.id === variantId)
+    const variant = product.variants.variantProducts.find(
+      (v) => v.id === variantId,
+    ) as EnhancedProductVariant
     if (variant) {
       setSelectedVariant({
-        sku: variant.sku,
-        price: variant.price,
-        images: variant.images,
-        info: variant.info,
+        ...variant,
       })
     }
   }
 
+  const optionName = selectedVariant?.info.options[0].key.label || 'Option'
+
   return (
-    <div className="mt-6">
-      <Select onValueChange={handleVariantChange}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select variant" />
+    <div className="space-y-2">
+      <Label htmlFor="variant-select">{optionName}</Label>
+      <Select onValueChange={handleVariantChange} value={selectedVariant?.id}>
+        <SelectTrigger id="variant-select" className="w-full">
+          <SelectValue placeholder={`Select ${optionName.toLowerCase()}`} />
         </SelectTrigger>
         <SelectContent>
-          {product.variants.variantProducts.map((variant) => (
+          {product.variants.variantProducts.map((variant: EnhancedProductVariant) => (
             <SelectItem key={variant.id} value={variant.id}>
-              {/* @ts-ignore */}
               {variant.info.options?.map((o: any) => o.label).join(' / ')}
             </SelectItem>
           ))}

@@ -10,3 +10,17 @@ export type VariantInfo = {
     }>
   }
 }
+
+export type EnhancedProductVariant = Omit<ProductVariant[number], 'info'> & {
+  info: {
+    options: Array<{
+      label: string
+      id: string
+      slug: string
+      key: {
+        slug: string
+        label: string
+      }
+    }>
+  }
+}
