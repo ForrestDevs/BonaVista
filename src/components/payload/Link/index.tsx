@@ -18,6 +18,7 @@ type CMSLinkType = {
   type?: 'custom' | 'reference' | null
   url?: string | null
   isNavItem?: boolean
+  onClick?: () => void
 }
 
 export const CMSLink: React.FC<CMSLinkType> = (props) => {
@@ -32,6 +33,7 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     size: sizeFromProps,
     url,
     isNavItem,
+    onClick,
   } = props
 
   const href =
@@ -49,7 +51,12 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
   /* Ensure we don't break any styles set by richText */
   if (appearance === 'inline') {
     return (
-      <OptimizedLink className={cn(className)} href={href || url || ''} {...newTabProps}>
+      <OptimizedLink
+        className={cn(className)}
+        href={href || url || ''}
+        {...newTabProps}
+        onClick={onClick}
+      >
         {label && label}
         {children && children}
       </OptimizedLink>
@@ -58,7 +65,12 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
 
   if (isNavItem) {
     return (
-      <OptimizedLink className={cn(className)} href={href || url || ''} {...newTabProps}>
+      <OptimizedLink
+        className={cn(className)}
+        href={href || url || ''}
+        {...newTabProps}
+        onClick={onClick}
+      >
         {label && label}
         {children && children}
       </OptimizedLink>
@@ -67,7 +79,12 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
 
   return (
     <Button asChild className={className} size={size} variant={appearance}>
-      <OptimizedLink className={cn(className)} href={href || url || ''} {...newTabProps}>
+      <OptimizedLink
+        className={cn(className)}
+        href={href || url || ''}
+        {...newTabProps}
+        onClick={onClick}
+      >
         {label && label}
         {children && children}
       </OptimizedLink>

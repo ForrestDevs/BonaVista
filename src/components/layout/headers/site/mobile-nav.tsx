@@ -1,9 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
-import { ChevronDown, Menu as MenuIcon } from 'lucide-react'
+import { ChevronDown, ChevronRight, Menu as MenuIcon, X } from 'lucide-react'
 import { Header } from '@payload-types'
 import {
   Accordion,
@@ -15,6 +22,7 @@ import { buttonVariants } from '@/components/ui/button'
 import Link from 'next/link'
 import { cn } from '@lib/utils/cn'
 import { CMSLink } from '@/components/payload/Link'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 export default function MobileNav({ header }: { header: Header }) {
   const [open, setOpen] = useState(false)
@@ -26,9 +34,11 @@ export default function MobileNav({ header }: { header: Header }) {
           <MenuIcon />
         </Button>
       </SheetTrigger>
+      <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+      <SheetDescription className="sr-only">Navigation Menu</SheetDescription>
 
-      <SheetContent side="right" className="bg-blue-100">
-        <nav className="flex flex-col gap-4 py-6">
+      <SheetContent side="right" className="">
+        {/* <nav className="flex flex-col gap-4 py-6">
           {header.siteHeader.navItems.map((item, index) => (
             <div key={index}>
               {item.navItem.isLink ? (
@@ -123,6 +133,64 @@ export default function MobileNav({ header }: { header: Header }) {
               )}
             </div>
           ))}
+        </nav> */}
+        <nav className="flex flex-col gap-4 py-6">
+          <div className="overflow-y-auto px-4 pb-12 pt-4">
+            {header.siteHeader.navItems.map((item) => (
+              <div key={item.navItem.label} className="py-2">
+                {item.navItem.isLink ? (
+                  <CMSLink
+                    {...item.navItem.link}
+                    className="block py-2 text-lg font-medium"
+                    isNavItem
+                    onClick={() => setOpen(false)}
+                  >
+                    {item.navItem.label}
+                  </CMSLink>
+                ) : (
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-lg font-medium [&[data-state=open]>svg]:rotate-90 [&>svg]:transition-transform [&>svg]:duration-300">
+                      {item.navItem.label}
+                      <ChevronRight className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      {item.navItem.submenu?.map((subItem) => (
+                        <div key={subItem.label} className="pl-4">
+                          {subItem.sublinks?.length > 0 ? (
+                            <Collapsible>
+                              <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-base [&[data-state=open]>svg]:rotate-90 [&>svg]:transition-transform [&>svg]:duration-300">
+                                {subItem.label}
+                                <ChevronRight className="h-4 w-4 " />
+                              </CollapsibleTrigger>
+                              <CollapsibleContent>
+                                {subItem.sublinks.map((sublink) => (
+                                  <CMSLink
+                                    key={sublink.label}
+                                    {...sublink}
+                                    className="block py-2 pl-4 text-sm"
+                                    isNavItem
+                                    onClick={() => setOpen(false)}
+                                  />
+                                ))}
+                              </CollapsibleContent>
+                            </Collapsible>
+                          ) : (
+                            <CMSLink
+                              {...subItem.link}
+                              className="block py-2 text-base"
+                              onClick={() => setOpen(false)}
+                            >
+                              {subItem.label}
+                            </CMSLink>
+                          )}
+                        </div>
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
+                )}
+              </div>
+            ))}
+          </div>
         </nav>
       </SheetContent>
     </Sheet>

@@ -9,6 +9,7 @@
   :root {
     --removed-body-scroll-bar-size: 0px;
     --shop-header-height: 84.5px;
+    --marketing-header-height: 84.5px;
   }
 
   body {

@@ -112,9 +112,11 @@ Total estimated time: 10-15 weeks
 - International payment methods
 - Multi-currency support
 
+add loading spinners to variant select
 
-Update Marketing Header and Nav (Mobile)
+
 Add pagination to product results
+Fix filtering and sort options
 Clean up product page
 Complete order flow with checkout and payment (create order in payload use hooks to send data elsewhere)
 finish up shop home page
