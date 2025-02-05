@@ -1,6 +1,6 @@
 import type { Field } from 'payload'
 
-import deepMerge from '../utilities/deepMerge'
+import deepMerge from '../../lib/utils/deepMerge'
 import { PAGE_SLUG } from '../collections/constants'
 
 export type LinkAppearances =

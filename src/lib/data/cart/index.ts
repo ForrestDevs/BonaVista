@@ -342,8 +342,6 @@ export async function addToCart(cartItem: CartItem): Promise<Cart> {
     })
   }
 
-  console.log('updatedCartItems', updatedCartItems)
-
   // Update the cart in the database
   try {
     const updatedCart = await payload.update({

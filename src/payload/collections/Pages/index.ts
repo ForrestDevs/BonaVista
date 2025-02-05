@@ -4,7 +4,7 @@ import { hero } from '@payload/fields/hero'
 import { pageBlocks } from '@/payload/blocks'
 import { slugField } from '@/payload/fields/slug'
 import { populatePublishedAt } from '@payload/hooks/populatePublishedAt'
-import { generatePreviewPath } from '@payload/utilities/generatePreviewPath'
+import { generatePreviewPath } from '@/lib/utils/generatePreviewPath'
 import { revalidatePage } from './hooks/revalidatePage'
 import {
   MetaDescriptionField,

@@ -1,6 +1,6 @@
 import { CollectionBeforeChangeHook } from 'payload'
 import { PRODUCT_CATEGORY_SLUG } from '@payload/collections/constants'
-import { log } from '@payload/utilities/log'
+import { log } from '@/lib/utils/log'
 
 export const beforeChange: CollectionBeforeChangeHook = async ({
   data,

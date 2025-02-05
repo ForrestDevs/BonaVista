@@ -128,11 +128,11 @@ export default async function StoreHome() {
   //   collection: SHOP_COLLECTION_SLUG,
   // })
 
-  const page = await getCachedDocument<typeof PAGE_SLUG>(PAGE_SLUG, 'shop', 1)
+  // const page = await getCachedDocument<typeof PAGE_SLUG>(PAGE_SLUG, 'shop', 1)
 
-  if (!page) {
-    return <div>Page not found</div>
-  }
+  // if (!page) {
+  //   return <div>Page not found</div>
+  // }
 
   const products = await payload
     .find({

@@ -1,6 +1,6 @@
 import { BasePayload, CollectionAfterChangeHook } from 'payload'
 import { PRODUCT_CATEGORY_SLUG } from '@payload/collections/constants'
-import { log } from '@payload/utilities/log'
+import { log } from '@/lib/utils/log'
 
 /**
  * Updates the fullSlug for a category and all its descendants

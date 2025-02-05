@@ -113,12 +113,21 @@ Total estimated time: 10-15 weeks
 - Multi-currency support
 
 
-
+Update Marketing Header and Nav (Mobile)
 Add pagination to product results
-Make cart modal work
 Clean up product page
-Add loading states to adding and deleting products
-stop rerenders on product update in cart page
 Complete order flow with checkout and payment (create order in payload use hooks to send data elsewhere)
 finish up shop home page
+
+Finish About Page
+Populate Blog Posts
+Add Videos to Resource Page
+import testimonials
+Clean up admin dashboard add overview page
+   - add quick links to zoho and spire
+   - show stats for website traffic
+   - show stats for orders
+   - show stats for leads
+   - show stats for subscriptions
+
 

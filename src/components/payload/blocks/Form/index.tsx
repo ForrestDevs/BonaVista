@@ -64,7 +64,7 @@ export const FormBlock: React.FC<FormBlockProps> = ({ preTitle, title, body }) =
   }
 
   return (
-    <section className="bg-muted p-10">
+    <section className="p-10">
       <div className="container flex flex-col items-center max-w-3xl gap-6 mx-auto">
         <div className="flex flex-col items-center text-center gap-2">
           {preTitle && <p className="text-primary font-medium tracking-wide">{preTitle}</p>}

@@ -17,7 +17,7 @@ export const getCustomer = async () => {
   return getCachedCustomer(user)
 }
 
-export const getCachedCustomer = cache(
+const getCachedCustomer = cache(
   async (user: User) => {
     const payload = await getPayload()
 
@@ -60,41 +60,51 @@ export type CustomerDTO = {
 }
 
 export async function getCustomerDTO(): Promise<CustomerDTO> | null {
-  const payload = await getPayload()
   const user = await getCurrentUser()
 
   if (!user || !user.customer) {
     return null
   }
 
-  const customerID = typeof user.customer === 'string' ? user.customer : user.customer.id
+  return getCachedCustomerDTO(user)
+}
 
-  try {
-    const customer = await payload.findByID({
-      collection: CUSTOMER_SLUG,
-      id: customerID,
-    })
+const getCachedCustomerDTO = cache(
+  async (user: User) => {
+    const payload = await getPayload()
 
-    if (!customer) {
+    const customerID = typeof user.customer === 'string' ? user.customer : user.customer.id
+
+    try {
+      const customer = await payload.findByID({
+        collection: CUSTOMER_SLUG,
+        id: customerID,
+      })
+
+      if (!customer) {
+        return null
+      }
+
+      const customerDTO: CustomerDTO = {
+        id: customer.id,
+        email: user.email,
+        firstName: user.firstName ?? '',
+        lastName: user.lastName ?? '',
+        phone: user.phone ?? '',
+        billingAddress: customer.billing_address,
+        shippingAddresses: customer.shipping_addresses,
+        stripeCustomerId: customer.stripeCustomerID ?? '',
+        cart: customer.cart,
+        metadata: customer.metadata,
+      }
+
+      return customerDTO
+    } catch (error) {
+      console.error(error)
       return null
     }
-
-    const customerDTO: CustomerDTO = {
-      id: customer.id,
-      email: user.email,
-      firstName: user.firstName ?? '',
-      lastName: user.lastName ?? '',
-      phone: user.phone ?? '',
-      billingAddress: customer.billing_address,
-      shippingAddresses: customer.shipping_addresses,
-      stripeCustomerId: customer.stripeCustomerID ?? '',
-      cart: customer.cart,
-      metadata: customer.metadata,
-    }
-
-    return customerDTO
-  } catch (error) {
-    console.error(error)
-    return null
-  }
-}
+  },
+  {
+    tags: (user: User) => ['getCustomerDTO', user.id],
+  },
+)

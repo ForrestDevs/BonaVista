@@ -6,17 +6,6 @@ export const CART_COOKIE = '_cart_id'
 
 export type CartCookieJson = { id: string; linesCount: number }
 
-// export async function getCartCookie(): Promise<string | null> {
-//   const cookiestore = await cookies()
-//   const value = cookiestore.get('_cart_id')?.value
-
-//   if (!value) {
-//     return null
-//   }
-
-//   return value
-// }
-
 export async function getCartCookie(): Promise<null | CartCookieJson> {
   const cookiesValue = await cookies()
   const cartCookieJson = safeJsonParse(cookiesValue.get(CART_COOKIE)?.value)

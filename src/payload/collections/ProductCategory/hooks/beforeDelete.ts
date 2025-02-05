@@ -1,6 +1,6 @@
 import { CollectionBeforeDeleteHook } from 'payload'
 import { PRODUCT_CATEGORY_SLUG, PRODUCT_SLUG } from '@payload/collections/constants'
-import { log } from '@payload/utilities/log'
+import { log } from '@/lib/utils/log'
 
 // Keep track of categories being deleted in the current batch
 const pendingDeletions = new Set<string | number>()

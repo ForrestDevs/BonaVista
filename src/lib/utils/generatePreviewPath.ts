@@ -1,4 +1,5 @@
 import { CollectionSlug } from 'payload'
+import { previewAction } from '../data/preview'
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
   posts: '/blog',
@@ -26,5 +27,5 @@ export const generatePreviewPath = ({ collection, slug }: Props) => {
     encodedParams.append(key, value)
   })
 
-  return `/next/preview?${encodedParams.toString()}`
+  return previewAction(encodedParams.toString())
 }

@@ -1,23 +1,17 @@
+'use server'
+
 import jwt from 'jsonwebtoken'
 import { draftMode } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { CollectionSlug } from 'payload'
 import getPayload from '@/lib/utils/getPayload'
+import { cookies as nextCookies } from 'next/headers'
 
-const payloadToken = 'payload-token'
-
-export async function GET(
-  req: Request & {
-    cookies: {
-      get: (name: string) => {
-        value: string
-      }
-    }
-  },
-): Promise<Response> {
+export async function previewAction(url: string): Promise<Response> {
   const payload = await getPayload()
-  const token = req.cookies.get(payloadToken)?.value
-  const { searchParams } = new URL(req.url)
+  const cookies = await nextCookies()
+  const token = cookies.get('payload-token')?.value
+  const { searchParams } = new URL(url)
   const path = searchParams.get('path')
   const collection = searchParams.get('collection') as CollectionSlug
   const slug = searchParams.get('slug')

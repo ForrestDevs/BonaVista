@@ -14,7 +14,7 @@ import { Banner } from '@payload/blocks/Banner'
 import { Code } from '@payload/blocks/Code'
 import { Media } from '@payload/blocks/Media'
 import { slugField } from '@payload/fields/slug'
-import { generatePreviewPath } from '@payload/utilities/generatePreviewPath'
+import { generatePreviewPath } from '@/lib/utils/generatePreviewPath'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidatePost } from './hooks/revalidatePost'
 import {

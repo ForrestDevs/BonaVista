@@ -5,7 +5,7 @@ import { getCustomerDTO } from '@/lib/data/customer'
 import { StripePayment } from '@/components/shop/stripe-payment'
 import { CartEmpty } from '@/components/shop/cart/cart-empty'
 import { SignInPrompt } from '@/components/shop/cart/sign-in-prompt'
-import { CartSummaryTable } from '@/components/shop/cart/cart-summary-table'
+import { CartSummaryList } from '@/components/shop/cart/summary/cart-summary-list'
 import { StripeElementsContainer } from '@/components/shop/stripe-elements-container'
 import { Suspense } from 'react'
 
@@ -38,23 +38,27 @@ export default async function CartPage() {
       <div className="min-h-[calc(100dvh-7rem)] lg:grid lg:grid-cols-12 lg:gap-x-8 container mx-auto">
         <div className="my-8 lg:col-span-7">
           <div className="sticky top-24">
-            <h1 className="mb-4 text-3xl font-bold leading-none tracking-tight">Cart</h1>
-            <CartSummaryTable cart={structuredClone(cart)} />
+            <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
+              <h1 className="text-3xl font-bold text-gray-900 mb-6">Your Cart</h1>
+              <CartSummaryList items={structuredClone(cart.items)} />
+            </div>
           </div>
         </div>
-        <div className="my-8 w-full lg:col-span-5">
-          <section className="flex flex-col max-w-md pb-12 gap-4">
-            <h2 className="text-3xl font-bold leading-none tracking-tight">Checkout</h2>
-            <Suspense fallback={<div>Loading...</div>}>
-              <StripePayment
-                cartShippingRateId={''}
-                shippingRates={[]}
-                allProductsDigital={false}
-                locale={locale}
-                customer={customer}
-              />
-            </Suspense>
-          </section>
+        <div className="my-8 lg:col-span-5">
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
+            <section className="flex flex-col gap-4">
+              <h2 className="text-2xl font-bold text-gray-900">Checkout</h2>
+              <Suspense fallback={<div>Loading...</div>}>
+                <StripePayment
+                  cartShippingRateId={''}
+                  shippingRates={[]}
+                  allProductsDigital={false}
+                  locale={locale}
+                  customer={customer}
+                />
+              </Suspense>
+            </section>
+          </div>
         </div>
       </div>
     </StripeElementsContainer>
