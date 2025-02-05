@@ -111,3 +111,14 @@ Total estimated time: 10-15 weeks
 - Expanded subscription features
 - International payment methods
 - Multi-currency support
+
+
+
+Add pagination to product results
+Make cart modal work
+Clean up product page
+Add loading states to adding and deleting products
+stop rerenders on product update in cart page
+Complete order flow with checkout and payment (create order in payload use hooks to send data elsewhere)
+finish up shop home page
+

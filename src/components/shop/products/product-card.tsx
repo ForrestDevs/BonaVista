@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@components/ui/card'
 import { Popover, PopoverContent, PopoverTrigger } from '@components/ui/popover'
-import { InfoIcon, ShoppingCartIcon } from 'lucide-react'
+import { InfoIcon, Loader2Icon, ShoppingCartIcon } from 'lucide-react'
 import { Product, ProductVariant } from '@payload-types'
 import { Media } from '@components/payload/Media'
 import Price from '@components/payload/Price'
@@ -29,6 +29,7 @@ type EnhancedProductVariant = Omit<ProductVariant[number], 'info'> & {
 
 export function ProductCard({ product }: { product: Product }) {
   const router = useRouter()
+  const [isAddingToCart, setIsAddingToCart] = useState(false)
   const [selectedVariant, setSelectedVariant] = useState<EnhancedProductVariant | null>(() => {
     if (product.variants && product.variants.variantProducts.length > 0) {
       const variant = product.variants.variantProducts[0]
@@ -66,35 +67,35 @@ export function ProductCard({ product }: { product: Product }) {
     ? (selectedVariant?.images[0]?.image ?? null)
     : (product?.baseProduct?.images[0]?.image ?? null)
 
-  const handleAddToCart = (variant: EnhancedProductVariant | null) => {
+  const handleAddToCart = async (variant: EnhancedProductVariant | null) => {
+    setIsAddingToCart(true)
     if (hasVariants) {
       if (variant) {
-        console.log(`Added to cart: ${product.title} - ${JSON.stringify(variant)}`)
         const cartItem: CartItem = {
           product: product,
           isVariant: true,
           variant: variant.info.options.map((o) => ({
             option: o.label,
-            id: o.id,
+            id: variant.id,
           })),
           quantity: 1,
           price: variant.price,
           url: `/product/${product.slug}`,
-          id: uniqueId('cart-item-'),
+          id: variant.id,
         }
-        addToCart(cartItem)
+        await addToCart(cartItem)
       }
     } else {
-      console.log(`Added to cart: ${product.title} - ${product.baseProduct.price}`)
-      addToCart({
+      await addToCart({
         product: product,
         isVariant: false,
         quantity: 1,
         price: product.baseProduct.price,
         url: `/product/${product.slug}`,
-        id: uniqueId('cart-item-'),
+        id: product.id,
       })
     }
+    setIsAddingToCart(false)
   }
 
   return (
@@ -153,16 +154,28 @@ export function ProductCard({ product }: { product: Product }) {
 
             <Button
               className="col-span-1"
-              disabled={!selectedVariant}
+              disabled={!selectedVariant || isAddingToCart}
               onClick={() => handleAddToCart(selectedVariant)}
             >
-              <ShoppingCartIcon className="mr-2 h-4 w-4" />
+              {isAddingToCart ? (
+                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <ShoppingCartIcon className="mr-2 h-4 w-4" />
+              )}
               Add to Cart
             </Button>
           </div>
         ) : (
-          <Button className="w-full" onClick={() => handleAddToCart(null)}>
-            <ShoppingCartIcon className="mr-2 h-4 w-4" />
+          <Button
+            className="w-full"
+            onClick={() => handleAddToCart(null)}
+            disabled={isAddingToCart}
+          >
+            {isAddingToCart ? (
+              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <ShoppingCartIcon className="mr-2 h-4 w-4" />
+            )}
             Add to Cart
           </Button>
         )}

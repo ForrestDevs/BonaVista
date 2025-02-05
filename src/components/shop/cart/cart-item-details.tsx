@@ -3,14 +3,12 @@ import { YnsLink } from '@/components/ui/link'
 import { CartItem } from '@/lib/types/cart'
 import React from 'react'
 
-export function CartItemThumbnail({ item }: { item: CartItem }) {
-  const product = typeof item.product === 'object' ? item.product : null
-  const isVariant = item.isVariant
-  // const thumbnail = isVariant
-  //   ? (product?.variants.variantProducts.find((v) =>
-  //       v.options.every((o, i) => o === item.variant[i].option),
-  //     )?.images[0]?.image ?? null)
-  //   : (product?.baseProduct?.images[0]?.image ?? null)
+export function CartItemThumbnail({ line }: { line: CartItem }) {
+  const product = typeof line.product === 'object' ? line.product : null
+  const isVariant = line.isVariant
+  const thumbnail = isVariant
+    ? product?.variants.variantProducts.find((v) => v.id === line.variant[0].id)?.images[0]?.image
+    : product?.baseProduct?.images[0]?.image
 
   return (
     <div className="sm:w-24 w-12">
@@ -19,18 +17,16 @@ export function CartItemThumbnail({ item }: { item: CartItem }) {
         href={`/product/${product?.slug}`}
       >
         <div className="rounded-lg relative w-full overflow-hidden transition-shadow ease-in-out duration-150 aspect-[1/1] border border-muted">
-          {/* {thumbnail ? (
-            <Media
-              imgClassName="object-cover w-full h-full absolute inset-0"
-              resource={thumbnail}
-            //   fill
-            //   width={300}
-            //   height={300}
-            />
+          {thumbnail ? (
+            <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-neutral-200">
+              <Media
+                resource={thumbnail}
+                imgClassName="absolute inset-0 h-full w-full object-cover object-center"
+              />
+            </div>
           ) : (
-            <div className="aspect-square rounded-md object-cover bg-muted-foreground"></div>
-          )} */}
-          <div className="aspect-square rounded-md object-cover bg-muted-foreground"></div>
+            <div className="h-24 w-24 flex-shrink-0 rounded-md bg-neutral-100" />
+          )}
         </div>
       </YnsLink>
     </div>

@@ -44,7 +44,7 @@ export const CartSummaryTable = ({ cart }: { cart: Cart }) => {
           {cart.items.map((line) => (
             <TableRow key={line.id} className="w-full">
               <TableCell className="h-12 !pl-0 w-24 p-4">
-                <CartItemThumbnail item={line} />
+                <CartItemThumbnail line={line} />
               </TableCell>
               <TableCell className="h-12 pr-3 text-left p-0 py-2">
                 <CartItemDetails item={line} />

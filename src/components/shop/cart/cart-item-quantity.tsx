@@ -7,18 +7,19 @@ import { CartItem } from '@/lib/types/cart'
 import { useOptimisticAction } from 'next-safe-action/hooks'
 import { Trash2 } from 'lucide-react'
 import { deleteCartItem } from '@/lib/data/cart'
-import { updateCartItemQuantity } from '@/lib/actions/cart'
+import { updateCartItemQuantityAction } from '@/lib/actions/cart'
+import { useState } from 'react'
 // import { updateCartItemQuantity } from '@/lib/data/cart'
 
 export function CartItemQuantity({ item }: { item: CartItem }) {
   const quantity = item.quantity
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const { execute, result, optimisticState, isExecuting } = useOptimisticAction(
-    updateCartItemQuantity,
+    updateCartItemQuantityAction,
     {
       currentState: { quantity }, // gets passed from Server Component
       updateFn: (state, newQuantity) => {
-        console.log('newQuantity', newQuantity)
         return {
           quantity: newQuantity.quantity,
         }
@@ -27,7 +28,9 @@ export function CartItemQuantity({ item }: { item: CartItem }) {
   )
 
   const handleRemoveItem = async (itemId: string) => {
+    setIsDeleting(true)
     await deleteCartItem({ cartItemId: itemId })
+    setIsDeleting(false)
   }
 
   //   const updateQuantity = async (itemId: string, quantity: number) => {

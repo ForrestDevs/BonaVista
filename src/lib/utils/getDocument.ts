@@ -1,7 +1,7 @@
 import { unstable_cache } from 'next/cache'
 import { CollectionSlug, DataFromCollectionSlug, Where } from 'payload'
 import getPayload from './getPayload'
-
+import { cache } from '@/lib/utils/cache'
 export async function getDocument<T extends CollectionSlug>(
   collection: T,
   slug: string,
@@ -34,59 +34,51 @@ export async function getCachedDocument<T extends CollectionSlug>(
   slug: string,
   depth?: number,
 ) {
-  const cache = unstable_cache(
+  const cacheFn = cache(
     async () => getDocument<T>(collection, slug, depth),
-    [collection, slug],
     {
       tags: [`${collection}_${slug}`],
     },
+    [collection, slug],
   )
 
-  return await cache()
+  return await cacheFn()
 }
 
 export async function getDocuments<T extends CollectionSlug>({
   collection,
   where,
   depth,
+  limit,
 }: {
   collection: T
   where?: Where
   depth?: number
+  limit?: number
 }) {
   const payload = await getPayload()
-  const documents = await payload.find({ collection, where: where || undefined, depth })
+  const documents = await payload.find({ collection, where: where || undefined, depth, limit })
   return documents.docs
-
-  // try {
-  //   console.log(where)
-
-  //   console.log(documents)
-  //   return documents.docs
-  // } catch (error) {
-  //   console.error(error)
-  //   return []
-  // }
 }
 
 export async function getCachedDocuments<T extends CollectionSlug>({
   collection,
   where,
   depth,
+  limit,
 }: {
   collection: T
   where?: Where
   depth?: number
+  limit?: number
 }) {
-  // console.log(`tag: ${collection}_${JSON.stringify(where)}`)
-
-  const cache = unstable_cache(
-    async () => getDocuments<T>({ collection, where, depth }),
-    [collection, JSON.stringify(where)],
+  const cacheFn = cache(
+    async () => getDocuments<T>({ collection, where, depth, limit }),
     {
-      tags: [`${collection}_${JSON.stringify(where)}`],
+      tags: [`${collection}_${JSON.stringify(where)}`, `get${collection}`],
     },
+    [collection, JSON.stringify(where)],
   )
 
-  return await cache()
+  return await cacheFn()
 }

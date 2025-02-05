@@ -12,6 +12,7 @@ import { ProductGallery } from './components/product-gallery'
 import { AddToCartButton } from './components/add-to-cart-button'
 import { ProductPrice } from './components/product-price'
 import { Gallery } from '@/components/shop/products/gallery'
+import ProductBreadcrumb from './components/product-breadcrumb'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -72,15 +73,7 @@ export default async function ProductDetail({ params }: Props) {
       <ProductProvider product={product}>
         <div className="container mx-auto px-4 py-8">
           {/* Breadcrumb */}
-          <nav className="mb-8">
-            <ol className="flex text-sm">
-              <li className="hover:text-blue-600">
-                <Link href="/shop">Shop</Link>
-              </li>
-              <span className="mx-2">/</span>
-              <li className="text-gray-500">{product.title}</li>
-            </ol>
-          </nav>
+          <ProductBreadcrumb product={product} searchParams={{ from: '' }} />
 
           <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8">
             {/* Left Column - Gallery & Details */}

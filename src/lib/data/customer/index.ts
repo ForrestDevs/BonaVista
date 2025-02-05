@@ -1,39 +1,50 @@
 'use server'
 
 import getPayload from '@lib/utils/getPayload'
-import { Cart, Customer } from '@payload-types'
+import { Cart, Customer, User } from '@payload-types'
 import { CUSTOMER_SLUG } from '@payload/collections/constants'
 import { getCurrentUser } from '../auth'
 import { PayloadJSON } from '@/lib/types/payload'
+import { cache } from '@/lib/utils/cache'
 
-export async function getCustomer(): Promise<Customer | null> {
-  const payload = await getPayload()
+export const getCustomer = async () => {
   const user = await getCurrentUser()
 
   if (!user) {
     return null
   }
 
-  try {
-    const { docs } = await payload.find({
-      collection: CUSTOMER_SLUG,
-      where: {
-        account: {
-          equals: user.id,
-        },
-      },
-    })
+  return getCachedCustomer(user)
+}
 
-    if (docs.length === 0) {
+export const getCachedCustomer = cache(
+  async (user: User) => {
+    const payload = await getPayload()
+
+    try {
+      const { docs } = await payload.find({
+        collection: CUSTOMER_SLUG,
+        where: {
+          account: {
+            equals: user.id,
+          },
+        },
+      })
+
+      if (docs.length === 0) {
+        return null
+      }
+
+      return docs[0]
+    } catch (error) {
+      console.error(error)
       return null
     }
-
-    return docs[0]
-  } catch (error) {
-    console.error(error)
-    return null
-  }
-}
+  },
+  {
+    tags: (user: User) => ['getCustomer', user.id],
+  },
+)
 
 export type CustomerDTO = {
   id: string

@@ -1,7 +1,15 @@
 import getPayload from '@lib/utils/getPayload'
-import { PRODUCT_SLUG } from '@payload/collections/constants'
+import {
+  BRAND_SLUG,
+  PRODUCT_CATEGORY_SLUG,
+  PRODUCT_COLLECTION_SLUG,
+  PRODUCT_SLUG,
+} from '@payload/collections/constants'
 import { ProductCard } from '@/components/shop/products/product-card'
 import { Metadata } from 'next'
+import { FilteredProducts } from '@/components/shop/filter3/FilteredProducts'
+import { SortOption } from '@/components/shop/filter3/types'
+import { getCachedDocuments } from '@/lib/utils/getDocument'
 
 export const metadata: Metadata = {
   title: 'All Products | BonaVista Leisurescapes',
@@ -9,30 +17,73 @@ export const metadata: Metadata = {
 }
 
 export default async function ProductsPage() {
-  const payload = await getPayload()
+  const [products, categoryDocs, collectionDocs, brandDocs] = await Promise.all([
+    getCachedDocuments({
+      collection: PRODUCT_SLUG,
+      depth: 1,
+      limit: 1000,
+    }),
+    getCachedDocuments({
+      collection: PRODUCT_CATEGORY_SLUG,
+      depth: 1,
+      limit: 100,
+    }),
+    getCachedDocuments({
+      collection: PRODUCT_COLLECTION_SLUG,
+      depth: 1,
+      limit: 100,
+    }),
+    getCachedDocuments({
+      collection: BRAND_SLUG,
+      depth: 1,
+      limit: 100,
+    }),
+  ])
 
-  const { docs: products } = await payload.find({
-    collection: PRODUCT_SLUG,
-    limit: 100,
-    depth: 1,
-  })
+  const categories = categoryDocs.map((cat) => ({
+    label: cat.title,
+    value: cat.id,
+  }))
 
-  const amaze = await payload.findByID({
-    collection: PRODUCT_SLUG,
-    id: '67a1d872f69929cf5c183c32',
-    depth: 1,
-  })
+  const collections = collectionDocs.map((collection) => ({
+    label: collection.title,
+    value: collection.id,
+  }))
+
+  const brands = brandDocs.map((brand) => ({
+    label: brand.name,
+    value: brand.id,
+  }))
+
+  const filterOptions = {
+    categories: categories,
+    collections: collections,
+    brands: brands,
+    compatibility: [
+      { label: 'Hot Tub', value: 'hottub' },
+      { label: 'Swim Spa', value: 'swimspa' },
+      { label: 'Pool', value: 'pool' },
+    ],
+  }
+
+  // Configure which filters to enable
+  const config = {
+    enabledFilters: {
+      categories: true,
+      collections: true,
+      brands: true,
+      compatibility: true,
+      price: true,
+      search: true,
+    },
+    sortOptions: ['title', 'price', '-price', '-createdAt'] as SortOption[],
+    defaultSort: '-createdAt' as SortOption,
+  }
 
   return (
     <div className="container py-8 px-4">
       <h1 className="text-3xl font-bold mb-8">All Products</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-        {/* <ProductCard key={amaze.id} product={amaze} /> */}
-      </div>
+      <FilteredProducts initialProducts={products} config={config} options={filterOptions} />
     </div>
   )
 }

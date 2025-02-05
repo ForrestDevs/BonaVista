@@ -26,7 +26,40 @@ export async function ShopHeader() {
                 </Link>
               </div>
 
-              <div className="hidden lg:flex lg:col-span-1 items-center justify-center"></div>
+              <div className="hidden lg:flex lg:col-span-1 items-center justify-center">
+                <nav className="flex items-center">
+                  <YnsLink 
+                    href="/shop/products" 
+                    className="px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-md transition-colors duration-200 text-center whitespace-nowrap"
+                  >
+                    All Products
+                  </YnsLink>
+                  <YnsLink 
+                    href="/shop/category/water-care"
+                    className="px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-md transition-colors duration-200 text-center whitespace-nowrap"
+                  >
+                    Water Care
+                  </YnsLink>
+                  <YnsLink 
+                    href="/shop/category/accessories"
+                    className="px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-md transition-colors duration-200 text-center whitespace-nowrap"
+                  >
+                    Accessories
+                  </YnsLink>
+                  <YnsLink 
+                    href="/shop/category/outdoor-living"
+                    className="px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-md transition-colors duration-200 text-center whitespace-nowrap"
+                  >
+                    Outdoor Living
+                  </YnsLink>
+                  <YnsLink 
+                    href="/shop/collection/sale"
+                    className="px-4 py-2 text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 rounded-md transition-colors duration-200 text-center whitespace-nowrap"
+                  >
+                    Sale
+                  </YnsLink>
+                </nav>
+              </div>
 
               <div className="lg:col-span-1 flex items-center justify-end gap-2 lg:gap-4 min-w-0">
                 <Suspense fallback={<div>Loading...</div>}>

@@ -1,11 +1,12 @@
 'use server'
 
 import { actionClient } from '@/lib/actions/client'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { z } from 'zod'
-import { getOrSetCart } from '../data/cart'
+import { deleteCartItem, getOrSetCart, updateCartItemQuantity } from '../data/cart'
 import getPayload from '@/lib/utils/getPayload'
 import { CART_SLUG } from '@/payload/collections/constants'
+
 // const schema = z.object({
 //   id: z.string().uuid(),
 //   body: z.string().min(1),
@@ -40,42 +41,38 @@ const schema = z.object({
   path: z.optional(z.string()),
 })
 
-export const updateCartItemQuantity = actionClient
+
+export const updateCartItemQuantityAction = actionClient
   .metadata({ actionName: 'updateCartItemQuantity' })
   .schema(schema)
   .action(async ({ parsedInput }) => {
-    const { quantity, cartItemId, path } = parsedInput
+    const { quantity, cartItemId } = parsedInput
 
-    console.log('updating cart item quantity', quantity, cartItemId)
-    const payload = await getPayload()
-    const cart = await getOrSetCart() // Get the current cart
+    const result = await updateCartItemQuantity(quantity, cartItemId)
 
-    if (!cart) {
-      throw new Error('Error retrieving or creating cart')
-    }
-
-    const updatedCartItems = cart.items.map((item) => {
-      if (item.id === cartItemId) {
-        return { ...item, quantity }
-      }
-      return item
-    })
-
-    const updatedCart = await payload.update({
-      collection: CART_SLUG,
-      id: cart.id,
-      data: {
-        items: updatedCartItems,
-      },
-    })
-
-    console.log('updatedCart', updatedCart)
-
-    if (path) {
-      revalidatePath(path)
+    if (!result) {
+      throw new Error('Error updating cart item quantity')
     }
 
     return {
       newQuantity: quantity,
+    }
+  })
+
+export const deleteCartItemAction = actionClient
+  .metadata({ actionName: 'deleteCartItem' })
+  .schema(z.object({ cartItemId: z.string() }))
+  .action(async ({ parsedInput }) => {
+    const { cartItemId } = parsedInput
+    try {
+      await deleteCartItem({ cartItemId })
+      return {
+        cartItemId,
+      }
+    } catch (error) {
+      console.error('Error deleting cart item', error)
+      return {
+        error: 'Error deleting cart item',
+      }
     }
   })

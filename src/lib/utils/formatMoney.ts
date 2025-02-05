@@ -37,6 +37,17 @@ export const formatMoney = ({
   }).format(amount)
 }
 
+export const formatCurrency = ({
+  amount,
+  currency,
+  locale = 'en-US',
+}: Money & { locale?: string }) => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+  }).format(amount)
+}
+
 // https://docs.stripe.com/development-resources/currency-codes
 const stripeCurrencies: Record<string, number> = {
   BIF: 0,

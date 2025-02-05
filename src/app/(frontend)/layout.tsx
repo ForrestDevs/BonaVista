@@ -40,6 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       className="!scroll-smooth"
     >
       <head>
+        {/* <script src="https://unpkg.com/react-scan/dist/auto.global.js" async /> */}
         <link rel="stylesheet" href="https://use.typekit.net/rgs4hpy.css" />
       </head>
       <body className="antialiased">

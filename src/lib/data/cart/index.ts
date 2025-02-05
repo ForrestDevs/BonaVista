@@ -8,6 +8,7 @@ import { CART_SLUG, CUSTOMER_SLUG } from '@payload/collections/constants'
 import { getCartCookie, removeCartCookie, setCartCookie } from '@lib/data/cookies'
 import { revalidateTag } from 'next/cache'
 import { createPaymentIntent } from '@/lib/data/shop'
+import { cache } from '@/lib/utils/cache'
 
 export async function returnOrCreateCart(cart: Cart | null, customerId?: string): Promise<Cart> {
   if (cart) {
@@ -83,22 +84,43 @@ export async function createCart(customerId?: string): Promise<Cart> {
   }
 }
 
-export async function getCartById(id: string, depth?: number): Promise<Cart | null> {
-  const payload = await getPayload()
-  console.log('getCartById', id)
-  try {
-    const cart = await payload.findByID({
-      collection: CART_SLUG,
-      id,
-      depth: depth ?? 1,
-    })
-    return cart
-  } catch (error) {
-    console.log('error getting cart by id', error)
-    return null
-  }
-}
-
+/**
+ * Retrieves a cart by its ID from the cache or database.
+ *
+ * @param id The ID of the cart to retrieve.
+ * @param depth Optional depth parameter for payload query to control relation population.
+ * @returns A Promise that resolves to the cart object if found, null otherwise.
+ */
+export const getCartById = cache(
+  async (id: string, depth?: number): Promise<Cart | null> => {
+    const payload = await getPayload()
+    console.log('getCartById', id)
+    try {
+      const cart = await payload.findByID({
+        collection: CART_SLUG,
+        id,
+        depth: depth ?? 1,
+      })
+      return cart
+    } catch (error) {
+      console.log('error getting cart by id', error)
+      return null
+    }
+  },
+  {
+    tags: (id) => [`getCartById-${id}`], // Tags the cache with the cart ID for easy invalidation.
+    revalidate: 3600, // Revalidates the cache every 3600 seconds (1 hour).
+  },
+)
+/**
+ * Retrieves the current cart for either a logged-in customer or guest user
+ * @param depth Optional depth parameter for payload query to control relation population
+ * @returns The cart object if found, null otherwise
+ *
+ * For logged-in customers, retrieves cart from their customer record
+ * For guest users, retrieves cart ID from cookie and loads cart
+ * Returns structuredClone of cart to avoid mutation
+ */
 export async function getCart(depth?: number): Promise<Cart | null> {
   const customer = await getCustomer()
   if (customer) {
@@ -297,7 +319,7 @@ export async function addToCart(cartItem: CartItem): Promise<Cart> {
   ]
 
   if (existingItemIndex !== -1) {
-    console.log('item already exists in cart', existingItemIndex)
+    console.log('item already exists in cart at index:', existingItemIndex)
     // If the item already exists in the cart
     updatedCartItems[existingItemIndex] = {
       ...updatedCartItems[existingItemIndex], // Spread existing item properties
@@ -320,25 +342,32 @@ export async function addToCart(cartItem: CartItem): Promise<Cart> {
     })
   }
 
+  console.log('updatedCartItems', updatedCartItems)
+
   // Update the cart in the database
-  const updatedCart = await payload.update({
-    collection: CART_SLUG,
-    id: cart.id,
-    data: {
-      items: updatedCartItems,
-    },
-  })
-
-  if (updatedCart) {
-    await setCartCookie({
-      id: updatedCart.id,
-      linesCount: updatedCart.items.length,
+  try {
+    const updatedCart = await payload.update({
+      collection: CART_SLUG,
+      id: cart.id,
+      data: {
+        items: updatedCartItems,
+      },
     })
+    if (updatedCart) {
+      await setCartCookie({
+        id: updatedCart.id,
+        linesCount: updatedCart.items.length,
+      })
 
-    revalidateTag(`cart-${updatedCart.id}`)
+      revalidateTag(`cart-${updatedCart.id}`)
+      revalidateTag(`getCartById-${updatedCart.id}`)
+    }
+
+    return updatedCart
+  } catch (error) {
+    console.error('Error updating cart', error)
+    return cart
   }
-
-  return updatedCart
 }
 
 export async function deleteCartItem(options: {
@@ -404,18 +433,23 @@ export async function deleteCartItem(options: {
     })
 
     revalidateTag(`cart-${updatedCart.id}`)
+    revalidateTag(`getCartById-${updatedCart.id}`)
   }
 
   return updatedCart
 }
 
-export async function updateCartItemQuantity(quantity: number, cartItemId: string): Promise<Cart> {
+export async function updateCartItemQuantity(
+  quantity: number,
+  cartItemId: string,
+): Promise<Cart | null> {
   console.log('updating cart item quantity', quantity, cartItemId)
   const payload = await getPayload()
-  const cart = await getOrSetCart() // Get the current cart
+  const cart = await getOrSetCart()
 
   if (!cart) {
-    throw new Error('Error retrieving or creating cart')
+    payload.logger.error('Error retrieving or creating cart')
+    return null
   }
 
   const updatedCartItems = cart.items.map((item) => {
@@ -425,17 +459,25 @@ export async function updateCartItemQuantity(quantity: number, cartItemId: strin
     return item
   })
 
-  const updatedCart = await payload.update({
-    collection: CART_SLUG,
-    id: cart.id,
-    data: {
-      items: updatedCartItems,
-    },
-  })
+  try {
+    const updatedCart = await payload.update({
+      collection: CART_SLUG,
+      id: cart.id,
+      data: {
+        items: updatedCartItems,
+      },
+    })
 
-  console.log('updatedCart', updatedCart)
-
-  return updatedCart
+    console.log(
+      'updatedCart quantity',
+      updatedCart.items.find((item) => item.id === cartItemId)?.quantity,
+    )
+    revalidateTag(`getCartById-${updatedCart.id}`)
+    return updatedCart
+  } catch (error) {
+    payload.logger.error('Error updating cart item quantity', error)
+    return null
+  }
 }
 
 export async function increaseCartItemQuantity(
