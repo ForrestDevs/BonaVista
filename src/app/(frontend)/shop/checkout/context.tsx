@@ -1,13 +1,19 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useMemo } from 'react'
-import { Elements } from '@stripe/react-stripe-js'
+import { createContext, useContext, useState, useEffect, useMemo, useRef, useTransition } from 'react'
+import { Elements, useElements, useStripe } from '@stripe/react-stripe-js'
 import { type StripeElementLocale, StripeElementsOptions, loadStripe } from '@stripe/stripe-js'
 import { invariant } from '@/lib/utils/invariant'
 import { CustomerDTO } from '@/lib/data/customer'
+import { StripeElementsContainer } from '@/components/shop/stripe-elements-container'
+import { CheckoutSession } from '@/lib/types/checkout'
+import { useDebouncedValue } from '@/lib/hooks/useDebounce'
 
 type CheckoutFormData = {
   email: string
+  firstName: string
+  lastName: string
+  phone: string
   shipping: {
     name: string
     phone: string
@@ -44,7 +50,6 @@ type CheckoutContextType = {
   clearCheckoutState: () => void
   step: 'email' | 'delivery' | 'payment' | 'confirm'
   setStep: (step: 'email' | 'delivery' | 'payment' | 'confirm') => void
-  customer: CustomerDTO | null
   isReady: {
     linkAuthentication: boolean
     address: boolean
@@ -53,11 +58,11 @@ type CheckoutContextType = {
   formErrorMessage: string | null
   setFormErrorMessage: (value: string | null) => void
   isBillingAddressPending: boolean
+  debouncedBillingAddress: CheckoutFormData['billing']
   isLoading: boolean
   isTransitioning: boolean
-  setIsBillingAddressPending: (value: boolean) => void
+  transition: (fn: () => Promise<void>) => void
   setIsLoading: (value: boolean) => void
-  setIsTransitioning: (value: boolean) => void
   setIsReady: (key: keyof CheckoutContextType['isReady'], value: boolean) => void
   formData: CheckoutFormData
   updateFormData: (section: keyof CheckoutFormData, data: any) => void
@@ -69,18 +74,10 @@ const CheckoutContext = createContext<CheckoutContextType | undefined>(undefined
 
 export function CheckoutProvider({
   children,
-  clientSecret,
-  publishableKey,
-  stripeAccount,
-  currentLocale,
-  customer,
+  checkoutSession,
 }: {
   children: React.ReactNode
-  clientSecret?: string
-  publishableKey?: string
-  stripeAccount?: string
-  currentLocale: string
-  customer: CustomerDTO | null
+  checkoutSession: CheckoutSession
 }) {
   const [isGuestCheckout, setIsGuestCheckout] = useState(false)
   const [step, setStep] = useState<'email' | 'delivery' | 'payment' | 'confirm'>('email')
@@ -91,6 +88,9 @@ export function CheckoutProvider({
   })
   const [formData, setFormData] = useState<CheckoutFormData>({
     email: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
     shipping: {
       name: '',
       phone: '',
@@ -109,12 +109,14 @@ export function CheckoutProvider({
     },
   })
   const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
-  const [isBillingAddressPending, setIsBillingAddressPending] = useState(false)
+
   const [isLoading, setIsLoading] = useState(false)
-  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [isTransitioning, transition] = useTransition()
   const [sameAsShipping, setSameAsShipping] = useState(false)
-
-
+  const [isBillingAddressPending, debouncedBillingAddress] = useDebouncedValue(
+    formData.billing,
+    1000,
+  )
   const updateFormData = (section: keyof CheckoutFormData, data: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -136,29 +138,7 @@ export function CheckoutProvider({
     })
   }
 
-  // Stripe setup
-  const stripePublishableKey = publishableKey || process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-  invariant(stripePublishableKey, 'Stripe publishable key is required')
-  const stripePromise = useMemo(
-    () => loadStripe(stripePublishableKey, { stripeAccount }),
-    [stripePublishableKey, stripeAccount],
-  )
-
-  if (!clientSecret) {
-    return null
-  }
-
-  const options = {
-    clientSecret,
-    appearance: {
-      variables: {
-        fontFamily: `ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`,
-        fontSizeSm: '0.875rem',
-        colorDanger: 'hsl(0 84.2% 60.2%)',
-      },
-    },
-    locale: currentLocale as StripeElementLocale,
-  } satisfies StripeElementsOptions
+ 
 
   return (
     <CheckoutContext.Provider
@@ -166,17 +146,17 @@ export function CheckoutProvider({
         formErrorMessage,
         setFormErrorMessage,
         isBillingAddressPending,
-        setIsBillingAddressPending,
+        debouncedBillingAddress,
         isLoading,
         setIsLoading,
         isTransitioning,
-        setIsTransitioning,
+        transition,
         isGuestCheckout,
         setIsGuestCheckout,
         clearCheckoutState,
         step,
         setStep,
-        customer,
+        // customer,
         isReady,
         setIsReady,
         formData,
@@ -185,9 +165,9 @@ export function CheckoutProvider({
         setSameAsShipping,
       }}
     >
-      <Elements stripe={stripePromise} options={options}>
+      <StripeElementsContainer clientSecret={checkoutSession.clientSecret}>
         {children}
-      </Elements>
+      </StripeElementsContainer>
     </CheckoutContext.Provider>
   )
 }

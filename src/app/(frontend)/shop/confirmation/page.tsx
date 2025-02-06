@@ -1,12 +1,16 @@
 import { Badge } from '@/components/ui/badge'
-import type { PaymentIntent } from '@stripe/stripe-js'
 import { type ComponentProps, Fragment } from 'react'
-import { getCart } from '@/lib/data/cart'
+import { deleteCart, getCart } from '@/lib/data/cart'
 import getPayload from '@/lib/utils/getPayload'
 import { ClearCookieClientComponent } from '@/components/shop/clear-cookie.client'
 import CartItemDetails, { CartItemThumbnail } from '@/components/shop/cart/cart-item-details'
 import type { Metadata } from 'next'
 import { mergeOpenGraph } from '@lib/utils/mergeOpenGraph'
+import { stripeClient } from '@/lib/stripe'
+import { removeCartCookie } from '@/lib/data/cookies'
+import { redirect } from 'next/navigation'
+import { createOrder } from '@/lib/data/order'
+import { redis } from '@/lib/redis/client'
 
 export const generateMetadata = async (): Promise<Metadata> => {
   return {
@@ -14,7 +18,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
     description: 'Your order has been confirmed.',
     openGraph: mergeOpenGraph({
       title: 'Order Confirmation',
-      url: '/shop/order/success',
+      // url: '/shop/order/success',
     }),
   }
 }
@@ -29,23 +33,74 @@ export default async function OrderDetailsPage(props: {
   const searchParams = await props.searchParams
   if (
     typeof searchParams.payment_intent !== 'string' ||
-    typeof searchParams.payment_intent_client_secret !== 'string' ||
-    typeof searchParams.order_id !== 'string'
+    typeof searchParams.payment_intent_client_secret !== 'string'
+    // typeof searchParams.order_id !== 'string'
   ) {
     return <div>Invalid order details</div>
   }
 
-  const payload = await getPayload()
+  const paymentIntent = await stripeClient.paymentIntents.retrieve(searchParams.payment_intent)
 
-  const order = await payload.findByID({
-    collection: 'orders',
-    id: searchParams.order_id,
-  })
+  if (paymentIntent.status === 'succeeded') {
+    const paymentIntentData = {
+      total: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      id: paymentIntent.id,
+      status: paymentIntent.status,
+      paymentIntent: paymentIntent,
+    }
 
-  if (!order) {
-    return <div>Order not found</div>
+    const order = await createOrder('6781557686266121ab7ded4d', paymentIntentData)
+    // Clear cart cookie since payment succeeded
+    // await deleteCart()
+
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+              Thank you for your order!
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-gray-600">
+              Your payment was successful. Your order number is: {order.id}
+            </p>
+            <div className="mt-10">
+              <dl className="divide-y divide-gray-200">
+                <div className="py-4">
+                  <dt className="text-sm font-medium text-gray-500">Order Total</dt>
+                  <dd className="mt-1 text-lg font-semibold text-gray-900">
+                    ${(paymentIntent.amount / 100).toFixed(2)}{' '}
+                    {paymentIntent.currency.toUpperCase()}
+                  </dd>
+                </div>
+                <div className="py-4">
+                  <dt className="text-sm font-medium text-gray-500">Payment Status</dt>
+                  <dd className="mt-1 text-lg font-semibold text-green-600">
+                    {paymentIntent.status.charAt(0).toUpperCase() + paymentIntent.status.slice(1)}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  } else {
+    console.log('Payment failed')
+    redirect('shop/cart')
   }
-  const cookie = await getCart()
+
+  // const payload = await getPayload()
+
+  // const order = await payload.findByID({
+  //   collection: 'orders',
+  //   id: searchParams.order_id,
+  // })
+
+  // if (!order) {
+  //   return <div>Order not found</div>
+  // }
+  // const cookie = await getCart()
   //   const t = await getTranslations('/order.page')
   //   const locale = await getLocale()
 
@@ -53,235 +108,235 @@ export default async function OrderDetailsPage(props: {
   //     return lines.some(({ product }) => Boolean(product.metadata.digitalAsset))
   //   }
 
-  return (
-    <article className="max-w-3xl pb-32">
-      {/* <ClearCookieClientComponent cartId={order.order.id} cookieId={cookie?.id} /> */}
-      <h1 className="mt-4 inline-flex items-center text-3xl font-bold leading-none tracking-tight">
-        Order Confirmation
-        <PaymentStatus status={order.status} />
-      </h1>
-      <p className="mt-2">Thank you for your order!</p>
-      <dl className="mt-12 space-y-2 text-sm">
-        <dt className="font-semibold text-foreground">Order Number</dt>
-        <dd className="text-accent-foreground">{order.id.slice(3)}</dd>
-      </dl>
+  // return (
+  //   <article className="max-w-3xl pb-32">
+  //     {/* <ClearCookieClientComponent cartId={order.order.id} cookieId={cookie?.id} /> */}
+  //     <h1 className="mt-4 inline-flex items-center text-3xl font-bold leading-none tracking-tight">
+  //       Order Confirmation
+  //       <PaymentStatus status={order.status} />
+  //     </h1>
+  //     <p className="mt-2">Thank you for your order!</p>
+  //     <dl className="mt-12 space-y-2 text-sm">
+  //       <dt className="font-semibold text-foreground">Order Number</dt>
+  //       <dd className="text-accent-foreground">{order.id.slice(3)}</dd>
+  //     </dl>
 
-      <h2 className="sr-only">Products</h2>
-      <ul role="list" className="my-8 divide-y border-y">
-        {order.items.map((item) => (
-          <li key={item.id} className="py-8">
-            <article className="grid grid-cols-[auto,1fr] grid-rows-[repeat(auto,3)] justify-start gap-x-4 sm:gap-x-8">
-              <h3 className="row-start-1 font-semibold leading-none text-neutral-700">
-                <CartItemDetails item={item} />
-                {/* {item.product.title} - {item.variant.map((v) => v.option).join(', ')} */}
-              </h3>
-              <CartItemThumbnail line={item} />
-              <div className="prose row-start-2 text-secondary-foreground">
-                {/* <Markdown source={line.product.description || ''} /> */}
-              </div>
-              <footer className="row-start-3 mt-2 self-end">
-                <dl className="grid grid-cols-[max-content,auto] gap-2 sm:grid-cols-3">
-                  <div className="max-sm:col-span-2 max-sm:grid max-sm:grid-cols-subgrid">
-                    <dt className="text-sm font-semibold text-foreground">Price</dt>
-                    <dd className="text-sm text-accent-foreground">
-                      {item.price.toFixed(2)}
-                      {/* {formatMoney({
-                        amount: line.product.default_price.unit_amount ?? 0,
-                        currency: line.product.default_price.currency,
-                        locale,
-                      })} */}
-                    </dd>
-                  </div>
+  //     <h2 className="sr-only">Products</h2>
+  //     <ul role="list" className="my-8 divide-y border-y">
+  //       {order.items.map((item) => (
+  //         <li key={item.id} className="py-8">
+  //           <article className="grid grid-cols-[auto,1fr] grid-rows-[repeat(auto,3)] justify-start gap-x-4 sm:gap-x-8">
+  //             <h3 className="row-start-1 font-semibold leading-none text-neutral-700">
+  //               <CartItemDetails item={item} />
+  //               {/* {item.product.title} - {item.variant.map((v) => v.option).join(', ')} */}
+  //             </h3>
+  //             <CartItemThumbnail line={item} />
+  //             <div className="prose row-start-2 text-secondary-foreground">
+  //               {/* <Markdown source={line.product.description || ''} /> */}
+  //             </div>
+  //             <footer className="row-start-3 mt-2 self-end">
+  //               <dl className="grid grid-cols-[max-content,auto] gap-2 sm:grid-cols-3">
+  //                 <div className="max-sm:col-span-2 max-sm:grid max-sm:grid-cols-subgrid">
+  //                   <dt className="text-sm font-semibold text-foreground">Price</dt>
+  //                   <dd className="text-sm text-accent-foreground">
+  //                     {item.price.toFixed(2)}
+  //                     {/* {formatMoney({
+  //                       amount: line.product.default_price.unit_amount ?? 0,
+  //                       currency: line.product.default_price.currency,
+  //                       locale,
+  //                     })} */}
+  //                   </dd>
+  //                 </div>
 
-                  <div className="max-sm:col-span-2 max-sm:grid max-sm:grid-cols-subgrid">
-                    <dt className="text-sm font-semibold text-foreground">Quantity</dt>
-                    <dd className="text-sm text-accent-foreground">{item.quantity}</dd>
-                  </div>
+  //                 <div className="max-sm:col-span-2 max-sm:grid max-sm:grid-cols-subgrid">
+  //                   <dt className="text-sm font-semibold text-foreground">Quantity</dt>
+  //                   <dd className="text-sm text-accent-foreground">{item.quantity}</dd>
+  //                 </div>
 
-                  <div className="max-sm:col-span-2 max-sm:grid max-sm:grid-cols-subgrid">
-                    <dt className="text-sm font-semibold text-foreground">Total</dt>
-                    <dd className="text-sm text-accent-foreground">
-                      {(item.price * item.quantity).toFixed(2)}
-                      {/* {formatMoney({
-                        amount: (line.product.default_price.unit_amount ?? 0) * line.quantity,
-                        currency: line.product.default_price.currency,
-                        locale,
-                      })} */}
-                    </dd>
-                  </div>
-                </dl>
-              </footer>
-            </article>
-          </li>
-        ))}
-        {order.shippingRate && (
-          <li className="py-8">
-            <article className="grid grid-cols-[auto,1fr] grid-rows-[repeat(auto,3)] justify-start gap-x-4 sm:gap-x-8">
-              <h3 className="row-start-1 font-semibold leading-none text-neutral-700">
-                {order.shippingRate.displayName}
-              </h3>
-              <div className="col-start-1 row-span-3 row-start-1 mt-0.5 w-16 sm:mt-0 sm:w-32" />
-              <footer className="row-start-3 mt-2 self-end">
-                <dl className="grid grid-cols-[max-content,auto] gap-2 sm:grid-cols-3">
-                  <div className="max-sm:col-span-2 max-sm:grid max-sm:grid-cols-subgrid">
-                    <dt className="text-sm font-semibold text-foreground">Price</dt>
-                    <dd className="text-sm text-accent-foreground">
-                      {order.shippingRate.rate.toFixed(2)}
-                      {/* {formatMoney({
-                        amount: order.shippingRate.fixed_amount.amount ?? 0,
-                        currency: order.shippingRate.fixed_amount.currency,
-                        locale,
-                      })} */}
-                    </dd>
-                  </div>
-                </dl>
-              </footer>
-            </article>
-          </li>
-        )}
-      </ul>
+  //                 <div className="max-sm:col-span-2 max-sm:grid max-sm:grid-cols-subgrid">
+  //                   <dt className="text-sm font-semibold text-foreground">Total</dt>
+  //                   <dd className="text-sm text-accent-foreground">
+  //                     {(item.price * item.quantity).toFixed(2)}
+  //                     {/* {formatMoney({
+  //                       amount: (line.product.default_price.unit_amount ?? 0) * line.quantity,
+  //                       currency: line.product.default_price.currency,
+  //                       locale,
+  //                     })} */}
+  //                   </dd>
+  //                 </div>
+  //               </dl>
+  //             </footer>
+  //           </article>
+  //         </li>
+  //       ))}
+  //       {order.shippingRate && (
+  //         <li className="py-8">
+  //           <article className="grid grid-cols-[auto,1fr] grid-rows-[repeat(auto,3)] justify-start gap-x-4 sm:gap-x-8">
+  //             <h3 className="row-start-1 font-semibold leading-none text-neutral-700">
+  //               {order.shippingRate.displayName}
+  //             </h3>
+  //             <div className="col-start-1 row-span-3 row-start-1 mt-0.5 w-16 sm:mt-0 sm:w-32" />
+  //             <footer className="row-start-3 mt-2 self-end">
+  //               <dl className="grid grid-cols-[max-content,auto] gap-2 sm:grid-cols-3">
+  //                 <div className="max-sm:col-span-2 max-sm:grid max-sm:grid-cols-subgrid">
+  //                   <dt className="text-sm font-semibold text-foreground">Price</dt>
+  //                   <dd className="text-sm text-accent-foreground">
+  //                     {order.shippingRate.rate.toFixed(2)}
+  //                     {/* {formatMoney({
+  //                       amount: order.shippingRate.fixed_amount.amount ?? 0,
+  //                       currency: order.shippingRate.fixed_amount.currency,
+  //                       locale,
+  //                     })} */}
+  //                   </dd>
+  //                 </div>
+  //               </dl>
+  //             </footer>
+  //           </article>
+  //         </li>
+  //       )}
+  //     </ul>
 
-      <div className="pl-20 sm:pl-40">
-        <h2 className="sr-only">Details</h2>
-        {/* {isDigital(order.lines) && (
-          <div className="mb-8">
-            <h3 className="font-semibold leading-none text-neutral-700">Digital Asset</h3>
-            <ul className="mt-3">
-              {order.lines
-                .filter((line) => line.product.metadata.digitalAsset)
-                .map((line) => {
-                  return (
-                    <li key={line.product.id} className="text-sm">
-                      <a
-                        href={line.product.metadata.digitalAsset}
-                        target="_blank"
-                        download={true}
-                        rel="noreferrer"
-                        className="text-blue-500 hover:underline"
-                      >
-                        {line.product.name}
-                      </a>
-                    </li>
-                  )
-                })}
-            </ul>
-          </div>
-        )} */}
-        <div className="grid gap-8 sm:grid-cols-2">
-          {/* {order.shipping?.address && (
-            <div>
-              <h3 className="font-semibold leading-none text-neutral-700">
-                Shipping Address
-              </h3>
-              <p className="mt-3 text-sm">
-                {[
-                  order.order.shipping.name,
-                  order.order.shipping.address.line1,
-                  order.order.shipping.address.line2,
-                  order.order.shipping.address.postal_code,
-                  order.order.shipping.address.city,
-                  order.order.shipping.address.state,
-                  findMatchingCountry(order.order.shipping.address?.country)?.label,
-                  '\n',
-                  order.order.shipping.phone,
-                  order.order.receipt_email,
-                ]
-                  .filter(Boolean)
-                  .map((line, idx) => (
-                    <Fragment key={idx}>
-                      {line}
-                      <br />
-                    </Fragment>
-                  ))}
-              </p>
-            </div>
-          )} */}
+  //     <div className="pl-20 sm:pl-40">
+  //       <h2 className="sr-only">Details</h2>
+  //       {/* {isDigital(order.lines) && (
+  //         <div className="mb-8">
+  //           <h3 className="font-semibold leading-none text-neutral-700">Digital Asset</h3>
+  //           <ul className="mt-3">
+  //             {order.lines
+  //               .filter((line) => line.product.metadata.digitalAsset)
+  //               .map((line) => {
+  //                 return (
+  //                   <li key={line.product.id} className="text-sm">
+  //                     <a
+  //                       href={line.product.metadata.digitalAsset}
+  //                       target="_blank"
+  //                       download={true}
+  //                       rel="noreferrer"
+  //                       className="text-blue-500 hover:underline"
+  //                     >
+  //                       {line.product.name}
+  //                     </a>
+  //                   </li>
+  //                 )
+  //               })}
+  //           </ul>
+  //         </div>
+  //       )} */}
+  //       <div className="grid gap-8 sm:grid-cols-2">
+  //         {/* {order.shipping?.address && (
+  //           <div>
+  //             <h3 className="font-semibold leading-none text-neutral-700">
+  //               Shipping Address
+  //             </h3>
+  //             <p className="mt-3 text-sm">
+  //               {[
+  //                 order.order.shipping.name,
+  //                 order.order.shipping.address.line1,
+  //                 order.order.shipping.address.line2,
+  //                 order.order.shipping.address.postal_code,
+  //                 order.order.shipping.address.city,
+  //                 order.order.shipping.address.state,
+  //                 findMatchingCountry(order.order.shipping.address?.country)?.label,
+  //                 '\n',
+  //                 order.order.shipping.phone,
+  //                 order.order.receipt_email,
+  //               ]
+  //                 .filter(Boolean)
+  //                 .map((line, idx) => (
+  //                   <Fragment key={idx}>
+  //                     {line}
+  //                     <br />
+  //                   </Fragment>
+  //                 ))}
+  //             </p>
+  //           </div>
+  //         )} */}
 
-          {/* {order.order.payment_method?.billing_details.address && (
-            <div>
-              <h3 className="font-semibold leading-none text-neutral-700">{t('billingAddress')}</h3>
-              <p className="mt-3 text-sm">
-                {[
-                  order.order.payment_method.billing_details.name,
-                  order.order.payment_method.billing_details.address.line1,
-                  order.order.payment_method.billing_details.address.line2,
-                  order.order.payment_method.billing_details.address.postal_code,
-                  order.order.payment_method.billing_details.address.city,
-                  order.order.payment_method.billing_details.address.state,
-                  findMatchingCountry(order.order.payment_method?.billing_details?.address?.country)
-                    ?.label,
-                  '\n',
-                  order.order.payment_method.billing_details.phone,
-                  order.order.receipt_email,
-                ]
-                  .filter(Boolean)
-                  .map((line, idx) => (
-                    <Fragment key={idx}>
-                      {line}
-                      <br />
-                    </Fragment>
-                  ))}
-                {order.order.metadata.taxId && `${t('taxId')}: ${order.order.metadata.taxId}`}
-              </p>
-            </div>
-          )}
+  //         {/* {order.order.payment_method?.billing_details.address && (
+  //           <div>
+  //             <h3 className="font-semibold leading-none text-neutral-700">{t('billingAddress')}</h3>
+  //             <p className="mt-3 text-sm">
+  //               {[
+  //                 order.order.payment_method.billing_details.name,
+  //                 order.order.payment_method.billing_details.address.line1,
+  //                 order.order.payment_method.billing_details.address.line2,
+  //                 order.order.payment_method.billing_details.address.postal_code,
+  //                 order.order.payment_method.billing_details.address.city,
+  //                 order.order.payment_method.billing_details.address.state,
+  //                 findMatchingCountry(order.order.payment_method?.billing_details?.address?.country)
+  //                   ?.label,
+  //                 '\n',
+  //                 order.order.payment_method.billing_details.phone,
+  //                 order.order.receipt_email,
+  //               ]
+  //                 .filter(Boolean)
+  //                 .map((line, idx) => (
+  //                   <Fragment key={idx}>
+  //                     {line}
+  //                     <br />
+  //                   </Fragment>
+  //                 ))}
+  //               {order.order.metadata.taxId && `${t('taxId')}: ${order.order.metadata.taxId}`}
+  //             </p>
+  //           </div>
+  //         )}
 
-          {order.order.payment_method?.type === 'card' && order.order.payment_method.card && (
-            <div className="border-t pt-8 sm:col-span-2">
-              <h3 className="font-semibold leading-none text-neutral-700">{t('paymentMethod')}</h3>
-              <p className="mt-3 text-sm">
-                {order.order.payment_method.card.brand &&
-                  order.order.payment_method.card.brand in paymentMethods && (
-                    <Image
-                      src={
-                        paymentMethods[
-                          order.order.payment_method.card.brand as keyof typeof paymentMethods
-                        ]
-                      }
-                      className="mr-1 inline-block w-6 align-text-bottom"
-                      alt=""
-                    />
-                  )}
-                <span className="sr-only">{t('cardBrand')} </span>
-                <span className="capitalize">{order.order.payment_method.card.display_brand}</span>
-              </p>
-              <p className="mt-1.5 text-sm tabular-nums">
-                <span className="sr-only">{t('last4CardDigitsLabel')} </span>
-                <span aria-hidden>••••</span>
-                {order.order.payment_method.card.last4}
-              </p>
-            </div>
-          )} */}
+  //         {order.order.payment_method?.type === 'card' && order.order.payment_method.card && (
+  //           <div className="border-t pt-8 sm:col-span-2">
+  //             <h3 className="font-semibold leading-none text-neutral-700">{t('paymentMethod')}</h3>
+  //             <p className="mt-3 text-sm">
+  //               {order.order.payment_method.card.brand &&
+  //                 order.order.payment_method.card.brand in paymentMethods && (
+  //                   <Image
+  //                     src={
+  //                       paymentMethods[
+  //                         order.order.payment_method.card.brand as keyof typeof paymentMethods
+  //                       ]
+  //                     }
+  //                     className="mr-1 inline-block w-6 align-text-bottom"
+  //                     alt=""
+  //                   />
+  //                 )}
+  //               <span className="sr-only">{t('cardBrand')} </span>
+  //               <span className="capitalize">{order.order.payment_method.card.display_brand}</span>
+  //             </p>
+  //             <p className="mt-1.5 text-sm tabular-nums">
+  //               <span className="sr-only">{t('last4CardDigitsLabel')} </span>
+  //               <span aria-hidden>••••</span>
+  //               {order.order.payment_method.card.last4}
+  //             </p>
+  //           </div>
+  //         )} */}
 
-          <div className="col-span-2 grid grid-cols-2 gap-8 border-t pt-8">
-            <h3 className="font-semibold leading-none text-neutral-700">Total</h3>
-            <p>{order.total.toFixed(2)}</p>
-          </div>
-        </div>
-      </div>
-    </article>
-  )
+  //         <div className="col-span-2 grid grid-cols-2 gap-8 border-t pt-8">
+  //           <h3 className="font-semibold leading-none text-neutral-700">Total</h3>
+  //           <p>{order.total.toFixed(2)}</p>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   </article>
+  // )
 }
 
-const PaymentStatus = async ({ status }: { status: PaymentIntent.Status }) => {
-  //   const t = await getTranslations('/order.paymentStatus')
-  const statusToVariant = {
-    canceled: 'destructive',
-    processing: 'secondary',
-    requires_action: 'destructive',
-    requires_capture: 'destructive',
-    requires_confirmation: 'destructive',
-    requires_payment_method: 'destructive',
-    succeeded: 'default',
-  } satisfies Record<PaymentIntent.Status, ComponentProps<typeof Badge>['variant']>
+// const PaymentStatus = async ({ status }: { status: PaymentIntent.Status }) => {
+//   //   const t = await getTranslations('/order.paymentStatus')
+//   const statusToVariant = {
+//     canceled: 'destructive',
+//     processing: 'secondary',
+//     requires_action: 'destructive',
+//     requires_capture: 'destructive',
+//     requires_confirmation: 'destructive',
+//     requires_payment_method: 'destructive',
+//     succeeded: 'default',
+//   } satisfies Record<PaymentIntent.Status, ComponentProps<typeof Badge>['variant']>
 
-  return (
-    <Badge className="ml-2 capitalize" variant={statusToVariant[status]}>
-      {status}
-      {/* {t(status)} */}
-    </Badge>
-  )
-}
+//   return (
+//     <Badge className="ml-2 capitalize" variant={statusToVariant[status]}>
+//       {status}
+//       {/* {t(status)} */}
+//     </Badge>
+//   )
+// }
 
 // import React from 'react'
 // import { Metadata } from 'next'

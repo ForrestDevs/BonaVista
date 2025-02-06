@@ -43,4 +43,4 @@ export function CartSummaryList({ items }: CartSummaryListProps) {
       <CartSummaryTotals items={optimisticState.items} />
     </div>
   )
-} 
+}

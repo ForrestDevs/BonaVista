@@ -88,11 +88,14 @@ const Cart: CollectionConfig = {
     {
       name: 'payment_intent',
       type: 'json',
-      required: true,
     },
     {
       name: 'payment_id',
       type: 'text',
+    },
+    {
+      name: 'checkout_session',
+      type: 'json',
     },
     {
       name: 'payment_session',

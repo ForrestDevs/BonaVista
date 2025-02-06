@@ -55,15 +55,12 @@ export async function getCustomerCart(customerId: string): Promise<Cart | null> 
 export async function createCart(customerId?: string): Promise<Cart> {
   const payload = await getPayload()
 
-  const paymentIntent = await createPaymentIntent()
-
   try {
     const cart = await payload.create({
       collection: CART_SLUG,
       data: {
         type: 'default',
         ...(customerId ? { customer: customerId } : {}),
-        payment_intent: paymentIntent as any,
       },
     })
     console.log('created cart', cart.id)
@@ -681,4 +678,9 @@ export async function deleteCart() {
   await removeCartCookie()
   revalidateTag(`cart-${cart.id}`)
   revalidateTag('admin-orders')
+}
+
+export async function clearCartCookie() {
+  await removeCartCookie()
+  revalidateTag('cart')
 }

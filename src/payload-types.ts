@@ -293,7 +293,7 @@ export interface Cart {
   billing_address?: string | null;
   shipping_address?: string | null;
   items?: CartItems;
-  payment_intent:
+  payment_intent?:
     | {
         [k: string]: unknown;
       }
@@ -303,6 +303,15 @@ export interface Cart {
     | boolean
     | null;
   payment_id?: string | null;
+  checkout_session?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   payment_session?:
     | {
         [k: string]: unknown;
@@ -1876,6 +1885,7 @@ export interface CartSelect<T extends boolean = true> {
   items?: T | CartItemsSelect<T>;
   payment_intent?: T;
   payment_id?: T;
+  checkout_session?: T;
   payment_session?: T;
   payment_sessions?:
     | T

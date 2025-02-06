@@ -117,7 +117,7 @@ add loading spinners to variant select
 
 Add pagination to product results
 Fix filtering and sort options
-Clean up product page
+
 Complete order flow with checkout and payment (create order in payload use hooks to send data elsewhere)
 finish up shop home page
 

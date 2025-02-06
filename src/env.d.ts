@@ -15,6 +15,9 @@ declare global {
       STRIPE_SECRET_KEY: string
       NEXT_PUBLIC_STRIPE_IS_TEST_KEY: string
       OPENAI_API_KEY: string
+      UPSTASH_REDIS_REST_URL: string
+      UPSTASH_REDIS_REST_TOKEN: string
+      BLOB_READ_WRITE_TOKEN: string
     }
   }
 }

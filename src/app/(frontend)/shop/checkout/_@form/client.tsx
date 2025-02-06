@@ -1,7 +1,7 @@
 'use client'
 
 import { useQueryState } from 'nuqs'
-import { useCheckout } from '@/app/(frontend)/shop/_checkout/context'
+import { useCheckout } from '@/app/(frontend)/shop/checkout/context'
 import { Button } from '@/components/ui/button'
 import {
   AddressElement,

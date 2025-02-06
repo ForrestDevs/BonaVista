@@ -1,14 +1,13 @@
-import 'server-only'
+'use server'
+
 import { cookies } from 'next/headers'
 import { safeJsonParse } from '@lib/utils/safeJSONParse'
-
-export const CART_COOKIE = '_cart_id'
 
 export type CartCookieJson = { id: string; linesCount: number }
 
 export async function getCartCookie(): Promise<null | CartCookieJson> {
   const cookiesValue = await cookies()
-  const cartCookieJson = safeJsonParse(cookiesValue.get(CART_COOKIE)?.value)
+  const cartCookieJson = safeJsonParse(cookiesValue.get('_cart_id')?.value)
 
   if (
     !cartCookieJson ||
@@ -26,7 +25,7 @@ export async function getCartCookie(): Promise<null | CartCookieJson> {
 export const setCartCookie = async (cartCookieJson: CartCookieJson) => {
   const cookiestore = await cookies()
   try {
-    cookiestore.set(CART_COOKIE, JSON.stringify(cartCookieJson), {
+    cookiestore.set('_cart_id', JSON.stringify(cartCookieJson), {
       maxAge: 60 * 60 * 24 * 7, // This is 7 days in seconds (604800 seconds)
       httpOnly: true,
       sameSite: 'strict',
@@ -37,15 +36,15 @@ export const setCartCookie = async (cartCookieJson: CartCookieJson) => {
   }
 }
 
-export const removeCartCookie = async () => {
-  // Both methods are valid, but cookies().delete('_cart_id') is more straightforward
-  // and is the recommended approach for removing cookies in Next.js
-  const cookiestore = await cookies()
-  cookiestore.delete('_cart_id')
-}
-
-// export async function clearCartCookie(): Promise<void> {
-// 	(await cookies()).set(CART_COOKIE, "", {
-// 		maxAge: 0,
-// 	});
+// export async function removeCartCookie() {
+//   // Both methods are valid, but cookies().delete('_cart_id') is more straightforward
+//   // and is the recommended approach for removing cookies in Next.js
+//   const cookiestore = await cookies()
+//   cookiestore.delete('_cart_id')
 // }
+
+export async function removeCartCookie(): Promise<void> {
+  ;(await cookies()).set('_cart_id', '', {
+    maxAge: 0,
+  })
+}

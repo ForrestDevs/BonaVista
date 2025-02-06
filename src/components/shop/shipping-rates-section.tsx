@@ -3,67 +3,137 @@ import { cn } from '@/lib/utils/cn'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useOptimistic, useTransition } from 'react'
 import type Stripe from 'stripe'
+import { useEffect, useState } from 'react'
+import { ShippingOption } from '@payload-types'
+import { Label } from '@/components/ui/label'
+import { Card } from '@/components/ui/card'
+import { formatCurrency } from '@/lib/utils/currency'
+import { Skeleton } from '@/components/ui/skeleton'
+import { AlertCircle } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
-export const ShippingRatesSection = ({
-  shippingRates,
-  value,
-  onChange,
-}: {
-  shippingRates: any[]
-  value: string | null | undefined
-  onChange: (value: string) => void
-}) => {
-  const [isTransitioning, transition] = useTransition()
-  const [optimisticValue, setOptimisticValue] = useOptimistic(value)
-  const isPending = isTransitioning || optimisticValue !== value
+interface ShippingRatesSectionProps {
+  shippingOptions: ShippingOption[] | null
+  selectedOptionId: string | null
+  onSelect: (optionId: string) => void
+  postalCode: string | null
+  cartTotal: number
+  isLoading?: boolean
+}
+
+export function ShippingRatesSection({
+  shippingOptions,
+  selectedOptionId,
+  onSelect,
+  postalCode,
+  cartTotal,
+  isLoading = false,
+}: ShippingRatesSectionProps) {
+  const [availableOptions, setAvailableOptions] = useState<ShippingOption[]>([])
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!shippingOptions || !postalCode) {
+      setAvailableOptions([])
+      setError('Please enter your shipping address to see available shipping options.')
+      return
+    }
+
+    // Filter active shipping options
+    const activeOptions = shippingOptions.filter((option) => option.isActive)
+
+    // Filter options based on postal code and shipping rules
+    const filteredOptions = activeOptions.filter((option) => {
+      // If no regions specified, option is available everywhere
+      if (!option.shippingRules?.regions || option.shippingRules.regions.length === 0) {
+        return true
+      }
+
+      // Check if postal code matches any region's pattern
+      return option.shippingRules.regions.some((region) => {
+        const pattern = new RegExp(region.postalCodePattern, 'i')
+        return pattern.test(postalCode)
+      })
+    })
+
+    if (filteredOptions.length === 0) {
+      setError('No shipping options available for your location.')
+      setAvailableOptions([])
+      return
+    }
+
+    setAvailableOptions(filteredOptions)
+    setError(null)
+  }, [shippingOptions, postalCode])
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-6 w-1/4" />
+        <div className="space-y-2">
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Shipping Not Available</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    )
+  }
 
   return (
-    <fieldset className={cn(`grid gap-6 rounded-lg`, isPending && 'cursor-wait')}>
-      <legend className="mb-2 whitespace-nowrap text-sm font-medium">Shipping method</legend>
+    <Card className="p-6">
+      <h3 className="text-lg font-medium mb-4">Shipping Method</h3>
       <RadioGroup
-        className="grid max-w-md gap-4 xs:grid-cols-3"
-        value={optimisticValue ?? undefined}
-        onValueChange={(newValue) => {
-          transition(() => {
-            setOptimisticValue(newValue)
-            return onChange(newValue)
-          })
-        }}
+        value={selectedOptionId || undefined}
+        onValueChange={onSelect}
+        className="space-y-4"
       >
-        {shippingRates.map((rate) => (
-          <label
-            key={rate.id}
-            className={cn(
-              'grid content-end items-end rounded-md border-2 border-muted px-2 py-2 transition-colors',
-              `has-[[aria-checked="true"]]:border-foreground/60`,
-              isPending ? 'cursor-wait' : 'cursor-pointer hover:bg-neutral-50',
-            )}
-          >
-            <RadioGroupItem value={rate.id} className="sr-only" />
-            <p className="text-sm font-medium">{rate.display_name}</p>
-            {rate.delivery_estimate && (
-              <p className="text-xs text-muted-foreground">
-                <FormatDeliveryEstimate estimate={rate.delivery_estimate} />
-              </p>
-            )}
-            {rate.fixed_amount && (
-              <p className="mt-0.5">
-                {rate.fixed_amount.amount}
-                {/* {formatMoney({
-                  amount: rate.fixed_amount.amount,
-                  currency: rate.fixed_amount.currency,
-                  locale,
-                })} */}
-              </p>
-            )}
-          </label>
-        ))}
+        {availableOptions.map((option) => {
+          const rate = calculateShippingRate(option, cartTotal)
+          return (
+            <div key={option.id} className="flex items-center space-x-3">
+              <RadioGroupItem value={option.id} id={option.id} />
+              <Label htmlFor={option.id} className="flex-1">
+                <div className="flex justify-between items-center">
+                  <span>{option.name}</span>
+                  <span className="font-medium">
+                    {rate === 0 ? 'FREE' : formatCurrency(rate)}
+                  </span>
+                </div>
+                {option.shippingRules?.freeShippingThreshold && cartTotal < option.shippingRules.freeShippingThreshold && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Spend {formatCurrency(option.shippingRules.freeShippingThreshold - cartTotal)} more for free shipping
+                  </p>
+                )}
+              </Label>
+            </div>
+          )
+        })}
       </RadioGroup>
-    </fieldset>
+    </Card>
   )
 }
 
+function calculateShippingRate(option: ShippingOption, cartTotal: number): number {
+  if (!option.shippingRules) return 0
 
+  const { baseRate, freeShippingThreshold } = option.shippingRules
+
+  // Check if order qualifies for free shipping
+  if (freeShippingThreshold && cartTotal >= freeShippingThreshold) {
+    return 0
+  }
+
+  return baseRate
+}
 
 export const FormatDeliveryEstimate = ({ estimate }: { estimate: any }) => {
   //   const t = useTranslations('Global.deliveryEstimates')
