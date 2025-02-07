@@ -10,6 +10,8 @@ interface OrderPageProps {
   }>
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function OrderPage({ params }: OrderPageProps) {
   const { slug } = await params
   const payload = await getPayload()

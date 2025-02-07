@@ -3,6 +3,8 @@ import { CheckoutForm } from '@/components/shop/checkout/checkout-form'
 import { redirect } from 'next/navigation'
 import { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Checkout',

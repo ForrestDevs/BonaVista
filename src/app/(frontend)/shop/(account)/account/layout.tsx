@@ -3,6 +3,8 @@ import AccountNav from '@/components/shop/account/account-nav'
 import { getCustomerDTO } from '@/lib/data/customer'
 import { redirect } from 'next/navigation'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AccountPageLayout({ children }: { children: React.ReactNode }) {
   const customer = await getCustomerDTO()
 

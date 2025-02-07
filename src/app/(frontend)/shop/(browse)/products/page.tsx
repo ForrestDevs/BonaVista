@@ -11,6 +11,8 @@ import { FilteredProducts } from '@/components/shop/filter3/FilteredProducts'
 import { SortOption } from '@/components/shop/filter3/types'
 import { getCachedDocuments } from '@/lib/utils/getDocument'
 
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'All Products | BonaVista Leisurescapes',

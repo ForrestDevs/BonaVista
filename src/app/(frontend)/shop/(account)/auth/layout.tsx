@@ -2,6 +2,8 @@ import React from 'react'
 import { getCustomerDTO } from '@/lib/data/customer'
 import { redirect } from 'next/navigation'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
   const customer = await getCustomerDTO()
 

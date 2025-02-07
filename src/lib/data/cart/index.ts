@@ -123,75 +123,59 @@ export const getCartById = cache(
  */
 export async function getCart(depth?: number): Promise<Cart | null> {
   const customer = await getCustomer()
-  try {
-    if (customer) {
-      const cartId = typeof customer.cart === 'string' ? customer.cart : customer.cart?.id
-      const cart = await getCartById(cartId, depth)
-      if (!cart) {
-        throw 'Cart not found'
-      }
-      return structuredClone(cart)
-    } else {
-      const cartId = (await getCartCookie())?.id
-      if (!cartId) {
-        throw 'No cart cookie ID found'
-      }
-      const cart = await getCartById(cartId, depth)
-      if (!cart) {
-        throw 'Cart not found'
-      }
-      return structuredClone(cart)
+  if (customer) {
+    const cartId = typeof customer.cart === 'string' ? customer.cart : customer.cart?.id
+    const cart = await getCartById(cartId, depth)
+    if (!cart) {
+      return null
     }
-  } catch (error) {
-    console.log('No Current Cart', error)
-    return null
+    return structuredClone(cart)
+  } else {
+    const cartId = (await getCartCookie())?.id
+    if (!cartId) {
+      return null
+    }
+    const cart = await getCartById(cartId, depth)
+    if (!cart) {
+      return null
+    }
+    return structuredClone(cart)
   }
 }
 
 export async function getOrSetCart(): Promise<Cart | null> {
   const customer = await getCustomer()
-  try {
-    if (customer) {
-      console.log('customer found', customer.id)
-      if (customer.cart) {
-        console.log('customer has cart', customer.id)
-        const cartID = typeof customer.cart === 'string' ? customer.cart : customer.cart?.id
-        const cart = await getCartById(cartID)
-        if (!cart) {
-          throw 'Cart not found'
-        }
-        return structuredClone(cart)
-      } else {
-        console.log('customer does not have cart, creating new cart')
-        const newCart = await returnOrCreateCart(null, customer.id)
-        if (!newCart) {
-          throw 'Error creating cart'
-        }
-        return structuredClone(newCart)
+  if (customer) {
+    if (customer.cart) {
+      const cartID = typeof customer.cart === 'string' ? customer.cart : customer.cart?.id
+      const cart = await getCartById(cartID)
+      if (!cart) {
+        return null
       }
+      return structuredClone(cart)
     } else {
-      const cartId = (await getCartCookie())?.id
-      if (cartId) {
-        const cart = await getCartById(cartId)
-        if (!cart) {
-          throw 'Cart not found'
-        }
-        return structuredClone(cart)
-      } else {
-        console.log('cart was deleted creating new cart')
-        // Handle case where the cart was deleted
-        const newCart = await returnOrCreateCart(null)
-        if (!newCart) {
-          throw 'Error creating cart'
-        }
-        await setCartCookie({ id: newCart.id, linesCount: newCart.items.length })
-        revalidateTag(`cart-${newCart.id}`)
-        return structuredClone(newCart)
+      const newCart = await returnOrCreateCart(null, customer.id)
+      if (!newCart) {
+        return null
       }
+      return structuredClone(newCart)
     }
-  } catch (error) {
-    console.error('Error getting or setting cart', error)
-    return null
+  } else {
+    const cartId = (await getCartCookie())?.id
+    if (cartId) {
+      const cart = await getCartById(cartId)
+      if (!cart) {
+        return null
+      }
+      return structuredClone(cart)
+    } else {
+      const newCart = await returnOrCreateCart(null)
+      if (!newCart) {
+        return null
+      }
+      await setCartCookie({ id: newCart.id, linesCount: newCart.items.length })
+      return structuredClone(newCart)
+    }
   }
 }
 

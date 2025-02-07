@@ -121,6 +121,8 @@ const categories = [
   { name: 'Accessories', image: '/mineraluxe.jpg' },
 ]
 
+export const dynamic = 'force-dynamic'
+
 export default async function StoreHome() {
   const payload = await getPayload()
 

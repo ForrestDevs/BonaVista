@@ -9,6 +9,8 @@ import SkeletonCartPage from '@/components/shop/skeletons/layout/skeleton-cart-p
 import { getCustomerDTO } from '@/lib/data/customer'
 import { CartSummaryProvider } from '@/components/shop/cart/summary/cart-summary-context'
 
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Shopping Cart | BonaVista LeisureScapes',
@@ -28,7 +30,7 @@ export default async function CartPage() {
     )
   }
 
-  return (  
+  return (
     <Suspense fallback={<SkeletonCartPage />}>
       <SignInPrompt />
       <CartSummaryProvider>
