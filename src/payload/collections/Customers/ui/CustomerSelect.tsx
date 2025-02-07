@@ -56,7 +56,7 @@ export const CustomerSelect: React.FC<TextField> = (props) => {
   }, [])
 
   const href = `https://dashboard.stripe.com/${
-    process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''
+    process.env.NEXT_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''
   }customers/${stripeCustomerID}`
 
   return (
@@ -71,7 +71,7 @@ export const CustomerSelect: React.FC<TextField> = (props) => {
         {`Select the related Stripe customer or `}
         <a
           href={`https://dashboard.stripe.com/${
-            process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''
+            process.env.NEXT_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''
           }customers/create`}
           rel="noopener noreferrer"
           style={{ color: 'var(--theme-text' }}
@@ -106,7 +106,7 @@ export const CustomerSelect: React.FC<TextField> = (props) => {
           >
             <a
               href={`https://dashboard.stripe.com/${
-                process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''
+                process.env.NEXT_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''
               }customers/${stripeCustomerID}`}
               rel="noreferrer noopener"
               target="_blank"

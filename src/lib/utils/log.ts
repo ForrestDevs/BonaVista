@@ -1,5 +1,5 @@
 export const log = (...args: any[]) => {
-  if (process.env.CONSOLE_DEBUG_HOOKS === 'true') {
+  if (process.env.NEXT_PUBLIC_CONSOLE_DEBUG_HOOKS === 'true') {
     console.log(...args)
   }
 }

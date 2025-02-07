@@ -14,7 +14,7 @@ export default function LinkToPaymentIntent(props: TextField) {
   const { value: stripePaymentIntentID } = useFormFields(([fields]) => fields[name]) || {}
 
   const href = `https://dashboard.stripe.com/${
-    process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''
+    process.env.NEXT_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''
   }payments/${stripePaymentIntentID}`
 
   return (
@@ -45,7 +45,7 @@ export default function LinkToPaymentIntent(props: TextField) {
           >
             <a
               href={`https://dashboard.stripe.com/${
-                process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''
+                process.env.NEXT_PUBLIC_STRIPE_IS_TEST_KEY ? 'test/' : ''
               }customers/${stripePaymentIntentID}`}
               rel="noreferrer noopener"
               target="_blank"

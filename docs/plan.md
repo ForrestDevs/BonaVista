@@ -115,12 +115,6 @@ Total estimated time: 10-15 weeks
 add loading spinners to variant select
 
 
-Add pagination to product results
-Fix filtering and sort options
-
-Complete order flow with checkout and payment (create order in payload use hooks to send data elsewhere)
-finish up shop home page
-
 Finish About Page
 Populate Blog Posts
 Add Videos to Resource Page
@@ -132,7 +126,9 @@ Clean up admin dashboard add overview page
    - show stats for leads
    - show stats for subscriptions
 
-
+Add pagination to product results
+Fix filtering and sort options
+finish up shop home page
 
 cart cookie expires in 7 days so we need to make a payload job to check if any cart docs are older than 7 days and not completed orders and delete them
 
@@ -145,3 +141,8 @@ add product link on title to cart item
 add thumbnail url + media id to the lineItem 
 
 add return and exchange policy page
+
+check variant issue + stripe Customer ID issues with checkout and creating payment intents
+
+fix shipping price miscalculation
+fix preview urls to use server action

@@ -16,9 +16,9 @@ export const ProductCollection: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title'],
     preview: (doc) => {
-      return `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/api/preview?url=${encodeURIComponent(
-        `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/store/collections/${doc.slug}`,
-      )}&secret=${process.env.PAYLOAD_PUBLIC_DRAFT_SECRET}`
+      return `${process.env.NEXT_PUBLIC_SERVER_URL}/api/preview?url=${encodeURIComponent(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/store/collections/${doc.slug}`,
+      )}&secret=${process.env.NEXT_PUBLIC_DRAFT_SECRET}`
     },
   },
   hooks: {

@@ -2,22 +2,30 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       PAYLOAD_SECRET: string
-      DATABASE_URI: string
       NEXT_PUBLIC_SERVER_URL: string
-      VERCEL_PROJECT_PRODUCTION_URL: string
+      NEXT_PUBLIC_IS_LIVE: string
+      NEXT_PRIVATE_DRAFT_SECRET: string
+      REVALIDATION_KEY: string
       DATABASE_URI: string
-      S3_ENDPOINT: string
-      S3_ACCESS_KEY_ID: string
-      S3_SECRET_ACCESS_KEY: string
-      S3_BUCKET: string
-      S3_REGION: string
+      BLOB_READ_WRITE_TOKEN: string
+      ZOHO_CLIENT_ID: string
+      ZOHO_CLIENT_SECRET: string
+      ZOHO_REDIRECT_URI: string
+      ZOHO_REFRESH_TOKEN: string
+      RESEND_API_KEY: string
+      NEXT_PUBLIC_STRIPE_IS_TEST_KEY: string
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string
       STRIPE_SECRET_KEY: string
-      NEXT_PUBLIC_STRIPE_IS_TEST_KEY: string
+      PAYLOAD_SECRET: string
+      NEXT_PUBLIC_SERVER_URL: string
+      NEXT_PUBLIC_URL: string
+      NEXT_PUBLIC_IS_LIVE: string
+      NEXT_PUBLIC_DRAFT_SECRET: string
+      REVALIDATION_KEY: string
+      NEXT_PUBLIC_CONSOLE_DEBUG_HOOKS: string
       OPENAI_API_KEY: string
       UPSTASH_REDIS_REST_URL: string
       UPSTASH_REDIS_REST_TOKEN: string
-      BLOB_READ_WRITE_TOKEN: string
     }
   }
 }

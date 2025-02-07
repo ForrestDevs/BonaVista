@@ -61,37 +61,4 @@ export const plugins: Plugin[] = [
     // Token provided by Vercel once Blob storage is added to your Vercel project
     token: process.env.BLOB_READ_WRITE_TOKEN,
   }),
-  // s3Storage({
-  //   collections: {
-  //     ['media']: true,
-  //   },
-  //   bucket: process.env.S3_BUCKET || 'media',
-  //   config: {
-  //     endpoint: process.env.S3_ENDPOINT || '',
-  //     credentials: {
-  //       accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-  //       secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
-  //     },
-  //     region: process.env.S3_REGION || '',
-  //   },
-  // }),
-  // stripePlugin({
-  //   stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
-  //   stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOKS_SIGNING_SECRET,
-  //   isTestKey: Boolean(process.env.PAYLOAD_PUBLIC_STRIPE_IS_TEST_KEY),
-  //   rest: false,
-  //   webhooks: {
-  //     'price.updated': priceUpdated,
-  //     'product.created': productUpdated,
-  //     'product.updated': productUpdated,
-  //   },
-  // }),
-  // payloadAiPlugin({
-  //   generatePromptOnInit: true,
-  //   collections: {
-  //     ["posts"]: true,
-  //     ["pages"]: true,
-  //   },
-  //   debugging: true,
-  // }),
 ]

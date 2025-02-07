@@ -17,7 +17,7 @@ const Orders: CollectionConfig = {
   admin: {
     group: 'Shop',
     defaultColumns: ['createdAt', 'orderedBy'],
-    // preview: (doc) => `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/orders/${doc.id}`,
+    preview: (doc) => `${process.env.NEXT_PUBLIC_SERVER_URL}/shop/orders/${doc.id}`,
     useAsTitle: 'createdAt',
   },
   fields: [
