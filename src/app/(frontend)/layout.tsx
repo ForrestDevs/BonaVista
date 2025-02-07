@@ -41,6 +41,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <head>
         {/* <script src="https://unpkg.com/react-scan/dist/auto.global.js" async /> */}
+        <script
+          async
+          src="https://cdn-ca.pagesense.io/js/bvleisure/c676b99579df4a90897488e0f49cb527.js"
+          type="text/javascript"
+        />
         <link rel="stylesheet" href="https://use.typekit.net/rgs4hpy.css" />
       </head>
       <body className="antialiased">
