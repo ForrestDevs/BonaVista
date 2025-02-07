@@ -3,10 +3,12 @@ import FilterList from '@components/shop/filter'
 import { FilteredProducts } from '@components/shop/filtered-products'
 import { ResultsSkeleton } from '@components/shop/skeletons/layout/product-results-skeleton'
 import { sorting } from '@lib/search/constants'
-
-export const metadata = {
-  description: 'Search for products in the store.',
-  title: 'Search',
+import { Metadata } from 'next'
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    description: 'Search for products in the store.',
+    title: 'Search',
+  }
 }
 
 export default async function SearchPage({

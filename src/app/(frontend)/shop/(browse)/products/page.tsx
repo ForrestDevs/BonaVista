@@ -11,9 +11,15 @@ import { FilteredProducts } from '@/components/shop/filter3/FilteredProducts'
 import { SortOption } from '@/components/shop/filter3/types'
 import { getCachedDocuments } from '@/lib/utils/getDocument'
 
-export const metadata: Metadata = {
-  title: 'All Products | BonaVista Leisurescapes',
-  description: 'Browse our complete collection of pool and spa care products',
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'All Products | BonaVista Leisurescapes',
+    description: 'Browse our complete collection of pool and spa care products',
+    openGraph: {
+      title: 'All Products | BonaVista Leisurescapes',
+      description: 'Browse our complete collection of pool and spa care products',
+    },
+  }
 }
 
 export default async function ProductsPage() {
