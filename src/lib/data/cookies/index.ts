@@ -49,18 +49,9 @@ export async function deleteCartCookie() {
 }
 
 export async function deleteCartCookieById(id: string) {
-  try {
-    const cookie = await getCartCookie()
-    if (!cookie) {
-      throw new Error('Cart cookie not found')
-    }
-    if (cookie.id !== id) {
-      throw new Error('Cart cookie id does not match')
-    }
+  const cookie = await getCartCookie()
+  if (cookie?.id === id) {
     const cookiestore = await cookies()
     cookiestore.delete('_cart_cookie')
-  } catch (error) {
-    console.error('Failed to delete cart cookie', error)
-    return
   }
 }

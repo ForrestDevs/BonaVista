@@ -574,8 +574,6 @@ export async function deleteCart(cartId: string) {
       collection: CART_SLUG,
       id: cartId,
     })
-
-    revalidateTag(`cart-${cartId}`)
   } catch (error) {
     console.error('Error deleting cart', error)
   }
