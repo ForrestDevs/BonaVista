@@ -1,4 +1,4 @@
-import 'server-only'
+'use server'
 
 import { cookies } from 'next/headers'
 import { safeJsonParse } from '@lib/utils/safeJSONParse'
