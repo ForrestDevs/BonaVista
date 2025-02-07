@@ -91,6 +91,12 @@ const Orders: CollectionConfig = {
           required: true,
         },
         {
+          name: 'taxTotal',
+          type: 'number',
+          min: 0,
+          required: true,
+        },
+        {
           name: 'currency',
           type: 'text',
           required: true,
@@ -118,28 +124,46 @@ const Orders: CollectionConfig = {
               defaultValue: false,
             },
             {
-              name: 'variantOptions',
-              type: 'array',
+              name: 'variant',
+              type: 'group',
               fields: [
                 {
-                  name: 'key',
-                  type: 'group',
+                  name: 'variantOptions',
+                  type: 'array',
                   fields: [
                     {
-                      name: 'slug',
-                      type: 'text',
+                      name: 'key',
+                      type: 'group',
+                      fields: [
+                        {
+                          name: 'slug',
+                          type: 'text',
+                        },
+                        {
+                          name: 'label',
+                          type: 'text',
+                        },
+                      ],
+                    },
+                    {
+                      name: 'value',
+                      type: 'group',
+                      fields: [
+                        {
+                          name: 'slug',
+                          type: 'text',
+                        },
+                        {
+                          name: 'label',
+                          type: 'text',
+                        },
+                      ],
                     },
                   ],
                 },
                 {
-                  name: 'value',
-                  type: 'group',
-                  fields: [
-                    {
-                      name: 'slug',
-                      type: 'text',
-                    },
-                  ],
+                  name: 'id',
+                  type: 'text',
                 },
               ],
             },
@@ -163,7 +187,13 @@ const Orders: CollectionConfig = {
           name: 'url',
           type: 'text',
         },
+        {
+          name: 'thumbnailMediaId',
+          type: 'upload',
+          relationTo: 'media',
+        },
       ],
+      interfaceName: 'OrderItems',
     },
     {
       name: 'paymentIntent',

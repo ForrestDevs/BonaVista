@@ -3,7 +3,7 @@ import { Fragment, Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { handlePaymentSuccess } from '@/lib/data/checkout'
+import { getHashedPaymentIntent, handlePaymentSuccess } from '@/lib/data/checkout'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ClearCookieClientComponent } from '@/components/shop/checkout/clear-cart-cookie'
 import { AlertCircle } from 'lucide-react'
@@ -11,8 +11,7 @@ import SkeletonOrderConfirmed from '@components/shop/skeletons/layout/skeleton-o
 
 interface ConfirmationPageProps {
   searchParams: Promise<{
-    payment_intent: string
-    payment_intent_client_secret: string
+    pid: string
     cart_id: string
   }>
 }
@@ -20,15 +19,21 @@ interface ConfirmationPageProps {
 export const dynamic = 'force-dynamic'
 
 export default async function ConfirmationPage({ searchParams }: ConfirmationPageProps) {
-  const { payment_intent, payment_intent_client_secret, cart_id } = await searchParams
+  const { pid, cart_id } = await searchParams
 
-  if (!payment_intent || !payment_intent_client_secret || !cart_id) {
+  if (!pid || !cart_id) {
+    redirect('/shop/cart')
+  }
+
+  const paymentIntent = await getHashedPaymentIntent(pid)
+
+  if (!paymentIntent) {
     redirect('/shop/cart')
   }
 
   const result = await handlePaymentSuccess({
-    paymentIntentId: payment_intent,
-    clientSecret: payment_intent_client_secret,
+    paymentIntentId: paymentIntent.id,
+    clientSecret: paymentIntent.clientSecret,
   })
 
   return (
@@ -36,7 +41,18 @@ export default async function ConfirmationPage({ searchParams }: ConfirmationPag
       <div className="container py-8">
         <ClearCookieClientComponent cartId={cart_id} />
         <div className="max-w-2xl mx-auto">
-          {result.success ? (
+          {result.error ? (
+            <Fragment>
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{result.error || 'An unknown error occurred'}</AlertDescription>
+              </Alert>
+              <p>
+                {`Your payment was successful but there was an error processing your order. Please contact us to resolve this issue.`}
+              </p>
+            </Fragment>
+          ) : (
             <Card className="p-8">
               <div className="text-center space-y-4">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
@@ -68,7 +84,7 @@ export default async function ConfirmationPage({ searchParams }: ConfirmationPag
 
                 <div className="pt-8 space-x-4">
                   <Button asChild>
-                    <Link href={`/shop/v2/orders/${result.orderId}`}>View Order Details</Link>
+                    <Link href={`/shop/orders/${result.orderId}`}>View Order Details</Link>
                   </Button>
                   <Button variant="outline" asChild>
                     <Link href="/shop">Continue Shopping</Link>
@@ -76,21 +92,6 @@ export default async function ConfirmationPage({ searchParams }: ConfirmationPag
                 </div>
               </div>
             </Card>
-          ) : (
-            <Fragment>
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{result.error || 'An unknown error occurred'}</AlertDescription>
-              </Alert>
-              <p>
-                {`Your payment was successful but there was an error processing your order. Please contact us to resolve this issue.`}
-              </p>
-              <div className="flex wrap g-4">
-                <Link href={'/account'}>View account</Link>
-                <Link href={`${process.env.NEXT_PUBLIC_SERVER_URL}/orders`}>View all orders</Link>
-              </div>
-            </Fragment>
           )}
         </div>
       </div>

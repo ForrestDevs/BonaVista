@@ -2,9 +2,9 @@
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { getOrCreateStripeCustomer } from '@/lib/data/checkout'
+import { getOrCreateStripeCustomer, storeHashedPaymentIntent } from '@/lib/data/checkout'
 import { CheckoutSession } from '@/lib/types/checkout'
-import { formatMoney } from '@/lib/utils/formatMoney'
+import { formatMoney, formatStripeMoney } from '@/lib/utils/formatMoney'
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -31,7 +31,10 @@ export function PaymentStep({ session, onBack }: PaymentStepProps) {
 
       // If we have an email but no customer ID, create or get the customer
       if (session.steps.email.value && !session.stripeCustomerId) {
-        const customerId = await getOrCreateStripeCustomer(session.steps.email.value)
+        const customerId = await getOrCreateStripeCustomer(
+          session.steps.email.value,
+          session.steps.shipping.address,
+        )
         if (!customerId) {
           throw new Error('Failed to create customer')
         }
@@ -43,10 +46,15 @@ export function PaymentStep({ session, onBack }: PaymentStepProps) {
         throw submitError
       }
 
+      const hashedPaymentIntent = await storeHashedPaymentIntent(
+        session.paymentIntentId,
+        session.clientSecret,
+      )
+
       const { error: paymentError, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/shop/confirmation?cartId=${session.cartId}`,
+          return_url: `${window.location.origin}/shop/confirmation?cartId=${session.cartId}&pid=${hashedPaymentIntent}`,
         },
         redirect: 'if_required',
       })
@@ -56,8 +64,7 @@ export function PaymentStep({ session, onBack }: PaymentStepProps) {
       }
 
       const params = new URLSearchParams({
-        payment_intent: paymentIntent.id,
-        payment_intent_client_secret: paymentIntent.client_secret ?? '',
+        pid: hashedPaymentIntent,
         cart_id: session.cartId,
       })
       router.push('/shop/confirmation?' + params.toString())
@@ -84,32 +91,36 @@ export function PaymentStep({ session, onBack }: PaymentStepProps) {
               <div className="flex justify-between text-sm">
                 <span>Subtotal</span>
                 <span>
-                  {session.amount}
-                  {/* {formatMoney({ amount: session.amount, currency: session.currencyCode })} */}
+                  {formatStripeMoney({
+                    amount: session.amount - session.taxAmount,
+                    currency: session.currencyCode,
+                  })}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Shipping</span>
                 <span>
-                  {session.shippingTotal}
-                  {/* {formatMoney({ amount: session.shippingTotal, currency: session.currencyCode })} */}
+                  {formatStripeMoney({
+                    amount: session.shippingTotal,
+                    currency: session.currencyCode,
+                  })}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>Tax</span>
                 <span>
-                  {session.taxAmount}
-                  {/* {formatMoney({ amount: session.taxAmount, currency: session.currencyCode })} */}
+                  Tax <span className="text-xs text-gray-500">(13%)</span>
+                </span>
+                <span>
+                  {formatStripeMoney({ amount: session.taxAmount, currency: session.currencyCode })}
                 </span>
               </div>
               <div className="flex justify-between font-medium pt-2 border-t">
                 <span>Total</span>
                 <span>
-                  {session.amount + session.shippingTotal + session.taxAmount}
-                  {/* {formatMoney({
-                    amount: session.amount + session.shippingTotal + session.taxAmount,
+                  {formatStripeMoney({
+                    amount: session.amount,
                     currency: session.currencyCode,
-                  })} */}
+                  })}
                 </span>
               </div>
             </div>

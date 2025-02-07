@@ -280,11 +280,7 @@ export async function mergeCarts(customerId: string): Promise<Cart | null> {
     } else {
       // Both carts are null, this should only happen if a user registers with an empty cart
       // In this case, we create a new cart for the customer
-      const newCart = await createCart(customerId)
-      if (!newCart) {
-        throw 'Error creating new cart'
-      }
-      return structuredClone(newCart)
+      return null
     }
   } catch (error) {
     console.error('Error merging carts', error)
@@ -324,12 +320,12 @@ export async function addToCart(cartItem: CartItem): Promise<Cart | null> {
     const existingItemIndex = cart.items.findIndex(({ product: existingProduct, variant }) => {
       const existingProductId =
         typeof existingProduct === 'string' ? existingProduct : existingProduct?.id
-      const existingVariantOptions = variant?.map((v) => v.option).sort() || []
-      const newVariantOptions = cartItem.variant?.map((v) => v.option).sort() || []
-      return (
-        existingProductId === productId &&
-        JSON.stringify(existingVariantOptions) === JSON.stringify(newVariantOptions)
-      )
+      const newProductId =
+        typeof cartItem.product === 'string' ? cartItem.product : cartItem.product?.id
+      const existingVariantId = variant?.id ?? null
+      const newVariantId = cartItem.variant?.id ?? null
+
+      return existingProductId === newProductId && existingVariantId === newVariantId
     })
 
     // Create a new array of cart items to avoid mutating the original cart
@@ -348,13 +344,20 @@ export async function addToCart(cartItem: CartItem): Promise<Cart | null> {
           (updatedCartItems[existingItemIndex].quantity || 0) + // Current quantity (default to 0 if undefined)
             (cartItem.quantity || 0), // New quantity to add (default to 0 if undefined)
         ),
+        variant: {
+          id: cartItem.variant?.id,
+          variantOptions: cartItem.variant?.variantOptions,
+        },
       }
     } else {
       updatedCartItems.push({
         id: cartItem.id,
         product: productId,
         price: cartItem.price,
-        variant: cartItem.variant,
+        variant: {
+          id: cartItem.variant?.id,
+          variantOptions: cartItem.variant?.variantOptions,
+        },
         isVariant: cartItem.isVariant,
         quantity: Math.max(0, cartItem.quantity || 0), // Ensure quantity is never negative
       })
@@ -422,23 +425,19 @@ export async function deleteCartItem({
     if (cartItemId) {
       updatedCartItems = cart.items.filter((item) => item.id !== cartItemId)
     } else {
-      const { product, variant } = cartItem
+      const { product } = cartItem
       const productId = typeof product === 'string' ? product : product?.id
-      const variantOptions = variant?.map((v) => v.option).sort() || []
 
       updatedCartItems = cart.items.filter((item) => {
-        const itemProductId = typeof item.product === 'string' ? item.product : item.product?.id
+        const existingProductId = typeof item.product === 'string' ? item.product : item.product?.id
         // If variant is provided, only delete items matching both ID and variant options
         if (cartItem?.variant) {
-          const existingVariantOptions = item.variant?.map((v) => v.option) || []
-
-          return !(
-            itemProductId === productId &&
-            JSON.stringify(existingVariantOptions) === JSON.stringify(variantOptions)
-          )
+          const existingVariantId = item.variant?.id ?? null
+          const newVariantId = cartItem.variant?.id ?? null
+          return !(existingProductId === productId && existingVariantId === newVariantId)
         }
         // If no variant, just filter by ID
-        return itemProductId !== productId
+        return existingProductId !== productId
       })
     }
 

@@ -129,7 +129,7 @@ export function ShippingStep({ initialAddress, onComplete, onBack }: ShippingSte
       // Update payment intent with new totals
       const updatedSession = await updatePaymentIntentWithDetails({
         ...tempSession,
-        amount: Math.round(taxResult.newTotal * 100),
+        amount: Math.round(taxResult.newTotal),
         taxAmount: taxResult?.taxAmount || 0,
         taxCalculationId: taxResult?.calculationId,
       })
@@ -151,6 +151,8 @@ export function ShippingStep({ initialAddress, onComplete, onBack }: ShippingSte
       setIsLoading(false)
     }
   }
+
+  console.log('shippingMethods', shippingMethods)
 
   return (
     <Card className="p-6">
@@ -198,7 +200,8 @@ export function ShippingStep({ initialAddress, onComplete, onBack }: ShippingSte
                       <div className="flex justify-between">
                         <span>{method.name}</span>
                         <span>
-                          {method.shippingRules.baseRate === 0 ||
+                          {!method.shippingRules.baseRate ||
+                          method.shippingRules.baseRate === 0 ||
                           method.shippingRules.baseRate === null
                             ? 'Free'
                             : formatMoney({

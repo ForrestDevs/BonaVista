@@ -18,24 +18,27 @@ export interface StripeAddress {
 }
 
 export interface CheckoutLineItem {
-  id: string
+  productId: string
   title: string
   sku: string
   description?: string
   price: number
   quantity: number
-  thumbnail?: string
+  thumbnailMediaId?: string
   isVariant?: boolean
-  variantOptions: {
-    key: {
-      slug: string
-      label: string
-    }
-    value: {
-      slug: string
-      label: string
-    }
-  }[]
+  variant?: {
+    id?: string
+    variantOptions?: {
+      key: {
+        slug: string
+        label: string
+      }
+      value: {
+        slug: string
+        label: string
+      }
+    }[]
+  }
 }
 
 export interface CheckoutSession {
@@ -73,6 +76,7 @@ export interface CheckoutSession {
   shippingTotal: number
   taxAmount: number
   taxCalculationId?: string
+  taxTransactionId?: string
   lastUpdated: number
   expiresAt: number
   status: 'pending' | 'completed' | 'failed'

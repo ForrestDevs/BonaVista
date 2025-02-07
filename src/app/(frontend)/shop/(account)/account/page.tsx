@@ -7,6 +7,7 @@ import { YnsLink } from '@components/ui/link'
 import { Container } from '@components/ui/container'
 import { Button } from '@components/ui/button'
 import { CustomerDTO, getCustomerDTO } from '@/lib/data/customer'
+import { formatStripeMoney } from '@/lib/utils/formatMoney'
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -80,39 +81,40 @@ export default async function Dashboard() {
                   docs.slice(0, 5).map((order) => (
                     <li key={order.id}>
                       <YnsLink href={`/shop/account/orders/details/${order.id}`}>
-                        <Container className="bg-ui-bg-subtle hover:bg-ui-bg-subtle-hover dark:bg-ui-bg-subtle dark:hover:bg-ui-bg-subtle-hover transition-colors duration-200 rounded-lg shadow-sm">
-                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 gap-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-sm w-full sm:w-auto">
-                              <div>
-                                <p className="font-medium text-ui-fg-subtle dark:text-ui-fg-subtle">
-                                  Date placed
-                                </p>
-                                <p className="text-ui-fg-base dark:text-ui-fg-base">
-                                  {/* {new Date(order.createdAt).toDateString()} */}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="font-medium text-ui-fg-subtle dark:text-ui-fg-subtle">
-                                  Order number
-                                </p>
-                                <p className="text-ui-fg-base dark:text-ui-fg-base">#{order.id}</p>
-                              </div>
-                              <div>
-                                <p className="font-medium text-ui-fg-subtle dark:text-ui-fg-subtle">
-                                  Total amount
-                                </p>
-                                <p className="text-ui-fg-base dark:text-ui-fg-base">
-                                  {order.total}
-                                </p>
-                              </div>
+                        <div className="flex flex-col sm:flex-row justify-between items-start rounded-lg bg-slate-100/60 sm:items-center p-6 gap-6 hover:shadow-md transition-shadow duration-200">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 text-sm w-full sm:w-auto">
+                            <div className="space-y-1.5">
+                              <p className="text-muted-foreground font-medium">Date placed</p>
+                              <p className="font-semibold text-primary">
+                                {new Date(order.createdAt).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })}
+                              </p>
                             </div>
-                            <Button className="flex items-center justify-center w-full sm:w-auto">
-                              <span className="sr-only">Go to order #{order.id}</span>
-                              <span className="mr-2">View Order</span>
-                              <ChevronDown className="-rotate-90" />
-                            </Button>
+                            <div className="space-y-1.5">
+                              <p className="text-muted-foreground font-medium">Order number</p>
+                              <p className="font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-md inline-block">
+                                #{order.id.substring(0, 8)}
+                              </p>
+                            </div>
+                            <div className="space-y-1.5">
+                              <p className="text-muted-foreground font-medium">Total amount</p>
+                              <p className="font-bold text-foreground">
+                                {formatStripeMoney({
+                                  amount: order.total,
+                                  currency: order.currency,
+                                })}
+                              </p>
+                            </div>
                           </div>
-                        </Container>
+                          <Button className="flex items-center justify-center w-full sm:w-auto">
+                            <span className="sr-only">Go to order #{order.id}</span>
+                            <span className="mr-2">View Order</span>
+                            <ChevronDown className="-rotate-90" />
+                          </Button>
+                        </div>
                       </YnsLink>
                     </li>
                   ))

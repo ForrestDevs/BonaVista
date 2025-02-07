@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import getPayload from '@/lib/utils/getPayload'
+import { formatStripeMoney } from '@/lib/utils/formatMoney'
 
 interface OrderPageProps {
   params: Promise<{
@@ -56,10 +57,10 @@ export default async function OrderPage({ params }: OrderPageProps) {
                         <p className="text-sm">Quantity: {item.quantity}</p>
                       </div>
                       <p className="font-medium">
-                        {new Intl.NumberFormat('en-US', {
-                          style: 'currency',
+                        {formatStripeMoney({
+                          amount: item.price,
                           currency: order.currency,
-                        }).format(item.price)}
+                        })}
                       </p>
                     </div>
                   ))}
@@ -70,10 +71,10 @@ export default async function OrderPage({ params }: OrderPageProps) {
                 <div className="flex justify-between">
                   <p className="font-semibold">Total</p>
                   <p className="font-semibold">
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
+                    {formatStripeMoney({
+                      amount: order.total,
                       currency: order.currency,
-                    }).format(order.total)}
+                    })}
                   </p>
                 </div>
               </div>

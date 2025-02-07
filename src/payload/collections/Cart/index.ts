@@ -45,10 +45,44 @@ const Cart: CollectionConfig = {
             },
             {
               name: 'variant',
-              type: 'array',
+              type: 'group',
               fields: [
                 {
-                  name: 'option',
+                  name: 'variantOptions',
+                  type: 'array',
+                  fields: [
+                    {
+                      name: 'key',
+                      type: 'group',
+                      fields: [
+                        {
+                          name: 'slug',
+                          type: 'text',
+                        },
+                        {
+                          name: 'label',
+                          type: 'text',
+                        },
+                      ],
+                    },
+                    {
+                      name: 'value',
+                      type: 'group',
+                      fields: [
+                        {
+                          name: 'slug',
+                          type: 'text',
+                        },
+                        {
+                          name: 'label',
+                          type: 'text',
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  name: 'id',
                   type: 'text',
                 },
               ],

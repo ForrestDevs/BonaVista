@@ -14,12 +14,22 @@ export type CartItems =
   | {
       product: string | Product;
       isVariant?: boolean | null;
-      variant?:
-        | {
-            option?: string | null;
-            id?: string | null;
-          }[]
-        | null;
+      variant?: {
+        variantOptions?:
+          | {
+              key?: {
+                slug?: string | null;
+                label?: string | null;
+              };
+              value?: {
+                slug?: string | null;
+                label?: string | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      };
       price: number;
       quantity: number;
       url?: string | null;
@@ -66,6 +76,37 @@ export type ProductVariant =
             id?: string | null;
           }[]
         | null;
+      id?: string | null;
+    }[]
+  | null;
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "OrderItems".
+ */
+export type OrderItems =
+  | {
+      product: string | Product;
+      isVariant?: boolean | null;
+      variant?: {
+        variantOptions?:
+          | {
+              key?: {
+                slug?: string | null;
+                label?: string | null;
+              };
+              value?: {
+                slug?: string | null;
+                label?: string | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      };
+      price: number;
+      quantity: number;
+      url?: string | null;
+      thumbnailMediaId?: (string | null) | Media;
       id?: string | null;
     }[]
   | null;
@@ -584,28 +625,9 @@ export interface Order {
     rate?: number | null;
   };
   total: number;
+  taxTotal: number;
   currency: string;
-  items?:
-    | {
-        product: string | Product;
-        isVariant?: boolean | null;
-        variantOptions?:
-          | {
-              key?: {
-                slug?: string | null;
-              };
-              value?: {
-                slug?: string | null;
-              };
-              id?: string | null;
-            }[]
-          | null;
-        price: number;
-        quantity: number;
-        url?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  items?: OrderItems;
   paymentIntent?:
     | {
         [k: string]: unknown;
@@ -1882,7 +1904,23 @@ export interface CartItemsSelect<T extends boolean = true> {
   variant?:
     | T
     | {
-        option?: T;
+        variantOptions?:
+          | T
+          | {
+              key?:
+                | T
+                | {
+                    slug?: T;
+                    label?: T;
+                  };
+              value?:
+                | T
+                | {
+                    slug?: T;
+                    label?: T;
+                  };
+              id?: T;
+            };
         id?: T;
       };
   price?: T;
@@ -1906,12 +1944,23 @@ export interface OrdersSelect<T extends boolean = true> {
         rate?: T;
       };
   total?: T;
+  taxTotal?: T;
   currency?: T;
-  items?:
+  items?: T | OrderItemsSelect<T>;
+  paymentIntent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "OrderItems_select".
+ */
+export interface OrderItemsSelect<T extends boolean = true> {
+  product?: T;
+  isVariant?: T;
+  variant?:
     | T
     | {
-        product?: T;
-        isVariant?: T;
         variantOptions?:
           | T
           | {
@@ -1919,22 +1968,23 @@ export interface OrdersSelect<T extends boolean = true> {
                 | T
                 | {
                     slug?: T;
+                    label?: T;
                   };
               value?:
                 | T
                 | {
                     slug?: T;
+                    label?: T;
                   };
               id?: T;
             };
-        price?: T;
-        quantity?: T;
-        url?: T;
         id?: T;
       };
-  paymentIntent?: T;
-  updatedAt?: T;
-  createdAt?: T;
+  price?: T;
+  quantity?: T;
+  url?: T;
+  thumbnailMediaId?: T;
+  id?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

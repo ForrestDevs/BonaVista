@@ -107,6 +107,7 @@ export function BillingStep({
           {sameAsShipping && shippingAddress && (
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="text-sm text-gray-600">
+                <p>{shippingAddress.name}</p>
                 <p>{shippingAddress.address.line1}</p>
                 {shippingAddress.address.line2 && <p>{shippingAddress.address.line2}</p>}
                 <p>
@@ -114,6 +115,7 @@ export function BillingStep({
                   {shippingAddress.address.postal_code}
                 </p>
                 <p>{shippingAddress.address.country}</p>
+                <p>{shippingAddress.phone}</p>
               </div>
             </div>
           )}

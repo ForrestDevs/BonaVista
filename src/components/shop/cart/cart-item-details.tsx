@@ -36,7 +36,9 @@ export function CartItemThumbnail({ line }: { line: CartItem }) {
 export default function CartItemDetails({ item }: { item: CartItem }) {
   const productTitle = typeof item.product === 'object' ? item.product.title : item.product
   const isVariant = item.isVariant
-  const variantOptions = isVariant ? item.variant.map((v) => v.option).join(', ') : null
+  const variantOptions = isVariant
+    ? item.variant.variantOptions.map((v) => v.value.label).join(', ')
+    : null
 
   return (
     <div className="">

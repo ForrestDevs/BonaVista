@@ -12,22 +12,27 @@ export async function calculateTax(session: CheckoutSession) {
     const calculation = await stripeClient.tax.calculations.create({
       currency: session.currencyCode.toLowerCase(),
       line_items: session.lineItems.map((item) => ({
-        amount: Math.round(item.price * 100),
+        amount: Math.round(item.price),
         quantity: item.quantity,
-        reference: item.id,
+        reference: item.productId,
       })),
-      customer: session.stripeCustomerId || undefined,
-      customer_details: {
-        address: {
-          line1: session.steps.shipping.address.address.line1,
-          line2: session.steps.shipping.address.address.line2 || undefined,
-          city: session.steps.shipping.address.address.city,
-          state: session.steps.shipping.address.address.state,
-          postal_code: session.steps.shipping.address.address.postal_code,
-          country: session.steps.shipping.address.address.country,
-        },
-        address_source: 'shipping',
-      },
+      ...(session.stripeCustomerId
+        ? {
+            customer: session.stripeCustomerId,
+          }
+        : {
+            customer_details: {
+              address: {
+                line1: session.steps.shipping.address.address.line1,
+                line2: session.steps.shipping.address.address.line2 || undefined,
+                city: session.steps.shipping.address.address.city,
+                state: session.steps.shipping.address.address.state,
+                postal_code: session.steps.shipping.address.address.postal_code,
+                country: session.steps.shipping.address.address.country,
+              },
+              address_source: 'shipping',
+            },
+          }),
       shipping_cost: {
         amount: Math.round(session.shippingTotal * 100),
         tax_behavior: 'inclusive', // Stripe will add the tax to the shipping cost
@@ -36,9 +41,9 @@ export async function calculateTax(session: CheckoutSession) {
 
     return {
       calculationId: calculation.id,
-      shippingCost: calculation.shipping_cost.amount / 100,
-      taxAmount: calculation.tax_amount_exclusive / 100,
-      newTotal: calculation.amount_total / 100,
+      shippingCost: calculation.shipping_cost.amount,
+      taxAmount: calculation.tax_amount_exclusive,
+      newTotal: calculation.amount_total,
       taxDate: calculation.tax_date,
     }
   } catch (error) {

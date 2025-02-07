@@ -30,7 +30,7 @@ const Customers: CollectionConfig = {
     // },
   ],
   hooks: {
-    beforeChange: [createStripeCustomer],
+    // beforeChange: [createStripeCustomer],
   },
   fields: [
     {

@@ -2,7 +2,7 @@ import getPayload from '@lib/utils/getPayload'
 import { PAGE_SLUG, SHOP_COLLECTION_SLUG } from '@payload/collections/constants'
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { cache, Fragment } from 'react'
+import { cache, Fragment, Suspense } from 'react'
 import { Button } from '@components/ui/button'
 import { Input } from '@components/ui/input'
 import {
@@ -35,6 +35,7 @@ import { RenderHero } from '@components/payload/heros'
 import { Carousel } from '@/components/shop/carousel'
 import Image from 'next/image'
 import { ProductCard } from '@/components/shop/products/product-card'
+import SkeletonShopHome from '@/components/shop/skeletons/layout/skele-shop-home'
 
 export const metadata: Metadata = {
   title: 'Shop | BonaVista Leisurescapes',
@@ -146,8 +147,9 @@ export default async function StoreHome() {
     })
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* <header className="sticky top-0 z-50 bg-white shadow-sm">
+    <Suspense fallback={<SkeletonShopHome />}>
+      <div className="flex flex-col min-h-screen bg-gray-50">
+        {/* <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="text-2xl font-bold text-[#1e365c]">
             BonaVista
@@ -177,14 +179,14 @@ export default async function StoreHome() {
         </div>
       </header> */}
 
-      <main className="flex-grow">
-        <div className="space-y-24 py-12">
-          <div className="container mx-auto px-4 z-0">
-            <Carousel slides={carouselSlides} />
-          </div>
+        <main className="flex-grow">
+          <div className="space-y-24 py-12">
+            <div className="container mx-auto px-4 z-0">
+              <Carousel slides={carouselSlides} />
+            </div>
 
-          {/* Featured Offer */}
-          {/* <section className="bg-[#1e365c] text-white py-16">
+            {/* Featured Offer */}
+            {/* <section className="bg-[#1e365c] text-white py-16">
             <div className="container mx-auto px-4 text-center">
               <h2 className="text-3xl font-bold mb-4">Limited Time Offer!</h2>
               <p className="text-xl mb-8">
@@ -196,18 +198,18 @@ export default async function StoreHome() {
             </div>
           </section> */}
 
-          {/* Top Selling Products */}
-          <section className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-[#1e365c]">Shop Our Top Selling Products</h2>
-              <div className="w-48 h-px bg-gray-200 mx-auto mt-4" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+            {/* Top Selling Products */}
+            <section className="container mx-auto px-4">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-[#1e365c]">Shop Our Top Selling Products</h2>
+                <div className="w-48 h-px bg-gray-200 mx-auto mt-4" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
 
-              {/* {featuredProducts.map((product) => (
+                {/* {featuredProducts.map((product) => (
                 <Card
                   key={product.id}
                   className="overflow-hidden transition-shadow hover:shadow-lg"
@@ -233,166 +235,167 @@ export default async function StoreHome() {
                   </CardFooter>
                 </Card>
               ))} */}
-            </div>
-          </section>
-
-          {/* Categories */}
-          <section className="bg-white py-16">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-[#1e365c] text-center mb-12">
-                Shop by Category
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {categories.map((category, index) => (
-                  <div key={index} className="relative overflow-hidden rounded-lg group">
-                    <Image
-                      src={category.image}
-                      alt={category.name}
-                      width={400}
-                      height={400}
-                      className="w-full h-64 object-cover transition-transform group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                      <h3 className="text-white text-2xl font-bold">{category.name}</h3>
-                    </div>
-                  </div>
-                ))}
               </div>
-            </div>
-          </section>
+            </section>
 
-          {/* Mineraluxe System */}
-          <section className="container mx-auto px-4">
-            <div className="bg-white rounded-3xl p-12">
-              <div className="text-center mb-8">
-                <h3 className="text-gray-600 uppercase tracking-wide">Allow us to introduce</h3>
-                <h2 className="text-3xl font-bold text-[#1e365c] mt-2">
-                  The Mineraluxe Hot Tub Care System
+            {/* Categories */}
+            <section className="bg-white py-16">
+              <div className="container mx-auto px-4">
+                <h2 className="text-3xl font-bold text-[#1e365c] text-center mb-12">
+                  Shop by Category
                 </h2>
-                <p className="text-gray-600 mt-2">advanced hot tub care</p>
-              </div>
-              <div className="grid md:grid-cols-2 gap-12 items-center">
-                <div className="relative">
-                  <Image
-                    src="/mineraluxe.jpg"
-                    alt="Mineraluxe Hot Tub Care System"
-                    width={600}
-                    height={600}
-                    className="rounded-lg"
-                  />
-                </div>
-                <div className="space-y-8">
-                  {mineraluxeSteps.map((step) => (
-                    <div key={step.number} className="flex gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#e8f1f5] flex items-center justify-center text-[#1e365c] font-bold">
-                        {step.number}
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-[#1e365c] text-lg">{step.title}</h3>
-                        <p className="text-gray-600 mt-1">{step.description}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                  {categories.map((category, index) => (
+                    <div key={index} className="relative overflow-hidden rounded-lg group">
+                      <Image
+                        src={category.image}
+                        alt={category.name}
+                        width={400}
+                        height={400}
+                        className="w-full h-64 object-cover transition-transform group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                        <h3 className="text-white text-2xl font-bold">{category.name}</h3>
                       </div>
                     </div>
                   ))}
-                  <Button className="w-full md:w-auto bg-[#1e365c] hover:bg-[#2a4a7c]">
-                    SHOP NOW!
-                  </Button>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          {/* Why Choose Us */}
-          <section className="bg-[#e8f1f5] py-16">
-            <div className="container mx-auto px-4">
+            {/* Mineraluxe System */}
+            <section className="container mx-auto px-4">
+              <div className="bg-white rounded-3xl p-12">
+                <div className="text-center mb-8">
+                  <h3 className="text-gray-600 uppercase tracking-wide">Allow us to introduce</h3>
+                  <h2 className="text-3xl font-bold text-[#1e365c] mt-2">
+                    The Mineraluxe Hot Tub Care System
+                  </h2>
+                  <p className="text-gray-600 mt-2">advanced hot tub care</p>
+                </div>
+                <div className="grid md:grid-cols-2 gap-12 items-center">
+                  <div className="relative">
+                    <Image
+                      src="/mineraluxe.jpg"
+                      alt="Mineraluxe Hot Tub Care System"
+                      width={600}
+                      height={600}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-8">
+                    {mineraluxeSteps.map((step) => (
+                      <div key={step.number} className="flex gap-4">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#e8f1f5] flex items-center justify-center text-[#1e365c] font-bold">
+                          {step.number}
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-[#1e365c] text-lg">{step.title}</h3>
+                          <p className="text-gray-600 mt-1">{step.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                    <Button className="w-full md:w-auto bg-[#1e365c] hover:bg-[#2a4a7c]">
+                      SHOP NOW!
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Why Choose Us */}
+            <section className="bg-[#e8f1f5] py-16">
+              <div className="container mx-auto px-4">
+                <h2 className="text-3xl font-bold text-[#1e365c] text-center mb-12">
+                  Why Choose BonaVista
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="text-center">
+                    <Star className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-[#1e365c] mb-2">Expert Advice</h3>
+                    <p className="text-gray-600">
+                      Our team of pool and spa experts are here to help you make the best choices
+                      for your needs.
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <Truck className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-[#1e365c] mb-2">Fast Shipping</h3>
+                    <p className="text-gray-600">
+                      Enjoy free shipping on orders over $100 and quick delivery to your doorstep.
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <Shield className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-[#1e365c] mb-2">Quality Guarantee</h3>
+                    <p className="text-gray-600">
+                      We stand behind the quality of our products with our satisfaction guarantee.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Newsletter Signup */}
+            <section className="bg-[#1e365c] text-white py-16">
+              <div className="container mx-auto px-4 text-center">
+                <h2 className="text-3xl font-bold mb-4">Stay in the Loop</h2>
+                <p className="text-xl mb-8">
+                  Subscribe to our newsletter for exclusive deals, tips, and the latest product
+                  updates.
+                </p>
+                <form className="flex flex-col md:flex-row justify-center items-center gap-4">
+                  <Input
+                    type="email"
+                    placeholder="Your email"
+                    className="w-full md:w-64 bg-white/10 border-white/20 text-white placeholder-white/50"
+                  />
+                  <Button type="submit" variant="secondary">
+                    Subscribe
+                  </Button>
+                </form>
+              </div>
+            </section>
+
+            {/* Customer Reviews */}
+            <section className="container mx-auto px-4">
               <h2 className="text-3xl font-bold text-[#1e365c] text-center mb-12">
-                Why Choose BonaVista
+                What Our Customers Say
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="text-center">
-                  <Star className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-[#1e365c] mb-2">Expert Advice</h3>
-                  <p className="text-gray-600">
-                    Our team of pool and spa experts are here to help you make the best choices for
-                    your needs.
-                  </p>
-                </div>
-                <div className="text-center">
-                  <Truck className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-[#1e365c] mb-2">Fast Shipping</h3>
-                  <p className="text-gray-600">
-                    Enjoy free shipping on orders over $100 and quick delivery to your doorstep.
-                  </p>
-                </div>
-                <div className="text-center">
-                  <Shield className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-[#1e365c] mb-2">Quality Guarantee</h3>
-                  <p className="text-gray-600">
-                    We stand behind the quality of our products with our satisfaction guarantee.
-                  </p>
-                </div>
+                <Card className="bg-white">
+                  <CardContent className="p-6">
+                    <p className="text-gray-600 mb-4">
+                      &quot;BonaVista&apos;s products have made maintaining my hot tub so much
+                      easier. The Mineraluxe system is a game-changer!&quot;
+                    </p>
+                    <p className="font-bold text-[#1e365c]">- Sarah T.</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white">
+                  <CardContent className="p-6">
+                    <p className="text-gray-600 mb-4">
+                      &quot;Great selection of pool care products and excellent customer service. I
+                      highly recommend BonaVista!&quot;
+                    </p>
+                    <p className="font-bold text-[#1e365c]">- Mike R.</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white">
+                  <CardContent className="p-6">
+                    <p className="text-gray-600 mb-4">
+                      &quot;The expert advice I received helped me choose the perfect products for
+                      my new swim spa. Thank you, BonaVista!&quot;
+                    </p>
+                    <p className="font-bold text-[#1e365c]">- Emily L.</p>
+                  </CardContent>
+                </Card>
               </div>
-            </div>
-          </section>
-
-          {/* Newsletter Signup */}
-          <section className="bg-[#1e365c] text-white py-16">
-            <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold mb-4">Stay in the Loop</h2>
-              <p className="text-xl mb-8">
-                Subscribe to our newsletter for exclusive deals, tips, and the latest product
-                updates.
-              </p>
-              <form className="flex flex-col md:flex-row justify-center items-center gap-4">
-                <Input
-                  type="email"
-                  placeholder="Your email"
-                  className="w-full md:w-64 bg-white/10 border-white/20 text-white placeholder-white/50"
-                />
-                <Button type="submit" variant="secondary">
-                  Subscribe
-                </Button>
-              </form>
-            </div>
-          </section>
-
-          {/* Customer Reviews */}
-          <section className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-[#1e365c] text-center mb-12">
-              What Our Customers Say
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Card className="bg-white">
-                <CardContent className="p-6">
-                  <p className="text-gray-600 mb-4">
-                    &quot;BonaVista&apos;s products have made maintaining my hot tub so much easier.
-                    The Mineraluxe system is a game-changer!&quot;
-                  </p>
-                  <p className="font-bold text-[#1e365c]">- Sarah T.</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-white">
-                <CardContent className="p-6">
-                  <p className="text-gray-600 mb-4">
-                    &quot;Great selection of pool care products and excellent customer service. I
-                    highly recommend BonaVista!&quot;
-                  </p>
-                  <p className="font-bold text-[#1e365c]">- Mike R.</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-white">
-                <CardContent className="p-6">
-                  <p className="text-gray-600 mb-4">
-                    &quot;The expert advice I received helped me choose the perfect products for my
-                    new swim spa. Thank you, BonaVista!&quot;
-                  </p>
-                  <p className="font-bold text-[#1e365c]">- Emily L.</p>
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-        </div>
-      </main>
-    </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </Suspense>
   )
 
   // return (

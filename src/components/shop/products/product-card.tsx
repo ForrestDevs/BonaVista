@@ -37,15 +37,23 @@ export function ProductCard({ product }: { product: Product }) {
 
   const handleAddToCart = async (variant: EnhancedProductVariant | null) => {
     setIsAddingToCart(true)
+
+    console.log('variant', variant.id)
     if (hasVariants) {
       if (variant) {
         const cartItem: CartItem = {
           product: product,
           isVariant: true,
-          variant: variant.info.options.map((o) => ({
-            option: o.label,
+          variant: {
             id: variant.id,
-          })),
+            variantOptions: variant.info.options.map((o) => ({
+              key: o.key,
+              value: {
+                slug: o.slug,
+                label: o.label,
+              },
+            })),
+          },
           quantity: 1,
           price: variant.price,
           url: `/product/${product.slug}`,

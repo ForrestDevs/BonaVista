@@ -28,7 +28,7 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
     const isVariant = line.isVariant
     const variantProduct = isVariant
       ? (product?.variants.variantProducts.find(
-          (v) => v.id === line.variant[0].id,
+          (v) => v.id === line.variant.id,
         ) as EnhancedProductVariant)
       : null
 
@@ -44,18 +44,21 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
       ? (variantProduct?.images[0]?.image ?? null)
       : (product?.baseProduct?.images[0]?.image ?? null)
 
-    const thumbnail = typeof media === 'string' ? media : media?.url
+    const thumbnail = typeof media === 'string' ? media : media?.id
 
     const newCheckoutLineItem: CheckoutLineItem = {
-      id: productId,
+      productId: productId,
       sku: sku,
       title: productTitle,
       description: productDescription,
-      price: price,
+      price: price * 100, // Stripe expects the price in cents
       quantity: quantity,
-      thumbnail: thumbnail,
+      thumbnailMediaId: thumbnail,
       isVariant: isVariant,
-      variantOptions: variantOptions,
+      variant: {
+        id: line.variant?.id,
+        variantOptions: variantOptions,
+      },
     }
 
     return newCheckoutLineItem
@@ -108,6 +111,7 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
           description={`Order for ${cart.items.length} items`}
           cartId={cart.id}
           lineItems={lineItems}
+          stripeCustomerId={customer?.stripeCustomerId}
           customerEmail={customer?.email}
           customerId={customer?.id}
           redirectTo="/shop/checkout"

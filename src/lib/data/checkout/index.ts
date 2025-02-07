@@ -15,9 +15,11 @@ import {
   CheckoutStep,
   HandlePaymentSuccessParams,
   PaymentSuccessResult,
+  StripeAddress,
 } from '@/lib/types/checkout'
 import { CART_SLUG } from '@/payload/collections/constants'
 import { deleteCart } from '../cart'
+import { Order } from '@payload-types'
 
 const CHECKOUT_SESSION_EXPIRY = 1000 * 60 * 30 // 30 minutes
 const ORDER_ARCHIVE_EXPIRY = 1000 * 60 * 60 * 24 * 30 // 30 days
@@ -46,7 +48,7 @@ export async function getStoredCheckoutSession(
     validCartId = cartCookie.id
   }
 
-  const redisKey = `new_cart_checkout_session:${validCartId}`
+  const redisKey = `cart_checkout_session:${validCartId}`
 
   const checkoutSession = await redis.get<CheckoutSession>(redisKey)
 
@@ -143,7 +145,7 @@ export async function createStoredCheckoutSession(
       expiresAt: Date.now() + CHECKOUT_SESSION_EXPIRY,
     }
 
-    const redisKey = `new_cart_checkout_session:${cartId}`
+    const redisKey = `cart_checkout_session:${cartId}`
     await redis.set<CheckoutSession>(redisKey, newCheckoutSession)
 
     return newCheckoutSession
@@ -185,7 +187,7 @@ export async function updateCheckoutStep<T extends CheckoutStep>({
   step,
   data,
 }: UpdateCheckoutStepParams<T>): Promise<CheckoutSession | null> {
-  const redisKey = `new_cart_checkout_session:${cartId}`
+  const redisKey = `cart_checkout_session:${cartId}`
   const session = await redis.get<CheckoutSession>(redisKey)
 
   if (!session) {
@@ -209,7 +211,10 @@ export async function updateCheckoutStep<T extends CheckoutStep>({
   return updatedSession
 }
 
-export async function getOrCreateStripeCustomer(email: string): Promise<string> {
+export async function getOrCreateStripeCustomer(
+  email: string,
+  address?: StripeAddress,
+): Promise<string> {
   const existingCustomers = await stripeClient.customers.list({
     email,
     limit: 1,
@@ -221,6 +226,18 @@ export async function getOrCreateStripeCustomer(email: string): Promise<string> 
 
   const customer = await stripeClient.customers.create({
     email,
+    ...(address && {
+      address: {
+        line1: address.address.line1,
+        line2: address.address.line2,
+        city: address.address.city,
+        state: address.address.state,
+        postal_code: address.address.postal_code,
+        country: address.address.country,
+      },
+    }),
+    name: address?.name,
+    phone: address?.phone,
     metadata: {
       source: 'website_checkout_v2',
       created_at: new Date().toISOString(),
@@ -284,7 +301,7 @@ export async function updatePaymentIntentWithDetails(
     }
 
     // Store updated session
-    const redisKey = `new_cart_checkout_session:${session.cartId}`
+    const redisKey = `cart_checkout_session:${session.cartId}`
     await redis.set<CheckoutSession>(redisKey, updatedSession)
 
     return updatedSession
@@ -338,7 +355,7 @@ export async function handlePaymentSuccess({
       throw new Error('No cart ID found in payment intent metadata')
     }
 
-    const checkoutSession = await getStoredCheckoutSession()
+    const checkoutSession = await getStoredCheckoutSession({ cartId })
 
     if (!checkoutSession) {
       return {
@@ -355,42 +372,74 @@ export async function handlePaymentSuccess({
       }
     }
 
+    const newOrderNumber = uuidv4()
+
+    const orderData: Omit<Order, 'createdAt' | 'updatedAt' | 'sizes' | 'id'> = {
+      status: 'succeeded',
+      orderNumber: newOrderNumber.toUpperCase(),
+      currency: paymentIntent.currency,
+      paymentIntent: paymentIntent as any,
+      orderedBy: checkoutSession.customerId,
+      shippingRate: {
+        displayName: checkoutSession.steps.shipping.method?.name,
+        rate: checkoutSession.shippingTotal,
+      },
+      taxTotal: checkoutSession.taxAmount,
+      total: checkoutSession.amount,
+      items: checkoutSession.lineItems.map((item) => ({
+        product: item.productId,
+        isVariant: item.isVariant,
+        variant: {
+          id: item.variant?.id,
+          variantOptions: item.variant?.variantOptions ?? [],
+        },
+        thumbnailMediaId: item.thumbnailMediaId,
+        price: item.price,
+        quantity: item.quantity,
+        url: `${process.env.NEXT_PUBLIC_URL}/shop/product/${item.productId}`,
+      })),
+    }
+
     // Create order
     const order = await payload.create({
       collection: 'orders',
       data: {
-        status: 'succeeded',
-        orderNumber: uuidv4(),
-        currency: paymentIntent.currency,
-        paymentIntent: paymentIntent as any,
-        orderedBy: checkoutSession.customerId,
-        items: checkoutSession.lineItems.map((item) => ({
-          product: item.id,
-          isVariant: item.isVariant,
-          variantOptions: item.variantOptions?.map((option) => ({
-            option: option,
-            id: item.id,
-          })),
-          price: item.price,
-          quantity: item.quantity,
-          url: `${process.env.NEXT_PUBLIC_URL}/shop/product/${item.id}`,
-        })),
-        shippingRate: {
-          displayName: checkoutSession.steps.shipping.method?.name,
-          rate: checkoutSession.shippingTotal,
-        },
-        total: checkoutSession.amount,
+        ...orderData,
       },
     })
 
-    if (!order) {
-      throw new Error('Failed to create order')
+    // update customer to remove cart reference and add stripeCustomerId
+    if (checkoutSession.customerId) {
+      // remove the cart from the customer
+      const customer = await payload.update({
+        collection: 'customers',
+        id: checkoutSession.customerId,
+        data: {
+          stripeCustomerID: checkoutSession.stripeCustomerId,
+          cart: null,
+        },
+      })
     }
 
-    redis.set(`new_cart_checkout_session:${cartId}`, {
+    // create tax transaction
+    const transaction = await stripeClient.tax.transactions.createFromCalculation({
+      calculation: checkoutSession.taxCalculationId!,
+      reference: paymentIntentId,
+      expand: ['line_items'],
+    })
+
+    // update the payment intent with the tax transaction id
+    await stripeClient.paymentIntents.update(paymentIntentId, {
+      metadata: {
+        taxTransactionId: transaction.id,
+      },
+    })
+
+    redis.set(`cart_checkout_session:${cartId}`, {
       ...checkoutSession,
       status: 'completed',
       orderId: order.id,
+      taxTransactionId: transaction.id,
     })
 
     // Archive the checkout session
@@ -426,4 +475,19 @@ async function triggerPostOrderProcesses({
   cartId: string
 }): Promise<void> {
   await deleteCart(cartId)
+}
+
+export async function storeHashedPaymentIntent(id: string, clientSecret: string) {
+  const hashedId = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(id))
+  const key = Buffer.from(hashedId).toString('hex').slice(0, 36)
+  await redis.set(`payment_intent:${key}`, { id, clientSecret }, { ex: 1000 * 60 * 60 * 24 }) // 1 day expiry
+  return key
+}
+
+export async function getHashedPaymentIntent(key: string) {
+  const value = await redis.get<{ id: string; clientSecret: string }>(`payment_intent:${key}`)
+  if (!value) {
+    return null
+  }
+  return value
 }

@@ -72,7 +72,7 @@ export default function Register({ setCurrentView }: Props) {
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input {...field} type="text"/>
+                  <Input {...field} type="text" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -111,7 +111,7 @@ export default function Register({ setCurrentView }: Props) {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input {...field} type="password"/>
+                  <Input {...field} type="password" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -130,13 +130,9 @@ export default function Register({ setCurrentView }: Props) {
               </FormItem>
             )}
           />
-          {state.status === 'error' && (
-            <p className="text-red-500 text-sm mt-2">
-              {state.message}
-            </p>
-          )}
+          {state.status === 'error' && <p className="text-red-500 text-sm mt-2">{state.message}</p>}
           <span className="text-center text-ui-fg-base text-small-regular mt-6">
-            By creating an account, you agree to Medusa Store&apos;s{' '}
+            By creating an account, you agree to BonaVista LeisureScapes&apos;s{' '}
             <YnsLink href="/content/privacy-policy" className="underline">
               Privacy Policy
             </YnsLink>{' '}
@@ -150,7 +146,6 @@ export default function Register({ setCurrentView }: Props) {
             type="submit"
             className="w-full mt-6"
             disabled={isPending || !form.formState.isValid}
-
           >
             {isPending ? 'Creating Account...' : 'Create Account'}
           </Button>
@@ -159,11 +154,7 @@ export default function Register({ setCurrentView }: Props) {
 
       <span className="text-center text-ui-fg-base text-small-regular mt-6">
         Already have an account?{' '}
-        <button
-          onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
-          className="underline"
-          
-        >
+        <button onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)} className="underline">
           Sign in
         </button>
         .

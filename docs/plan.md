@@ -135,3 +135,13 @@ Clean up admin dashboard add overview page
 
 
 cart cookie expires in 7 days so we need to make a payload job to check if any cart docs are older than 7 days and not completed orders and delete them
+
+
+add suspense to shop all hottubs/swimspas + shop home page
+
+optimize payload calls because sometimes images dont load on the shop page
+
+add product link on title to cart item 
+add thumbnail url + media id to the lineItem 
+
+add return and exchange policy page

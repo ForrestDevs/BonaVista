@@ -142,7 +142,9 @@ export async function createPaymentIntent({
         amount: amount,
         currency: currencyCode,
         description: description,
-        customer: stripeCustomerId,
+        ...(stripeCustomerId && {
+          customer: stripeCustomerId,
+        }),
         metadata: metadata,
         automatic_payment_methods: {
           enabled: true,

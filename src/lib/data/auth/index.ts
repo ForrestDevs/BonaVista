@@ -34,7 +34,10 @@ export async function login(data: LoginSchema) {
 
   console.log('merging carts')
   const mergedCarts = await mergeCarts(customerId)
-  console.log('merged carts', mergedCarts.id)
+
+  if (!mergedCarts) {
+    return { message: 'User logged in' }
+  }
 
   return {
     message: 'User logged in and carts merged',
@@ -109,7 +112,7 @@ export async function register(data: RegisterSchema) {
     console.log('updatedUser', updatedUser)
   } catch (error) {
     console.error(error)
-    return { message: 'Invalid email or password' }
+    return { message: 'Invalid email or password or customer already exists' }
   }
 
   // login user
@@ -134,9 +137,7 @@ export async function getCurrentUser(): Promise<User | null> {
 
     return user as User
   } catch (error) {
-    console.error(error)
+    console.error('No current user signed in', error)
     return null
   }
 }
-
-

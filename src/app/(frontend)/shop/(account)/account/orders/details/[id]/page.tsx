@@ -9,6 +9,8 @@ import CartItemDetails, { CartItemThumbnail } from '@/components/shop/cart/cart-
 import { Order } from '@payload-types'
 import { PaymentIntent } from '@stripe/stripe-js'
 import { Metadata } from 'next'
+import OrderItemDetails, { OrderItemThumbnail } from '@/components/shop/account/order-item-details'
+import { formatStripeMoney } from '@/lib/utils/formatMoney'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,66 +42,74 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
   }
 
   const customer = typeof order.orderedBy === 'string' ? null : order.orderedBy
-
   const user = typeof customer?.account === 'string' ? null : customer.account
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Order details</h1>
-        <Link href="/shop/account/orders">
-          <span className="sr-only">Close</span>× Back to overview
+    <div className="max-w-5xl mx-auto space-y-8 px-4 sm:px-6 py-8 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">Order Details</h1>
+        <Link 
+          href="/shop/account/orders"
+          className="flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+        >
+          <span>← Back to orders</span>
         </Link>
       </div>
 
-      <p className="text-gray-600">
-        We have sent the order confirmation details to {customer?.email}.
-      </p>
+      <div className="bg-blue-50 p-4 rounded-lg">
+        <p className="text-blue-800 text-sm sm:text-base">
+          Order confirmation details have been sent to <span className="font-semibold">{customer?.email}</span>
+        </p>
+      </div>
 
-      <div className="space-y-2">
-        <p>Order date: {formatDateTime(order.createdAt)}</p>
-        <p className="text-blue-600">Order number: {order.id}</p>
-        <div className="flex gap-x-8">
-          <p>Order status: {order.status || 'Not fulfilled'}</p>
-          <p>Payment status: {order.status === 'succeeded' ? 'Paid' : 'Awaiting'}</p>
+      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 space-y-3">
+        <p className="text-gray-600">Order date: <span className="text-gray-900">{formatDateTime(order.createdAt)}</span></p>
+        <p>Order number: <span className="font-medium text-blue-600">{order.id}</span></p>
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-12">
+          <p>Status: <span className="font-medium capitalize">{order.status || 'Not fulfilled'}</span></p>
+          <p>Payment: <span className="font-medium">{order.status === 'succeeded' ? 'Paid' : 'Awaiting Payment'}</span></p>
         </div>
       </div>
 
       {/* Order Items */}
-      <div className="space-y-4">
-        {order.items?.map((item) => (
-          <div key={item.id} className="flex items-center justify-between border-b pb-4">
-            <div className="flex items-center gap-x-4">
-              <div className="h-20 w-20 rounded-lg border">
-                <CartItemThumbnail line={item} />
-                {/* {item.image && (
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="h-full w-full object-cover rounded-lg"
-                  />
-                )} */}
+      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+        <h2 className="text-xl font-semibold mb-6">Items</h2>
+        <div className="divide-y divide-gray-100">
+          {order.items?.map((item) => (
+            <div 
+              key={item.id} 
+              className="flex flex-col sm:flex-row sm:items-center justify-between py-4 hover:bg-gray-50 transition-colors rounded-lg px-3 gap-4"
+            >
+              <div className="flex items-center gap-x-4 sm:gap-x-6">
+                <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-lg border overflow-hidden flex-shrink-0">
+                  <OrderItemThumbnail line={item} />
+                </div>
+                <OrderItemDetails item={item} />
               </div>
-              <CartItemDetails item={item} />
+              <div className="text-left sm:text-right">
+                <p className="text-gray-600">
+                  {item.quantity}x {formatStripeMoney({ amount: item.price, currency: order.currency })}
+                </p>
+                <p className="font-medium text-lg mt-1">
+                  {formatStripeMoney({
+                    amount: item.quantity * item.price,
+                    currency: order.currency,
+                  })}
+                </p>
+              </div>
             </div>
-            <div className="text-right">
-              <p>
-                {item.quantity}x ${item.price.toFixed(2)}
-              </p>
-              <p className="font-medium">${(item.quantity * item.price).toFixed(2)}</p>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Delivery Section */}
-      <div>
-        <h2 className="text-2xl font-bold mb-6">Delivery</h2>
-        <div className="grid grid-cols-3 gap-8">
-          <div>
-            <h3 className="font-medium mb-2">Shipping Address</h3>
+      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+        <h2 className="text-xl font-semibold mb-6">Delivery Information</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="space-y-3">
+            <h3 className="font-medium text-gray-900">Shipping Address</h3>
             <div className="text-gray-600 space-y-1">
-              <p>
+              <p className="font-medium text-gray-900">
                 {user?.firstName ?? 'Luke'} {user?.lastName ?? 'Gannon'}
               </p>
               <p>{order.paymentIntent.shipping.address.line1}</p>
@@ -107,26 +117,28 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                 <p>{order.paymentIntent?.shipping.address.line2}</p>
               )}
               <p>
-                {order.paymentIntent?.shipping.address.city},{' '}
-                {order.paymentIntent?.shipping.address.state}
+                {order.paymentIntent?.shipping.address.city}, {order.paymentIntent?.shipping.address.state}
               </p>
               <p>{order.paymentIntent?.shipping.address.country}</p>
             </div>
           </div>
 
-          <div>
-            <h3 className="font-medium mb-2">Contact</h3>
+          <div className="space-y-3">
+            <h3 className="font-medium text-gray-900">Contact Details</h3>
             <div className="text-gray-600 space-y-1">
               <p>{user?.phone}</p>
               <p>{customer?.email}</p>
             </div>
           </div>
 
-          <div>
-            <h3 className="font-medium mb-2">Method</h3>
+          <div className="space-y-3">
+            <h3 className="font-medium text-gray-900">Shipping Method</h3>
             <p className="text-gray-600">
               {order.shippingRate.displayName === 'Standard Shipping'
-                ? `${order.shippingRate.displayName} ($${order.shippingRate.rate?.toFixed(2)})`
+                ? `${order.shippingRate.displayName} (${formatStripeMoney({
+                    amount: order.shippingRate.rate,
+                    currency: order.currency,
+                  })})`
                 : 'Local Pickup'}
             </p>
           </div>
@@ -134,37 +146,43 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Order Summary */}
-      <div>
-        <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
-        <div className="space-y-2">
-          <div className="flex justify-between">
+      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+        <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
+        <div className="space-y-3 sm:max-w-md sm:ml-auto">
+          <div className="flex justify-between text-gray-600">
             <p>Subtotal</p>
-            <p>${order.total?.toFixed(2)}</p>
+            <p>{formatStripeMoney({ amount: order.total, currency: order.currency })}</p>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between text-gray-600">
             <p>Shipping</p>
-            <p>${order.shippingRate.rate?.toFixed(2)}</p>
+            <p>{formatStripeMoney({ amount: order.shippingRate.rate, currency: order.currency })}</p>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between text-gray-600">
             <p>Taxes</p>
-            <p>${order.total?.toFixed(2)}</p>
+            <p>{formatStripeMoney({ amount: order.taxTotal, currency: order.currency })}</p>
           </div>
-          <div className="flex justify-between font-medium text-lg pt-2 border-t">
+          <div className="flex justify-between font-medium text-lg pt-3 border-t">
             <p>Total</p>
-            <p>${order.total?.toFixed(2)}</p>
+            <p className="text-blue-600">{formatStripeMoney({ amount: order.total, currency: order.currency })}</p>
           </div>
         </div>
       </div>
 
       {/* Need Help Section */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Need help?</h2>
-        <div className="space-y-2">
-          <Link href="/contact" className="block text-blue-600 hover:underline">
-            Contact
+      <div className="bg-gray-50 rounded-xl p-4 sm:p-6">
+        <h2 className="text-xl font-semibold mb-4">Need Help?</h2>
+        <div className="space-y-3">
+          <Link 
+            href="/contact" 
+            className="block text-blue-600 hover:text-blue-800 transition-colors hover:underline"
+          >
+            Contact Support
           </Link>
-          <Link href="/returns" className="block text-blue-600 hover:underline">
-            Returns & Exchanges
+          <Link 
+            href="/returns" 
+            className="block text-blue-600 hover:text-blue-800 transition-colors hover:underline"
+          >
+            Returns & Exchanges Policy
           </Link>
         </div>
       </div>

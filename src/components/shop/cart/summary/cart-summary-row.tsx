@@ -41,9 +41,11 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
     const product = typeof line.product === 'object' ? line.product : null
     const productTitle = typeof line.product === 'object' ? line.product.title : line.product
     const isVariant = line.isVariant
-    const variantOptions = isVariant ? line.variant.map((v) => v.option).join(', ') : null
+    const variantOptions = isVariant
+      ? line.variant.variantOptions.map((v) => v.value.label).join(', ')
+      : null
     const thumbnail = isVariant
-      ? product?.variants.variantProducts.find((v) => v.id === line.variant[0].id)?.images[0]?.image
+      ? product?.variants.variantProducts.find((v) => v.id === line.variant.id)?.images[0]?.image
       : product?.baseProduct?.images[0]?.image
 
     const debouncedExecute = useMemo(

@@ -26,15 +26,25 @@ export function AddToCartButton() {
         quantity,
         ...(selectedVariant && {
           isVariant: true,
-          variant: [
-            {
-              id: selectedVariant.sku,
-              option:
-                typeof selectedVariant.info === 'object' && 'options' in selectedVariant.info
-                  ? selectedVariant.info.options[0]?.label
-                  : undefined,
-            },
-          ],
+          variant: {
+            id: selectedVariant.id,
+            variantOptions: selectedVariant.info.options.map((option) => ({
+              key: option.key,
+              value: {
+                slug: option.slug,
+                label: option.label,
+              },
+            })),
+          },
+          // variant: [
+          //   {
+          //     id: selectedVariant.sku,
+          //     option:
+          //       typeof selectedVariant.info === 'object' && 'options' in selectedVariant.info
+          //         ? selectedVariant.info.options[0]?.label
+          //         : undefined,
+          //   },
+          // ],
         }),
       }
 
