@@ -11,6 +11,8 @@ import { HTMLMotionProps, motion } from 'framer-motion'
 import { cn } from '@/lib/utils/cn'
 import { formatCurrency } from '@/lib/utils/formatMoney'
 import { debounce } from 'lodash'
+import { useCart } from './cart-summary-context'
+import { useRouter } from 'next/navigation'
 
 type CartSummaryRowProps = {
   line: CartItem
@@ -20,9 +22,21 @@ type CartSummaryRowProps = {
 } & HTMLMotionProps<'li'>
 
 export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
-  ({ line, deleteCartItemCallback, className, index, length, ...rest }: CartSummaryRowProps, ref) => {
+  (
+    { line, deleteCartItemCallback, className, index, length, ...rest }: CartSummaryRowProps,
+    ref,
+  ) => {
+    const router = useRouter()
+    const { setIsUpdating } = useCart()
     const [optimisticQuantity, setOptimisticQuantity] = useState(line.quantity)
-    const { execute, hasErrored } = useAction(updateCartItemQuantityAction)
+    const { execute, hasErrored } = useAction(updateCartItemQuantityAction, {
+      onSuccess: () => {
+        setTimeout(() => {
+          setIsUpdating(false)
+          router.refresh()
+        }, 1000)
+      },
+    })
 
     const product = typeof line.product === 'object' ? line.product : null
     const productTitle = typeof line.product === 'object' ? line.product.title : line.product
@@ -34,7 +48,7 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
 
     const debouncedExecute = useMemo(
       () =>
-        debounce((quantity: number) => {
+        debounce(async (quantity: number) => {
           execute({ quantity, cartItemId: line.id })
         }, 1000),
       [execute, line.id],
@@ -47,6 +61,7 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
     }, [hasErrored, line.quantity])
 
     const handleUpdateQuantity = (quantity: number) => {
+      setIsUpdating(true)
       setOptimisticQuantity(quantity)
       debouncedExecute(quantity)
     }
@@ -78,9 +93,7 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
             <div className="flex justify-between">
               <div>
                 <h3 className="font-medium text-neutral-900">{productTitle}</h3>
-                {isVariant && (
-                  <p className="mt-1 text-sm text-neutral-500">{variantOptions}</p>
-                )}
+                {isVariant && <p className="mt-1 text-sm text-neutral-500">{variantOptions}</p>}
               </div>
               <p className="text-sm font-medium text-neutral-900">
                 {formatCurrency({ amount: line.price * optimisticQuantity, currency: 'CAD' })}
@@ -110,9 +123,7 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
                   </Button>
                 </div>
                 {optimisticQuantity > 1 && (
-                  <p className="text-sm text-neutral-500">
-                    (${line.price.toFixed(2)} each)
-                  </p>
+                  <p className="text-sm text-neutral-500">(${line.price.toFixed(2)} each)</p>
                 )}
               </div>
               <Button
@@ -132,4 +143,4 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
   },
 )
 
-CartSummaryRow.displayName = 'CartSummaryRow' 
+CartSummaryRow.displayName = 'CartSummaryRow'

@@ -14,7 +14,7 @@ export default function NotFound() {
       <p className="text-small-regular text-ui-fg-base">
         The cart you tried to access does not exist. Clear your cookies and try again.
       </p>
-      <InteractiveLink href="/shop">Go to frontpage</InteractiveLink>
+      <InteractiveLink href="/shop">Go home</InteractiveLink>
     </div>
   )
 }

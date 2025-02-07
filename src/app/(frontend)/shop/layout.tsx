@@ -1,20 +1,20 @@
 import { TooltipProvider } from '@components/ui/tooltip'
 import { ShopHeader } from '@components/layout/headers/shop'
-import { CartModalPage } from '@components/shop/cart/drawer/cart-modal'
-import { CartModalProvider } from '@components/shop/cart/context/cart-context'
+import { CartDrawer } from '@/components/shop/cart/drawer/cart-drawer'
+import { CartDrawerProvider } from '@/components/shop/cart/drawer/cart-drawer-context'
 
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <CartModalProvider>
+      <CartDrawerProvider>
         <ShopHeader />
         <TooltipProvider>
           <div className="flex-1">
             {children}
-            <CartModalPage />
+            <CartDrawer />
           </div>
         </TooltipProvider>
-      </CartModalProvider>
+      </CartDrawerProvider>
     </div>
   )
 }

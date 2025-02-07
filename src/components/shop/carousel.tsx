@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from "@/components/ui/button"
-
+import Image from 'next/image'
 interface CarouselProps {
   slides: {
     title: string
@@ -36,9 +36,14 @@ export function Carousel({ slides }: CarouselProps) {
             index === current ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <div
-            className="absolute inset-0 bg-cover bg-center z-0"
-            style={{ backgroundImage: `url(${slide.image})` }}
+          
+          <Image
+            src={slide.image}
+            alt={slide.title}
+            width={1000}
+            height={1000}
+            className="object-cover object-center z-0"
+            priority
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent">
             <div className="flex h-full items-center">

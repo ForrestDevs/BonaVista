@@ -31,7 +31,6 @@ const SkeletonCartPage = () => {
                 <div className="w-20 h-12 bg-gray-200 animate-pulse" />
               </div>
               <Table>
-                <TableCaption>A list of your recent invoices.</TableCaption>
                 <TableHeader className="border-t-0">
                   <TableRow>
                     <TableHead className="!pl-0">

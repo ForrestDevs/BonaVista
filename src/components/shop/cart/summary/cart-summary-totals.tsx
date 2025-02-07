@@ -1,19 +1,65 @@
 'use client'
 
-import { CartItem } from '@/lib/types/cart'
-import { formatCurrency } from '@/lib/utils/formatMoney'
+import { formatMoney } from '@/lib/utils/formatMoney'
 import { motion } from 'framer-motion'
+import { CheckoutButton } from '../../checkout/checkout-button'
+import { CheckoutLineItem } from '@/lib/types/checkout'
+import { EnhancedProductVariant } from '@/lib/types/product'
+import { useCart } from './cart-summary-context'
+import { Cart } from '@payload-types'
+import { CustomerDTO } from '@/lib/data/customer'
 
 interface CartSummaryTotalsProps {
-  items: CartItem[]
+  cart: Cart
+  customer: CustomerDTO | null
 }
 
-export function CartSummaryTotals({ items }: CartSummaryTotalsProps) {
-  const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0)
-  const shippingCost = 25.0 // This should come from your shipping configuration
-  const taxRate = 0.13 // This should come from your tax configuration
-  const taxCost = (subtotal + shippingCost) * taxRate
-  const total = subtotal + shippingCost + taxCost
+export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
+  const { isUpdating } = useCart()
+  const subtotal = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0) ?? 0
+
+  const lineItems: CheckoutLineItem[] = cart.items.map((line) => {
+    const price = line.price
+    const quantity = line.quantity
+    const productId = typeof line.product === 'object' ? line.product.id : line.product
+    const product = typeof line.product === 'object' ? line.product : null
+    const productTitle = product?.title ?? 'N/A'
+    const productDescription = product?.description ?? 'No description available'
+    const isVariant = line.isVariant
+    const variantProduct = isVariant
+      ? (product?.variants.variantProducts.find(
+          (v) => v.id === line.variant[0].id,
+        ) as EnhancedProductVariant)
+      : null
+
+    const variantOptions = variantProduct?.info.options.map((option) => ({
+      key: option.key,
+      value: {
+        slug: option.slug,
+        label: option.label,
+      },
+    }))
+    const sku = isVariant ? variantProduct?.sku : (product?.baseProduct?.sku ?? '')
+    const media = isVariant
+      ? (variantProduct?.images[0]?.image ?? null)
+      : (product?.baseProduct?.images[0]?.image ?? null)
+
+    const thumbnail = typeof media === 'string' ? media : media?.url
+
+    const newCheckoutLineItem: CheckoutLineItem = {
+      id: productId,
+      sku: sku,
+      title: productTitle,
+      description: productDescription,
+      price: price,
+      quantity: quantity,
+      thumbnail: thumbnail,
+      isVariant: isVariant,
+      variantOptions: variantOptions,
+    }
+
+    return newCheckoutLineItem
+  })
 
   return (
     <motion.div
@@ -27,29 +73,47 @@ export function CartSummaryTotals({ items }: CartSummaryTotalsProps) {
           <div className="flex items-center justify-between py-4">
             <div className="text-neutral-600">Subtotal</div>
             <div className="font-medium text-neutral-900">
-              {formatCurrency({ amount: subtotal, currency: 'CAD' })}
+              {isUpdating ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-neutral-900 border-t-transparent" />
+              ) : (
+                formatMoney({ amount: subtotal, currency: 'CAD' })
+              )}
             </div>
           </div>
           <div className="flex items-center justify-between py-4">
             <div className="text-neutral-600">Shipping</div>
-            <div className="font-medium text-neutral-900">
-              {formatCurrency({ amount: shippingCost, currency: 'CAD' })}
-            </div>
+            <div className="font-medium text-neutral-900">Calculated at checkout</div>
           </div>
           <div className="flex items-center justify-between py-4">
-            <div className="text-neutral-600">Tax ({(taxRate * 100).toFixed(0)}%)</div>
-            <div className="font-medium text-neutral-900">
-              {formatCurrency({ amount: taxCost, currency: 'CAD' })}
-            </div>
+            <div className="text-neutral-600">Tax</div>
+            <div className="font-medium text-neutral-900">Calculated at checkout</div>
           </div>
           <div className="flex items-center justify-between py-4">
             <div className="text-base font-medium text-neutral-900">Order total</div>
             <div className="text-base font-medium text-neutral-900">
-              {formatCurrency({ amount: total, currency: 'CAD' })}
+              {isUpdating ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-neutral-900 border-t-transparent" />
+              ) : (
+                formatMoney({ amount: subtotal, currency: 'CAD' })
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      <div className="mt-6">
+        <CheckoutButton
+          amount={subtotal}
+          currencyCode="CAD"
+          description={`Order for ${cart.items.length} items`}
+          cartId={cart.id}
+          lineItems={lineItems}
+          customerEmail={customer?.email}
+          customerId={customer?.id}
+          redirectTo="/shop/checkout"
+          disabled={isUpdating}
+        />
+      </div>
     </motion.div>
   )
-} 
+}

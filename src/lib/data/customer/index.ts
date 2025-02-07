@@ -8,13 +8,18 @@ import { PayloadJSON } from '@/lib/types/payload'
 import { cache } from '@/lib/utils/cache'
 
 export const getCustomer = async () => {
-  const user = await getCurrentUser()
+  try {
+    const user = await getCurrentUser()
 
-  if (!user) {
+    if (!user) {
+      throw 'No user found'
+    }
+
+    return getCachedCustomer(user)
+  } catch (error) {
+    console.error(error)
     return null
   }
-
-  return getCachedCustomer(user)
 }
 
 const getCachedCustomer = cache(

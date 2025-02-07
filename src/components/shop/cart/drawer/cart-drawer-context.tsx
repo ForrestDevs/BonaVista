@@ -7,7 +7,7 @@ import { type ReactNode, createContext, use, useEffect, useState } from 'react'
 type CartModalProviderValue = { open: boolean; setOpen: (open: boolean) => void }
 const CartModalContext = createContext<CartModalProviderValue | null>(null)
 
-export const CartModalProvider = ({ children }: { children: ReactNode }) => {
+export const CartDrawerProvider = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
   useEffect(() => {

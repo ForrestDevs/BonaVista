@@ -290,8 +290,6 @@ export interface User {
 export interface Cart {
   id: string;
   customer?: (string | null) | Customer;
-  billing_address?: string | null;
-  shipping_address?: string | null;
   items?: CartItems;
   payment_intent?:
     | {
@@ -302,7 +300,6 @@ export interface Cart {
     | number
     | boolean
     | null;
-  payment_id?: string | null;
   checkout_session?:
     | {
         [k: string]: unknown;
@@ -312,23 +309,6 @@ export interface Cart {
     | number
     | boolean
     | null;
-  payment_session?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  payment_sessions?:
-    | {
-        provider?: string | null;
-        status?: ('pending' | 'authorized' | 'requires_more' | 'error' | 'canceled') | null;
-        id?: string | null;
-      }[]
-    | null;
-  type: 'default' | 'swap' | 'draft_order' | 'payment_link' | 'claim';
   taxCalculationId?: string | null;
   completed_at?: string | null;
   payment_authorized_at?: string | null;
@@ -350,14 +330,7 @@ export interface Cart {
     | number
     | boolean
     | null;
-  shipping_total?: number | null;
   discount_total?: number | null;
-  raw_discount_total?: number | null;
-  item_tax_total?: number | null;
-  shipping_tax_total?: number | null;
-  tax_total?: number | null;
-  refunded_total?: number | null;
-  total?: number | null;
   subtotal?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -592,6 +565,7 @@ export interface ProductCategory {
  */
 export interface Order {
   id: string;
+  orderNumber: string;
   status?:
     | (
         | 'canceled'
@@ -615,9 +589,14 @@ export interface Order {
     | {
         product: string | Product;
         isVariant?: boolean | null;
-        variant?:
+        variantOptions?:
           | {
-              option?: string | null;
+              key?: {
+                slug?: string | null;
+              };
+              value?: {
+                slug?: string | null;
+              };
               id?: string | null;
             }[]
           | null;
@@ -1880,34 +1859,15 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface CartSelect<T extends boolean = true> {
   customer?: T;
-  billing_address?: T;
-  shipping_address?: T;
   items?: T | CartItemsSelect<T>;
   payment_intent?: T;
-  payment_id?: T;
   checkout_session?: T;
-  payment_session?: T;
-  payment_sessions?:
-    | T
-    | {
-        provider?: T;
-        status?: T;
-        id?: T;
-      };
-  type?: T;
   taxCalculationId?: T;
   completed_at?: T;
   payment_authorized_at?: T;
   metadata?: T;
   payment?: T;
-  shipping_total?: T;
   discount_total?: T;
-  raw_discount_total?: T;
-  item_tax_total?: T;
-  shipping_tax_total?: T;
-  tax_total?: T;
-  refunded_total?: T;
-  total?: T;
   subtotal?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1935,6 +1895,7 @@ export interface CartItemsSelect<T extends boolean = true> {
  * via the `definition` "orders_select".
  */
 export interface OrdersSelect<T extends boolean = true> {
+  orderNumber?: T;
   status?: T;
   orderedBy?: T;
   stripePaymentIntentID?: T;
@@ -1951,10 +1912,19 @@ export interface OrdersSelect<T extends boolean = true> {
     | {
         product?: T;
         isVariant?: T;
-        variant?:
+        variantOptions?:
           | T
           | {
-              option?: T;
+              key?:
+                | T
+                | {
+                    slug?: T;
+                  };
+              value?:
+                | T
+                | {
+                    slug?: T;
+                  };
               id?: T;
             };
         price?: T;

@@ -1,11 +1,11 @@
 'use client'
 
-import { useCartModal } from '@/components/shop/cart/context/cart-context'
+import { useCartModal } from '@/components/shop/cart/drawer/cart-drawer-context'
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/components/ui/drawer'
 import { useMediaQuery } from '@/lib/hooks/useMediaQuery'
 import type { ReactNode } from 'react'
 
-export const CartAsideDrawer = ({ children }: { children: ReactNode }) => {
+export const CartDrawerWrapper = ({ children }: { children: ReactNode }) => {
   const { open, setOpen } = useCartModal()
 
   const isDesktop = useMediaQuery('(min-width: 640px)')

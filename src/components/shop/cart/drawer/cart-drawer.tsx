@@ -1,28 +1,26 @@
 import { Button } from '@/components/ui/button'
 import { YnsLink } from '@/components/ui/link'
 import { getCart } from '@/lib/data/cart'
-import { calculateCartTotalNetWithoutShipping } from '@/lib/data/cart/utils'
-import { CartAsideDrawer } from './cart-aside-drawer'
-import { CartItemRow } from './cart-item-row'
-import { CartItemList } from './cart-item-list'
+import { CartDrawerWrapper } from './cart-drawer-wrapper'
+import { CartDrawerItemList } from './cart-drawer-item-list'
 import { formatCurrency } from '@/lib/utils/formatMoney'
 
-export async function CartModalPage() {
+export async function CartDrawer() {
   const cart = await getCart(2)
 
   if (!cart || cart.items.length === 0) {
     return null
   }
 
-  const total = calculateCartTotalNetWithoutShipping(cart)
+  const total = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0)
 
   return (
-    <CartAsideDrawer>
+    <CartDrawerWrapper>
       <div className="flex flex-col max-h-[75vh] sm:max-h-none sm:h-full">
         <h2 className="text-lg font-semibold text-neutral-900 ml-6 pt-2 sm:pt-6 pb-2">
           My Cart <span className="text-sm text-neutral-600">({cart.items.length} items)</span>
         </h2>
-        <CartItemList items={cart.items} />
+        <CartDrawerItemList items={cart.items} />
 
         <div className="border-t border-neutral-200 px-4 py-4 sm:px-6">
           <div
@@ -37,6 +35,6 @@ export async function CartModalPage() {
           </Button>
         </div>
       </div>
-    </CartAsideDrawer>
+    </CartDrawerWrapper>
   )
 }

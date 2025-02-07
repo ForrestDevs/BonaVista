@@ -1,6 +1,6 @@
 'use client'
 
-import { useCartModal } from '@/components/shop/cart/context/cart-context'
+import { useCartModal } from '@/components/shop/cart/drawer/cart-drawer-context'
 import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { YnsLink } from '@components/ui/link'
@@ -10,10 +10,10 @@ export const CartLink = ({ children }: { children: ReactNode }) => {
   const { setOpen } = useCartModal()
   return (
     <YnsLink
-      href="/cart"
+      href="/shop/cart"
       onClick={(e) => {
         e.preventDefault()
-        if (pathname === '/cart') {
+        if (pathname === '/shop/cart') {
           return
         }
         const buttonElement = document.activeElement as HTMLElement // Get the currently focused element

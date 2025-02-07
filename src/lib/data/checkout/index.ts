@@ -4,30 +4,49 @@ import { redis } from '@/lib/redis/client'
 import { getCartCookie } from '@/lib/data/cookies'
 import { createPaymentIntent } from '@/lib/data/shop'
 import { redirect } from 'next/navigation'
+import { stripeClient } from '@/lib/stripe'
+import getPayload from '@/lib/utils/getPayload'
+import { v4 as uuidv4 } from 'uuid'
 import {
   BeginCheckoutParams,
+  CreateStoredCheckoutParams,
   CheckoutSession,
-  CreateStoredCheckoutSessionParams,
+  UpdateCheckoutStepParams,
+  CheckoutStep,
+  HandlePaymentSuccessParams,
+  PaymentSuccessResult,
 } from '@/lib/types/checkout'
+import { CART_SLUG } from '@/payload/collections/constants'
+import { deleteCart } from '../cart'
+
+const CHECKOUT_SESSION_EXPIRY = 1000 * 60 * 30 // 30 minutes
+const ORDER_ARCHIVE_EXPIRY = 1000 * 60 * 60 * 24 * 30 // 30 days
+
+interface GetStoredCheckoutSessionParams {
+  cartId?: string
+  redirectTo?: string
+}
 
 export async function getStoredCheckoutSession(
-  redirectTo?: string,
+  props?: GetStoredCheckoutSessionParams,
 ): Promise<CheckoutSession | null> {
-  const cartCookie = await getCartCookie()
+  const { cartId, redirectTo } = props || {}
 
-  if (!cartCookie?.id) {
-    console.error('No cart found')
-    if (redirectTo) {
-      redirect(redirectTo)
+  let validCartId = cartId
+  if (!validCartId) {
+    const cartCookie = await getCartCookie()
+
+    if (!cartCookie?.id) {
+      if (redirectTo) {
+        redirect(redirectTo)
+      }
+      return null
     }
 
-    return null
+    validCartId = cartCookie.id
   }
 
-  console.log('cartCookie', cartCookie)
-
-  const cartId = cartCookie.id
-  const redisKey = `cart_checkout_session:${cartId}`
+  const redisKey = `new_cart_checkout_session:${validCartId}`
 
   const checkoutSession = await redis.get<CheckoutSession>(redisKey)
 
@@ -38,13 +57,22 @@ export async function getStoredCheckoutSession(
     }
     return null
   }
-  console.log('checkoutSession from redis', checkoutSession.cartId)
+
+  // Check if session has expired
+  // if (Date.now() > checkoutSession.expiresAt) {
+  //   console.error('Checkout session has expired')
+  //   await redis.del(redisKey)
+  //   if (redirectTo) {
+  //     redirect(redirectTo)
+  //   }
+  //   return null
+  // }
 
   return checkoutSession
 }
 
 export async function createStoredCheckoutSession(
-  props: CreateStoredCheckoutSessionParams,
+  props: CreateStoredCheckoutParams,
 ): Promise<CheckoutSession | null> {
   const {
     amount,
@@ -56,31 +84,36 @@ export async function createStoredCheckoutSession(
     lineItems,
     customerEmail,
     customerId,
-    shippingMethod,
     shippingTotal,
     taxAmount,
   } = props
 
   try {
-    console.log('creating payment intent')
-
-    const amountInCents = amount * 100
+    const amountInCents = Math.round(amount * 100)
 
     const paymentIntent = await createPaymentIntent({
       amount: amountInCents,
       currencyCode,
       description,
       stripeCustomerId,
-      metadata,
+      metadata: {
+        ...metadata,
+        cartId,
+        sessionId: uuidv4(),
+      },
       cartId,
     })
 
-    console.log('payment intent created')
+    if (!paymentIntent) {
+      throw new Error('Failed to create payment intent')
+    }
 
     const newCheckoutSession: CheckoutSession = {
+      id: uuidv4(),
+      status: 'pending',
       cartId,
       paymentIntentId: paymentIntent.id,
-      clientSecret: paymentIntent.client_secret,
+      clientSecret: paymentIntent.client_secret!,
       amount,
       currencyCode,
       description,
@@ -88,15 +121,31 @@ export async function createStoredCheckoutSession(
       stripeCustomerId,
       customerEmail,
       customerId,
-      shippingMethod,
+      steps: {
+        email: {
+          completed: Boolean(customerEmail),
+          value: customerEmail,
+        },
+        shipping: {
+          completed: false,
+        },
+        billing: {
+          completed: false,
+          sameAsShipping: true,
+        },
+        payment: {
+          completed: false,
+        },
+      },
       shippingTotal,
       taxAmount,
+      lastUpdated: Date.now(),
+      expiresAt: Date.now() + CHECKOUT_SESSION_EXPIRY,
     }
-    console.log('new checkout session created')
 
-    const redisKey = `cart_checkout_session:${cartId}`
+    const redisKey = `new_cart_checkout_session:${cartId}`
     await redis.set<CheckoutSession>(redisKey, newCheckoutSession)
-    console.log('new checkout session set in redis')
+
     return newCheckoutSession
   } catch (error) {
     console.error('Error creating checkout session', error)
@@ -105,55 +154,276 @@ export async function createStoredCheckoutSession(
 }
 
 export async function beginCheckoutSession(props: BeginCheckoutParams): Promise<void | null> {
-  const {
-    amount,
-    currencyCode,
-    description,
-    customerId,
-    metadata,
-    cartId,
-    redirectTo,
-    lineItems,
-    customerEmail,
-    stripeCustomerId,
-    shippingMethod,
-    shippingTotal,
-    taxAmount,
-  } = props
-
-  // check for existing checkout session
+  const { redirectTo, ...sessionProps } = props
+  console.log('begining new checkout session for cart', sessionProps.cartId)
+  // Check for existing checkout session
   const checkoutSession = await getStoredCheckoutSession()
 
-  // if checkout session exists, redirect to checkout
+  // If checkout session exists and is valid, redirect to checkout
   if (checkoutSession) {
-    console.log('checkout session exists', checkoutSession)
-    redirect(redirectTo)
-  } else {
-    console.log('no checkout session exists, creating new one')
-    // create new checkout session
-    const newCheckoutSession = await createStoredCheckoutSession({
-      amount,
-      currencyCode,
-      description,
-      cartId,
-      lineItems,
-      stripeCustomerId,
-      customerEmail,
-      customerId,
-      shippingMethod,
-      shippingTotal,
-      taxAmount,
-      metadata,
-    })
-
-    // if checkout session creation fails, dont redirect and fail silently
-    if (!newCheckoutSession) {
-      console.error('Error creating checkout session')
-      return null
-    }
-
-    console.log('new checkout session created', newCheckoutSession)
-    // redirect to checkout
+    console.log('checkout session found, redirecting to', redirectTo)
     redirect(redirectTo)
   }
+  console.log('no checkout session found, creating new one')
+  // Create new checkout session
+  const newCheckoutSession = await createStoredCheckoutSession({
+    ...sessionProps,
+    shippingTotal: 0,
+    taxAmount: 0,
+  })
+
+  if (!newCheckoutSession) {
+    console.error('Error creating checkout session')
+    return null
+  }
+  console.log('new checkout session created, redirecting to', redirectTo)
+  redirect(redirectTo)
+}
+
+export async function updateCheckoutStep<T extends CheckoutStep>({
+  cartId,
+  step,
+  data,
+}: UpdateCheckoutStepParams<T>): Promise<CheckoutSession | null> {
+  const redisKey = `new_cart_checkout_session:${cartId}`
+  const session = await redis.get<CheckoutSession>(redisKey)
+
+  if (!session) {
+    console.error('Checkout session not found')
+    return null
+  }
+
+  const updatedSession: CheckoutSession = {
+    ...session,
+    steps: {
+      ...session.steps,
+      [step]: {
+        ...session.steps[step],
+        ...data,
+      },
+    },
+    lastUpdated: Date.now(),
+  }
+
+  await redis.set(redisKey, updatedSession)
+  return updatedSession
+}
+
+export async function getOrCreateStripeCustomer(email: string): Promise<string> {
+  const existingCustomers = await stripeClient.customers.list({
+    email,
+    limit: 1,
+  })
+
+  if (existingCustomers.data.length > 0) {
+    return existingCustomers.data[0].id
+  }
+
+  const customer = await stripeClient.customers.create({
+    email,
+    metadata: {
+      source: 'website_checkout_v2',
+      created_at: new Date().toISOString(),
+    },
+  })
+
+  return customer.id
+}
+
+export async function updatePaymentIntentWithDetails(
+  session: CheckoutSession,
+): Promise<CheckoutSession | null> {
+  try {
+    // Get or create Stripe customer if we have an email but no customer ID
+    let stripeCustomerId = session.stripeCustomerId
+    if (session.steps.email.value && !stripeCustomerId) {
+      stripeCustomerId = await getOrCreateStripeCustomer(session.steps.email.value)
+      if (!stripeCustomerId) {
+        throw new Error('Failed to create/get customer')
+      }
+    }
+
+    // Update payment intent
+    const updatedPaymentIntent = await stripeClient.paymentIntents.update(session.paymentIntentId, {
+      amount: session.amount,
+      customer: stripeCustomerId,
+      shipping: session.steps.shipping.address
+        ? {
+            address: {
+              line1: session.steps.shipping.address.address.line1,
+              line2: session.steps.shipping.address.address.line2 || undefined,
+              city: session.steps.shipping.address.address.city,
+              state: session.steps.shipping.address.address.state,
+              postal_code: session.steps.shipping.address.address.postal_code,
+              country: session.steps.shipping.address.address.country,
+            },
+            name: session.steps.shipping.address.name,
+            phone: session.steps.shipping.address.phone,
+          }
+        : undefined,
+      metadata: {
+        taxCalculationId: session.taxCalculationId,
+      },
+      // ...(session.taxCalculationId && {
+      //   async_workflows: {
+      //     inputs: {
+      //       tax: {
+      //         calculation: session.taxCalculationId,
+      //       },
+      //     },
+      //   },
+      // }),
+    })
+
+    // Update session with new details
+    const updatedSession: CheckoutSession = {
+      ...session,
+      stripeCustomerId,
+      clientSecret: updatedPaymentIntent.client_secret!,
+      lastUpdated: Date.now(),
+    }
+
+    // Store updated session
+    const redisKey = `new_cart_checkout_session:${session.cartId}`
+    await redis.set<CheckoutSession>(redisKey, updatedSession)
+
+    return updatedSession
+  } catch (error) {
+    console.error('Error updating payment intent:', error)
+    return null
+  }
+}
+
+export async function archiveCheckoutSession(
+  session: CheckoutSession,
+  orderId: string,
+): Promise<void> {
+  try {
+    // Create archive key using customer email and ID
+    const archiveKey = session.steps.email.value
+      ? `order_archive:${session.stripeCustomerId}_${session.steps.email.value}`
+      : `order_archive:${session.stripeCustomerId}`
+
+    // Store order details
+    await redis.set(
+      archiveKey,
+      {
+        orderId,
+        session,
+        archivedAt: Date.now(),
+      },
+      {
+        ex: ORDER_ARCHIVE_EXPIRY,
+      },
+    )
+  } catch (error) {
+    console.error('Error archiving checkout session:', error)
+  }
+}
+
+export async function handlePaymentSuccess({
+  paymentIntentId,
+  clientSecret,
+}: HandlePaymentSuccessParams): Promise<PaymentSuccessResult> {
+  try {
+    const payload = await getPayload()
+    const paymentIntent = await stripeClient.paymentIntents.retrieve(paymentIntentId)
+
+    if (paymentIntent.status !== 'succeeded' || paymentIntent.client_secret !== clientSecret) {
+      throw new Error('Invalid payment intent status or client secret')
+    }
+
+    const cartId = paymentIntent.metadata.cartId
+    if (!cartId) {
+      throw new Error('No cart ID found in payment intent metadata')
+    }
+
+    const checkoutSession = await getStoredCheckoutSession()
+
+    if (!checkoutSession) {
+      return {
+        success: false,
+        error: 'Checkout session not found',
+      }
+    }
+
+    if (checkoutSession.status === 'completed') {
+      console.warn('checkout session already completed, returning')
+      return {
+        success: true,
+        orderId: checkoutSession.orderId,
+      }
+    }
+
+    // Create order
+    const order = await payload.create({
+      collection: 'orders',
+      data: {
+        status: 'succeeded',
+        orderNumber: uuidv4(),
+        currency: paymentIntent.currency,
+        paymentIntent: paymentIntent as any,
+        orderedBy: checkoutSession.customerId,
+        items: checkoutSession.lineItems.map((item) => ({
+          product: item.id,
+          isVariant: item.isVariant,
+          variantOptions: item.variantOptions?.map((option) => ({
+            option: option,
+            id: item.id,
+          })),
+          price: item.price,
+          quantity: item.quantity,
+          url: `${process.env.NEXT_PUBLIC_URL}/shop/product/${item.id}`,
+        })),
+        shippingRate: {
+          displayName: checkoutSession.steps.shipping.method?.name,
+          rate: checkoutSession.shippingTotal,
+        },
+        total: checkoutSession.amount,
+      },
+    })
+
+    if (!order) {
+      throw new Error('Failed to create order')
+    }
+
+    redis.set(`new_cart_checkout_session:${cartId}`, {
+      ...checkoutSession,
+      status: 'completed',
+      orderId: order.id,
+    })
+
+    // Archive the checkout session
+    await archiveCheckoutSession(checkoutSession, order.id)
+
+    // Trigger post-order processes
+    void triggerPostOrderProcesses({
+      orderId: order.id,
+      email: checkoutSession.customerEmail!,
+      cartId,
+    })
+
+    return {
+      success: true,
+      orderId: order.id,
+    }
+  } catch (error) {
+    console.error('Error handling successful payment:', error)
+    return {
+      success: false,
+      error: 'Failed to process order',
+    }
+  }
+}
+
+async function triggerPostOrderProcesses({
+  orderId,
+  email,
+  cartId,
+}: {
+  orderId: string
+  email: string
+  cartId: string
+}): Promise<void> {
+  await deleteCart(cartId)
 }

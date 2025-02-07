@@ -133,3 +133,5 @@ Clean up admin dashboard add overview page
    - show stats for subscriptions
 
 
+
+cart cookie expires in 7 days so we need to make a payload job to check if any cart docs are older than 7 days and not completed orders and delete them

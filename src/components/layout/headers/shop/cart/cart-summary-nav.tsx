@@ -1,13 +1,8 @@
-// import { getCartFromCookiesAction } from '@/actions/cart-actions'
-// import { getLocale, getTranslations } from '@/i18n/server'
-// import { formatMoney } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@components/ui/tooltip'
-// import { calculateCartTotalNetWithoutShipping } from 'commerce-kit'
 import { ShoppingBagIcon } from 'lucide-react'
 import { Suspense } from 'react'
 import { CartLink } from '@/components/layout/headers/shop/cart/cart-link'
 import { getCart } from '@/lib/data/cart'
-import { calculateCartTotalNetWithoutShipping } from '@/lib/data/cart/utils'
 import { formatMoney } from '@/lib/utils/formatMoney'
 
 const CartFallback = () => (
@@ -33,10 +28,8 @@ const CartSummaryNavInner = async () => {
     return <CartFallback />
   }
 
-  const total = calculateCartTotalNetWithoutShipping(cart)
-  const totalItems = cart.items.length
-  //   const t = await getTranslations('Global.nav.cartSummary')
-  //   const locale = await getLocale()
+  const total = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0)
+  const totalItems = cart.items.reduce((acc, item) => acc + item.quantity, 0)
 
   return (
     <TooltipProvider>
@@ -50,20 +43,14 @@ const CartSummaryNavInner = async () => {
                 {totalItems}
               </span>
               <span className="sr-only">
-                Total: {total}
-                {/* {t('total')}:{' '}
-                {formatMoney({
-                  amount: total,
-                  currency: cart.cart.currency,
-                  locale,
-                })} */}
+                Total: {formatMoney({ amount: total, currency: 'CAD' })}
               </span>
             </CartLink>
           </div>
         </TooltipTrigger>
         <TooltipContent side="left" sideOffset={25}>
           <p>Items: {totalItems}</p>
-          <p>Total: {total}</p>
+          <p>Total: {formatMoney({ amount: total, currency: 'CAD' })}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

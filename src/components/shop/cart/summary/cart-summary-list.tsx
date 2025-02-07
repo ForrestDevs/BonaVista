@@ -1,27 +1,32 @@
 'use client'
 
-import { CartItem } from '@/lib/types/cart'
 import { AnimatePresence } from 'framer-motion'
 import { useOptimisticAction } from 'next-safe-action/hooks'
 import { deleteCartItemAction } from '@/lib/actions/cart'
 import { CartSummaryRow } from './cart-summary-row'
-import { CartSummaryTotals } from './cart-summary-totals'
+import { useCart } from './cart-summary-context'
+import { Cart } from '@payload-types'
 
 interface CartSummaryListProps {
-  items: CartItem[]
+  cart: Cart
 }
 
-export function CartSummaryList({ items }: CartSummaryListProps) {
+export function CartSummaryList({ cart }: CartSummaryListProps) {
+  const { setIsUpdating } = useCart()
   const { execute, optimisticState } = useOptimisticAction(deleteCartItemAction, {
-    currentState: { items },
+    currentState: { items: cart.items },
     updateFn: (state, newItems) => {
+      const updatedItems = state.items.filter((item) => item.id !== newItems.cartItemId)
       return {
-        items: state.items.filter((item) => item.id !== newItems.cartItemId),
+        items: updatedItems,
       }
+    },
+    onSuccess: () => {
+      setIsUpdating(false)
     },
   })
 
-  if (items.length === 0) {
+  if (cart.items.length === 0) {
     return <p className="text-center text-gray-500">Your cart is empty.</p>
   }
 
@@ -40,7 +45,6 @@ export function CartSummaryList({ items }: CartSummaryListProps) {
           ))}
         </AnimatePresence>
       </ul>
-      <CartSummaryTotals items={optimisticState.items} />
     </div>
   )
 }

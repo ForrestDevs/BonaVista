@@ -69,7 +69,7 @@ export async function getStripeClient({
 
   const stripeClient = new Stripe(privateKey, {
     typescript: true,
-    apiVersion: '2024-12-18.acacia',
+    apiVersion: '2025-01-27.acacia',
     httpClient: Stripe.createFetchHttpClient((fetch, options) =>
       fetch(fetch, {
         ...options,

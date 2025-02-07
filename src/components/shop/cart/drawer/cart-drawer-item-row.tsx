@@ -11,18 +11,26 @@ import { HTMLMotionProps, motion } from 'framer-motion'
 import { cn } from '@/lib/utils/cn'
 import { formatCurrency } from '@/lib/utils/formatMoney'
 import { debounce } from 'lodash'
+import { useRouter } from 'next/navigation'
 
-type CartItemRowProps = {
+type CartDrawerItemProps = {
   line: CartItem
   deleteCartItemCallback: (input: { cartItemId: string }) => void
   index: number
   length: number
 } & HTMLMotionProps<'li'>
 
-export const CartItemRow = forwardRef<HTMLLIElement, CartItemRowProps>(
-  ({ line, deleteCartItemCallback, className, index, length, ...rest }: CartItemRowProps, ref) => {
+export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
+  ({ line, deleteCartItemCallback, className, index, length, ...rest }: CartDrawerItemProps, ref) => {
+    const router = useRouter()
     const [optimisticQuantity, setOptimisticQuantity] = useState(line.quantity)
-    const { execute, hasErrored } = useAction(updateCartItemQuantityAction)
+    const { execute, hasErrored } = useAction(updateCartItemQuantityAction, {
+      onSuccess: () => {
+        setTimeout(() => {
+          router.refresh()
+        }, 1000)
+      },
+    })
 
     const product = typeof line.product === 'object' ? line.product : null
     const productTitle = typeof line.product === 'object' ? line.product.title : line.product

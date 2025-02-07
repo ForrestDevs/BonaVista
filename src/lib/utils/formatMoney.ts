@@ -26,6 +26,17 @@ export const getDecimalFromStripeAmount = ({ amount: minor, currency }: Money) =
 }
 
 export const formatMoney = ({
+  amount,
+  currency,
+  locale = 'en-US',
+}: Money & { locale?: string }) => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+  }).format(amount)
+}
+
+export const formatStripeMoney = ({
   amount: minor,
   currency,
   locale = 'en-US',

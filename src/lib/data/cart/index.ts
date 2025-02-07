@@ -3,19 +3,26 @@
 import { getCustomer } from '../customer'
 import { CartItem } from '@lib/types/cart'
 import getPayload from '@lib/utils/getPayload'
-import { Address, Cart } from '@payload-types'
+import { Cart } from '@payload-types'
 import { CART_SLUG, CUSTOMER_SLUG } from '@payload/collections/constants'
-import { getCartCookie, removeCartCookie, setCartCookie } from '@lib/data/cookies'
+import { deleteCartCookie, getCartCookie, setCartCookie } from '@lib/data/cookies'
 import { revalidateTag } from 'next/cache'
-import { createPaymentIntent } from '@/lib/data/shop'
 import { cache } from '@/lib/utils/cache'
 
-export async function returnOrCreateCart(cart: Cart | null, customerId?: string): Promise<Cart> {
+export async function returnOrCreateCart(
+  cart: Cart | null,
+  customerId?: string,
+): Promise<Cart | null> {
   if (cart) {
     return cart
   } else {
-    const newCart = await createCart(customerId)
-    return newCart
+    try {
+      const newCart = await createCart(customerId)
+      return newCart
+    } catch (error) {
+      console.error('Error creating cart', error)
+      return null
+    }
   }
 }
 
@@ -52,32 +59,30 @@ export async function getCustomerCart(customerId: string): Promise<Cart | null> 
   }
 }
 
-export async function createCart(customerId?: string): Promise<Cart> {
+export async function createCart(customerId?: string): Promise<Cart | null> {
   const payload = await getPayload()
 
   try {
     const cart = await payload.create({
       collection: CART_SLUG,
       data: {
-        type: 'default',
         ...(customerId ? { customer: customerId } : {}),
       },
     })
-    console.log('created cart', cart.id)
     if (customerId) {
-      console.log('updating customer cart', customerId)
-      const updatedCustomer = await payload.update({
+      await payload.update({
         collection: CUSTOMER_SLUG,
         id: customerId,
         data: {
           cart: cart.id,
         },
+        select: {},
       })
-      console.log('updated customer', updatedCustomer.id)
     }
     return cart
   } catch (error) {
-    throw Error('Error creating cart', error)
+    console.error('Error creating cart', error)
+    return null
   }
 }
 
@@ -91,7 +96,6 @@ export async function createCart(customerId?: string): Promise<Cart> {
 export const getCartById = cache(
   async (id: string, depth?: number): Promise<Cart | null> => {
     const payload = await getPayload()
-    console.log('getCartById', id)
     try {
       const cart = await payload.findByID({
         collection: CART_SLUG,
@@ -100,12 +104,11 @@ export const getCartById = cache(
       })
       return cart
     } catch (error) {
-      console.log('error getting cart by id', error)
       return null
     }
   },
   {
-    tags: (id) => [`getCartById-${id}`], // Tags the cache with the cart ID for easy invalidation.
+    tags: (id) => [`cart-${id}`], // Tags the cache with the cart ID for easy invalidation.
     revalidate: 3600, // Revalidates the cache every 3600 seconds (1 hour).
   },
 )
@@ -120,57 +123,75 @@ export const getCartById = cache(
  */
 export async function getCart(depth?: number): Promise<Cart | null> {
   const customer = await getCustomer()
-  if (customer) {
-    console.log('found customer cart')
-    const cartId = typeof customer.cart === 'string' ? customer.cart : customer.cart?.id
-    console.log('cartId', cartId)
-    const cart = await getCartById(cartId, depth)
-    return structuredClone(cart)
+  try {
+    if (customer) {
+      const cartId = typeof customer.cart === 'string' ? customer.cart : customer.cart?.id
+      const cart = await getCartById(cartId, depth)
+      if (!cart) {
+        throw 'Cart not found'
+      }
+      return structuredClone(cart)
+    } else {
+      const cartId = (await getCartCookie())?.id
+      if (!cartId) {
+        throw 'No cart cookie ID found'
+      }
+      const cart = await getCartById(cartId, depth)
+      if (!cart) {
+        throw 'Cart not found'
+      }
+      return structuredClone(cart)
+    }
+  } catch (error) {
+    console.log('No Current Cart', error)
+    return null
   }
-  const cartId = (await getCartCookie())?.id
-  if (cartId) {
-    const cart = await getCartById(cartId, depth)
-    return structuredClone(cart)
-  }
-  return null
 }
 
-export async function getOrSetCart(): Promise<Cart> {
+export async function getOrSetCart(): Promise<Cart | null> {
   const customer = await getCustomer()
-  if (customer) {
-    console.log('found customer')
-    if (customer.cart) {
-      const cartID = typeof customer.cart === 'string' ? customer.cart : customer.cart?.id
-      const cart = await getCartById(cartID)
-      return structuredClone(cart) // No need for returnOrCreateCart, cart should already exist
+  try {
+    if (customer) {
+      console.log('customer found', customer.id)
+      if (customer.cart) {
+        console.log('customer has cart', customer.id)
+        const cartID = typeof customer.cart === 'string' ? customer.cart : customer.cart?.id
+        const cart = await getCartById(cartID)
+        if (!cart) {
+          throw 'Cart not found'
+        }
+        return structuredClone(cart)
+      } else {
+        console.log('customer does not have cart, creating new cart')
+        const newCart = await returnOrCreateCart(null, customer.id)
+        if (!newCart) {
+          throw 'Error creating cart'
+        }
+        return structuredClone(newCart)
+      }
     } else {
-      const newCart = await returnOrCreateCart(null, customer.id)
-      return structuredClone(newCart)
-    }
-  } else {
-    console.log('no customer')
-    const cartId = (await getCartCookie())?.id
-    console.log('cartId', cartId)
-    if (cartId) {
-      const cart = await getCartById(cartId)
-      if (cart) {
-        console.log('cart found in cookie')
-        return structuredClone(cart) // No need for returnOrCreateCart, cart should already exist
+      const cartId = (await getCartCookie())?.id
+      if (cartId) {
+        const cart = await getCartById(cartId)
+        if (!cart) {
+          throw 'Cart not found'
+        }
+        return structuredClone(cart)
       } else {
         console.log('cart was deleted creating new cart')
         // Handle case where the cart was deleted
         const newCart = await returnOrCreateCart(null)
+        if (!newCart) {
+          throw 'Error creating cart'
+        }
         await setCartCookie({ id: newCart.id, linesCount: newCart.items.length })
         revalidateTag(`cart-${newCart.id}`)
         return structuredClone(newCart)
       }
-    } else {
-      console.log('creating new cart')
-      const newCart = await returnOrCreateCart(null)
-      await setCartCookie({ id: newCart.id, linesCount: newCart.items.length })
-      revalidateTag(`cart-${newCart.id}`)
-      return structuredClone(newCart)
     }
+  } catch (error) {
+    console.error('Error getting or setting cart', error)
+    return null
   }
 }
 
@@ -201,62 +222,64 @@ function mergeItems(guestCart: Cart, customerCart: Cart): CartItem[] {
   return syncedItems
 }
 
-export async function mergeCarts(customerId: string): Promise<Cart> {
+/**
+ * Merges a guest cart with a customer cart.
+ *
+ * This function:
+ * 1. Retrieves the current guest and customer carts
+ * 2. Merges the items from the guest cart into the customer cart
+ * 3. Deletes the guest cart
+ * 4. Updates the customer cart in the database
+ * 5. Sets the cart cookie to the updated customer cart
+ * 6. Revalidates the cart cache
+ *
+ * @param customerId The ID of the customer to merge the cart with
+ * @returns The updated customer cart or null if an error occurs
+ */
+export async function mergeCarts(customerId: string): Promise<Cart | null> {
   const [payload, guestCart, customerCart] = await Promise.all([
     getPayload(),
     getGuestCart(),
     getCustomerCart(customerId),
   ])
 
-  console.log('merging carts')
-  console.log('guestCart', guestCart !== null)
-  console.log('customerCart', customerCart !== null)
-
-  if (guestCart && customerCart) {
-    const mergedItems = mergeItems(guestCart, customerCart)
-
-    try {
-      console.log('merging customer cart with guest cart')
+  try {
+    if (guestCart && customerCart) {
+      const mergedItems = mergeItems(guestCart, customerCart)
       // Update customer's cart in the database
-      await payload.update({
+      const updatedCustomerCart = await payload.update({
         collection: CART_SLUG,
         id: customerCart.id,
         data: {
           items: mergedItems,
         },
       })
-    } catch (error) {
-      console.error('Error updating customer cart', error)
-      throw error
-    }
-
-    try {
-      console.log('deleting guest cart', guestCart.id)
+      if (!updatedCustomerCart) {
+        throw 'Error updating customer cart'
+      }
       // Delete the guest cart
       await payload.delete({
         collection: CART_SLUG,
         id: guestCart.id,
       })
-      // removeCartCookie()
-    } catch (error) {
-      console.error('Error deleting guest cart', error)
-      throw error
-    }
 
-    await setCartCookie({ id: customerCart.id, linesCount: customerCart.items.length })
-    revalidateTag(`cart-${customerCart.id}`)
+      await setCartCookie({ id: customerCart.id, linesCount: customerCart.items.length })
+      revalidateTag(`cart-${customerCart.id}`)
 
-    return customerCart
-  } else if (guestCart && !customerCart) {
-    // Associate guest cart with customer
-    try {
+      return updatedCustomerCart
+    } else if (guestCart && !customerCart) {
+      // Associate guest cart with customer
       const updatedGuestCart = await payload.update({
         collection: CART_SLUG,
         id: guestCart.id,
         data: { customer: customerId },
       })
 
-      const updatedCustomer = await payload.update({
+      if (!updatedGuestCart) {
+        throw 'Error associating guest cart with customer'
+      }
+
+      await payload.update({
         collection: CUSTOMER_SLUG,
         id: customerId,
         data: { cart: updatedGuestCart.id },
@@ -265,86 +288,100 @@ export async function mergeCarts(customerId: string): Promise<Cart> {
       await setCartCookie({ id: updatedGuestCart.id, linesCount: updatedGuestCart.items.length })
       revalidateTag(`cart-${updatedGuestCart.id}`)
 
-      // removeCartCookie()
-
       return updatedGuestCart
-    } catch (error) {
-      console.error('Error associating guest cart with customer', error)
-      throw error
+    } else if (customerCart && !guestCart) {
+    } else if (customerCart && !guestCart) {
+      // Customer already has a cart, no need to merge
+      return customerCart
+    } else {
+      // Both carts are null, this should only happen if a user registers with an empty cart
+      // In this case, we create a new cart for the customer
+      const newCart = await createCart(customerId)
+      if (!newCart) {
+        throw 'Error creating new cart'
+      }
+      return structuredClone(newCart)
     }
-  } else if (customerCart && !guestCart) {
-    // Customer already has a cart, no need to merge
-    return customerCart
-  } else {
-    console.log('creating new cart for customer', customerId)
-    // Both carts are null, this should only happen if a user registers with an empty cart
-    // In this case, we create a new cart for the customer
-    return createCart(customerId)
+  } catch (error) {
+    console.error('Error merging carts', error)
+    return null
   }
 }
-
-export async function addToCart(cartItem: CartItem): Promise<Cart> {
+/**
+ * Adds an item to the cart.
+ *
+ * This function:
+ * 1. Gets or creates the appropriate cart
+ * 2. Finds the index of the item in the cart that matches the new item
+ * 3. Updates the quantity of the item if it already exists
+ * 4. Adds the item to the cart if it doesn't exist
+ * 5. Updates the cart in the database
+ * 6. Sets the cart cookie to the updated cart
+ * 7. Revalidates the cart cache
+ *
+ * @param cartItem The item to add to the cart
+ * @returns The updated cart or null if an error occurs
+ */
+export async function addToCart(cartItem: CartItem): Promise<Cart | null> {
   const payload = await getPayload()
-  const cart = await getOrSetCart() // Get or create the appropriate cart
 
-  if (!cart) {
-    throw new Error('Error retrieving or creating cart')
-  }
-
-  const { product } = cartItem
-  const productId = typeof product === 'string' ? product : product?.id
-  console.log('productId', productId)
-
-  // Find the index of the item in the cart that matches the new item
-  // This checks both the product ID and variant (if applicable)
-  const existingItemIndex = cart.items.findIndex(({ product: existingProduct, variant }) => {
-    const existingProductId =
-      typeof existingProduct === 'string' ? existingProduct : existingProduct?.id
-    const existingVariantOptions = variant?.map((v) => v.option).sort() || []
-    const newVariantOptions = cartItem.variant?.map((v) => v.option).sort() || []
-    return (
-      existingProductId === productId &&
-      JSON.stringify(existingVariantOptions) === JSON.stringify(newVariantOptions)
-    )
-  })
-
-  // Create a new array of cart items to avoid mutating the original cart
-  let updatedCartItems = [
-    ...cart.items.map((item) => ({
-      ...item,
-    })),
-  ]
-
-  if (existingItemIndex !== -1) {
-    console.log('item already exists in cart at index:', existingItemIndex)
-    // If the item already exists in the cart
-    updatedCartItems[existingItemIndex] = {
-      ...updatedCartItems[existingItemIndex], // Spread existing item properties
-      quantity: Math.max(
-        0, // Ensure quantity is never negative
-        (updatedCartItems[existingItemIndex].quantity || 0) + // Current quantity (default to 0 if undefined)
-          (cartItem.quantity || 0), // New quantity to add (default to 0 if undefined)
-      ),
-    }
-  } else {
-    console.log('item does not exist in cart, adding it')
-    // If the item doesn't exist in the cart, add it as a new item
-    updatedCartItems.push({
-      id: cartItem.id,
-      product: productId,
-      price: cartItem.price,
-      variant: cartItem.variant,
-      isVariant: cartItem.isVariant,
-      quantity: Math.max(0, cartItem.quantity || 0), // Ensure quantity is never negative
-    })
-  }
-
-  // Update the cart in the database
   try {
+    const cart = await getOrSetCart() // Get or create the appropriate cart
+
+    if (!cart) {
+      throw 'Error retrieving or creating cart'
+    }
+
+    const { product } = cartItem
+    const productId = typeof product === 'string' ? product : product?.id
+
+    // Find the index of the item in the cart that matches the new item
+    // This checks both the product ID and variant (if applicable)
+    const existingItemIndex = cart.items.findIndex(({ product: existingProduct, variant }) => {
+      const existingProductId =
+        typeof existingProduct === 'string' ? existingProduct : existingProduct?.id
+      const existingVariantOptions = variant?.map((v) => v.option).sort() || []
+      const newVariantOptions = cartItem.variant?.map((v) => v.option).sort() || []
+      return (
+        existingProductId === productId &&
+        JSON.stringify(existingVariantOptions) === JSON.stringify(newVariantOptions)
+      )
+    })
+
+    // Create a new array of cart items to avoid mutating the original cart
+    let updatedCartItems = [
+      ...cart.items.map((item) => ({
+        ...item,
+      })),
+    ]
+
+    // The item already exists in the cart
+    if (existingItemIndex !== -1) {
+      updatedCartItems[existingItemIndex] = {
+        ...updatedCartItems[existingItemIndex], // Spread existing item properties
+        quantity: Math.max(
+          0, // Ensure quantity is never negative
+          (updatedCartItems[existingItemIndex].quantity || 0) + // Current quantity (default to 0 if undefined)
+            (cartItem.quantity || 0), // New quantity to add (default to 0 if undefined)
+        ),
+      }
+    } else {
+      updatedCartItems.push({
+        id: cartItem.id,
+        product: productId,
+        price: cartItem.price,
+        variant: cartItem.variant,
+        isVariant: cartItem.isVariant,
+        quantity: Math.max(0, cartItem.quantity || 0), // Ensure quantity is never negative
+      })
+    }
+
+    // Update the cart in the database
     const updatedCart = await payload.update({
       collection: CART_SLUG,
       id: cart.id,
       data: {
+        subtotal: updatedCartItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
         items: updatedCartItems,
       },
     })
@@ -355,332 +392,207 @@ export async function addToCart(cartItem: CartItem): Promise<Cart> {
       })
 
       revalidateTag(`cart-${updatedCart.id}`)
-      revalidateTag(`getCartById-${updatedCart.id}`)
     }
 
     return updatedCart
   } catch (error) {
-    console.error('Error updating cart', error)
-    return cart
-  }
-}
-
-export async function deleteCartItem(options: {
-  cartItemId?: string
-  cartItem?: CartItem
-}): Promise<Cart> {
-  const payload = await getPayload()
-  const cart = await getOrSetCart() // Get the current cart
-
-  if (!cart) {
-    throw new Error('Error retrieving or creating cart')
-  }
-
-  let updatedCartItems = []
-
-  if (options.cartItemId) {
-    updatedCartItems = cart.items.filter((item) => item.id !== options.cartItemId)
-  } else {
-    const { product, variant } = options.cartItem
-    const productId = typeof product === 'string' ? product : product?.id
-    const variantOptions = variant?.map((v) => v.option).sort() || []
-
-    updatedCartItems = cart.items.filter((item) => {
-      const itemProductId = typeof item.product === 'string' ? item.product : item.product?.id
-      // If variant is provided, only delete items matching both ID and variant options
-      if (options.cartItem?.variant) {
-        console.log('deleting variant')
-        console.log('item id:', itemProductId, 'cartItem id:', productId)
-        const existingVariantOptions = item.variant?.map((v) => v.option) || []
-        console.log('existingVariantOptions', existingVariantOptions)
-        console.log('newVariantOptions', variantOptions)
-
-        console.log(
-          'item.product.id === cartItem.product.id',
-          itemProductId === productId,
-          JSON.stringify(existingVariantOptions) === JSON.stringify(variantOptions),
-        )
-
-        return !(
-          itemProductId === productId &&
-          JSON.stringify(existingVariantOptions) === JSON.stringify(variantOptions)
-        )
-      }
-      console.log('no variant, deleting item', itemProductId, productId)
-      // If no variant, just filter by ID
-      return itemProductId !== productId
-    })
-  }
-
-  // Update the cart in the database
-  const updatedCart = await payload.update({
-    collection: CART_SLUG,
-    id: cart.id,
-    data: {
-      items: updatedCartItems,
-    },
-  })
-
-  if (updatedCart) {
-    await setCartCookie({
-      id: updatedCart.id,
-      linesCount: updatedCart.items.length,
-    })
-
-    revalidateTag(`cart-${updatedCart.id}`)
-    revalidateTag(`getCartById-${updatedCart.id}`)
-  }
-
-  return updatedCart
-}
-
-export async function updateCartItemQuantity(
-  quantity: number,
-  cartItemId: string,
-): Promise<Cart | null> {
-  console.log('updating cart item quantity', quantity, cartItemId)
-  const payload = await getPayload()
-  const cart = await getOrSetCart()
-
-  if (!cart) {
-    payload.logger.error('Error retrieving or creating cart')
+    console.error('Error adding item to cart', error)
     return null
   }
-
-  const updatedCartItems = cart.items.map((item) => {
-    if (item.id === cartItemId) {
-      return { ...item, quantity }
-    }
-    return item
-  })
+}
+/**
+ * Deletes an item from the current cart.
+ *
+ * This function:
+ * 1. Retrieves the current cart
+ * 2. Deletes the item from the cart
+ * 3. Sets the cart cookie to the updated cart
+ * 4. Revalidates the cart cache
+ *
+ * @param cartItemId The ID of the item to delete
+ * @param cartItem The item to delete
+ *
+ * @returns The updated cart or null if an error occurs
+ */
+export async function deleteCartItem({
+  cartItemId,
+  cartItem,
+}: {
+  cartItemId?: string
+  cartItem?: CartItem
+}): Promise<Cart | null> {
+  const payload = await getPayload()
 
   try {
+    if (!cartItemId && !cartItem) {
+      throw 'No cart item ID or cart item provided'
+    }
+    const cart = await getCart() // Get the current cart
+
+    if (!cart) {
+      throw 'No cart found'
+    }
+
+    let updatedCartItems = []
+
+    if (cartItemId) {
+      updatedCartItems = cart.items.filter((item) => item.id !== cartItemId)
+    } else {
+      const { product, variant } = cartItem
+      const productId = typeof product === 'string' ? product : product?.id
+      const variantOptions = variant?.map((v) => v.option).sort() || []
+
+      updatedCartItems = cart.items.filter((item) => {
+        const itemProductId = typeof item.product === 'string' ? item.product : item.product?.id
+        // If variant is provided, only delete items matching both ID and variant options
+        if (cartItem?.variant) {
+          const existingVariantOptions = item.variant?.map((v) => v.option) || []
+
+          return !(
+            itemProductId === productId &&
+            JSON.stringify(existingVariantOptions) === JSON.stringify(variantOptions)
+          )
+        }
+        // If no variant, just filter by ID
+        return itemProductId !== productId
+      })
+    }
+
+    // Update the cart in the database
     const updatedCart = await payload.update({
       collection: CART_SLUG,
       id: cart.id,
       data: {
+        subtotal: updatedCartItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
         items: updatedCartItems,
       },
     })
 
-    console.log(
-      'updatedCart quantity',
-      updatedCart.items.find((item) => item.id === cartItemId)?.quantity,
-    )
-    revalidateTag(`getCartById-${updatedCart.id}`)
+    if (updatedCart) {
+      await setCartCookie({
+        id: updatedCart.id,
+        linesCount: updatedCart.items.length,
+      })
+
+      revalidateTag(`cart-${updatedCart.id}`)
+    }
+
     return updatedCart
   } catch (error) {
-    payload.logger.error('Error updating cart item quantity', error)
+    console.error('Error deleting cart item', error)
     return null
   }
 }
-
-export async function increaseCartItemQuantity(
+/**
+ * Updates the quantity of an item in the current cart.
+ *
+ * This function:
+ * 1. Retrieves the current cart
+ * 2. Updates the quantity of the specified item
+ * 3. Sets the cart cookie to the updated cart
+ * 4. Revalidates the cart cache
+ *
+ * @returns The updated cart or null if an error occurs
+ */
+export async function updateCartItemQuantity(
   quantity: number,
-  options: { cartItemId: string } | { cartItem: Omit<CartItem, 'quantity'> },
-): Promise<Cart> {
+  cartItemId: string,
+): Promise<Cart | null> {
   const payload = await getPayload()
-  const cart = await getOrSetCart() // Get the current cart
 
-  if (!cart) {
-    throw new Error('Error retrieving or creating cart')
-  }
+  try {
+    const cart = await getCart()
 
-  let updatedCartItems: CartItem[] = []
-
-  if ('cartItemId' in options) {
-    // Find the cart item
-    const foundCartItem = cart.items.find((item) => item.id === options.cartItemId)
-
-    if (!foundCartItem) {
-      throw new Error('Cart item not found')
+    if (!cart) {
+      throw 'No cart found'
     }
 
-    // Update the quantity
-    updatedCartItems = cart.items.map((item) => {
-      if (item.id === options.cartItemId) {
-        return {
-          ...item,
-          product: typeof item.product === 'string' ? item.product : item.product?.id,
-          quantity: item.quantity + quantity,
-        }
+    const updatedCartItems = cart.items.map((item) => {
+      if (item.id === cartItemId) {
+        return { ...item, quantity }
       }
       return item
     })
-  } else {
-    const { product, variant } = options.cartItem
-    const productId = typeof product === 'string' ? product : product?.id
-    const variantOptions = variant?.map((v) => v.option).sort() || []
 
-    updatedCartItems = cart.items.map((item) => {
-      const { product: existingProduct, variant: existingVariant } = item
-      const existingProductId =
-        typeof existingProduct === 'string' ? existingProduct : existingProduct?.id
-      const existingVariantOptions = existingVariant?.map((v) => v.option).sort() || []
-
-      if (
-        existingProductId === productId &&
-        (!variant || JSON.stringify(existingVariantOptions) === JSON.stringify(variantOptions))
-      ) {
-        return {
-          ...item,
-          quantity: item.quantity + quantity,
-        }
-      }
-      return item
-    })
-  }
-
-  // Update the cart in the database
-  const updatedCart = await payload.update({
-    collection: CART_SLUG,
-    id: cart.id,
-    data: {
-      items: updatedCartItems,
-    },
-  })
-
-  return updatedCart
-}
-
-export async function decreaseCartItemQuantity(
-  quantity: number,
-  options: { cartItemId: string } | { cartItem: Omit<CartItem, 'quantity'> },
-): Promise<Cart> {
-  const payload = await getPayload()
-  const cart = await getOrSetCart() // Get the current cart
-
-  if (!cart) {
-    throw new Error('Error retrieving or creating cart')
-  }
-
-  let updatedCartItems: CartItem[] = []
-
-  if ('cartItemId' in options) {
-    // Find the cart item
-    const foundCartItem = cart.items.find((item) => item.id === options.cartItemId)
-
-    if (!foundCartItem) {
-      throw new Error('Cart item not found')
-    }
-
-    // Update the quantity
-    updatedCartItems = cart.items.map((item) => {
-      if (item.id === options.cartItemId) {
-        const newQuantity = Math.max(0, item.quantity - quantity)
-        if (newQuantity === 0) {
-          return null
-        } else {
-          return {
-            ...item,
-            product: typeof item.product === 'string' ? item.product : item.product?.id,
-            quantity: newQuantity,
-          }
-        }
-      }
-      return item
-    })
-  } else {
-    const { product, variant } = options.cartItem
-    const productId = typeof product === 'string' ? product : product?.id
-    const variantOptions = variant?.map((v) => v.option).sort() || []
-
-    updatedCartItems = cart.items.map((item) => {
-      const { product: existingProduct, variant: existingVariant } = item
-      const existingProductId =
-        typeof existingProduct === 'string' ? existingProduct : existingProduct?.id
-      const existingVariantOptions = existingVariant?.map((v) => v.option).sort() || []
-
-      if (
-        existingProductId === productId &&
-        (!variant || JSON.stringify(existingVariantOptions) === JSON.stringify(variantOptions))
-      ) {
-        const newQuantity = Math.max(0, item.quantity - quantity)
-        if (newQuantity === 0) {
-          return null
-        } else {
-          return {
-            ...item,
-            quantity: newQuantity,
-          }
-        }
-      }
-      return item
-    })
-  }
-
-  // Filter out null items
-  const filteredUpdatedCartItems = updatedCartItems.filter((item) => item !== null) as CartItem[]
-
-  // Update the cart in the database
-  const updatedCart = await payload.update({
-    collection: CART_SLUG,
-    id: cart.id,
-    data: {
-      items: filteredUpdatedCartItems,
-    },
-  })
-
-  if (updatedCart) {
-    await setCartCookie({
-      id: updatedCart.id,
-      linesCount: updatedCart.items.length,
+    const updatedCart = await payload.update({
+      collection: CART_SLUG,
+      id: cart.id,
+      data: {
+        subtotal: updatedCartItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
+        items: updatedCartItems,
+      },
     })
 
     revalidateTag(`cart-${updatedCart.id}`)
+    return updatedCart
+  } catch (error) {
+    console.error('Error updating cart item quantity', error)
+    return null
   }
-
-  return updatedCart
 }
-
-export async function clearCart(): Promise<Cart> {
+/**
+ * Clears the items from the current cart.
+ *
+ * This function:
+ * 1. Retrieves the current cart
+ * 2. Updates the cart to have no items
+ * 3. Sets the cart cookie to have no items
+ * 4. Revalidates the cart cache
+ *
+ * @returns The updated cart
+ */
+export async function clearCartItems(): Promise<Cart> {
   const payload = await getPayload()
-  const cart = await getOrSetCart() // Get the current cart
+  try {
+    const cart = await getCart() // Get the current cart
 
-  if (!cart) {
-    throw new Error('Error retrieving or creating cart')
-  }
+    if (!cart) {
+      throw 'No cart found'
+    }
 
-  // Update the cart in the database
-  const updatedCart = await payload.update({
-    collection: CART_SLUG,
-    id: cart.id,
-    data: {
-      items: [],
-    },
-  })
-
-  if (updatedCart) {
-    await setCartCookie({
-      id: updatedCart.id,
-      linesCount: updatedCart.items.length,
+    // Update the cart in the database
+    const updatedCart = await payload.update({
+      collection: CART_SLUG,
+      id: cart.id,
+      data: {
+        items: [],
+      },
     })
 
-    revalidateTag(`cart-${updatedCart.id}`)
+    if (updatedCart) {
+      await setCartCookie({
+        id: updatedCart.id,
+        linesCount: updatedCart.items.length,
+      })
+
+      revalidateTag(`cart-${updatedCart.id}`)
+    }
+
+    return updatedCart
+  } catch (error) {
+    console.error('Error clearing cart items', error)
+    return null
   }
-
-  return updatedCart
 }
-
-export async function deleteCart() {
+/**
+ * Deletes the cart with the given ID from the database.
+ *
+ * This function:
+ * 1. Deletes the cart from the database
+ * 2. Revalidates the cart cache
+ *
+ */
+export async function deleteCart(cartId: string) {
   const payload = await getPayload()
-  const cart = await getOrSetCart() // Get the current cart
 
-  if (!cart) {
-    throw new Error('Error retrieving or creating cart')
+  try {
+    await payload.delete({
+      collection: CART_SLUG,
+      id: cartId,
+    })
+
+    revalidateTag(`cart-${cartId}`)
+  } catch (error) {
+    console.error('Error deleting cart', error)
   }
-
-  await payload.delete({
-    collection: CART_SLUG,
-    id: cart.id,
-  })
-
-  await removeCartCookie()
-  revalidateTag(`cart-${cart.id}`)
-  revalidateTag('admin-orders')
-}
-
-export async function clearCartCookie() {
-  await removeCartCookie()
-  revalidateTag('cart')
 }

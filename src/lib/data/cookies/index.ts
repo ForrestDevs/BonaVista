@@ -1,13 +1,14 @@
-'use server'
+import 'server-only'
 
 import { cookies } from 'next/headers'
 import { safeJsonParse } from '@lib/utils/safeJSONParse'
+import { revalidateTag } from 'next/cache'
 
 export type CartCookieJson = { id: string; linesCount: number }
 
 export async function getCartCookie(): Promise<null | CartCookieJson> {
   const cookiesValue = await cookies()
-  const cartCookieJson = safeJsonParse(cookiesValue.get('_cart_id')?.value)
+  const cartCookieJson = safeJsonParse(cookiesValue.get('_cart_cookie')?.value)
 
   if (
     !cartCookieJson ||
@@ -22,10 +23,10 @@ export async function getCartCookie(): Promise<null | CartCookieJson> {
   return cartCookieJson as CartCookieJson
 }
 
-export const setCartCookie = async (cartCookieJson: CartCookieJson) => {
+export async function setCartCookie(cartCookieJson: CartCookieJson) {
   const cookiestore = await cookies()
   try {
-    cookiestore.set('_cart_id', JSON.stringify(cartCookieJson), {
+    cookiestore.set('_cart_cookie', JSON.stringify(cartCookieJson), {
       maxAge: 60 * 60 * 24 * 7, // This is 7 days in seconds (604800 seconds)
       httpOnly: true,
       sameSite: 'strict',
@@ -36,15 +37,30 @@ export const setCartCookie = async (cartCookieJson: CartCookieJson) => {
   }
 }
 
-// export async function removeCartCookie() {
-//   // Both methods are valid, but cookies().delete('_cart_id') is more straightforward
-//   // and is the recommended approach for removing cookies in Next.js
-//   const cookiestore = await cookies()
-//   cookiestore.delete('_cart_id')
-// }
+export async function deleteCartCookie() {
+  const cookie = await getCartCookie()
+  if (!cookie) {
+    return
+  }
 
-export async function removeCartCookie(): Promise<void> {
-  ;(await cookies()).set('_cart_id', '', {
-    maxAge: 0,
-  })
+  const cookiestore = await cookies()
+  cookiestore.delete('_cart_cookie')
+  revalidateTag(`cart-${cookie.id}`)
+}
+
+export async function deleteCartCookieById(id: string) {
+  try {
+    const cookie = await getCartCookie()
+    if (!cookie) {
+      throw new Error('Cart cookie not found')
+    }
+    if (cookie.id !== id) {
+      throw new Error('Cart cookie id does not match')
+    }
+    const cookiestore = await cookies()
+    cookiestore.delete('_cart_cookie')
+  } catch (error) {
+    console.error('Failed to delete cart cookie', error)
+    return
+  }
 }

@@ -22,6 +22,14 @@ const Orders: CollectionConfig = {
   },
   fields: [
     {
+      name: 'orderNumber',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+      },
+      required: true,
+    },
+    {
       name: 'status',
       type: 'select',
       options: [
@@ -110,12 +118,28 @@ const Orders: CollectionConfig = {
               defaultValue: false,
             },
             {
-              name: 'variant',
+              name: 'variantOptions',
               type: 'array',
               fields: [
                 {
-                  name: 'option',
-                  type: 'text',
+                  name: 'key',
+                  type: 'group',
+                  fields: [
+                    {
+                      name: 'slug',
+                      type: 'text',
+                    },
+                  ],
+                },
+                {
+                  name: 'value',
+                  type: 'group',
+                  fields: [
+                    {
+                      name: 'slug',
+                      type: 'text',
+                    },
+                  ],
                 },
               ],
             },
