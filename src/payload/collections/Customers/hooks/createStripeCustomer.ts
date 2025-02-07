@@ -1,10 +1,5 @@
 import type { CollectionBeforeChangeHook } from 'payload'
-
-import Stripe from 'stripe'
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-12-18.acacia',
-})
+import { stripeClient } from '@lib/stripe'
 
 export const createStripeCustomer: CollectionBeforeChangeHook = async ({
   data,
@@ -15,7 +10,7 @@ export const createStripeCustomer: CollectionBeforeChangeHook = async ({
     try {
       // lookup an existing customer by email and if found, assign the ID to the user
       // if not found, create a new customer and assign the new ID to the user
-      const existingCustomer = await stripe.customers.list({
+      const existingCustomer = await stripeClient.customers.list({
         email: data.email,
         limit: 1,
       })
@@ -29,7 +24,7 @@ export const createStripeCustomer: CollectionBeforeChangeHook = async ({
       }
 
       // create a new customer and assign the ID to the user
-      const customer = await stripe.customers.create({
+      const customer = await stripeClient.customers.create({
         email: data.email,
       })
 
