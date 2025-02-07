@@ -55,6 +55,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Footer />
           </Providers>
         </main>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`
+          }}
+        />
+        <script
+          id="zsiqscript"
+          src="https://salesiq.zohopublic.ca/widget?wc=6b3900749f2d88dc157e54f6ecfe336fee892b38bbc437ef3a4f73ffbfb8fc41150a20226b9ab8ae137c6050564a94ff"
+          defer
+        />
       </body>
     </html>
   )
