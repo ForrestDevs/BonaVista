@@ -26,6 +26,13 @@ import { plugins } from './payload/plugins'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+const serverURL = process.env.NEXT_PUBLIC_SERVER_URL || ''
+const allowedOrigins = [
+  serverURL,
+  'https://www2.bonavistaleisurescapes.com',
+  'https://bonavistaleisurescapes.com',
+].filter(Boolean)
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -94,8 +101,8 @@ export default buildConfig({
   }),
   collections,
   globals,
-  cors: [process.env.NEXT_PUBLIC_SERVER_URL || ''].filter(Boolean),
-  csrf: [process.env.NEXT_PUBLIC_SERVER_URL || ''].filter(Boolean),
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
   endpoints: [
     // {
     //   handler: createPaymentIntent,
