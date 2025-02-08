@@ -12,8 +12,6 @@ import {
 } from '@payloadcms/richtext-lexical'
 import {
   BoldFeature,
-  FixedToolbarFeature,
-  HeadingFeature,
   ItalicFeature,
   LinkFeature,
   lexicalEditor,
@@ -62,7 +60,6 @@ export default buildConfig({
   editor: lexicalEditor({
     features: () => {
       return [
-        // PayloadAiPluginLexicalEditorFeature(),
         OrderedListFeature(),
         UnorderedListFeature(),
         AlignFeature(),
@@ -133,29 +130,29 @@ export default buildConfig({
     // },
   ],
   plugins: [...plugins],
-  secret: process.env.PAYLOAD_SECRET || 'default',
+  secret: process.env.PAYLOAD_SECRET || 'a10c2070-903e-4297-918d-b6917b92eb36',
   sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  async onInit(payload) {
-    const existingUsers = await payload.find({
-      collection: 'users',
-      limit: 1,
-    })
+  // async onInit(payload) {
+  //   const existingUsers = await payload.find({
+  //     collection: 'users',
+  //     limit: 1,
+  //   })
 
-    // This is useful for local development
-    // so you do not need to create a first-user every time
-    if (existingUsers.docs.length === 0) {
-      await payload.create({
-        collection: 'users',
-        data: {
-          name: 'Dev User',
-          email: 'dev@payloadcms.com',
-          password: 'test',
-          roles: ['admin'],
-        },
-      })
-    }
-  },
+  //   // This is useful for local development
+  //   // so you do not need to create a first-user every time
+  //   if (existingUsers.docs.length === 0) {
+  //     await payload.create({
+  //       collection: 'users',
+  //       data: {
+  //         name: 'Dev User',
+  //         email: 'dev@payloadcms.com',
+  //         password: 'test',
+  //         roles: ['admin'],
+  //       },
+  //     })
+  //   }
+  // },
 })

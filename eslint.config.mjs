@@ -13,7 +13,6 @@ const eslintConfig = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
     rules: {
-      
       'prefer-const': 'off',
       'react/no-string-refs': 'off',
       'react/display-name': 'off',
@@ -27,18 +26,6 @@ const eslintConfig = [
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-wrapper-object-types': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
-      // '@typescript-eslint/no-unused-vars': [
-      //   'warn',
-      //   {
-      //     vars: 'all',
-      //     args: 'after-used',
-      //     ignoreRestSiblings: false,
-      //     argsIgnorePattern: '^_',
-      //     varsIgnorePattern: '^_',
-      //     destructuredArrayIgnorePattern: '^_',
-      //     caughtErrorsIgnorePattern: '^(_|ignore)',
-      //   },
-      // ],
     },
     ignores: [
       'src/payload-types.ts',

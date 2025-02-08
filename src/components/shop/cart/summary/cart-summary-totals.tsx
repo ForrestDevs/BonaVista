@@ -1,7 +1,7 @@
 'use client'
 
 import { formatMoney } from '@/lib/utils/formatMoney'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { CheckoutButton } from '../../checkout/checkout-button'
 import { CheckoutLineItem } from '@/lib/types/checkout'
 import { EnhancedProductVariant } from '@/lib/types/product'

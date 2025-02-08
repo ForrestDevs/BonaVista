@@ -2,7 +2,7 @@
 
 import { CartItem } from '@/lib/types/cart'
 import { CartDrawerItem } from './cart-drawer-item-row'
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'motion/react'
 import { useOptimisticAction } from 'next-safe-action/hooks'
 import { deleteCartItemAction } from '@/lib/actions/cart'
 

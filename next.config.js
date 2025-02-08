@@ -29,15 +29,17 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    scrollRestoration: true,
-  },
   devIndicators: {
     devIndicators: true,
     buildActivity: true,
     appIsrStatus: true,
   },
-  output: 'standalone',
+  experimental: {
+    //   scrollRestoration: true,
+    staticGenerationRetryCount: 1,
+    staticGenerationMaxConcurrency: 2,
+    staticGenerationMinPagesPerWorker: 25,
+  },
   redirects,
 }
 

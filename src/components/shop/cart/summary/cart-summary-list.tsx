@@ -1,6 +1,6 @@
 'use client'
 
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'motion/react'
 import { useOptimisticAction } from 'next-safe-action/hooks'
 import { deleteCartItemAction } from '@/lib/actions/cart'
 import { CartSummaryRow } from './cart-summary-row'
