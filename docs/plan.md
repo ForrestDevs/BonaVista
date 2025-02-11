@@ -149,11 +149,6 @@ fix preview urls to use server action
 
 
 
-sitemaps: 
-  - products sitemap
-  - product categories sitemap
-
-
 cache optimizations:
    - blog-cateogires (revalidateTag)
    - posts (revalidateTag)

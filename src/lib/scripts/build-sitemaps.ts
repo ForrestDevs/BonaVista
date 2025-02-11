@@ -99,3 +99,10 @@ async function findSitemapFiles(dir: string): Promise<string[]> {
 }
 
 main()
+  .then(() => {
+    process.exit(0)
+  })
+  .catch((error) => {
+    console.error('Error generating sitemap:', error)
+    process.exit(1)
+  })
