@@ -118,7 +118,7 @@ add loading spinners to variant select
 Finish About Page
 Populate Blog Posts
 Add Videos to Resource Page
-import testimonials
+
 Clean up admin dashboard add overview page
    - add quick links to zoho and spire
    - show stats for website traffic

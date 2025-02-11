@@ -53,7 +53,19 @@ export function TestimonialsCarousel({ testimonials }: { testimonials: Testimoni
                       ))}
                     </div>
                     <div className="font-semibold">{testimonial.author}</div>
-                    <div className="text-sm text-muted-foreground">{testimonial.date}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {new Date(testimonial.date).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                      }).replace(/(\d+)(?=(,\s\d{4}))/, (day) => {
+                        const num = parseInt(day);
+                        if (num % 10 === 1 && num !== 11) return `${num}st`;
+                        if (num % 10 === 2 && num !== 12) return `${num}nd`; 
+                        if (num % 10 === 3 && num !== 13) return `${num}rd`;
+                        return `${num}th`;
+                      })}
+                    </div>
                   </div>
                 </CardContent>
               </Card>

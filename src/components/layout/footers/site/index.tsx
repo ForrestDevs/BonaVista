@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/payload/Logo'
 import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa'
-import { Instagram } from 'lucide-react'
+import { InstagramLogoIcon } from '@radix-ui/react-icons'
 
 export function Footer() {
   return (
@@ -23,15 +23,24 @@ export function Footer() {
             </p>
 
             <div className="flex space-x-4">
-              <Link href="#" className="hover:text-accent-foreground">
+              <Link
+                href="https://www.facebook.com/bonavistaleisurescapes/"
+                className="hover:text-accent-foreground"
+              >
                 <FaFacebook className="h-6 w-6" />
                 <span className="sr-only">Facebook</span>
               </Link>
-              <Link href="#" className="hover:text-accent-foreground">
-                <Instagram className="h-6 w-6" />
+              <Link
+                href="https://www.instagram.com/bonavistaleisurescapes"
+                className="hover:text-accent-foreground"
+              >
+                <InstagramLogoIcon className="h-6 w-6" />
                 <span className="sr-only">Instagram</span>
               </Link>
-              <Link href="#" className="hover:text-accent-foreground">
+              <Link
+                href="https://www.youtube.com/@bonavistaleisurescapes"
+                className="hover:text-accent-foreground"
+              >
                 <FaYoutube className="h-6 w-6" />
                 <span className="sr-only">Youtube</span>
               </Link>

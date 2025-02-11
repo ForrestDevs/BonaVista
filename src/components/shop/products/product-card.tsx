@@ -38,22 +38,20 @@ export function ProductCard({ product }: { product: Product }) {
   const handleAddToCart = async (variant: EnhancedProductVariant | null) => {
     setIsAddingToCart(true)
 
-    console.log('variant', variant.id)
     if (hasVariants) {
       if (variant) {
+        console.log('variant', variant)
         const cartItem: CartItem = {
           product: product,
           isVariant: true,
-          variant: {
-            id: variant.id,
-            variantOptions: variant.info.options.map((o) => ({
-              key: o.key,
-              value: {
-                slug: o.slug,
-                label: o.label,
-              },
-            })),
-          },
+          variantId: variant.id,
+          variantOptions: variant.info.options.map((o) => ({
+            key: o.key,
+            value: {
+              slug: o.slug,
+              label: o.label,
+            },
+          })),
           quantity: 1,
           price: variant.price,
           url: `/product/${product.slug}`,

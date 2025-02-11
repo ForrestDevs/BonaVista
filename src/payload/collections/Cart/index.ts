@@ -44,46 +44,40 @@ const Cart: CollectionConfig = {
               defaultValue: false,
             },
             {
-              name: 'variant',
-              type: 'group',
+              name: 'variantId',
+              type: 'text',
+            },
+            {
+              name: 'variantOptions',
+              type: 'array',
               fields: [
                 {
-                  name: 'variantOptions',
-                  type: 'array',
+                  name: 'key',
+                  type: 'group',
                   fields: [
                     {
-                      name: 'key',
-                      type: 'group',
-                      fields: [
-                        {
-                          name: 'slug',
-                          type: 'text',
-                        },
-                        {
-                          name: 'label',
-                          type: 'text',
-                        },
-                      ],
+                      name: 'slug',
+                      type: 'text',
                     },
                     {
-                      name: 'value',
-                      type: 'group',
-                      fields: [
-                        {
-                          name: 'slug',
-                          type: 'text',
-                        },
-                        {
-                          name: 'label',
-                          type: 'text',
-                        },
-                      ],
+                      name: 'label',
+                      type: 'text',
                     },
                   ],
                 },
                 {
-                  name: 'id',
-                  type: 'text',
+                  name: 'value',
+                  type: 'group',
+                  fields: [
+                    {
+                      name: 'slug',
+                      type: 'text',
+                    },
+                    {
+                      name: 'label',
+                      type: 'text',
+                    },
+                  ],
                 },
               ],
             },

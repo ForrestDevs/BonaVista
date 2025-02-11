@@ -1,5 +1,5 @@
 import getPayload from '@lib/utils/getPayload'
-import { PAGE_SLUG, SHOP_COLLECTION_SLUG } from '@payload/collections/constants'
+import { PAGE_SLUG, PRODUCT_SLUG, SHOP_COLLECTION_SLUG } from '@payload/collections/constants'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { cache, Fragment, Suspense } from 'react'
@@ -116,10 +116,10 @@ const mineraluxeSteps = [
 ]
 
 const categories = [
-  { name: 'Hot Tubs', image: '/mineraluxe.jpg' },
-  { name: 'Pools', image: '/mineraluxe.jpg' },
-  { name: 'Swim Spas', image: '/mineraluxe.jpg' },
-  { name: 'Accessories', image: '/mineraluxe.jpg' },
+  { name: 'Water Care', image: '/mineraluxe.jpg', slug: 'water-care' },
+  { name: 'Filters', image: '/mineraluxe.jpg', slug: 'filters' },
+  { name: 'Accessories', image: '/mineraluxe.jpg', slug: 'accessories' },
+  { name: 'Fragrances', image: '/mineraluxe.jpg', slug: 'fragrances' },
 ]
 
 export const dynamic = 'force-dynamic'
@@ -137,10 +137,15 @@ export default async function StoreHome() {
   //   return <div>Page not found</div>
   // }
 
-  const products = await payload
+  const bestSellers = await payload
     .find({
-      collection: 'products',
+      collection: PRODUCT_SLUG,
       depth: 1,
+      where: {
+        collections: {
+          in: ['67aadde8d9fad6d03cb36e83'],
+        },
+      },
     })
     .then((res) => {
       return res.docs
@@ -148,55 +153,12 @@ export default async function StoreHome() {
 
   return (
     <Suspense fallback={<SkeletonShopHome />}>
-      <div className="flex flex-col min-h-screen bg-gray-50">
-        {/* <header className="sticky top-0 z-50 bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-[#1e365c]">
-            BonaVista
-          </Link>
-          <div className="hidden md:flex items-center space-x-6">
-            <Link href="/products" className="text-gray-600 hover:text-[#1e365c] transition-colors">
-              Products
-            </Link>
-            <Link href="/about" className="text-gray-600 hover:text-[#1e365c] transition-colors">
-              About
-            </Link>
-            <Link href="/contact" className="text-gray-600 hover:text-[#1e365c] transition-colors">
-              Contact
-            </Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            <SearchBar />
-            <Button variant="ghost" size="icon">
-              <ShoppingCart className="h-5 w-5" />
-              <span className="sr-only">Cart</span>
-            </Button>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Menu</span>
-            </Button>
-          </div>
-        </div>
-      </header> */}
-
-        <main className="flex-grow">
+      <div className="flex flex-col min-h-screen bg-white">
+        <div className="flex-grow">
           <div className="space-y-24 py-12">
             <div className="container mx-auto px-4 z-0">
               <Carousel slides={carouselSlides} />
             </div>
-
-            {/* Featured Offer */}
-            {/* <section className="bg-[#1e365c] text-white py-16">
-            <div className="container mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold mb-4">Limited Time Offer!</h2>
-              <p className="text-xl mb-8">
-                Get 20% off on all Mineraluxe products. Use code: SUMMER20
-              </p>
-              <Button size="lg" variant="secondary" asChild>
-                <Link href="/products/mineraluxe">Shop Mineraluxe</Link>
-              </Button>
-            </div>
-          </section> */}
 
             {/* Top Selling Products */}
             <section className="container mx-auto px-4">
@@ -205,48 +167,26 @@ export default async function StoreHome() {
                 <div className="w-48 h-px bg-gray-200 mx-auto mt-4" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {products.map((product) => (
+                {bestSellers.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
-
-                {/* {featuredProducts.map((product) => (
-                <Card
-                  key={product.id}
-                  className="overflow-hidden transition-shadow hover:shadow-lg"
-                >
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    width={300}
-                    height={300}
-                    className="w-full object-cover"
-                  />
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-lg mb-2 text-[#1e365c]">{product.name}</h3>
-                    <p className="text-[#1e365c] font-bold">
-                      ${product.price}
-                      {product.maxPrice && (
-                        <span className="text-gray-500"> – ${product.maxPrice}</span>
-                      )}
-                    </p>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0">
-                    <Button className="w-full bg-[#1e365c] hover:bg-[#2a4a7c]">Add to Cart</Button>
-                  </CardFooter>
-                </Card>
-              ))} */}
               </div>
             </section>
 
             {/* Categories */}
             <section className="bg-white py-16">
               <div className="container mx-auto px-4">
-                <h2 className="text-3xl font-bold text-[#1e365c] text-center mb-12">
-                  Shop by Category
-                </h2>
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-bold text-[#1e365c]">Shop by Category</h2>
+                  <div className="w-48 h-px bg-gray-200 mx-auto mt-4" />
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                   {categories.map((category, index) => (
-                    <div key={index} className="relative overflow-hidden rounded-lg group">
+                    <Link
+                      key={index}
+                      className="relative overflow-hidden rounded-lg group"
+                      href={`/shop/category/${category.slug}`}
+                    >
                       <Image
                         src={category.image}
                         alt={category.name}
@@ -257,7 +197,7 @@ export default async function StoreHome() {
                       <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                         <h3 className="text-white text-2xl font-bold">{category.name}</h3>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -304,7 +244,7 @@ export default async function StoreHome() {
             </section>
 
             {/* Why Choose Us */}
-            <section className="bg-[#e8f1f5] py-16">
+            <section className="bg-[#c5e8f7] py-16">
               <div className="container mx-auto px-4">
                 <h2 className="text-3xl font-bold text-[#1e365c] text-center mb-12">
                   Why Choose BonaVista
@@ -322,7 +262,8 @@ export default async function StoreHome() {
                     <Truck className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
                     <h3 className="text-xl font-bold text-[#1e365c] mb-2">Fast Shipping</h3>
                     <p className="text-gray-600">
-                      Enjoy free shipping on orders over $100 and quick delivery to your doorstep.
+                      Enjoy free shipping on orders over $250 in Toronto and quick delivery to your
+                      doorstep.
                     </p>
                   </div>
                   <div className="text-center">
@@ -335,65 +276,8 @@ export default async function StoreHome() {
                 </div>
               </div>
             </section>
-
-            {/* Newsletter Signup */}
-            <section className="bg-[#1e365c] text-white py-16">
-              <div className="container mx-auto px-4 text-center">
-                <h2 className="text-3xl font-bold mb-4">Stay in the Loop</h2>
-                <p className="text-xl mb-8">
-                  Subscribe to our newsletter for exclusive deals, tips, and the latest product
-                  updates.
-                </p>
-                <form className="flex flex-col md:flex-row justify-center items-center gap-4">
-                  <Input
-                    type="email"
-                    placeholder="Your email"
-                    className="w-full md:w-64 bg-white/10 border-white/20 text-white placeholder-white/50"
-                  />
-                  <Button type="submit" variant="secondary">
-                    Subscribe
-                  </Button>
-                </form>
-              </div>
-            </section>
-
-            {/* Customer Reviews */}
-            <section className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-[#1e365c] text-center mb-12">
-                What Our Customers Say
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <Card className="bg-white">
-                  <CardContent className="p-6">
-                    <p className="text-gray-600 mb-4">
-                      &quot;BonaVista&apos;s products have made maintaining my hot tub so much
-                      easier. The Mineraluxe system is a game-changer!&quot;
-                    </p>
-                    <p className="font-bold text-[#1e365c]">- Sarah T.</p>
-                  </CardContent>
-                </Card>
-                <Card className="bg-white">
-                  <CardContent className="p-6">
-                    <p className="text-gray-600 mb-4">
-                      &quot;Great selection of pool care products and excellent customer service. I
-                      highly recommend BonaVista!&quot;
-                    </p>
-                    <p className="font-bold text-[#1e365c]">- Mike R.</p>
-                  </CardContent>
-                </Card>
-                <Card className="bg-white">
-                  <CardContent className="p-6">
-                    <p className="text-gray-600 mb-4">
-                      &quot;The expert advice I received helped me choose the perfect products for
-                      my new swim spa. Thank you, BonaVista!&quot;
-                    </p>
-                    <p className="font-bold text-[#1e365c]">- Emily L.</p>
-                  </CardContent>
-                </Card>
-              </div>
-            </section>
           </div>
-        </main>
+        </div>
       </div>
     </Suspense>
   )

@@ -317,13 +317,13 @@ export async function addToCart(cartItem: CartItem): Promise<Cart | null> {
 
     // Find the index of the item in the cart that matches the new item
     // This checks both the product ID and variant (if applicable)
-    const existingItemIndex = cart.items.findIndex(({ product: existingProduct, variant }) => {
+    const existingItemIndex = cart.items.findIndex(({ product: existingProduct, variantId }) => {
       const existingProductId =
         typeof existingProduct === 'string' ? existingProduct : existingProduct?.id
       const newProductId =
         typeof cartItem.product === 'string' ? cartItem.product : cartItem.product?.id
-      const existingVariantId = variant?.id ?? null
-      const newVariantId = cartItem.variant?.id ?? null
+      const existingVariantId = variantId ?? null
+      const newVariantId = cartItem.variantId ?? null
 
       return existingProductId === newProductId && existingVariantId === newVariantId
     })
@@ -344,20 +344,14 @@ export async function addToCart(cartItem: CartItem): Promise<Cart | null> {
           (updatedCartItems[existingItemIndex].quantity || 0) + // Current quantity (default to 0 if undefined)
             (cartItem.quantity || 0), // New quantity to add (default to 0 if undefined)
         ),
-        variant: {
-          id: cartItem.variant?.id,
-          variantOptions: cartItem.variant?.variantOptions,
-        },
       }
     } else {
       updatedCartItems.push({
         id: cartItem.id,
         product: productId,
         price: cartItem.price,
-        variant: {
-          id: cartItem.variant?.id,
-          variantOptions: cartItem.variant?.variantOptions,
-        },
+        variantId: cartItem.variantId,
+        variantOptions: cartItem.variantOptions,
         isVariant: cartItem.isVariant,
         quantity: Math.max(0, cartItem.quantity || 0), // Ensure quantity is never negative
       })
@@ -431,9 +425,9 @@ export async function deleteCartItem({
       updatedCartItems = cart.items.filter((item) => {
         const existingProductId = typeof item.product === 'string' ? item.product : item.product?.id
         // If variant is provided, only delete items matching both ID and variant options
-        if (cartItem?.variant) {
-          const existingVariantId = item.variant?.id ?? null
-          const newVariantId = cartItem.variant?.id ?? null
+        if (cartItem?.variantId) {
+          const existingVariantId = item.variantId ?? null
+          const newVariantId = cartItem.variantId ?? null
           return !(existingProductId === productId && existingVariantId === newVariantId)
         }
         // If no variant, just filter by ID

@@ -28,7 +28,7 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
     const isVariant = line.isVariant
     const variantProduct = isVariant
       ? (product?.variants.variantProducts.find(
-          (v) => v.id === line.variant.id,
+          (v) => v.id === line.variantId,
         ) as EnhancedProductVariant)
       : null
 
@@ -56,7 +56,7 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
       thumbnailMediaId: thumbnail,
       isVariant: isVariant,
       variant: {
-        id: line.variant?.id,
+        id: line.variantId,
         variantOptions: variantOptions,
       },
     }

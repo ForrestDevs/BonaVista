@@ -14,22 +14,20 @@ export type CartItems =
   | {
       product: string | Product;
       isVariant?: boolean | null;
-      variant?: {
-        variantOptions?:
-          | {
-              key?: {
-                slug?: string | null;
-                label?: string | null;
-              };
-              value?: {
-                slug?: string | null;
-                label?: string | null;
-              };
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      };
+      variantId?: string | null;
+      variantOptions?:
+        | {
+            key?: {
+              slug?: string | null;
+              label?: string | null;
+            };
+            value?: {
+              slug?: string | null;
+              label?: string | null;
+            };
+            id?: string | null;
+          }[]
+        | null;
       price: number;
       quantity: number;
       url?: string | null;
@@ -1912,25 +1910,21 @@ export interface CartSelect<T extends boolean = true> {
 export interface CartItemsSelect<T extends boolean = true> {
   product?: T;
   isVariant?: T;
-  variant?:
+  variantId?: T;
+  variantOptions?:
     | T
     | {
-        variantOptions?:
+        key?:
           | T
           | {
-              key?:
-                | T
-                | {
-                    slug?: T;
-                    label?: T;
-                  };
-              value?:
-                | T
-                | {
-                    slug?: T;
-                    label?: T;
-                  };
-              id?: T;
+              slug?: T;
+              label?: T;
+            };
+        value?:
+          | T
+          | {
+              slug?: T;
+              label?: T;
             };
         id?: T;
       };
