@@ -150,10 +150,11 @@ fix preview urls to use server action
 
 
 sitemaps: 
-  - pages sitemap
-  - blog (posts) sitemap
-  - hot tubs / swimspas sitemap
   - products sitemap
   - product categories sitemap
-  
 
+
+cache optimizations:
+   - blog-cateogires (revalidateTag)
+   - posts (revalidateTag)
+   - pages (revalidateTag)

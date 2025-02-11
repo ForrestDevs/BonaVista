@@ -3,7 +3,7 @@ import type { Post } from '@/payload-types'
 import { PostCard } from '@/components/marketing/blog/post-card'
 
 type Args = {
-  posts: Post[]
+  posts: Omit<Post, 'content' | 'updatedAt' | 'createdAt'>[]
 }
 
 export function PostArchive({ posts }: Args) {

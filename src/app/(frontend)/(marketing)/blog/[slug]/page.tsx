@@ -4,21 +4,22 @@ import getPayload from '@lib/utils/getPayload'
 
 import { RelatedPosts } from '@/components/payload/blocks/RelatedPosts'
 import { PayloadRedirects } from '@/components/payload/PayloadRedirects'
-import { draftMode, headers } from 'next/headers'
+import { draftMode } from 'next/headers'
 
 import RichText from '@/components/payload/RichText'
 import type { Post } from '@/payload-types'
 
 import { PostHero } from '@/components/payload/heros/PostHero'
 import { generateMeta } from '@/lib/utils/generateMeta'
+import { POST_SLUG } from '@/payload/collections/constants'
+import { queryPostBySlug } from '@/lib/utils/queryBySlug'
 
 export async function generateStaticParams() {
   const payload = await getPayload()
 
   const { docs } = await payload.find({
-    collection: 'posts',
+    collection: POST_SLUG,
     draft: false,
-    limit: 1000,
     overrideAccess: false,
   })
 
@@ -42,11 +43,8 @@ export default async function Post({ params }: { params: Params }) {
 
   return (
     <article className="pt-16 pb-16">
-      {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />
-
       <PostHero post={post} />
-
       <div className="flex flex-col gap-4 pt-8">
         <div className="container lg:grid lg:grid-cols-[1fr_48rem_1fr] grid-rows-[1fr]">
           <RichText
@@ -69,25 +67,5 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { slug } = await params
   const post = await queryPostBySlug({ slug })
 
-  return generateMeta({ doc: post, collectionSlug: 'posts' })
+  return generateMeta({ doc: post, collectionSlug: POST_SLUG })
 }
-
-const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = await draftMode()
-
-  const payload = await getPayload()
-
-  const result = await payload.find({
-    collection: 'posts',
-    draft,
-    limit: 1,
-    overrideAccess: draft,
-    where: {
-      slug: {
-        equals: slug,
-      },
-    },
-  })
-
-  return result.docs?.[0] || null
-})

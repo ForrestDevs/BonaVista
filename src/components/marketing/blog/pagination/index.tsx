@@ -3,6 +3,7 @@ import getPayload from '@/lib/utils/getPayload'
 import { Pagination } from '@/components/marketing/blog/pagination/pagination'
 import { PostArchive } from '@/components/marketing/blog/post-archive'
 import { PageRange } from '@/components/marketing/blog/pagination/page-range'
+import { POST_SLUG } from '@/payload/collections/constants'
 
 type Props = {
   category?: string
@@ -13,9 +14,17 @@ export default async function FilteredPagination({ category, page }: Props) {
   const payload = await getPayload()
 
   const posts = await payload.find({
-    collection: 'posts',
+    collection: POST_SLUG,
     depth: 1,
     limit: 9,
+    overrideAccess: false,
+    select: {
+      title: true,
+      slug: true,
+      publishedAt: true,
+      meta: true,
+      categories: true,
+    },
     ...(category && {
       where: {
         categories: {

@@ -125,36 +125,26 @@ const Posts: CollectionConfig = {
           name: 'meta',
           label: 'SEO',
           fields: [
-            {
-              name: 'title',
-              type: 'text',
-            },
-            {
-              name: 'description',
-              type: 'textarea',
-            },
-            {
-              name: 'image',
-              type: 'upload',
-              relationTo: 'media',
-            },
             OverviewField({
               titlePath: 'meta.title',
               descriptionPath: 'meta.description',
               imagePath: 'meta.image',
             }),
-            // MetaTitleField({
-            //   hasGenerateFn: true,
-            // }),
-            // MetaImageField({
-            //   relationTo: 'media',
-            // }),
-            // MetaDescriptionField({}),
+            MetaTitleField({
+              hasGenerateFn: true,
+            }),
+            MetaImageField({
+              relationTo: 'media',
+            }),
+            MetaDescriptionField({
+              overrides: {
+                maxLength: 200,
+              },
+            }),
             PreviewField({
               // if the `generateUrl` function is configured
               hasGenerateFn: true,
               // field paths to match the target field for data
-              
               titlePath: 'meta.title',
               descriptionPath: 'meta.description',
             }),

@@ -11,22 +11,24 @@ import { Footer } from '@/components/layout/footers/site'
 import getPayload from '@/lib/utils/getPayload'
 
 export async function generateMetadata(): Promise<Metadata> {
-  // const payload = await getPayload()
+  const payload = await getPayload()
 
-  // const initData = await payload.findGlobal({
-  //   slug: 'site-settings',
-  // })
+  const initData = await payload.findGlobal({
+    slug: 'site-settings',
+  })
 
   return {
-    title: 'BonaVista Leisurescapes',
-    description: 'BonaVista Leisurescapes',
+    title: initData?.general?.appName || 'BonaVista LeisureScapes',
+    description:
+      initData?.general?.appDescription ||
+      "Toronto's premier destination for luxury hot tubs, swim spas, and outdoor living solutions. Experience BonaVista Leisurescapes' expert guidance, premium Hydropool products, and award-winning customer service.",
     metadataBase: new URL(
       process.env.NEXT_PUBLIC_SERVER_URL || 'https://bonavistaleisurescapes.com',
     ),
     openGraph: mergeOpenGraph(),
     twitter: {
       card: 'summary_large_image',
-      creator: 'BonaVista Leisurescapes',
+      creator: '@bonavistaleisurescapes',
     },
   }
 }
@@ -57,7 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </main>
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`
+            __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`,
           }}
         />
         <script

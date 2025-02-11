@@ -11,7 +11,7 @@ import { Media } from '@components/payload/Media'
 export const PostCard: React.FC<{
   alignItems?: 'center'
   className?: string
-  doc?: Post
+  doc?: Omit<Post, 'content' | 'updatedAt' | 'createdAt'>
   showCategories?: boolean
   title?: string
 }> = (props) => {

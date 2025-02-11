@@ -5,7 +5,10 @@ import getPayload from '@/lib/utils/getPayload'
 import { StandardHero } from '@/components/payload/heros/Standard'
 import { RenderHero } from '@/components/payload/heros'
 import { RenderBlocks } from '@/components/payload/blocks'
-import { queryPageBySlug } from '@/lib/utils/queryPageBySlug'
+import { queryPageBySlug } from '@/lib/utils/queryBySlug'
+import { generateMeta } from '@/lib/utils/generateMeta'
+import { PAGE_SLUG } from '@/payload/collections/constants'
+import { Metadata } from 'next'
 
 export default async function GalleryHome() {
   const payload = await getPayload()
@@ -27,4 +30,10 @@ export default async function GalleryHome() {
       </Suspense>
     </div>
   )
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await queryPageBySlug('gallery')
+
+  return generateMeta({ doc: page, collectionSlug: PAGE_SLUG })
 }

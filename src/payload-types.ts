@@ -941,8 +941,11 @@ export interface Post {
   categories?: (string | BlogCategory)[] | null;
   meta?: {
     title?: string | null;
-    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
     image?: (string | null) | Media;
+    description?: string | null;
   };
   publishedAt?: string | null;
   authors?: (string | User)[] | null;
@@ -1489,6 +1492,14 @@ export interface Spa {
   detailsLink?: string | null;
   quoteLink?: string | null;
   financingLink?: string | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -2538,8 +2549,8 @@ export interface PostsSelect<T extends boolean = true> {
     | T
     | {
         title?: T;
-        description?: T;
         image?: T;
+        description?: T;
       };
   publishedAt?: T;
   authors?: T;
@@ -2688,6 +2699,13 @@ export interface SpasSelect<T extends boolean = true> {
   detailsLink?: T;
   quoteLink?: T;
   financingLink?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

@@ -8,6 +8,10 @@ import { RenderHero } from '@components/payload/heros'
 import { generateMeta } from '@/lib/utils/generateMeta'
 import getPayload from '@/lib/utils/getPayload'
 import { notFound } from 'next/navigation'
+import { queryPageBySlug } from '@/lib/utils/queryBySlug'
+import type { RequiredDataFromCollectionSlug } from 'payload'
+import { PAGE_SLUG } from '@/payload/collections/constants'
+
 type Args = {
   params: Promise<{
     slug?: string[] | undefined
@@ -20,14 +24,11 @@ export default async function Page({ params: paramsPromise }: Args) {
   const lastSlug = slug[slug.length - 1]
   const url = '/' + slug
 
-  let page: PageType | null
+  let page: RequiredDataFromCollectionSlug<typeof PAGE_SLUG> | null
 
-  page = await queryPageBySlug({
-    slug: lastSlug,
-  })
+  page = await queryPageBySlug(lastSlug)
 
   if (!page) {
-    // return notFound()
     return <PayloadRedirects url={url} />
   }
 
@@ -51,37 +52,10 @@ export async function generateMetadata({
   const slug = params.slug || ['home']
   const lastSlug = slug[slug.length - 1]
 
-  const page = await queryPageBySlug({
-    slug: lastSlug,
-  })
+  const page = await queryPageBySlug(lastSlug)
 
-  // return generateMeta({ doc: page, collectionSlug: 'pages' })
-
-  return {
-    title: page?.meta?.title,
-    description: page?.meta?.description,
-  }
+  return generateMeta({ doc: page, collectionSlug: PAGE_SLUG })
 }
-
-const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = await draftMode()
-
-  const payload = await getPayload()
-
-  const result = await payload.find({
-    collection: 'pages',
-    draft,
-    limit: 1,
-    overrideAccess: draft,
-    where: {
-      slug: {
-        equals: slug,
-      },
-    },
-  })
-
-  return result.docs?.[0] || null
-})
 
 export async function generateStaticParams() {
   let paths: { slug: string[] }[] = []

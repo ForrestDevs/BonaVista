@@ -1,4 +1,10 @@
 import React from 'react'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Terms of Service | BonaVista LeisureScapes',
+  description: 'The terms of service for BonaVista LeisureScapes website',
+}
 
 export default function TermsOfService() {
   return (

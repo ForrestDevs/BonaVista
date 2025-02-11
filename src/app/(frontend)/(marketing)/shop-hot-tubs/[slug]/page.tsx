@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import getPayload from '@/lib/utils/getPayload'
 import { Spa } from '@/payload-types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -7,30 +7,37 @@ import { Button } from '@/components/ui/button'
 import { Droplets, Tag, Users } from 'lucide-react'
 import Image from 'next/image'
 import { FaCompactDisc } from 'react-icons/fa'
+import LoadingPage from '@/components/layout/suspense/loading-page'
+import { querySpaBySlug } from '@/lib/utils/queryBySlug'
+import { SPA_SLUG } from '@/payload/collections/constants'
+import { generateMeta } from '@/lib/utils/generateMeta'
+import { Metadata } from 'next'
 
 type Args = {
   params: Promise<{ slug?: string }>
 }
 
+export async function generateMetadata({ params }: Args): Promise<Metadata> {
+  const { slug } = await params
+  const spa = await querySpaBySlug(slug)
+
+
+  return generateMeta({ doc: spa, collectionSlug: SPA_SLUG })
+}
+
 export default async function HotTubProductPage({ params }: Args) {
   const { slug } = await params
-  const payload = await getPayload()
-  const product = await payload
-    .find({
-      collection: 'spas',
-      where: {
-        slug: { equals: slug },
-      },
-    })
-    .then(({ docs }) => docs[0])
+  const spa = await querySpaBySlug(slug)
 
   return (
-    <div className="flex flex-col min-h-screen space-y-10">
-      <Hero product={product} />
-      <Banner product={product} />
-      <ThreeDModel link={product.threeDModel} title={product.title} />
-      <Specs product={product} />
-    </div>
+    <Suspense fallback={<LoadingPage />}>
+      <div className="flex flex-col min-h-screen space-y-10">
+        <Hero product={spa} />
+        <Banner product={spa} />
+        <ThreeDModel link={spa.threeDModel} title={spa.title} />
+        <Specs product={spa} />
+      </div>
+    </Suspense>
   )
 }
 
@@ -146,8 +153,8 @@ function ThreeDModel({ link, title }: { link: string; title: string }) {
     <div className="container">
       <div className="flex flex-col space-y-4 px-14 my-10 mb-20 justify-center items-center">
         <h3 className="text-center text-3xl lg:text-4xl font-bold">
-          View the {title}<span className="text-muted-foreground">™</span> Hot Tub in your own
-          backyard
+          View the {title}
+          <span className="text-muted-foreground">™</span> Hot Tub in your own backyard
         </h3>
         <p className="text-center text-muted-foreground max-w-4xl">
           Explore every inch of this hot tub with an innovative 3D view! Take a closer look at the

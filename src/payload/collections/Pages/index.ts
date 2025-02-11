@@ -84,12 +84,14 @@ const Pages: CollectionConfig = {
             MetaImageField({
               relationTo: 'media',
             }),
-
-            MetaDescriptionField({}),
+            MetaDescriptionField({
+              overrides: {
+                maxLength: 200,
+              },
+            }),
             PreviewField({
               // if the `generateUrl` function is configured
               hasGenerateFn: true,
-
               // field paths to match the target field for data
               titlePath: 'meta.title',
               descriptionPath: 'meta.description',

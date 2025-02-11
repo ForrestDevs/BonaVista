@@ -1,6 +1,6 @@
 import React from 'react'
 import getPayload from '@/lib/utils/getPayload'
-import { queryPageBySlug } from '@/lib/utils/queryPageBySlug'
+import { queryPageBySlug } from '@/lib/utils/queryBySlug'
 import { RenderHero } from '@/components/payload/heros'
 import { RenderBlocks } from '@/components/payload/blocks'
 import { Spa } from '@payload-types'
@@ -13,7 +13,7 @@ import { SearchParams } from 'nuqs'
 import { filterParamsCache } from './searchParams'
 
 type PageProps = {
-  searchParams: Promise<SearchParams> // Next.js 15+: async searchParams prop
+  searchParams: Promise<SearchParams>
 }
 
 export default async function ShopHotTubsHome({ searchParams }: PageProps) {

@@ -1,6 +1,11 @@
 import { Plugin } from 'payload'
-import { Page, Post } from '@/payload-types'
-import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
+import { Page, Post, Spa } from '@/payload-types'
+import {
+  GenerateDescription,
+  GenerateImage,
+  GenerateTitle,
+  GenerateURL,
+} from '@payloadcms/plugin-seo/types'
 import { getServerSideURL } from '@/lib/utils/getURL'
 
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
@@ -10,9 +15,20 @@ import { revalidateRedirects } from '../hooks/revalidateRedirects'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 
-const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
+const generateDescription: GenerateDescription<Spa> = ({ doc }) => {
+  return (
+    doc.description +
+      ` Experience the ultimate in luxury hydrotherapy and wellness with BonaVista Leisurescapes, Toronto's premier Hydropool dealer.` ||
+    'BonaVista Leisurescapes'
+  )
 }
+
+const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
+  return doc?.title
+    ? `${doc.title} | BonaVista Leisurescapes`
+    : 'BonaVista Leisurescapes'
+}
+
 
 const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
   const url = getServerSideURL()
@@ -51,6 +67,7 @@ export const plugins: Plugin[] = [
   seoPlugin({
     generateTitle,
     generateURL,
+    generateDescription,
   }),
   vercelBlobStorage({
     collections: {
@@ -58,7 +75,6 @@ export const plugins: Plugin[] = [
         prefix: 'bonavista/',
       },
     },
-    // Token provided by Vercel once Blob storage is added to your Vercel project
     token: process.env.BLOB_READ_WRITE_TOKEN,
   }),
 ]

@@ -2,6 +2,11 @@ import type { CollectionConfig } from 'payload'
 import { anyone, admins } from '@payload/access'
 import { SPA_SLUG } from '../constants'
 import { slugField } from '@/payload/fields/slug'
+import { MetaTitleField, OverviewField } from '@payloadcms/plugin-seo/fields'
+import { MetaImageField } from '@payloadcms/plugin-seo/fields'
+import { MetaDescriptionField } from '@payloadcms/plugin-seo/fields'
+import { PreviewField } from '@payloadcms/plugin-seo/fields'
+import { revalidateSpa } from './hooks/revalidateSpa'
 
 export const Spas: CollectionConfig = {
   slug: SPA_SLUG,
@@ -385,9 +390,43 @@ export const Spas: CollectionConfig = {
             },
           ],
         },
+        // SEO
+        {
+          name: 'meta',
+          label: 'SEO',
+          fields: [
+            OverviewField({
+              titlePath: 'meta.title',
+              descriptionPath: 'meta.description',
+              imagePath: 'meta.image',
+            }),
+            MetaTitleField({
+              hasGenerateFn: true,
+            }),
+            MetaImageField({
+              relationTo: 'media',
+            }),
+            MetaDescriptionField({
+              hasGenerateFn: true,
+              overrides: {
+                maxLength: 250,
+              },
+            }),
+            PreviewField({
+              // if the `generateUrl` function is configured
+              hasGenerateFn: true,
+              // field paths to match the target field for data
+              titlePath: 'meta.title',
+              descriptionPath: 'meta.description',
+            }),
+          ],
+        },
       ],
     },
   ],
+  hooks: {
+    afterChange: [revalidateSpa],
+  },
 } as const
 
 export default Spas
