@@ -2,7 +2,7 @@ import path from 'path'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 import { buildConfig } from 'payload'
-import { mongooseAdapter } from '@payloadcms/db-mongodb'
+import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
 import {
   UnderlineFeature,
   IndentFeature,
@@ -92,9 +92,16 @@ export default buildConfig({
       ]
     },
   }),
-  db: mongooseAdapter({
-    url: process.env.DATABASE_URI || '',
-    transactionOptions: false,
+  // db: mongooseAdapter({
+  //   url: process.env.DATABASE_URI || '',
+  //   transactionOptions: false,
+  // }),
+  db: vercelPostgresAdapter({
+    pool: {
+      connectionString:
+        process.env.DATABASE_URI || 'postgresql://forrestdevs:@localhost:5432/bv-dev',
+    },
+    migrationDir: path.resolve(dirname, 'lib/migrations'),
   }),
   collections,
   globals,
@@ -147,9 +154,9 @@ export default buildConfig({
   //     await payload.create({
   //       collection: 'users',
   //       data: {
-  //         name: 'Dev User',
-  //         email: 'dev@payloadcms.com',
-  //         password: 'test',
+  //         name: 'ForrestDev',
+  //         email: 'admin@bonavistaleisurescapes.com',
+  //         password: 'devs',
   //         roles: ['admin'],
   //       },
   //     })

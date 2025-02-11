@@ -18,13 +18,13 @@ export interface StripeAddress {
 }
 
 export interface CheckoutLineItem {
-  productId: string
+  productId: number
   title: string
   sku: string
   description?: string
   price: number
   quantity: number
-  thumbnailMediaId?: string
+  thumbnailMediaId?: number
   isVariant?: boolean
   variant?: {
     id?: string
@@ -42,8 +42,8 @@ export interface CheckoutLineItem {
 }
 
 export interface CheckoutSession {
-  id: string
-  cartId: string
+  id: number
+  cartId: number
   paymentIntentId: string
   clientSecret: string
   amount: number
@@ -52,7 +52,7 @@ export interface CheckoutSession {
   lineItems: CheckoutLineItem[]
   stripeCustomerId?: string
   customerEmail?: string
-  customerId?: string
+  customerId?: number
   steps: {
     email: {
       completed: boolean
@@ -91,7 +91,7 @@ export interface BeginCheckoutParams {
   lineItems: CheckoutLineItem[]
   stripeCustomerId?: string
   customerEmail?: string
-  customerId?: string
+  customerId?: number
   redirectTo: string
   metadata?: Record<string, string>
 }

@@ -53,7 +53,7 @@ export const navItem: NavItemType = ({ overrides = {} } = {}) => {
   ]
 
   const navItemResult: Field = {
-    name: 'navItem',
+    name: 'item',
     type: 'group',
     fields: [
       {
@@ -113,7 +113,7 @@ export const navItem: NavItemType = ({ overrides = {} } = {}) => {
               singular: 'Sublink',
               plural: 'Sublinks',
             },
-            name: 'sublinks',
+            name: 'links',
             type: 'array',
             fields: [
               {

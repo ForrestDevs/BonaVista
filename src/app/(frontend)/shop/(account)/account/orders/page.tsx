@@ -72,7 +72,7 @@ export default async function Orders() {
                   </div>
                   <div className="space-y-1 sm:text-right">
                     <p className="text-sm text-gray-500">Order number</p>
-                    <p className="font-medium text-blue-600">#{order.id.slice(0, 8)}</p>
+                    <p className="font-medium text-blue-600">#{order.id.toString().slice(0, 8)}</p>
                   </div>
                   <div className="space-y-1 sm:text-right">
                     <p className="text-sm text-gray-500">Total amount</p>

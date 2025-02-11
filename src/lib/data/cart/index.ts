@@ -11,7 +11,7 @@ import { cache } from '@/lib/utils/cache'
 
 export async function returnOrCreateCart(
   cart: Cart | null,
-  customerId?: string,
+  customerId?: number,
 ): Promise<Cart | null> {
   if (cart) {
     return cart
@@ -35,7 +35,7 @@ export async function getGuestCart(): Promise<Cart | null> {
   return null
 }
 
-export async function getCustomerCart(customerId: string): Promise<Cart | null> {
+export async function getCustomerCart(customerId: number): Promise<Cart | null> {
   const payload = await getPayload()
 
   try {
@@ -59,7 +59,7 @@ export async function getCustomerCart(customerId: string): Promise<Cart | null> 
   }
 }
 
-export async function createCart(customerId?: string): Promise<Cart | null> {
+export async function createCart(customerId?: number): Promise<Cart | null> {
   const payload = await getPayload()
 
   try {
@@ -94,7 +94,7 @@ export async function createCart(customerId?: string): Promise<Cart | null> {
  * @returns A Promise that resolves to the cart object if found, null otherwise.
  */
 export const getCartById = cache(
-  async (id: string, depth?: number): Promise<Cart | null> => {
+  async (id: number, depth?: number): Promise<Cart | null> => {
     const payload = await getPayload()
     try {
       const cart = await payload.findByID({
@@ -124,7 +124,7 @@ export const getCartById = cache(
 export async function getCart(depth?: number): Promise<Cart | null> {
   const customer = await getCustomer()
   if (customer) {
-    const cartId = typeof customer.cart === 'string' ? customer.cart : customer.cart?.id
+    const cartId = typeof customer.cart === 'number' ? customer.cart : customer.cart?.id
     const cart = await getCartById(cartId, depth)
     if (!cart) {
       return null
@@ -147,7 +147,7 @@ export async function getOrSetCart(): Promise<Cart | null> {
   const customer = await getCustomer()
   if (customer) {
     if (customer.cart) {
-      const cartID = typeof customer.cart === 'string' ? customer.cart : customer.cart?.id
+      const cartID = typeof customer.cart === 'number' ? customer.cart : customer.cart?.id
       const cart = await getCartById(cartID)
       if (!cart) {
         return null
@@ -220,7 +220,7 @@ function mergeItems(guestCart: Cart, customerCart: Cart): CartItem[] {
  * @param customerId The ID of the customer to merge the cart with
  * @returns The updated customer cart or null if an error occurs
  */
-export async function mergeCarts(customerId: string): Promise<Cart | null> {
+export async function mergeCarts(customerId: number): Promise<Cart | null> {
   const [payload, guestCart, customerCart] = await Promise.all([
     getPayload(),
     getGuestCart(),

@@ -15,11 +15,11 @@ export const Header: GlobalConfig = {
       type: 'tabs',
       tabs: [
         {
-          name: 'siteHeader',
+          name: 'site',
           label: 'Site Header',
           fields: [
             {
-              name: 'navItems',
+              name: 'items',
               type: 'array',
               fields: [navItem()],
               maxRows: 6,
@@ -27,11 +27,11 @@ export const Header: GlobalConfig = {
           ],
         },
         {
-          name: 'shopHeader',
+          name: 'shop',
           label: 'Shop Header',
           fields: [
             {
-              name: 'navItems',
+              name: 'items',
               type: 'array',
               fields: [navItem()],
               maxRows: 6,
