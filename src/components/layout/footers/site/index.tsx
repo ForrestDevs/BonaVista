@@ -59,13 +59,13 @@ export function Footer() {
         <div className="mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center text-sm">
           <p>&copy; {new Date().getFullYear()} BonaVista Leisurescapes. All rights reserved.</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
-            <Link href="/privacy-policy" className="hover:underline">
+            <Link href="/privacy" className="hover:underline">
               Privacy Policy
             </Link>
-            <Link href="/terms-of-service" className="hover:underline">
+            <Link href="/terms" className="hover:underline">
               Terms of Service
             </Link>
-            <Link href="/sitemap" className="hover:underline">
+            <Link href="/sitemap.xml" className="hover:underline">
               Sitemap
             </Link>
           </div>
