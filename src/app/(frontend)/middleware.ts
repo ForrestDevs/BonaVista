@@ -3,7 +3,6 @@ import type { NextRequest } from 'next/server'
 
 const allowedOrigins = [
   process.env.NEXT_PUBLIC_SERVER_URL,
-  'https://www2.bonavistaleisurescapes.com',
   'https://bonavistaleisurescapes.com',
 ].filter(Boolean) // Filter out any undefined values
 

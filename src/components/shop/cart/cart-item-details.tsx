@@ -7,7 +7,7 @@ export function CartItemThumbnail({ line }: { line: CartItem }) {
   const product = typeof line.product === 'object' ? line.product : null
   const isVariant = line.isVariant
   const thumbnail = isVariant
-    ? product?.variants.variantProducts.find((v) => v.id === line.variant[0].id)?.images[0]?.image
+    ? product?.variants.variantProducts.find((v) => v.id === line.variantId)?.images[0]?.image
     : product?.baseProduct?.images[0]?.image
 
   return (
@@ -37,7 +37,7 @@ export default function CartItemDetails({ item }: { item: CartItem }) {
   const productTitle = typeof item.product === 'object' ? item.product.title : item.product
   const isVariant = item.isVariant
   const variantOptions = isVariant
-    ? item.variant.variantOptions.map((v) => v.value.label).join(', ')
+    ? item.variantOptions?.map((v) => v.value.label).join(', ')
     : null
 
   return (
