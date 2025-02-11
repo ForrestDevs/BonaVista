@@ -11,15 +11,15 @@ import { Footer } from '@/components/layout/footers/site'
 import getPayload from '@/lib/utils/getPayload'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const payload = await getPayload()
+  // const payload = await getPayload()
 
-  const initData = await payload.findGlobal({
-    slug: 'site-settings',
-  })
+  // const initData = await payload.findGlobal({
+  //   slug: 'site-settings',
+  // })
 
   return {
-    title: initData?.general?.appName as string,
-    description: initData?.general?.appDescription as string,
+    title: 'BonaVista Leisurescapes',
+    description: 'BonaVista Leisurescapes',
     metadataBase: new URL(
       process.env.NEXT_PUBLIC_SERVER_URL || 'https://bonavistaleisurescapes.com',
     ),

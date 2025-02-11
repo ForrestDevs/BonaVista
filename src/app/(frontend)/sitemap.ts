@@ -5,7 +5,7 @@ import { Page } from '@payload-types'
 import { cache } from '@/lib/utils/cache'
 import getPayload from '@/lib/utils/getPayload'
 
-export async function generateSitemaps() {
+export async function getBaseRoutes() {
   const payload = await getPayload()
 
   // Fetch all page slugs from the database
@@ -20,8 +20,8 @@ export async function generateSitemaps() {
     '/',
     '/blog',
     '/gallery',
-    '/privacy-policy',
-    '/terms-of-service',
+    '/privacy',
+    '/terms',
     '/shop-hot-tubs',
     '/shop-swim-spas',
     '/shop',
@@ -46,7 +46,7 @@ export async function generateSitemaps() {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const routes = await generateSitemaps()
+  const routes = await getBaseRoutes()
 
   const returnRoutes = routes.map((route) => ({
     url: `${process.env.NEXT_PUBLIC_URL}${route.route === '' ? '' : `/${route.route}`}`,
@@ -62,5 +62,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route.route === '' ? 1 : 0.8, // Higher priority for homepage
   }))
 
-  return returnRoutes
+  return [...returnRoutes]
 }

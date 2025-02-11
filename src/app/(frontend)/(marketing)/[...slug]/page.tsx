@@ -7,7 +7,7 @@ import { RenderBlocks } from '@components/payload/blocks'
 import { RenderHero } from '@components/payload/heros'
 import { generateMeta } from '@/lib/utils/generateMeta'
 import getPayload from '@/lib/utils/getPayload'
-
+import { notFound } from 'next/navigation'
 type Args = {
   params: Promise<{
     slug?: string[] | undefined
@@ -27,6 +27,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   })
 
   if (!page) {
+    // return notFound()
     return <PayloadRedirects url={url} />
   }
 

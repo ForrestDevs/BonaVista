@@ -146,3 +146,14 @@ check variant issue + stripe Customer ID issues with checkout and creating payme
 
 fix shipping price miscalculation
 fix preview urls to use server action
+
+
+
+sitemaps: 
+  - pages sitemap
+  - blog (posts) sitemap
+  - hot tubs / swimspas sitemap
+  - products sitemap
+  - product categories sitemap
+  
+
