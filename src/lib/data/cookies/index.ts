@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { safeJsonParse } from '@lib/utils/safeJSONParse'
 import { revalidateTag } from 'next/cache'
 
-export type CartCookieJson = { id: string; linesCount: number }
+export type CartCookieJson = { id: number; linesCount: number }
 
 export async function getCartCookie(): Promise<null | CartCookieJson> {
   const cookiesValue = await cookies()
@@ -15,7 +15,7 @@ export async function getCartCookie(): Promise<null | CartCookieJson> {
     typeof cartCookieJson !== 'object' ||
     !('id' in cartCookieJson) ||
     !('linesCount' in cartCookieJson) ||
-    typeof cartCookieJson.id !== 'string' ||
+    typeof cartCookieJson.id !== 'number' ||
     typeof cartCookieJson.linesCount !== 'number'
   ) {
     return null
@@ -48,7 +48,7 @@ export async function deleteCartCookie() {
   revalidateTag(`cart-${cookie.id}`)
 }
 
-export async function deleteCartCookieById(id: string) {
+export async function deleteCartCookieById(id: number) {
   const cookie = await getCartCookie()
   if (cookie?.id === id) {
     const cookiestore = await cookies()

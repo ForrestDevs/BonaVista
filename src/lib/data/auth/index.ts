@@ -30,7 +30,7 @@ export async function login(data: LoginSchema) {
     return { message: 'Invalid email or password' }
   }
 
-  const customerId = typeof user?.customer === 'string' ? user.customer : user.customer.id
+  const customerId = typeof user?.customer === 'number' ? user.customer : user.customer.id
 
   console.log('merging carts')
   const mergedCarts = await mergeCarts(customerId)

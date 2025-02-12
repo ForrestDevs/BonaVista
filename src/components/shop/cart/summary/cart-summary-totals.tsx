@@ -44,7 +44,7 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
       ? (variantProduct?.images[0]?.image ?? null)
       : (product?.baseProduct?.images[0]?.image ?? null)
 
-    const thumbnail = typeof media === 'string' ? media : media?.id
+    const thumbnail = typeof media === 'number' ? media : media?.id
 
     const newCheckoutLineItem: CheckoutLineItem = {
       productId: productId,
@@ -109,7 +109,7 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
           amount={subtotal}
           currencyCode="CAD"
           description={`Order for ${cart.items.length} items`}
-          cartId={cart.id}
+          cartId={cart.id.toString()}
           lineItems={lineItems}
           stripeCustomerId={customer?.stripeCustomerId}
           customerEmail={customer?.email}

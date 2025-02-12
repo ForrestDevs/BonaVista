@@ -8,7 +8,7 @@ import { RemoveScroll } from 'react-remove-scroll'
 import { cn } from '@/lib/utils/cn'
 
 export default async function MarketingHeader() {
-  const header = await getCachedGlobal<'header'>('header')
+  const header = await getCachedGlobal('header')
 
   if (!header) return null
 

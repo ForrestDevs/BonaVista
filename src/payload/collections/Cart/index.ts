@@ -12,7 +12,7 @@ const Cart: CollectionConfig = {
     delete: admins,
   },
   admin: {
-    group: 'Shop',
+    group: 'Ecommerce',
     useAsTitle: 'id',
   },
   fields: [
@@ -45,7 +45,7 @@ const Cart: CollectionConfig = {
             },
             {
               name: 'variantId',
-              type: 'text',
+              type: 'number',
             },
             {
               name: 'variantOptions',

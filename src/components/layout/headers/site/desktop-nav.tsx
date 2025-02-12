@@ -18,26 +18,31 @@ export const DesktopNav: React.FC<{ className?: string; header: Header }> = ({
   return (
     <NavigationMenu className={className}>
       <NavigationMenuList className="flex flex-1 list-none items-center justify-center space-x-5 lg:space-x-6">
-        {header.siteHeader.navItems.map((item, index) => (
+        {header.site.items.map(({ item }, index) => (
           <NavigationMenuItem key={index}>
-            {item.navItem.submenu?.length > 0 ? (
+            {item.submenu?.length > 0 ? (
               <>
-                <Trigger>{item.navItem.label}</Trigger>
+                <Trigger>{item.label}</Trigger>
                 <NavigationMenuContent className={submenusContentClass()}>
                   <NavigationMenuSub className="w-full">
                     <NavigationMenuList className="flex flex-row gap-8 items-start justify-center h-fit">
-                      {item.navItem.submenu.map((subItem) => (
-                        <NavigationMenuItem key={subItem.label} className="relative">
+                      {item.submenu.map((subItem) => (
+                        <NavigationMenuItem key={subItem.id} className="relative">
                           <Trigger
-                            showChevron={subItem.sublinks?.length > 0}
+                            showChevron={subItem.links?.length > 0}
                             className="py-2 flex items-center gap-1 hover:underline font-medium"
                           >
-                            <SingleLink link={subItem.link} title={subItem.label} variant="none" />
+                            <SingleLink
+                              link={subItem.link}
+                              title={subItem.label}
+                              variant="none"
+                              isNavItem={!subItem.isLink}
+                            />
                           </Trigger>
-                          {subItem.sublinks && subItem.sublinks.length > 0 && (
+                          {subItem.links && subItem.links.length > 0 && (
                             <NavigationMenuContent className="absolute top-full left-0 mt-8 p-4 bg-white shadow-lg border border-gray-200 min-w-[200px]">
                               <ul className="flex flex-col gap-2">
-                                {subItem.sublinks.map((subLink) => (
+                                {subItem.links.map((subLink) => (
                                   <li key={subLink.label}>
                                     <SingleLink link={subLink} title={subLink.label} variant="sm" />
                                   </li>
@@ -52,7 +57,7 @@ export const DesktopNav: React.FC<{ className?: string; header: Header }> = ({
                 </NavigationMenuContent>
               </>
             ) : (
-              <SingleLink link={item.navItem.link} title={item.navItem.label} />
+              <SingleLink link={item.link} title={item.label} />
             )}
           </NavigationMenuItem>
         ))}

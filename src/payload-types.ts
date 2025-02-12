@@ -12,9 +12,9 @@
  */
 export type CartItems =
   | {
-      product: string | Product;
+      product: number | Product;
       isVariant?: boolean | null;
-      variantId?: string | null;
+      variantId?: number | null;
       variantOptions?:
         | {
             key?: {
@@ -70,7 +70,7 @@ export type ProductVariant =
         | null;
       images?:
         | {
-            image?: (string | null) | Media;
+            image?: (number | null) | Media;
             id?: string | null;
           }[]
         | null;
@@ -83,45 +83,94 @@ export type ProductVariant =
  */
 export type OrderItems =
   | {
-      product: string | Product;
+      product: number | Product;
       isVariant?: boolean | null;
-      variant?: {
-        variantOptions?:
-          | {
-              key?: {
-                slug?: string | null;
-                label?: string | null;
-              };
-              value?: {
-                slug?: string | null;
-                label?: string | null;
-              };
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      };
+      variantId?: number | null;
+      variantOptions?:
+        | {
+            key?: {
+              slug?: string | null;
+              label?: string | null;
+            };
+            value?: {
+              slug?: string | null;
+              label?: string | null;
+            };
+            id?: string | null;
+          }[]
+        | null;
       price: number;
       quantity: number;
       url?: string | null;
-      thumbnailMediaId?: (string | null) | Media;
+      thumbnail?: (number | null) | Media;
       id?: string | null;
     }[]
   | null;
+/**
+ * Supported timezones in IANA format.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "supportedTimezones".
+ */
+export type SupportedTimezones =
+  | 'Pacific/Midway'
+  | 'Pacific/Niue'
+  | 'Pacific/Honolulu'
+  | 'Pacific/Rarotonga'
+  | 'America/Anchorage'
+  | 'Pacific/Gambier'
+  | 'America/Los_Angeles'
+  | 'America/Tijuana'
+  | 'America/Denver'
+  | 'America/Phoenix'
+  | 'America/Chicago'
+  | 'America/Guatemala'
+  | 'America/New_York'
+  | 'America/Bogota'
+  | 'America/Caracas'
+  | 'America/Santiago'
+  | 'America/Buenos_Aires'
+  | 'America/Sao_Paulo'
+  | 'Atlantic/South_Georgia'
+  | 'Atlantic/Azores'
+  | 'Atlantic/Cape_Verde'
+  | 'Europe/London'
+  | 'Europe/Berlin'
+  | 'Africa/Lagos'
+  | 'Europe/Athens'
+  | 'Africa/Cairo'
+  | 'Europe/Moscow'
+  | 'Asia/Riyadh'
+  | 'Asia/Dubai'
+  | 'Asia/Baku'
+  | 'Asia/Karachi'
+  | 'Asia/Tashkent'
+  | 'Asia/Calcutta'
+  | 'Asia/Dhaka'
+  | 'Asia/Almaty'
+  | 'Asia/Jakarta'
+  | 'Asia/Bangkok'
+  | 'Asia/Shanghai'
+  | 'Asia/Singapore'
+  | 'Asia/Tokyo'
+  | 'Asia/Seoul'
+  | 'Australia/Sydney'
+  | 'Pacific/Guam'
+  | 'Pacific/Noumea'
+  | 'Pacific/Auckland'
+  | 'Pacific/Fiji';
 
 export interface Config {
   auth: {
     users: UserAuthOperations;
   };
   collections: {
-    address: Address;
     'blog-categories': BlogCategory;
     media: Media;
     users: User;
     cart: Cart;
     orders: Order;
     products: Product;
-    'shop-collections': ShopCollection;
     pages: Page;
     posts: Post;
     'product-categories': ProductCategory;
@@ -131,7 +180,6 @@ export interface Config {
     testimonials: Testimonial;
     spas: Spa;
     galleries: Gallery;
-    'media-folders': MediaFolder;
     'form-submissions': FormSubmission;
     'shipping-options': ShippingOption;
     redirects: Redirect;
@@ -144,19 +192,14 @@ export interface Config {
       children: 'product-categories';
       products: 'products';
     };
-    'media-folders': {
-      media: 'media';
-    };
   };
   collectionsSelect: {
-    address: AddressSelect<false> | AddressSelect<true>;
     'blog-categories': BlogCategoriesSelect<false> | BlogCategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     cart: CartSelect<false> | CartSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
-    'shop-collections': ShopCollectionsSelect<false> | ShopCollectionsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
@@ -166,7 +209,6 @@ export interface Config {
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     spas: SpasSelect<false> | SpasSelect<true>;
     galleries: GalleriesSelect<false> | GalleriesSelect<true>;
-    'media-folders': MediaFoldersSelect<false> | MediaFoldersSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     'shipping-options': ShippingOptionsSelect<false> | ShippingOptionsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -175,7 +217,7 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   globals: {
     'site-settings': Settings;
@@ -218,60 +260,115 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "address".
+ * via the `definition` "blog-categories".
  */
-export interface Address {
-  id: string;
-  customer: string | Customer;
-  company: string;
-  first_name: string;
-  last_name: string;
-  address_1: string;
-  address_2: string;
-  city: string;
-  country_code: string;
-  province: string;
-  postal_code: string;
-  phone: string;
-  metadata?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+export interface BlogCategory {
+  id: number;
+  title: string;
+  showInFilter?: boolean | null;
+  slug?: string | null;
+  slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  alt: string;
+  caption?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  firstName?: string | null;
+  lastName?: string | null;
+  name?: string | null;
+  phone?: string | null;
+  roles?: ('admin' | 'customer')[] | null;
+  customer?: (number | null) | Customer;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  _verified?: boolean | null;
+  _verificationToken?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  password?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "customers".
  */
 export interface Customer {
-  id: string;
+  id: number;
   email: string;
   /**
    * Whether the customer is a registered user
    */
   has_account?: boolean | null;
-  account?: (string | null) | User;
+  account?: (number | null) | User;
   stripeCustomerID?: string | null;
-  cart?: (string | null) | Cart;
-  skipSync?: boolean | null;
-  billing_address?:
+  cart?: (number | null) | Cart;
+  billing_addresses?:
     | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  shipping_addresses?:
-    | {
-        address?:
+        company: string;
+        first_name: string;
+        last_name: string;
+        line_1: string;
+        line_2: string;
+        city: string;
+        country: string;
+        state: string;
+        postal_code: string;
+        phone: string;
+        email: string;
+        metadata?:
           | {
               [k: string]: unknown;
             }
@@ -283,7 +380,32 @@ export interface Customer {
         id?: string | null;
       }[]
     | null;
-  orders?: (string | Order)[] | null;
+  shipping_addresses?:
+    | {
+        company: string;
+        first_name: string;
+        last_name: string;
+        line_1: string;
+        line_2: string;
+        city: string;
+        country: string;
+        state: string;
+        postal_code: string;
+        phone: string;
+        email: string;
+        metadata?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  orders?: (number | Order)[] | null;
   /**
    * An optional key-value map with additional details
    */
@@ -301,34 +423,11 @@ export interface Customer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
-export interface User {
-  id: string;
-  firstName?: string | null;
-  lastName?: string | null;
-  name?: string | null;
-  phone?: string | null;
-  roles?: ('admin' | 'customer')[] | null;
-  customer?: (string | null) | Customer;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  password?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cart".
  */
 export interface Cart {
-  id: string;
-  customer?: (string | null) | Customer;
+  id: number;
+  customer?: (number | null) | Customer;
   items?: CartItems;
   payment_intent?:
     | {
@@ -379,12 +478,12 @@ export interface Cart {
  * via the `definition` "products".
  */
 export interface Product {
-  id: string;
+  id: number;
   slug?: string | null;
   slugLock?: boolean | null;
   title: string;
   description?: string | null;
-  relatedProducts?: (string | Product)[] | null;
+  relatedProducts?: (number | Product)[] | null;
   moreInfo?: {
     root: {
       type: string;
@@ -429,7 +528,7 @@ export interface Product {
     price?: number | null;
     images?:
       | {
-          image?: (string | null) | Media;
+          image?: (number | null) | Media;
           id?: string | null;
         }[]
       | null;
@@ -451,9 +550,9 @@ export interface Product {
       | null;
     variantProducts?: ProductVariant;
   };
-  brand?: (string | Brand)[] | null;
-  collections?: (string | ProductCollection)[] | null;
-  categories?: (string | ProductCategory)[] | null;
+  brand?: (number | Brand)[] | null;
+  collections?: (number | ProductCollection)[] | null;
+  categories?: (number | ProductCategory)[] | null;
   /**
    * Select which equipment types this product is compatible with
    */
@@ -464,79 +563,10 @@ export interface Product {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: string;
-  folder?: (string | MediaFolder)[] | null;
-  alt: string;
-  caption?: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  prefix?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    thumbnail?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media-folders".
- */
-export interface MediaFolder {
-  id: string;
-  name: string;
-  media?: {
-    docs?: (string | Media)[] | null;
-    hasNextPage?: boolean | null;
-  } | null;
-  parent?: (string | null) | MediaFolder;
-  breadcrumbs?:
-    | {
-        doc?: (string | null) | MediaFolder;
-        url?: string | null;
-        label?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "brands".
  */
 export interface Brand {
-  id: string;
+  id: number;
   slug?: string | null;
   slugLock?: boolean | null;
   name: string;
@@ -548,7 +578,7 @@ export interface Brand {
  * via the `definition` "product-collections".
  */
 export interface ProductCollection {
-  id: string;
+  id: number;
   slug?: string | null;
   slugLock?: boolean | null;
   title: string;
@@ -570,7 +600,7 @@ export interface ProductCollection {
  * via the `definition` "product-categories".
  */
 export interface ProductCategory {
-  id: string;
+  id: number;
   slug?: string | null;
   slugLock?: boolean | null;
   /**
@@ -582,17 +612,17 @@ export interface ProductCategory {
   /**
    * Select a parent category (leave empty for root categories)
    */
-  parent?: (string | null) | ProductCategory;
+  parent?: (number | null) | ProductCategory;
   /**
    * Indicates if the category is a leaf (i.e. has no children). Products can only be assigned to leaf categories.
    */
   isLeaf?: boolean | null;
   children?: {
-    docs?: (string | ProductCategory)[] | null;
+    docs?: (number | ProductCategory)[] | null;
     hasNextPage?: boolean | null;
   } | null;
   products?: {
-    docs?: (string | Product)[] | null;
+    docs?: (number | Product)[] | null;
     hasNextPage?: boolean | null;
   } | null;
   updatedAt: string;
@@ -603,7 +633,7 @@ export interface ProductCategory {
  * via the `definition` "orders".
  */
 export interface Order {
-  id: string;
+  id: number;
   orderNumber: string;
   status?:
     | (
@@ -616,7 +646,7 @@ export interface Order {
         | 'succeeded'
       )
     | null;
-  orderedBy?: (string | null) | Customer;
+  orderedBy?: (number | null) | Customer;
   stripePaymentIntentID?: string | null;
   shippingRate?: {
     displayName?: string | null;
@@ -640,38 +670,10 @@ export interface Order {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blog-categories".
- */
-export interface BlogCategory {
-  id: string;
-  title: string;
-  showInFilter?: boolean | null;
-  slug?: string | null;
-  slugLock?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "shop-collections".
- */
-export interface ShopCollection {
-  id: string;
-  slug?: string | null;
-  slugLock?: boolean | null;
-  title: string;
-  description?: string | null;
-  publishedOn?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
  */
 export interface Page {
-  id: string;
+  id: number;
   slug?: string | null;
   slugLock?: boolean | null;
   title: string;
@@ -699,7 +701,7 @@ export interface Page {
             newTab?: boolean | null;
             reference?: {
               relationTo: 'pages';
-              value: string | Page;
+              value: number | Page;
             } | null;
             url?: string | null;
             label: string;
@@ -714,8 +716,8 @@ export interface Page {
     title?: string | null;
     subtitle?: string | null;
     size?: ('large' | 'medium' | 'small') | null;
-    background?: (string | null) | Media;
-    media?: (string | null) | Media;
+    background?: (number | null) | Media;
+    media?: (number | null) | Media;
     slides?:
       | {
           pretitle?: string | null;
@@ -728,7 +730,7 @@ export interface Page {
                   newTab?: boolean | null;
                   reference?: {
                     relationTo: 'pages';
-                    value: string | Page;
+                    value: number | Page;
                   } | null;
                   url?: string | null;
                   label: string;
@@ -740,7 +742,7 @@ export interface Page {
                 id?: string | null;
               }[]
             | null;
-          background?: (string | null) | Media;
+          background?: (number | null) | Media;
           id?: string | null;
         }[]
       | null;
@@ -757,7 +759,6 @@ export interface Page {
         | ContentBlock
         | FormBlock
         | MediaBlock
-        | ShopArchiveBlock
         | ServicesBlock
         | TestimonialsBlock
         | ContactBlock
@@ -831,7 +832,7 @@ export interface Page {
             /**
              * Select up to 3 spas to feature
              */
-            spas: (string | Spa)[];
+            spas: (number | Spa)[];
             /**
              * Link to the shop hot tubs page
              */
@@ -840,7 +841,7 @@ export interface Page {
               newTab?: boolean | null;
               reference?: {
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null;
               url?: string | null;
               label: string;
@@ -860,19 +861,10 @@ export interface Page {
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
     description?: string | null;
   };
   publishedAt?: string | null;
-  parent?: (string | null) | Page;
-  breadcrumbs?:
-    | {
-        doc?: (string | null) | Page;
-        url?: string | null;
-        label?: string | null;
-        id?: string | null;
-      }[]
-    | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -899,12 +891,12 @@ export interface ArchiveBlock {
   } | null;
   populateBy?: ('collection' | 'selection') | null;
   relationTo?: 'posts' | null;
-  categories?: (string | BlogCategory)[] | null;
+  categories?: (number | BlogCategory)[] | null;
   limit?: number | null;
   selectedDocs?:
     | {
         relationTo: 'posts';
-        value: string | Post;
+        value: number | Post;
       }[]
     | null;
   id?: string | null;
@@ -918,7 +910,7 @@ export interface ArchiveBlock {
  * via the `definition` "posts".
  */
 export interface Post {
-  id: string;
+  id: number;
   title: string;
   content: {
     root: {
@@ -935,18 +927,18 @@ export interface Post {
     };
     [k: string]: unknown;
   };
-  relatedPosts?: (string | Post)[] | null;
-  categories?: (string | BlogCategory)[] | null;
+  relatedPosts?: (number | Post)[] | null;
+  categories?: (number | BlogCategory)[] | null;
   meta?: {
     title?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
     description?: string | null;
   };
   publishedAt?: string | null;
-  authors?: (string | User)[] | null;
+  authors?: (number | User)[] | null;
   populatedAuthors?:
     | {
         id?: string | null;
@@ -1011,7 +1003,7 @@ export interface CallToActionBlock {
           newTab?: boolean | null;
           reference?: {
             relationTo: 'pages';
-            value: string | Page;
+            value: number | Page;
           } | null;
           url?: string | null;
           label: string;
@@ -1068,7 +1060,7 @@ export interface ContentBlock {
         align?: ('start' | 'center' | 'end') | null;
         enableLink?: boolean | null;
         enableBackgroundImage?: boolean | null;
-        backgroundImage?: (string | null) | Media;
+        backgroundImage?: (number | null) | Media;
         richText?: {
           root: {
             type: string;
@@ -1146,7 +1138,7 @@ export interface ContentBlock {
           newTab?: boolean | null;
           reference?: {
             relationTo: 'pages';
-            value: string | Page;
+            value: number | Page;
           } | null;
           url?: string | null;
           label: string;
@@ -1168,7 +1160,7 @@ export interface ContentBlock {
  */
 export interface MediaBlock {
   position?: ('default' | 'fullscreen') | null;
-  media: string | Media;
+  media: number | Media;
   id?: string | null;
   blockName?: string | null;
   blockType: 'mediaBlock';
@@ -1205,7 +1197,7 @@ export interface TypographyBlock {
           newTab?: boolean | null;
           reference?: {
             relationTo: 'pages';
-            value: string | Page;
+            value: number | Page;
           } | null;
           url?: string | null;
           label: string;
@@ -1280,34 +1272,6 @@ export interface FormBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ShopArchiveBlock".
- */
-export interface ShopArchiveBlock {
-  introContent?: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  populateBy?: ('shop-collections' | 'product-categories') | null;
-  showAllCollections?: boolean | null;
-  productCollections?: (string | ShopCollection)[] | null;
-  productCategories?: (string | ProductCategory)[] | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'shop-archive';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ServicesBlock".
  */
 export interface ServicesBlock {
@@ -1319,7 +1283,7 @@ export interface ServicesBlock {
     newTab?: boolean | null;
     reference?: {
       relationTo: 'pages';
-      value: string | Page;
+      value: number | Page;
     } | null;
     url?: string | null;
     label: string;
@@ -1332,13 +1296,13 @@ export interface ServicesBlock {
     | {
         title: string;
         description: string;
-        image: string | Media;
+        image: number | Media;
         link: {
           type?: ('reference' | 'custom') | null;
           newTab?: boolean | null;
           reference?: {
             relationTo: 'pages';
-            value: string | Page;
+            value: number | Page;
           } | null;
           url?: string | null;
           label: string;
@@ -1366,7 +1330,7 @@ export interface TestimonialsBlock {
     newTab?: boolean | null;
     reference?: {
       relationTo: 'pages';
-      value: string | Page;
+      value: number | Page;
     } | null;
     url?: string | null;
     label: string;
@@ -1380,7 +1344,7 @@ export interface TestimonialsBlock {
   selectedDocs?:
     | {
         relationTo: 'testimonials';
-        value: string | Testimonial;
+        value: number | Testimonial;
       }[]
     | null;
   id?: string | null;
@@ -1392,7 +1356,7 @@ export interface TestimonialsBlock {
  * via the `definition` "testimonials".
  */
 export interface Testimonial {
-  id: string;
+  id: number;
   title: string;
   content: string;
   author: string;
@@ -1425,7 +1389,7 @@ export interface LatestPostsBlock {
     newTab?: boolean | null;
     reference?: {
       relationTo: 'pages';
-      value: string | Page;
+      value: number | Page;
     } | null;
     url?: string | null;
     label: string;
@@ -1443,7 +1407,7 @@ export interface LatestPostsBlock {
  * via the `definition` "spas".
  */
 export interface Spa {
-  id: string;
+  id: number;
   slug?: string | null;
   slugLock?: boolean | null;
   type: 'hot-tub' | 'swim-spa';
@@ -1484,8 +1448,8 @@ export interface Spa {
   heater?: string | null;
   electrical?: string | null;
   warranty?: string | null;
-  thumbnail?: (string | null) | Media;
-  topdown?: (string | null) | Media;
+  thumbnail?: (number | null) | Media;
+  topdown?: (number | null) | Media;
   threeDModel?: string | null;
   detailsLink?: string | null;
   quoteLink?: string | null;
@@ -1495,7 +1459,7 @@ export interface Spa {
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
     description?: string | null;
   };
   updatedAt: string;
@@ -1506,7 +1470,7 @@ export interface Spa {
  * via the `definition` "galleries".
  */
 export interface Gallery {
-  id: string;
+  id: number;
   hero: {
     type: 'none' | 'standard' | 'slider' | 'highImpact' | 'mediumImpact' | 'lowImpact' | 'parallax';
     richText?: {
@@ -1531,7 +1495,7 @@ export interface Gallery {
             newTab?: boolean | null;
             reference?: {
               relationTo: 'pages';
-              value: string | Page;
+              value: number | Page;
             } | null;
             url?: string | null;
             label: string;
@@ -1546,8 +1510,8 @@ export interface Gallery {
     title?: string | null;
     subtitle?: string | null;
     size?: ('large' | 'medium' | 'small') | null;
-    background?: (string | null) | Media;
-    media?: (string | null) | Media;
+    background?: (number | null) | Media;
+    media?: (number | null) | Media;
     slides?:
       | {
           pretitle?: string | null;
@@ -1560,7 +1524,7 @@ export interface Gallery {
                   newTab?: boolean | null;
                   reference?: {
                     relationTo: 'pages';
-                    value: string | Page;
+                    value: number | Page;
                   } | null;
                   url?: string | null;
                   label: string;
@@ -1572,7 +1536,7 @@ export interface Gallery {
                 id?: string | null;
               }[]
             | null;
-          background?: (string | null) | Media;
+          background?: (number | null) | Media;
           id?: string | null;
         }[]
       | null;
@@ -1585,7 +1549,7 @@ export interface Gallery {
   description?: string | null;
   slug?: string | null;
   slugLock?: boolean | null;
-  images?: (string | Media)[] | null;
+  images?: (number | Media)[] | null;
   showCaptions?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -1595,7 +1559,7 @@ export interface Gallery {
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
-  id: string;
+  id: number;
   submissionType: 'contact';
   firstName: string;
   lastName: string;
@@ -1616,7 +1580,7 @@ export interface FormSubmission {
  * via the `definition` "shipping-options".
  */
 export interface ShippingOption {
-  id: string;
+  id: number;
   name: string;
   type: 'pickup' | 'shipping';
   shippingRules?: {
@@ -1642,7 +1606,7 @@ export interface ShippingOption {
  * via the `definition` "redirects".
  */
 export interface Redirect {
-  id: string;
+  id: number;
   /**
    * You will need to rebuild the website when changing this field.
    */
@@ -1652,11 +1616,11 @@ export interface Redirect {
     reference?:
       | ({
           relationTo: 'pages';
-          value: string | Page;
+          value: number | Page;
         } | null)
       | ({
           relationTo: 'posts';
-          value: string | Post;
+          value: number | Post;
         } | null);
     url?: string | null;
   };
@@ -1668,96 +1632,84 @@ export interface Redirect {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
-        relationTo: 'address';
-        value: string | Address;
-      } | null)
-    | ({
         relationTo: 'blog-categories';
-        value: string | BlogCategory;
+        value: number | BlogCategory;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'cart';
-        value: string | Cart;
+        value: number | Cart;
       } | null)
     | ({
         relationTo: 'orders';
-        value: string | Order;
+        value: number | Order;
       } | null)
     | ({
         relationTo: 'products';
-        value: string | Product;
-      } | null)
-    | ({
-        relationTo: 'shop-collections';
-        value: string | ShopCollection;
+        value: number | Product;
       } | null)
     | ({
         relationTo: 'pages';
-        value: string | Page;
+        value: number | Page;
       } | null)
     | ({
         relationTo: 'posts';
-        value: string | Post;
+        value: number | Post;
       } | null)
     | ({
         relationTo: 'product-categories';
-        value: string | ProductCategory;
+        value: number | ProductCategory;
       } | null)
     | ({
         relationTo: 'product-collections';
-        value: string | ProductCollection;
+        value: number | ProductCollection;
       } | null)
     | ({
         relationTo: 'brands';
-        value: string | Brand;
+        value: number | Brand;
       } | null)
     | ({
         relationTo: 'customers';
-        value: string | Customer;
+        value: number | Customer;
       } | null)
     | ({
         relationTo: 'testimonials';
-        value: string | Testimonial;
+        value: number | Testimonial;
       } | null)
     | ({
         relationTo: 'spas';
-        value: string | Spa;
+        value: number | Spa;
       } | null)
     | ({
         relationTo: 'galleries';
-        value: string | Gallery;
-      } | null)
-    | ({
-        relationTo: 'media-folders';
-        value: string | MediaFolder;
+        value: number | Gallery;
       } | null)
     | ({
         relationTo: 'form-submissions';
-        value: string | FormSubmission;
+        value: number | FormSubmission;
       } | null)
     | ({
         relationTo: 'shipping-options';
-        value: string | ShippingOption;
+        value: number | ShippingOption;
       } | null)
     | ({
         relationTo: 'redirects';
-        value: string | Redirect;
+        value: number | Redirect;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -1767,10 +1719,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -1790,31 +1742,11 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "address_select".
- */
-export interface AddressSelect<T extends boolean = true> {
-  customer?: T;
-  company?: T;
-  first_name?: T;
-  last_name?: T;
-  address_1?: T;
-  address_2?: T;
-  city?: T;
-  country_code?: T;
-  province?: T;
-  postal_code?: T;
-  phone?: T;
-  metadata?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1833,7 +1765,6 @@ export interface BlogCategoriesSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
-  folder?: T;
   alt?: T;
   caption?: T;
   prefix?: T;
@@ -1881,6 +1812,8 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
+  _verified?: T;
+  _verificationToken?: T;
   loginAttempts?: T;
   lockUntil?: T;
 }
@@ -1963,32 +1896,28 @@ export interface OrdersSelect<T extends boolean = true> {
 export interface OrderItemsSelect<T extends boolean = true> {
   product?: T;
   isVariant?: T;
-  variant?:
+  variantId?: T;
+  variantOptions?:
     | T
     | {
-        variantOptions?:
+        key?:
           | T
           | {
-              key?:
-                | T
-                | {
-                    slug?: T;
-                    label?: T;
-                  };
-              value?:
-                | T
-                | {
-                    slug?: T;
-                    label?: T;
-                  };
-              id?: T;
+              slug?: T;
+              label?: T;
+            };
+        value?:
+          | T
+          | {
+              slug?: T;
+              label?: T;
             };
         id?: T;
       };
   price?: T;
   quantity?: T;
   url?: T;
-  thumbnailMediaId?: T;
+  thumbnail?: T;
   id?: T;
 }
 /**
@@ -2070,20 +1999,6 @@ export interface ProductVariantSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "shop-collections_select".
- */
-export interface ShopCollectionsSelect<T extends boolean = true> {
-  slug?: T;
-  slugLock?: T;
-  title?: T;
-  description?: T;
-  publishedOn?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages_select".
  */
 export interface PagesSelect<T extends boolean = true> {
@@ -2153,7 +2068,6 @@ export interface PagesSelect<T extends boolean = true> {
         content?: T | ContentBlockSelect<T>;
         form?: T | FormBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
-        'shop-archive'?: T | ShopArchiveBlockSelect<T>;
         services?: T | ServicesBlockSelect<T>;
         testimonials?: T | TestimonialsBlockSelect<T>;
         contact?: T | ContactBlockSelect<T>;
@@ -2216,15 +2130,6 @@ export interface PagesSelect<T extends boolean = true> {
         description?: T;
       };
   publishedAt?: T;
-  parent?: T;
-  breadcrumbs?:
-    | T
-    | {
-        doc?: T;
-        url?: T;
-        label?: T;
-        id?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -2426,19 +2331,6 @@ export interface FormBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ShopArchiveBlock_select".
- */
-export interface ShopArchiveBlockSelect<T extends boolean = true> {
-  introContent?: T;
-  populateBy?: T;
-  showAllCollections?: T;
-  productCollections?: T;
-  productCategories?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ServicesBlock_select".
  */
 export interface ServicesBlockSelect<T extends boolean = true> {
@@ -2616,12 +2508,38 @@ export interface CustomersSelect<T extends boolean = true> {
   account?: T;
   stripeCustomerID?: T;
   cart?: T;
-  skipSync?: T;
-  billing_address?: T;
+  billing_addresses?:
+    | T
+    | {
+        company?: T;
+        first_name?: T;
+        last_name?: T;
+        line_1?: T;
+        line_2?: T;
+        city?: T;
+        country?: T;
+        state?: T;
+        postal_code?: T;
+        phone?: T;
+        email?: T;
+        metadata?: T;
+        id?: T;
+      };
   shipping_addresses?:
     | T
     | {
-        address?: T;
+        company?: T;
+        first_name?: T;
+        last_name?: T;
+        line_1?: T;
+        line_2?: T;
+        city?: T;
+        country?: T;
+        state?: T;
+        postal_code?: T;
+        phone?: T;
+        email?: T;
+        metadata?: T;
         id?: T;
       };
   orders?: T;
@@ -2773,25 +2691,6 @@ export interface GalleriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media-folders_select".
- */
-export interface MediaFoldersSelect<T extends boolean = true> {
-  name?: T;
-  media?: T;
-  parent?: T;
-  breadcrumbs?:
-    | T
-    | {
-        doc?: T;
-        url?: T;
-        label?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions_select".
  */
 export interface FormSubmissionsSelect<T extends boolean = true> {
@@ -2889,8 +2788,8 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  * via the `definition` "site-settings".
  */
 export interface Settings {
-  id: string;
-  productsPage?: (string | null) | Page;
+  id: number;
+  productsPage?: (number | null) | Page;
   general?: {
     /**
      * Enter your app name
@@ -2919,7 +2818,7 @@ export interface Settings {
  * via the `definition` "shop-settings".
  */
 export interface ShopSetting {
-  id: string;
+  id: number;
   currency?: ('USD' | 'EUR' | 'GBP') | null;
   paymentMethods?:
     | {
@@ -2943,18 +2842,18 @@ export interface ShopSetting {
  * via the `definition` "header".
  */
 export interface Header {
-  id: string;
-  siteHeader?: {
-    navItems?:
+  id: number;
+  site?: {
+    items?:
       | {
-          navItem: {
+          item: {
             label: string;
             isLink?: boolean | null;
             link?: {
               type?: ('reference' | 'custom') | null;
               reference?: {
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null;
               url?: string | null;
               newTab?: boolean | null;
@@ -2967,18 +2866,18 @@ export interface Header {
                     type?: ('reference' | 'custom') | null;
                     reference?: {
                       relationTo: 'pages';
-                      value: string | Page;
+                      value: number | Page;
                     } | null;
                     url?: string | null;
                     newTab?: boolean | null;
                   };
-                  sublinks?:
+                  links?:
                     | {
                         label: string;
                         type?: ('reference' | 'custom') | null;
                         reference?: {
                           relationTo: 'pages';
-                          value: string | Page;
+                          value: number | Page;
                         } | null;
                         url?: string | null;
                         newTab?: boolean | null;
@@ -2993,17 +2892,17 @@ export interface Header {
         }[]
       | null;
   };
-  shopHeader?: {
-    navItems?:
+  shop?: {
+    items?:
       | {
-          navItem: {
+          item: {
             label: string;
             isLink?: boolean | null;
             link?: {
               type?: ('reference' | 'custom') | null;
               reference?: {
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null;
               url?: string | null;
               newTab?: boolean | null;
@@ -3016,18 +2915,18 @@ export interface Header {
                     type?: ('reference' | 'custom') | null;
                     reference?: {
                       relationTo: 'pages';
-                      value: string | Page;
+                      value: number | Page;
                     } | null;
                     url?: string | null;
                     newTab?: boolean | null;
                   };
-                  sublinks?:
+                  links?:
                     | {
                         label: string;
                         type?: ('reference' | 'custom') | null;
                         reference?: {
                           relationTo: 'pages';
-                          value: string | Page;
+                          value: number | Page;
                         } | null;
                         url?: string | null;
                         newTab?: boolean | null;
@@ -3050,7 +2949,7 @@ export interface Header {
  * via the `definition` "footer".
  */
 export interface Footer {
-  id: string;
+  id: number;
   siteFooter?: {
     navItems?:
       | {
@@ -3059,7 +2958,7 @@ export interface Footer {
             newTab?: boolean | null;
             reference?: {
               relationTo: 'pages';
-              value: string | Page;
+              value: number | Page;
             } | null;
             url?: string | null;
             label: string;
@@ -3076,7 +2975,7 @@ export interface Footer {
             newTab?: boolean | null;
             reference?: {
               relationTo: 'pages';
-              value: string | Page;
+              value: number | Page;
             } | null;
             url?: string | null;
             label: string;
@@ -3139,13 +3038,13 @@ export interface ShopSettingsSelect<T extends boolean = true> {
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
-  siteHeader?:
+  site?:
     | T
     | {
-        navItems?:
+        items?:
           | T
           | {
-              navItem?:
+              item?:
                 | T
                 | {
                     label?: T;
@@ -3171,7 +3070,7 @@ export interface HeaderSelect<T extends boolean = true> {
                                 url?: T;
                                 newTab?: T;
                               };
-                          sublinks?:
+                          links?:
                             | T
                             | {
                                 label?: T;
@@ -3187,13 +3086,13 @@ export interface HeaderSelect<T extends boolean = true> {
               id?: T;
             };
       };
-  shopHeader?:
+  shop?:
     | T
     | {
-        navItems?:
+        items?:
           | T
           | {
-              navItem?:
+              item?:
                 | T
                 | {
                     label?: T;
@@ -3219,7 +3118,7 @@ export interface HeaderSelect<T extends boolean = true> {
                                 url?: T;
                                 newTab?: T;
                               };
-                          sublinks?:
+                          links?:
                             | T
                             | {
                                 label?: T;

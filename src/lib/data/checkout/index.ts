@@ -25,7 +25,7 @@ const CHECKOUT_SESSION_EXPIRY = 1000 * 60 * 30 // 30 minutes
 const ORDER_ARCHIVE_EXPIRY = 1000 * 60 * 60 * 24 * 30 // 30 days
 
 interface GetStoredCheckoutSessionParams {
-  cartId?: string
+  cartId?: number
   redirectTo?: string
 }
 
@@ -100,10 +100,10 @@ export async function createStoredCheckoutSession(
       stripeCustomerId,
       metadata: {
         ...metadata,
-        cartId,
+        cartId: cartId.toString(),
         sessionId: uuidv4(),
       },
-      cartId,
+      cartId: cartId.toString(),
     })
 
     if (!paymentIntent) {
@@ -111,7 +111,7 @@ export async function createStoredCheckoutSession(
     }
 
     const newCheckoutSession: CheckoutSession = {
-      id: uuidv4(),
+      id: Math.floor(Math.random() * 9007199254740991),
       status: 'pending',
       cartId,
       paymentIntentId: paymentIntent.id,
@@ -313,7 +313,7 @@ export async function updatePaymentIntentWithDetails(
 
 export async function archiveCheckoutSession(
   session: CheckoutSession,
-  orderId: string,
+  orderId: number,
 ): Promise<void> {
   try {
     // Create archive key using customer email and ID
@@ -355,7 +355,7 @@ export async function handlePaymentSuccess({
       throw new Error('No cart ID found in payment intent metadata')
     }
 
-    const checkoutSession = await getStoredCheckoutSession({ cartId })
+    const checkoutSession = await getStoredCheckoutSession({ cartId: parseInt(cartId) })
 
     if (!checkoutSession) {
       return {
@@ -368,7 +368,7 @@ export async function handlePaymentSuccess({
       console.warn('checkout session already completed, returning')
       return {
         success: true,
-        orderId: checkoutSession.orderId,
+        orderId: parseInt(checkoutSession.orderId),
       }
     }
 
@@ -389,10 +389,8 @@ export async function handlePaymentSuccess({
       items: checkoutSession.lineItems.map((item) => ({
         product: item.productId,
         isVariant: item.isVariant,
-        variant: {
-          id: item.variant?.id,
-          variantOptions: item.variant?.variantOptions ?? [],
-        },
+        variantId: item.variantId,
+        variantOptions: item.variantOptions ?? [],
         thumbnailMediaId: item.thumbnailMediaId,
         price: item.price,
         quantity: item.quantity,
@@ -449,7 +447,7 @@ export async function handlePaymentSuccess({
     void triggerPostOrderProcesses({
       orderId: order.id,
       email: checkoutSession.customerEmail!,
-      cartId,
+      cartId: parseInt(cartId),
     })
 
     return {
@@ -470,9 +468,9 @@ async function triggerPostOrderProcesses({
   email,
   cartId,
 }: {
-  orderId: string
+  orderId: number
   email: string
-  cartId: string
+  cartId: number
 }): Promise<void> {
   await deleteCart(cartId)
 }

@@ -59,12 +59,18 @@ NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName
 const NavigationMenuSub = NavigationMenuPrimitive.Sub
 
 interface SingleLinkProps {
-  link: Header['siteHeader']['navItems'][number]['navItem']['link']
+  link: Header['site']['items'][number]['item']['link']
   title: string
   variant?: 'sm' | 'md' | 'lg' | 'none'
+  isNavItem?: boolean
 }
 
-const SingleLink: React.FC<SingleLinkProps> = ({ link, title, variant = 'md' }) => {
+const SingleLink: React.FC<SingleLinkProps> = ({
+  link,
+  title,
+  variant = 'md',
+  isNavItem = false,
+}) => {
   const sizeClasses = {
     sm: 'text-sm lg:text-base xl:text-lg',
     md: 'text-base lg:text-lg xl:text-xl',
@@ -79,8 +85,12 @@ const SingleLink: React.FC<SingleLinkProps> = ({ link, title, variant = 'md' }) 
     sizeClasses[variant],
   )
 
+  if (isNavItem) {
+    return <span className={styleClasses}>{title}</span>
+  }
+
   return (
-    <CMSLink {...link} label={title} className={styleClasses} isNavItem>
+    <CMSLink {...link} label={title} className={styleClasses} isNavItem={true} appearance="link">
       <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-200 group-hover:w-full"></span>
     </CMSLink>
   )

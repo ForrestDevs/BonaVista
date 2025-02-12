@@ -1,5 +1,5 @@
 import getPayload from '@lib/utils/getPayload'
-import { PAGE_SLUG, PRODUCT_SLUG, SHOP_COLLECTION_SLUG } from '@payload/collections/constants'
+import { PAGE_SLUG, PRODUCT_SLUG } from '@payload/collections/constants'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { cache, Fragment, Suspense } from 'react'

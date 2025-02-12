@@ -1,11 +1,11 @@
-import { BasePayload, CollectionAfterChangeHook } from 'payload'
+import { BasePayload, CollectionAfterChangeHook, PayloadRequest } from 'payload'
 import { PRODUCT_CATEGORY_SLUG } from '@payload/collections/constants'
 import { log } from '@/lib/utils/log'
 
 /**
  * Updates the fullSlug for a category and all its descendants
  */
-async function updateFullSlugHierarchy(payload: BasePayload, category: any): Promise<void> {
+async function updateFullSlugHierarchy(req: PayloadRequest, category: any): Promise<void> {
   log(`\n🔄 Starting updateFullSlugHierarchy for category: ${category.title} (${category.id})`)
 
   try {
@@ -18,7 +18,8 @@ async function updateFullSlugHierarchy(payload: BasePayload, category: any): Pro
       const parentId = typeof category.parent === 'object' ? category.parent.id : category.parent
       log(`🔍 Looking up parent with ID: ${parentId}`)
 
-      const parent = await payload.findByID({
+      const parent = await req.payload.findByID({
+        req,
         collection: PRODUCT_CATEGORY_SLUG,
         id: parentId,
       })
@@ -36,7 +37,8 @@ async function updateFullSlugHierarchy(payload: BasePayload, category: any): Pro
 
     // Get all descendants before updating
     log(`\n🔍 Finding all immediate descendants of ${category.title}`)
-    const descendants = await payload.find({
+    const descendants = await req.payload.find({
+      req,
       collection: PRODUCT_CATEGORY_SLUG,
       where: {
         'parent.id': { equals: category.id },
@@ -46,10 +48,11 @@ async function updateFullSlugHierarchy(payload: BasePayload, category: any): Pro
 
     // Update current category first
     log(`\n📝 Updating current category (${category.title}) with fullSlug: ${fullSlug}`)
-    await payload.update({
+    await req.payload.update({
+      req,
       collection: PRODUCT_CATEGORY_SLUG,
       id: category.id,
-      data: { fullSlug },
+      data: { fullSlug: fullSlug },
       context: { isInternalOperation: true, skipFullSlugUpdate: true },
     })
 
@@ -57,7 +60,8 @@ async function updateFullSlugHierarchy(payload: BasePayload, category: any): Pro
     for (const child of descendants.docs) {
       const childFullSlug = `${fullSlug}/${child.slug}`
       log(`\n📝 Updating child ${child.title} with fullSlug: ${childFullSlug}`)
-      await payload.update({
+      await req.payload.update({
+        req,
         collection: PRODUCT_CATEGORY_SLUG,
         id: child.id,
         data: { fullSlug: childFullSlug },
@@ -65,7 +69,7 @@ async function updateFullSlugHierarchy(payload: BasePayload, category: any): Pro
       })
 
       // Recursively update child's descendants
-      await updateFullSlugHierarchy(payload, {
+      await updateFullSlugHierarchy(req, {
         ...child,
         fullSlug: childFullSlug,
       })
@@ -79,7 +83,7 @@ async function updateFullSlugHierarchy(payload: BasePayload, category: any): Pro
 }
 
 export const afterChange: CollectionAfterChangeHook = async ({
-  req: { payload },
+  req,
   operation,
   doc,
   previousDoc,
@@ -102,7 +106,8 @@ export const afterChange: CollectionAfterChangeHook = async ({
       const parentId = typeof doc.parent === 'object' ? doc.parent.id : doc.parent
       log(`🔄 Updating parent ${parentId} to non-leaf`)
       // Run parent update first
-      await payload.update({
+      await req.payload.update({
+        req,
         collection: PRODUCT_CATEGORY_SLUG,
         id: parentId,
         data: { isLeaf: false },
@@ -117,7 +122,8 @@ export const afterChange: CollectionAfterChangeHook = async ({
       if (doc.parent) {
         const newParentId = typeof doc.parent === 'object' ? doc.parent.id : doc.parent
         log(`🔄 Updating new parent ${newParentId} to non-leaf`)
-        const result = await payload.update({
+        const result = await req.payload.update({
+          req,
           collection: PRODUCT_CATEGORY_SLUG,
           id: newParentId,
           data: { isLeaf: false },
@@ -132,7 +138,8 @@ export const afterChange: CollectionAfterChangeHook = async ({
           typeof previousDoc.parent === 'object' ? previousDoc.parent.id : previousDoc.parent
         log(`🔍 Checking children count for old parent ${oldParentId}`)
 
-        const oldParentChildren = await payload.find({
+        const oldParentChildren = await req.payload.find({
+          req,
           collection: PRODUCT_CATEGORY_SLUG,
           where: {
             'parent.id': { equals: oldParentId },
@@ -141,7 +148,8 @@ export const afterChange: CollectionAfterChangeHook = async ({
         })
         log(`📊 Old parent has ${oldParentChildren.totalDocs} remaining children`)
 
-        await payload.update({
+        await req.payload.update({
+          req,
           collection: PRODUCT_CATEGORY_SLUG,
           id: oldParentId,
           data: { isLeaf: oldParentChildren.totalDocs === 0 },
@@ -152,7 +160,7 @@ export const afterChange: CollectionAfterChangeHook = async ({
       // Finally update fullSlug hierarchy
       if (!context.skipFullSlugUpdate) {
         log('\n🔄 Starting fullSlug hierarchy update')
-        await updateFullSlugHierarchy(payload, doc)
+        await updateFullSlugHierarchy(req, doc)
       } else {
         log('⏭️ Skipping fullSlug update - already being handled')
       }

@@ -8,6 +8,9 @@ export const Footer: GlobalConfig = {
   access: {
     read: () => true,
   },
+  admin: {
+    group: 'Website',
+  },
   fields: [
     {
       type: 'tabs',

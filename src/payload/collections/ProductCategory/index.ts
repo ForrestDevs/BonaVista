@@ -16,7 +16,7 @@ const ProductCategory: CollectionConfig = {
     delete: admin,
   },
   admin: {
-    group: 'Shop',
+    group: 'Ecommerce',
     useAsTitle: 'title',
     defaultColumns: ['title', 'parent', 'fullSlug', 'isLeaf'],
   },
