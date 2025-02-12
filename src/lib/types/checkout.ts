@@ -19,6 +19,7 @@ export interface StripeAddress {
 
 export interface CheckoutLineItem {
   productId: number
+  variantId?: number
   title: string
   sku: string
   description?: string
@@ -26,19 +27,16 @@ export interface CheckoutLineItem {
   quantity: number
   thumbnailMediaId?: number
   isVariant?: boolean
-  variant?: {
-    id?: string
-    variantOptions?: {
-      key: {
-        slug: string
-        label: string
-      }
-      value: {
-        slug: string
-        label: string
-      }
-    }[]
-  }
+  variantOptions?: {
+    key: {
+      slug: string
+      label: string
+    }
+    value: {
+      slug: string
+      label: string
+    }
+  }[]
 }
 
 export interface CheckoutSession {
@@ -87,7 +85,7 @@ export interface BeginCheckoutParams {
   amount: number
   currencyCode: string
   description?: string
-  cartId: string
+  cartId: number
   lineItems: CheckoutLineItem[]
   stripeCustomerId?: string
   customerEmail?: string
@@ -102,7 +100,7 @@ export interface CreateStoredCheckoutParams extends Omit<BeginCheckoutParams, 'r
 }
 
 export interface UpdateCheckoutStepParams<T extends CheckoutStep> {
-  cartId: string
+  cartId: number
   step: T
   data: Partial<CheckoutSession['steps'][T]>
 }
@@ -114,6 +112,6 @@ export interface HandlePaymentSuccessParams {
 
 export interface PaymentSuccessResult {
   success: boolean
-  orderId?: string
+  orderId?: number
   error?: string
 }

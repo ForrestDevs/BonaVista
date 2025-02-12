@@ -5,7 +5,7 @@ const seedProductCategories = async () => {
   const payload = await getPayload()
 
   // Helper function to create category
-  const createCategory = async (title: string, description: string, parentId?: string) => {
+  const createCategory = async (title: string, description: string, parentId?: number) => {
     try {
       return await payload.create({
         collection: PRODUCT_CATEGORY_SLUG,
@@ -83,88 +83,84 @@ const seedProductCategories = async () => {
     )
 
     // Swim Spa Care subcategories
-    await Promise.all([
-      createCategory(
-        'Swim Spa Kits',
-        'All-in-one water care kits for swim spa maintenance.',
-        swimSpaCare.id,
-      ),
-      createCategory(
-        'Swim Spa Balancers',
-        'Water balancers for optimal swim spa water chemistry.',
-        swimSpaCare.id,
-      ),
-      createCategory(
-        'Swim Spa Sanitizers',
-        'Sanitizing solutions for swim spa water safety.',
-        swimSpaCare.id,
-      ),
-      createCategory(
-        'Swim Spa Maintenance',
-        'Regular maintenance products for swim spas.',
-        swimSpaCare.id,
-      ),
-    ])
+    await createCategory(
+      'Swim Spa Kits',
+      'All-in-one water care kits for swim spa maintenance.',
+      swimSpaCare.id,
+    )
+    await createCategory(
+      'Swim Spa Balancers',
+      'Water balancers for optimal swim spa water chemistry.',
+      swimSpaCare.id,
+    )
+    await createCategory(
+      'Swim Spa Sanitizers',
+      'Sanitizing solutions for swim spa water safety.',
+      swimSpaCare.id,
+    )
+    await createCategory(
+      'Swim Spa Maintenance',
+      'Regular maintenance products for swim spas.',
+      swimSpaCare.id,
+    )
 
     // Hot Tub Care subcategories
-    await Promise.all([
-      createCategory(
-        'Hot Tub Kits',
-        'Complete water care kits for hot tub maintenance.',
-        hotTubCare.id,
-      ),
-      createCategory(
-        'Hot Tub Balancers',
-        'Water balancers for optimal hot tub water chemistry.',
-        hotTubCare.id,
-      ),
-      createCategory(
-        'Hot Tub Sanitizers',
-        'Sanitizing products for hot tub water safety.',
-        hotTubCare.id,
-      ),
-      createCategory(
-        'Hot Tub Maintenance',
-        'Essential maintenance products for hot tubs.',
-        hotTubCare.id,
-      ),
-    ])
-
+    await createCategory(
+      'Hot Tub Kits',
+      'Complete water care kits for hot tub maintenance.',
+      hotTubCare.id,
+    )
+    await createCategory(
+      'Hot Tub Balancers',
+      'Water balancers for optimal hot tub water chemistry.',
+      hotTubCare.id,
+    )
+    await createCategory(
+      'Hot Tub Sanitizers',
+      'Sanitizing products for hot tub water safety.',
+      hotTubCare.id,
+    )
+    await createCategory(
+      'Hot Tub Maintenance',
+      'Essential maintenance products for hot tubs.',
+      hotTubCare.id,
+    )
     // Pool Care subcategories
-    await Promise.all([
-      createCategory('Pool Kits', 'Comprehensive pool care kits.', poolCare.id),
-      createCategory(
-        'Pool Salts',
-        'Salt products for chlorine generators and salt water pools.',
-        poolCare.id,
-      ),
-      createCategory(
-        'Pool Balancers',
-        'Water balancers for optimal pool water chemistry.',
-        poolCare.id,
-      ),
-      createCategory('Pool Sanitizers', 'Pool sanitizing and disinfection products.', poolCare.id),
-      createCategory('Pool Maintenance', 'Regular pool maintenance products.', poolCare.id),
-      createCategory('Pool Algaecides', 'Algae prevention and treatment solutions.', poolCare.id),
-    ])
-
+    await createCategory('Pool Kits', 'Comprehensive pool care kits.', poolCare.id)
+    await createCategory(
+      'Pool Salts',
+      'Salt products for chlorine generators and salt water pools.',
+      poolCare.id,
+    )
+    await createCategory(
+      'Pool Balancers',
+      'Water balancers for optimal pool water chemistry.',
+      poolCare.id,
+    )
+    await createCategory(
+      'Pool Sanitizers',
+      'Pool sanitizing and disinfection products.',
+      poolCare.id,
+    )
+    await createCategory('Pool Maintenance', 'Regular pool maintenance products.', poolCare.id)
+    await createCategory(
+      'Pool Algaecides',
+      'Algae prevention and treatment solutions.',
+      poolCare.id,
+    )
     // Filters subcategories
-    await Promise.all([
-      createCategory('Swim Spa Filters', 'Replacement filters for swim spas.', filters.id),
-      createCategory('Hot Tub Filters', 'Replacement filters for hot tubs.', filters.id),
-      createCategory('Pool Filters', 'Replacement filters for pools.', filters.id),
-    ])
+    await createCategory('Swim Spa Filters', 'Replacement filters for swim spas.', filters.id)
+    await createCategory('Hot Tub Filters', 'Replacement filters for hot tubs.', filters.id)
+    await createCategory('Pool Filters', 'Replacement filters for pools.', filters.id)
 
     // Parts subcategories
-    await Promise.all([
-      createCategory('Swim Spa Parts', 'Replacement parts for swim spas.', parts.id),
-      createCategory('Hot Tub Parts', 'Replacement parts for hot tubs.', parts.id),
-      createCategory(
-        'Pool Winterization',
-        'Products and equipment for pool winterizing.',
-        parts.id,
-      ),
-    ])
+    await createCategory('Swim Spa Parts', 'Replacement parts for swim spas.', parts.id)
+    await createCategory('Hot Tub Parts', 'Replacement parts for hot tubs.', parts.id)
+    await createCategory(
+      'Pool Winterization',
+      'Products and equipment for pool winterizing.',
+      parts.id,
+    )
 
     // Accessories subcategories
     const swimSpaAccessories = await createCategory(
@@ -186,21 +182,33 @@ const seedProductCategories = async () => {
     )
 
     // Pool Accessories subcategories
-    await Promise.all([
-      createCategory('Pool Tools', 'Maintenance and cleaning tools for pools.', poolAccessories.id),
-      createCategory('Pool Toys', 'Recreational toys and games for pool fun.', poolAccessories.id),
-      createCategory(
-        'Pool Robots',
-        'Automatic pool cleaning robots and equipment.',
-        poolAccessories.id,
-      ),
-    ])
+    await createCategory(
+      'Pool Tools',
+      'Maintenance and cleaning tools for pools.',
+      poolAccessories.id,
+    )
+    await createCategory(
+      'Pool Toys',
+      'Recreational toys and games for pool fun.',
+      poolAccessories.id,
+    )
+    await createCategory(
+      'Pool Robots',
+      'Automatic pool cleaning robots and equipment.',
+      poolAccessories.id,
+    )
 
     // Outdoor Living subcategories
-    await Promise.all([
-      createCategory('Patio Furniture', 'Stylish and durable outdoor furniture.', outdoorLiving.id),
-      createCategory('Fire Features', 'Outdoor fire pits and heating solutions.', outdoorLiving.id),
-    ])
+    await createCategory(
+      'Patio Furniture',
+      'Stylish and durable outdoor furniture.',
+      outdoorLiving.id,
+    )
+    await createCategory(
+      'Fire Features',
+      'Outdoor fire pits and heating solutions.',
+      outdoorLiving.id,
+    )
 
     console.log('Successfully seeded product categories')
   } catch (error) {

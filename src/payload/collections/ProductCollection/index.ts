@@ -12,7 +12,7 @@ export const ProductCollection: CollectionConfig = {
     delete: admin,
   },
   admin: {
-    group: 'Shop',
+    group: 'Ecommerce',
     useAsTitle: 'title',
     defaultColumns: ['title'],
     preview: (doc) => {

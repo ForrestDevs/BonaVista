@@ -43,6 +43,7 @@ const Pages: CollectionConfig = {
 
       return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
     },
+    group: 'Website',
     useAsTitle: 'title',
   },
   fields: [
@@ -109,7 +110,7 @@ const Pages: CollectionConfig = {
     },
   ],
   hooks: {
-    afterChange: [revalidatePage],
+    // afterChange: [revalidatePage],
     beforeChange: [populatePublishedAt],
   },
   versions: {

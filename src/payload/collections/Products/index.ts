@@ -22,12 +22,10 @@ import { slugField } from '@payload/fields/slug'
 import { revalidateProduct } from './hooks/revalidateProduct'
 import {
   PRODUCT_CATEGORY_SLUG,
-  SHOP_COLLECTION_SLUG,
   PRODUCT_SLUG,
   BRAND_SLUG,
   PRODUCT_COLLECTION_SLUG,
 } from '../constants'
-import { TableFeatureClient } from '@payloadcms/richtext-lexical/client'
 
 const Products: CollectionConfig = {
   slug: 'products',
@@ -38,7 +36,7 @@ const Products: CollectionConfig = {
     update: admins,
   },
   admin: {
-    group: 'Shop',
+    group: 'Ecommerce',
     defaultColumns: ['title', 'stripeProductID', '_status'],
     livePreview: {
       url: ({ data }) => {

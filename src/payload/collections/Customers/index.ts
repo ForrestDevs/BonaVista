@@ -1,8 +1,6 @@
 import { CollectionConfig } from 'payload'
-import { ADDRESS_SLUG, CART_SLUG, CUSTOMER_SLUG, ORDER_SLUG, USER_SLUG } from '../constants'
+import { CART_SLUG, CUSTOMER_SLUG, ORDER_SLUG, USER_SLUG } from '../constants'
 import { admins, anyone, authenticated } from '@payload/access'
-// import { customerProxy } from './endpoints/customer'
-import { createStripeCustomer } from './hooks/createStripeCustomer'
 
 const Customers: CollectionConfig = {
   slug: CUSTOMER_SLUG,
@@ -14,23 +12,8 @@ const Customers: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    group: 'Shop',
+    group: 'Ecommerce',
     useAsTitle: 'email',
-  },
-  endpoints: [
-    // {
-    //   handler: customerProxy,
-    //   method: 'get',
-    //   path: '/:teamID/customer',
-    // },
-    // {
-    //   handler: customerProxy,
-    //   method: 'patch',
-    //   path: '/:teamID/customer',
-    // },
-  ],
-  hooks: {
-    // beforeChange: [createStripeCustomer],
   },
   fields: [
     {
@@ -75,19 +58,85 @@ const Customers: CollectionConfig = {
       hasMany: false,
     },
     {
-      name: 'skipSync',
-      type: 'checkbox',
-      admin: {
-        hidden: true,
-        position: 'sidebar',
-        readOnly: true,
+      label: {
+        singular: 'Billing Address',
+        plural: 'Billing Addresses',
       },
-      label: 'Skip Sync',
-    },
-    {
-      label: 'Billing Address',
-      name: 'billing_address',
-      type: 'json',
+      name: 'billing_addresses',
+      type: 'array',
+      fields: [
+        {
+          name: 'company',
+          type: 'text',
+          required: true,
+          label: 'Company',
+        },
+        {
+          name: 'first_name',
+          type: 'text',
+          required: true,
+          label: 'First Name',
+        },
+        {
+          name: 'last_name',
+          type: 'text',
+          required: true,
+          label: 'Last Name',
+        },
+        {
+          name: 'line_1',
+          type: 'text',
+          required: true,
+          label: 'Address Line 1',
+        },
+        {
+          name: 'line_2',
+          type: 'text',
+          required: true,
+          label: 'Address Line 2',
+        },
+        {
+          name: 'city',
+          type: 'text',
+          required: true,
+          label: 'City',
+        },
+        {
+          name: 'country',
+          type: 'text',
+          required: true,
+          label: 'Country Code',
+        },
+        {
+          name: 'state',
+          type: 'text',
+          required: true,
+          label: 'Province',
+        },
+        {
+          name: 'postal_code',
+          type: 'text',
+          required: true,
+          label: 'Postal Code',
+        },
+        {
+          name: 'phone',
+          type: 'text',
+          required: true,
+          label: 'Phone',
+        },
+        {
+          name: 'email',
+          type: 'text',
+          required: true,
+          label: 'Email',
+        },
+        {
+          name: 'metadata',
+          type: 'json',
+          label: 'Metadata',
+        },
+      ],
     },
     {
       label: {
@@ -98,8 +147,75 @@ const Customers: CollectionConfig = {
       type: 'array',
       fields: [
         {
-          name: 'address',
+          name: 'company',
+          type: 'text',
+          required: true,
+          label: 'Company',
+        },
+        {
+          name: 'first_name',
+          type: 'text',
+          required: true,
+          label: 'First Name',
+        },
+        {
+          name: 'last_name',
+          type: 'text',
+          required: true,
+          label: 'Last Name',
+        },
+        {
+          name: 'line_1',
+          type: 'text',
+          required: true,
+          label: 'Address Line 1',
+        },
+        {
+          name: 'line_2',
+          type: 'text',
+          required: true,
+          label: 'Address Line 2',
+        },
+        {
+          name: 'city',
+          type: 'text',
+          required: true,
+          label: 'City',
+        },
+        {
+          name: 'country',
+          type: 'text',
+          required: true,
+          label: 'Country Code',
+        },
+        {
+          name: 'state',
+          type: 'text',
+          required: true,
+          label: 'Province',
+        },
+        {
+          name: 'postal_code',
+          type: 'text',
+          required: true,
+          label: 'Postal Code',
+        },
+        {
+          name: 'phone',
+          type: 'text',
+          required: true,
+          label: 'Phone',
+        },
+        {
+          name: 'email',
+          type: 'text',
+          required: true,
+          label: 'Email',
+        },
+        {
+          name: 'metadata',
           type: 'json',
+          label: 'Metadata',
         },
       ],
     },

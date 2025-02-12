@@ -20,6 +20,8 @@ import Users from './payload/collections/Users'
 import globals from './payload/globals'
 import collections from './payload/collections'
 import { plugins } from './payload/plugins'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
+import nodemailer from 'nodemailer'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -92,14 +94,22 @@ export default buildConfig({
       ]
     },
   }),
-  // db: mongooseAdapter({
-  //   url: process.env.DATABASE_URI || '',
-  //   transactionOptions: false,
-  // }),
+  email: nodemailerAdapter({
+    defaultFromAddress: 'donotreply@bonavistaleisurescapes.com',
+    defaultFromName: 'Bonavista Leisurescapes',
+    transport: nodemailer.createTransport({
+      host: 'smtp.office365.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'admin@bonavistaleisurescapes.com',
+        pass: 'vzdkgktbgvwhtvrk',
+      },
+    }),
+  }),
   db: vercelPostgresAdapter({
     pool: {
-      connectionString:
-        process.env.DATABASE_URI || 'postgresql://forrestdevs:@localhost:5432/bv-dev',
+      connectionString: process.env.DATABASE_URI || '',
     },
     migrationDir: path.resolve(dirname, 'lib/migrations'),
   }),
@@ -142,24 +152,24 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  // async onInit(payload) {
-  //   const existingUsers = await payload.find({
-  //     collection: 'users',
-  //     limit: 1,
-  //   })
+  async onInit(payload) {
+    const existingUsers = await payload.find({
+      collection: 'users',
+      limit: 1,
+    })
 
-  //   // This is useful for local development
-  //   // so you do not need to create a first-user every time
-  //   if (existingUsers.docs.length === 0) {
-  //     await payload.create({
-  //       collection: 'users',
-  //       data: {
-  //         name: 'ForrestDev',
-  //         email: 'admin@bonavistaleisurescapes.com',
-  //         password: 'devs',
-  //         roles: ['admin'],
-  //       },
-  //     })
-  //   }
-  // },
+    // This is useful for local development
+    // so you do not need to create a first-user every time
+    if (existingUsers.docs.length === 0) {
+      await payload.create({
+        collection: 'users',
+        data: {
+          name: 'Admin',
+          email: 'admin@bonavistaleisurescapes.com',
+          password: 'devs',
+          roles: ['admin'],
+        },
+      })
+    }
+  },
 })

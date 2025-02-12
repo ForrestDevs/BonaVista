@@ -42,12 +42,12 @@ const getCachedCustomer = cache(
     }
   },
   {
-    tags: (user: User) => ['getCustomer', user.id],
+    tags: (user: User) => ['getCustomer', user.id.toString()],
   },
 )
 
 export type CustomerDTO = {
-  id: string
+  id: number
   email: string
   firstName: string
   lastName: string
@@ -55,7 +55,7 @@ export type CustomerDTO = {
   billingAddress: PayloadJSON
   shippingAddresses: PayloadJSON[]
   stripeCustomerId: string
-  cart: string | Cart
+  cart: number | Cart
   metadata: PayloadJSON
 }
 
@@ -73,7 +73,7 @@ const getCachedCustomerDTO = cache(
   async (user: User) => {
     const payload = await getPayload()
 
-    const customerID = typeof user.customer === 'string' ? user.customer : user.customer.id
+    const customerID = typeof user.customer === 'object' ? user.customer.id : user.customer
 
     try {
       const customer = await payload.findByID({
@@ -105,6 +105,6 @@ const getCachedCustomerDTO = cache(
     }
   },
   {
-    tags: (user: User) => ['getCustomerDTO', user.id],
+    tags: (user: User) => ['getCustomerDTO', user.id.toString()],
   },
 )

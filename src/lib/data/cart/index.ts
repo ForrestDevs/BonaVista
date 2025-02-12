@@ -124,7 +124,7 @@ export const getCartById = cache(
 export async function getCart(depth?: number): Promise<Cart | null> {
   const customer = await getCustomer()
   if (customer) {
-    const cartId = typeof customer.cart === 'number' ? customer.cart : customer.cart?.id
+    const cartId = typeof customer.cart === 'object' ? customer.cart?.id : customer.cart
     const cart = await getCartById(cartId, depth)
     if (!cart) {
       return null
@@ -147,7 +147,7 @@ export async function getOrSetCart(): Promise<Cart | null> {
   const customer = await getCustomer()
   if (customer) {
     if (customer.cart) {
-      const cartID = typeof customer.cart === 'number' ? customer.cart : customer.cart?.id
+      const cartID = typeof customer.cart === 'object' ? customer.cart?.id : customer.cart
       const cart = await getCartById(cartID)
       if (!cart) {
         return null
@@ -183,11 +183,11 @@ function mergeItems(guestCart: Cart, customerCart: Cart): CartItem[] {
   const syncedItems: CartItem[] = [
     ...(guestCart?.items.map((item) => ({
       ...item,
-      product: typeof item.product === 'string' ? item.product : item.product?.id,
+      product: typeof item.product === 'object' ? item.product?.id : item.product,
     })) || []),
     ...(customerCart?.items.map((item) => ({
       ...item,
-      product: typeof item.product === 'string' ? item.product : item.product?.id,
+      product: typeof item.product === 'object' ? item.product?.id : item.product,
     })) || []),
   ].reduce((acc: CartItem[], item) => {
     const indexInAcc = acc.findIndex(({ id }) => id === item.id)
@@ -313,15 +313,15 @@ export async function addToCart(cartItem: CartItem): Promise<Cart | null> {
     }
 
     const { product } = cartItem
-    const productId = typeof product === 'string' ? product : product?.id
+    const productId = typeof product === 'object' ? product?.id : product
 
     // Find the index of the item in the cart that matches the new item
     // This checks both the product ID and variant (if applicable)
     const existingItemIndex = cart.items.findIndex(({ product: existingProduct, variantId }) => {
       const existingProductId =
-        typeof existingProduct === 'string' ? existingProduct : existingProduct?.id
+        typeof existingProduct === 'object' ? existingProduct?.id : existingProduct
       const newProductId =
-        typeof cartItem.product === 'string' ? cartItem.product : cartItem.product?.id
+        typeof cartItem.product === 'object' ? cartItem.product?.id : cartItem.product
       const existingVariantId = variantId ?? null
       const newVariantId = cartItem.variantId ?? null
 
@@ -420,10 +420,10 @@ export async function deleteCartItem({
       updatedCartItems = cart.items.filter((item) => item.id !== cartItemId)
     } else {
       const { product } = cartItem
-      const productId = typeof product === 'string' ? product : product?.id
+      const productId = typeof product === 'object' ? product?.id : product
 
       updatedCartItems = cart.items.filter((item) => {
-        const existingProductId = typeof item.product === 'string' ? item.product : item.product?.id
+        const existingProductId = typeof item.product === 'object' ? item.product?.id : item.product
         // If variant is provided, only delete items matching both ID and variant options
         if (cartItem?.variantId) {
           const existingVariantId = item.variantId ?? null
@@ -559,7 +559,7 @@ export async function clearCartItems(): Promise<Cart> {
  * 2. Revalidates the cart cache
  *
  */
-export async function deleteCart(cartId: string) {
+export async function deleteCart(cartId: number) {
   const payload = await getPayload()
 
   try {

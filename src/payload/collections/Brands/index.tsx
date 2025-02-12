@@ -6,7 +6,7 @@ import { slugField } from '@payload/fields/slug'
 export const Brands: CollectionConfig = {
   slug: BRAND_SLUG,
   admin: {
-    group: 'Shop',
+    group: 'Ecommerce',
     useAsTitle: 'name',
   },
   access: {

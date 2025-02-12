@@ -3,7 +3,7 @@ import { PRODUCT_CATEGORY_SLUG } from '../../constants'
 export async function getCategoryBreadcrumbs(
   req: any,
   categoryId: string,
-): Promise<{ name: string; slug: string; fullSlug: string }[]> {
+): Promise<{ name: string; slug: string; full_slug: string }[]> {
   const breadcrumbs = []
   let current = await req.payload.findByID({
     collection: PRODUCT_CATEGORY_SLUG,
@@ -12,9 +12,9 @@ export async function getCategoryBreadcrumbs(
 
   while (current) {
     breadcrumbs.unshift({
-      name: current.name,
+      name: current.title,
       slug: current.slug,
-      fullSlug: current.fullSlug,
+      full_slug: current.full_slug,
     })
     if (!current.parent) break
     const parentId = typeof current.parent === 'object' ? current.parent.id : current.parent

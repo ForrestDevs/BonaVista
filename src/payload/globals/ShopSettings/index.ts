@@ -6,6 +6,9 @@ export const ShopSettings: GlobalConfig = {
   access: {
     read: () => true,
   },
+  admin: {
+    group: 'Admin',
+  },
   fields: [
     {
       name: 'currency',

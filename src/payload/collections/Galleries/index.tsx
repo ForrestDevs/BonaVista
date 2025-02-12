@@ -15,6 +15,7 @@ const Galleries: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'updatedAt'],
+    group: 'Website',
   },
   fields: [
     {

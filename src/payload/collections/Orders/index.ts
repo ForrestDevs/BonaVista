@@ -15,7 +15,7 @@ const Orders: CollectionConfig = {
     update: admins,
   },
   admin: {
-    group: 'Shop',
+    group: 'Ecommerce',
     defaultColumns: ['createdAt', 'orderedBy'],
     preview: (doc) => `${process.env.NEXT_PUBLIC_SERVER_URL}/shop/orders/${doc.id}`,
     useAsTitle: 'createdAt',
@@ -124,46 +124,40 @@ const Orders: CollectionConfig = {
               defaultValue: false,
             },
             {
-              name: 'variant',
-              type: 'group',
+              name: 'variantId',
+              type: 'number',
+            },
+            {
+              name: 'variantOptions',
+              type: 'array',
               fields: [
                 {
-                  name: 'variantOptions',
-                  type: 'array',
+                  name: 'key',
+                  type: 'group',
                   fields: [
                     {
-                      name: 'key',
-                      type: 'group',
-                      fields: [
-                        {
-                          name: 'slug',
-                          type: 'text',
-                        },
-                        {
-                          name: 'label',
-                          type: 'text',
-                        },
-                      ],
+                      name: 'slug',
+                      type: 'text',
                     },
                     {
-                      name: 'value',
-                      type: 'group',
-                      fields: [
-                        {
-                          name: 'slug',
-                          type: 'text',
-                        },
-                        {
-                          name: 'label',
-                          type: 'text',
-                        },
-                      ],
+                      name: 'label',
+                      type: 'text',
                     },
                   ],
                 },
                 {
-                  name: 'id',
-                  type: 'text',
+                  name: 'value',
+                  type: 'group',
+                  fields: [
+                    {
+                      name: 'slug',
+                      type: 'text',
+                    },
+                    {
+                      name: 'label',
+                      type: 'text',
+                    },
+                  ],
                 },
               ],
             },
@@ -188,7 +182,7 @@ const Orders: CollectionConfig = {
           type: 'text',
         },
         {
-          name: 'thumbnailMediaId',
+          name: 'thumbnail',
           type: 'upload',
           relationTo: 'media',
         },

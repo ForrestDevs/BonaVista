@@ -4,6 +4,7 @@ const FormSubmissions: CollectionConfig = {
   slug: 'form-submissions',
   admin: {
     useAsTitle: 'email',
+    group: 'Website',
   },
   fields: [
     {

@@ -12,7 +12,7 @@ const BlogCategory: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    group: 'Blog',
+    group: 'Website',
     useAsTitle: 'title',
   },
   fields: [

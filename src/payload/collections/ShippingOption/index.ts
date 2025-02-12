@@ -5,6 +5,7 @@ export const ShippingOptions: CollectionConfig = {
   slug: SHIPPING_OPTION_SLUG,
   admin: {
     useAsTitle: 'name',
+    group: 'Admin',
   },
   fields: [
     {
