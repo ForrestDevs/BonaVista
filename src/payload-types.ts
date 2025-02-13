@@ -224,12 +224,14 @@ export interface Config {
     'shop-settings': ShopSetting;
     header: Header;
     footer: Footer;
+    'store-hours': StoreHours;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'shop-settings': ShopSettingsSelect<false> | ShopSettingsSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'store-hours': StoreHoursSelect<false> | StoreHoursSelect<true>;
   };
   locale: null;
   user: User & {
@@ -2989,6 +2991,25 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "store-hours".
+ */
+export interface StoreHours {
+  id: number;
+  /**
+   * Configure store hours for each day of the week
+   */
+  days: {
+    dayOfWeek: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+    isClosed?: boolean | null;
+    openTime?: string | null;
+    closeTime?: string | null;
+    id?: string | null;
+  }[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
@@ -3178,6 +3199,24 @@ export interface FooterSelect<T extends boolean = true> {
                   };
               id?: T;
             };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "store-hours_select".
+ */
+export interface StoreHoursSelect<T extends boolean = true> {
+  days?:
+    | T
+    | {
+        dayOfWeek?: T;
+        isClosed?: T;
+        openTime?: T;
+        closeTime?: T;
+        id?: T;
       };
   updatedAt?: T;
   createdAt?: T;

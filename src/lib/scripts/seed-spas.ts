@@ -269,7 +269,7 @@ async function seedSpas() {
         collection: 'media',
         data: {
           alt: `${spa.title} Thumbnail Image`,
-          folder: [mediaFolderId],
+          // folder: [mediaFolderId],
         },
         filePath: thumbImagePath,
       })
@@ -280,7 +280,7 @@ async function seedSpas() {
         collection: 'media',
         data: {
           alt: `${spa.title} Topdown Image`,
-          folder: [mediaFolderId],
+          // folder: [mediaFolderId],
         },
         filePath: topsideImagePath,
       })

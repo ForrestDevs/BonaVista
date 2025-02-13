@@ -110,7 +110,7 @@ const Pages: CollectionConfig = {
     },
   ],
   hooks: {
-    // afterChange: [revalidatePage],
+    afterChange: [revalidatePage],
     beforeChange: [populatePublishedAt],
   },
   versions: {

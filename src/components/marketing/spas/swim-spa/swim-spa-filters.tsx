@@ -7,32 +7,33 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DualRangeSlider } from '@/components/ui/slider'
 import { RangeLabel } from '@/components/ui/slider'
-import { useSearchParams } from 'next/navigation'
 import { useQueryStates } from 'nuqs'
-import { filterParamsParsers } from '../searchParams'
+import { swimSpaSearchParamsParsers } from './swim-spa-search-params'
 import { useState } from 'react'
 
-const seatOptions = {
-  min: 2,
-  max: 6,
+const lengthOptions = {
+  min: 13,
+  max: 19,
   step: 1,
 }
 
 const priceOptions = {
   min: 20000,
-  max: 50000,
+  max: 60000,
   step: 1000,
 }
 
 const collectionOptions = [
-  { name: 'Aquatic Training', slug: 'aquatic-training' },
-  { name: 'Performance', slug: 'performance' },
-  { name: 'Fitness', slug: 'fitness' },
+  { name: 'Executive Trainer', slug: 'executive-trainer' },
+  { name: 'Executive Sport', slug: 'executive-sport' },
+  { name: 'Aqua Trainer', slug: 'aqua-trainer' },
+  { name: 'Aqua Sport', slug: 'aqua-sport' },
+  { name: 'Aqua Play', slug: 'aqua-play' },
 ]
 
 export default function SpaFilters() {
   const [isOpen, setIsOpen] = useState(false)
-  const [filterParams, setFilterParams] = useQueryStates(filterParamsParsers)
+  const [filterParams, setFilterParams] = useQueryStates(swimSpaSearchParamsParsers)
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,9 +42,9 @@ export default function SpaFilters() {
     [setFilterParams],
   )
 
-  const handleSeatsChange = useCallback(
+  const handleLengthChange = useCallback(
     (value: number[]) => {
-      setFilterParams({ seats: value })
+      setFilterParams({ length: value })
     },
     [setFilterParams],
   )
@@ -132,17 +133,17 @@ export default function SpaFilters() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <p className="text-sm font-medium">Number of Seats</p>
+          <p className="text-sm font-medium">Length</p>
           <DualRangeSlider
-            value={filterParams.seats ?? [seatOptions.min, seatOptions.max]}
-            onValueChange={handleSeatsChange}
-            min={seatOptions.min}
-            max={seatOptions.max}
-            step={seatOptions.step}
+            value={filterParams.length ?? [lengthOptions.min, lengthOptions.max]}
+            onValueChange={handleLengthChange}
+            min={lengthOptions.min}
+            max={lengthOptions.max}
+            step={lengthOptions.step}
           />
           <RangeLabel
-            min={filterParams.seats?.[0] ?? seatOptions.min}
-            max={filterParams.seats?.[1] ?? seatOptions.max}
+            min={filterParams.length?.[0] ?? lengthOptions.min}
+            max={filterParams.length?.[1] ?? lengthOptions.max}
           />
         </div>
 
@@ -172,4 +173,4 @@ export default function SpaFilters() {
       </div>
     </div>
   )
-} 
+}

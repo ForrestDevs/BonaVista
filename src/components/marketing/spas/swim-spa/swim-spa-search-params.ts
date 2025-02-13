@@ -1,15 +1,15 @@
 import { parseAsString, createSearchParamsCache, parseAsArrayOf, parseAsInteger } from 'nuqs/server'
 
-export const filterParamsParsers = {
+export const swimSpaSearchParamsParsers = {
   search: parseAsString.withOptions({ clearOnDefault: true, shallow: false }).withDefault(''),
-  seats: parseAsArrayOf(parseAsInteger)
+  length: parseAsArrayOf(parseAsInteger)
     .withOptions({ clearOnDefault: true, shallow: false })
-    .withDefault([3, 8]),
+    .withDefault([13, 19]),
   price: parseAsArrayOf(parseAsInteger)
     .withOptions({ clearOnDefault: true, shallow: false })
-    .withDefault([10000, 20000]),
+    .withDefault([20000, 60000]),
   collections: parseAsArrayOf(parseAsString)
     .withOptions({ clearOnDefault: true, shallow: false })
     .withDefault([]),
 }
-export const filterParamsCache = createSearchParamsCache(filterParamsParsers)
+export const swimSpaSearchParamsCache = createSearchParamsCache(swimSpaSearchParamsParsers)

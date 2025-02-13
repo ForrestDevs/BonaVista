@@ -519,6 +519,15 @@ export const enum_footer_shop_footer_nav_items_link_type = pgEnum(
   'enum_footer_shop_footer_nav_items_link_type',
   ['reference', 'custom'],
 )
+export const enum_store_hours_days_day_of_week = pgEnum('enum_store_hours_days_day_of_week', [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+])
 
 export const blog_categories = pgTable(
   'blog_categories',
@@ -1952,30 +1961,6 @@ export const pages_blocks_featured_spas = pgTable(
   }),
 )
 
-export const pages_breadcrumbs = pgTable(
-  'pages_breadcrumbs',
-  {
-    _order: integer('_order').notNull(),
-    _parentID: integer('_parent_id').notNull(),
-    id: varchar('id').primaryKey(),
-    doc: integer('doc_id').references(() => pages.id, {
-      onDelete: 'set null',
-    }),
-    url: varchar('url'),
-    label: varchar('label'),
-  },
-  (columns) => ({
-    _orderIdx: index('pages_breadcrumbs_order_idx').on(columns._order),
-    _parentIDIdx: index('pages_breadcrumbs_parent_id_idx').on(columns._parentID),
-    pages_breadcrumbs_doc_idx: index('pages_breadcrumbs_doc_idx').on(columns.doc),
-    _parentIDFk: foreignKey({
-      columns: [columns['_parentID']],
-      foreignColumns: [pages.id],
-      name: 'pages_breadcrumbs_parent_id_fk',
-    }).onDelete('cascade'),
-  }),
-)
-
 export const pages = pgTable(
   'pages',
   {
@@ -2003,9 +1988,6 @@ export const pages = pgTable(
     }),
     meta_description: varchar('meta_description'),
     publishedAt: timestamp('published_at', { mode: 'string', withTimezone: true, precision: 3 }),
-    parent: integer('parent_id').references((): AnyPgColumn => pages.id, {
-      onDelete: 'set null',
-    }),
     updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
       .defaultNow()
       .notNull(),
@@ -2021,7 +2003,6 @@ export const pages = pgTable(
     ),
     pages_hero_hero_media_idx: index('pages_hero_hero_media_idx').on(columns.hero_media),
     pages_meta_meta_image_idx: index('pages_meta_meta_image_idx').on(columns.meta_image),
-    pages_parent_idx: index('pages_parent_idx').on(columns.parent),
     pages_updated_at_idx: index('pages_updated_at_idx').on(columns.updatedAt),
     pages_created_at_idx: index('pages_created_at_idx').on(columns.createdAt),
     pages__status_idx: index('pages__status_idx').on(columns._status),
@@ -2723,33 +2704,6 @@ export const _pages_v_blocks_featured_spas = pgTable(
   }),
 )
 
-export const _pages_v_version_breadcrumbs = pgTable(
-  '_pages_v_version_breadcrumbs',
-  {
-    _order: integer('_order').notNull(),
-    _parentID: integer('_parent_id').notNull(),
-    id: serial('id').primaryKey(),
-    doc: integer('doc_id').references(() => pages.id, {
-      onDelete: 'set null',
-    }),
-    url: varchar('url'),
-    label: varchar('label'),
-    _uuid: varchar('_uuid'),
-  },
-  (columns) => ({
-    _orderIdx: index('_pages_v_version_breadcrumbs_order_idx').on(columns._order),
-    _parentIDIdx: index('_pages_v_version_breadcrumbs_parent_id_idx').on(columns._parentID),
-    _pages_v_version_breadcrumbs_doc_idx: index('_pages_v_version_breadcrumbs_doc_idx').on(
-      columns.doc,
-    ),
-    _parentIDFk: foreignKey({
-      columns: [columns['_parentID']],
-      foreignColumns: [_pages_v.id],
-      name: '_pages_v_version_breadcrumbs_parent_id_fk',
-    }).onDelete('cascade'),
-  }),
-)
-
 export const _pages_v = pgTable(
   '_pages_v',
   {
@@ -2783,9 +2737,6 @@ export const _pages_v = pgTable(
       mode: 'string',
       withTimezone: true,
       precision: 3,
-    }),
-    version_parent: integer('version_parent_id').references(() => pages.id, {
-      onDelete: 'set null',
     }),
     version_updatedAt: timestamp('version_updated_at', {
       mode: 'string',
@@ -2821,9 +2772,6 @@ export const _pages_v = pgTable(
     _pages_v_version_meta_version_meta_image_idx: index(
       '_pages_v_version_meta_version_meta_image_idx',
     ).on(columns.version_meta_image),
-    _pages_v_version_version_parent_idx: index('_pages_v_version_version_parent_idx').on(
-      columns.version_parent,
-    ),
     _pages_v_version_version_updated_at_idx: index('_pages_v_version_version_updated_at_idx').on(
       columns.version_updatedAt,
     ),
@@ -4389,6 +4337,37 @@ export const footer_rels = pgTable(
   }),
 )
 
+export const store_hours_days = pgTable(
+  'store_hours_days',
+  {
+    _order: integer('_order').notNull(),
+    _parentID: integer('_parent_id').notNull(),
+    id: varchar('id').primaryKey(),
+    dayOfWeek: enum_store_hours_days_day_of_week('day_of_week').notNull(),
+    isClosed: boolean('is_closed').default(false),
+    openTime: timestamp('open_time', { mode: 'string', withTimezone: true, precision: 3 }),
+    closeTime: timestamp('close_time', { mode: 'string', withTimezone: true, precision: 3 }),
+  },
+  (columns) => ({
+    _orderIdx: index('store_hours_days_order_idx').on(columns._order),
+    _parentIDIdx: index('store_hours_days_parent_id_idx').on(columns._parentID),
+    store_hours_days_day_of_week_idx: uniqueIndex('store_hours_days_day_of_week_idx').on(
+      columns.dayOfWeek,
+    ),
+    _parentIDFk: foreignKey({
+      columns: [columns['_parentID']],
+      foreignColumns: [store_hours.id],
+      name: 'store_hours_days_parent_id_fk',
+    }).onDelete('cascade'),
+  }),
+)
+
+export const store_hours = pgTable('store_hours', {
+  id: serial('id').primaryKey(),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 }),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 }),
+})
+
 export const relations_blog_categories = relations(blog_categories, () => ({}))
 export const relations_media = relations(media, () => ({}))
 export const relations_users_roles = relations(users_roles, ({ one }) => ({
@@ -4974,18 +4953,6 @@ export const relations_pages_blocks_featured_spas = relations(
     }),
   }),
 )
-export const relations_pages_breadcrumbs = relations(pages_breadcrumbs, ({ one }) => ({
-  _parentID: one(pages, {
-    fields: [pages_breadcrumbs._parentID],
-    references: [pages.id],
-    relationName: 'breadcrumbs',
-  }),
-  doc: one(pages, {
-    fields: [pages_breadcrumbs.doc],
-    references: [pages.id],
-    relationName: 'doc',
-  }),
-}))
 export const relations_pages_rels = relations(pages_rels, ({ one }) => ({
   parent: one(pages, {
     fields: [pages_rels.parent],
@@ -5084,14 +5051,6 @@ export const relations_pages = relations(pages, ({ one, many }) => ({
     fields: [pages.meta_image],
     references: [media.id],
     relationName: 'meta_image',
-  }),
-  parent: one(pages, {
-    fields: [pages.parent],
-    references: [pages.id],
-    relationName: 'parent',
-  }),
-  breadcrumbs: many(pages_breadcrumbs, {
-    relationName: 'breadcrumbs',
   }),
   _rels: many(pages_rels, {
     relationName: '_rels',
@@ -5341,21 +5300,6 @@ export const relations__pages_v_blocks_featured_spas = relations(
     }),
   }),
 )
-export const relations__pages_v_version_breadcrumbs = relations(
-  _pages_v_version_breadcrumbs,
-  ({ one }) => ({
-    _parentID: one(_pages_v, {
-      fields: [_pages_v_version_breadcrumbs._parentID],
-      references: [_pages_v.id],
-      relationName: 'version_breadcrumbs',
-    }),
-    doc: one(pages, {
-      fields: [_pages_v_version_breadcrumbs.doc],
-      references: [pages.id],
-      relationName: 'doc',
-    }),
-  }),
-)
 export const relations__pages_v_rels = relations(_pages_v_rels, ({ one }) => ({
   parent: one(_pages_v, {
     fields: [_pages_v_rels.parent],
@@ -5459,14 +5403,6 @@ export const relations__pages_v = relations(_pages_v, ({ one, many }) => ({
     fields: [_pages_v.version_meta_image],
     references: [media.id],
     relationName: 'version_meta_image',
-  }),
-  version_parent: one(pages, {
-    fields: [_pages_v.version_parent],
-    references: [pages.id],
-    relationName: 'version_parent',
-  }),
-  version_breadcrumbs: many(_pages_v_version_breadcrumbs, {
-    relationName: 'version_breadcrumbs',
   }),
   _rels: many(_pages_v_rels, {
     relationName: '_rels',
@@ -6072,6 +6008,18 @@ export const relations_footer = relations(footer, ({ many }) => ({
     relationName: '_rels',
   }),
 }))
+export const relations_store_hours_days = relations(store_hours_days, ({ one }) => ({
+  _parentID: one(store_hours, {
+    fields: [store_hours_days._parentID],
+    references: [store_hours.id],
+    relationName: 'days',
+  }),
+}))
+export const relations_store_hours = relations(store_hours, ({ many }) => ({
+  days: many(store_hours_days, {
+    relationName: 'days',
+  }),
+}))
 
 type DatabaseSchema = {
   enum_users_roles: typeof enum_users_roles
@@ -6190,6 +6138,7 @@ type DatabaseSchema = {
   enum_header_shop_items_item_link_type: typeof enum_header_shop_items_item_link_type
   enum_footer_site_footer_nav_items_link_type: typeof enum_footer_site_footer_nav_items_link_type
   enum_footer_shop_footer_nav_items_link_type: typeof enum_footer_shop_footer_nav_items_link_type
+  enum_store_hours_days_day_of_week: typeof enum_store_hours_days_day_of_week
   blog_categories: typeof blog_categories
   media: typeof media
   users_roles: typeof users_roles
@@ -6241,7 +6190,6 @@ type DatabaseSchema = {
   pages_blocks_contact: typeof pages_blocks_contact
   pages_blocks_latest_posts: typeof pages_blocks_latest_posts
   pages_blocks_featured_spas: typeof pages_blocks_featured_spas
-  pages_breadcrumbs: typeof pages_breadcrumbs
   pages: typeof pages
   pages_rels: typeof pages_rels
   _pages_v_version_hero_links: typeof _pages_v_version_hero_links
@@ -6267,7 +6215,6 @@ type DatabaseSchema = {
   _pages_v_blocks_contact: typeof _pages_v_blocks_contact
   _pages_v_blocks_latest_posts: typeof _pages_v_blocks_latest_posts
   _pages_v_blocks_featured_spas: typeof _pages_v_blocks_featured_spas
-  _pages_v_version_breadcrumbs: typeof _pages_v_version_breadcrumbs
   _pages_v: typeof _pages_v
   _pages_v_rels: typeof _pages_v_rels
   posts_populated_authors: typeof posts_populated_authors
@@ -6318,6 +6265,8 @@ type DatabaseSchema = {
   footer_shop_footer_nav_items: typeof footer_shop_footer_nav_items
   footer: typeof footer
   footer_rels: typeof footer_rels
+  store_hours_days: typeof store_hours_days
+  store_hours: typeof store_hours
   relations_blog_categories: typeof relations_blog_categories
   relations_media: typeof relations_media
   relations_users_roles: typeof relations_users_roles
@@ -6369,7 +6318,6 @@ type DatabaseSchema = {
   relations_pages_blocks_contact: typeof relations_pages_blocks_contact
   relations_pages_blocks_latest_posts: typeof relations_pages_blocks_latest_posts
   relations_pages_blocks_featured_spas: typeof relations_pages_blocks_featured_spas
-  relations_pages_breadcrumbs: typeof relations_pages_breadcrumbs
   relations_pages_rels: typeof relations_pages_rels
   relations_pages: typeof relations_pages
   relations__pages_v_version_hero_links: typeof relations__pages_v_version_hero_links
@@ -6395,7 +6343,6 @@ type DatabaseSchema = {
   relations__pages_v_blocks_contact: typeof relations__pages_v_blocks_contact
   relations__pages_v_blocks_latest_posts: typeof relations__pages_v_blocks_latest_posts
   relations__pages_v_blocks_featured_spas: typeof relations__pages_v_blocks_featured_spas
-  relations__pages_v_version_breadcrumbs: typeof relations__pages_v_version_breadcrumbs
   relations__pages_v_rels: typeof relations__pages_v_rels
   relations__pages_v: typeof relations__pages_v
   relations_posts_populated_authors: typeof relations_posts_populated_authors
@@ -6446,6 +6393,8 @@ type DatabaseSchema = {
   relations_footer_shop_footer_nav_items: typeof relations_footer_shop_footer_nav_items
   relations_footer_rels: typeof relations_footer_rels
   relations_footer: typeof relations_footer
+  relations_store_hours_days: typeof relations_store_hours_days
+  relations_store_hours: typeof relations_store_hours
 }
 
 declare module '@payloadcms/db-vercel-postgres/types' {

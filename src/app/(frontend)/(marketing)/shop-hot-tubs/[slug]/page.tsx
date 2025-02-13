@@ -21,7 +21,6 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug } = await params
   const spa = await querySpaBySlug(slug)
 
-
   return generateMeta({ doc: spa, collectionSlug: SPA_SLUG })
 }
 

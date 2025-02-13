@@ -6,11 +6,11 @@ import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils/cn'
 import { Label } from '@/components/ui/label'
-import { filterParamsParsers } from '../searchParams'
+import { hotTubSearchParamsParsers } from './hot-tub-search-params'
 import { RangeLabel, DualRangeSlider } from '@/components/ui/slider'
 
-export default function SpaFilters() {
-  const [filterParams, setFilterParams] = useQueryStates(filterParamsParsers)
+export default function HotTubFilters() {
+  const [filterParams, setFilterParams] = useQueryStates(hotTubSearchParamsParsers)
   const [isOpen, setIsOpen] = useState(false)
 
   const seatOptions = {
@@ -20,7 +20,7 @@ export default function SpaFilters() {
   }
   const priceOptions = {
     min: 10000,
-    max: 20000,
+    max: 22000,
     step: 500,
   }
   const collectionOptions = [
