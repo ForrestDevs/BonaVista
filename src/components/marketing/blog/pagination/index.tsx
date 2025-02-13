@@ -6,7 +6,7 @@ import { PageRange } from '@/components/marketing/blog/pagination/page-range'
 import { POST_SLUG } from '@/payload/collections/constants'
 
 type Props = {
-  category?: string
+  category?: number
   page?: number
 }
 

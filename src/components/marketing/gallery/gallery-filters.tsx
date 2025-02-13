@@ -12,13 +12,16 @@ import {
 import { Button } from '@/components/ui/button'
 import clsx from 'clsx'
 import { parseAsString, useQueryStates } from 'nuqs'
+import getPayload from '@/lib/utils/getPayload'
+import { GALLERIES_SLUG } from '@/payload/collections/constants'
+import { gallerySearchParamsParsers } from './gallery-search-params'
 
-export default function GalleryFilters({ collections }: { collections: Gallery[] }) {
-  const [currentCollection, setCurrentCollection] = useQueryStates({
-    collection: parseAsString.withDefault(collections[0]?.slug).withOptions({
-      clearOnDefault: false,
-    }),
-  })
+type GalleryFiltersProps = {
+  collections: Pick<Gallery, 'id' | 'title' | 'slug'>[]
+}
+
+export default function GalleryFilters({ collections }: GalleryFiltersProps) {
+  const [currentCollection, setCurrentCollection] = useQueryStates(gallerySearchParamsParsers)
 
   return (
     <section className="container">

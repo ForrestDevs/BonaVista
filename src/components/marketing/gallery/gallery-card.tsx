@@ -6,11 +6,11 @@ type Args = {
   image: MediaType
 }
 
-export function ImageCard({ image }: Args) {
+export function GalleryCard({ image }: Args) {
   return (
     <div className="aspect-square w-full h-full">
-      <MediaComponent 
-        resource={image} 
+      <MediaComponent
+        resource={image}
         size="360px"
         className="h-full w-full"
         imgClassName="object-cover w-full h-full"

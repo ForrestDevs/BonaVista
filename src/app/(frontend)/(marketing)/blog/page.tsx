@@ -9,6 +9,7 @@ import { queryPageBySlug } from '@/lib/utils/queryBySlug'
 import { generateMeta } from '@/lib/utils/generateMeta'
 import { BLOG_CATEGORY_SLUG, PAGE_SLUG } from '@/payload/collections/constants'
 import { getCachedDocuments } from '@/lib/utils/getDocument'
+import LoadingPage from '@/components/layout/suspense/loading-page'
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await queryPageBySlug('blog')
@@ -35,8 +36,8 @@ export default async function Page({ searchParams }: Args) {
   const categoryId = categories?.find((result) => result.slug === category)?.id
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <div className="flex flex-col min-h-screen space-y-16">
+    <Suspense fallback={<LoadingPage />}>
+      <div className="flex flex-col min-h-screen gap-20">
         <RenderHero {...blogLayout.hero} />
         <BlogIntro />
         <BlogFilters categories={categories} />

@@ -1,7 +1,7 @@
 import { draftMode } from 'next/headers'
 import getPayload from './getPayload'
 import { cache } from '@/lib/utils/cache'
-import { PAGE_SLUG, POST_SLUG, SPA_SLUG } from '@/payload/collections/constants'
+import { GALLERIES_SLUG, PAGE_SLUG, POST_SLUG, SPA_SLUG } from '@/payload/collections/constants'
 
 export const queryPostBySlug = cache(
   async ({ slug }: { slug: string }) => {
@@ -69,5 +69,27 @@ export const querySpaBySlug = cache(
   {
     tags: (slug) => [`spa-${slug}`],
     revalidate: 3600,
+  },
+)
+
+export const queryGalleryBySlug = cache(
+  async (slug: string) => {
+    const { isEnabled: draft } = await draftMode()
+    const payload = await getPayload()
+    const result = await payload.find({
+      collection: GALLERIES_SLUG,
+      draft,
+      limit: 1,
+      overrideAccess: draft,
+      where: {
+        slug: {
+          equals: slug,
+        },
+      },
+    })
+    return result.docs?.[0] || null
+  },
+  {
+    tags: (slug) => [`gallery-${slug}`],
   },
 )
