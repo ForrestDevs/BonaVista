@@ -1,11 +1,9 @@
-import React, { cache } from 'react'
+import React from 'react'
 import type { Metadata } from 'next'
 import getPayload from '@lib/utils/getPayload'
 
 import { RelatedPosts } from '@/components/payload/blocks/RelatedPosts'
 import { PayloadRedirects } from '@/components/payload/PayloadRedirects'
-import { draftMode } from 'next/headers'
-
 import RichText from '@/components/payload/RichText'
 import type { Post } from '@/payload-types'
 

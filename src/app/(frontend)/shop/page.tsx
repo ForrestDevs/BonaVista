@@ -143,7 +143,7 @@ export default async function StoreHome() {
       depth: 1,
       where: {
         collections: {
-          in: ['67aadde8d9fad6d03cb36e83'],
+          in: [1],
         },
       },
     })

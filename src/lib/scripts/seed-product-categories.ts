@@ -198,6 +198,8 @@ const seedProductCategories = async () => {
       poolAccessories.id,
     )
 
+    
+
     // Outdoor Living subcategories
     await createCategory(
       'Patio Furniture',
