@@ -26,24 +26,9 @@ const Pages: CollectionConfig = {
   admin: {
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
-      url: ({ data, req }) => {
-        const path = generatePreviewPath({
-          slug: typeof data?.slug === 'string' ? data.slug : '',
-          collection: 'pages',
-          req,
-        })
-
-        return path
-      },
+      url: () => `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
     },
-    // preview: (data) => {
-    //   const path = generatePreviewPath({
-    //     slug: typeof data?.slug === 'string' ? data.slug : '',
-    //     collection: 'pages',
-    //   })
-
-    //   return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
-    // },
+    preview: () => `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
     group: 'Website',
     useAsTitle: 'title',
   },

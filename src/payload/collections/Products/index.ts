@@ -38,26 +38,10 @@ const Products: CollectionConfig = {
   admin: {
     group: 'Ecommerce',
     defaultColumns: ['title', 'stripeProductID', '_status'],
-    // livePreview: {
-    //   url: ({ data, req }) => {
-    //     const path = generatePreviewPath({
-    //       slug: typeof data?.slug === 'string' ? data.slug : '',
-    //       collection: 'products',
-    //       req,
-    //     })
-
-    //     return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
-    //   },
-    // },
-    // preview: (data, { req }) => {
-    //   const path = generatePreviewPath({
-    //     slug: typeof data?.slug === 'string' ? data.slug : '',
-    //     collection: 'products',
-    //     req,
-    //   })
-
-    //   return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
-    // },
+    livePreview: {
+      url: () => `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
+    },
+    preview: () => `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
     useAsTitle: 'title',
   },
   fields: [

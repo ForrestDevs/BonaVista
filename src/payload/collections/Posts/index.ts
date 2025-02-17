@@ -38,24 +38,10 @@ const Posts: CollectionConfig = {
     group: 'Website',
     description: 'Blog posts',
     defaultColumns: ['title', 'slug', 'updatedAt'],
-    // livePreview: {
-    //   url: ({ data }) => {
-    //     const path = generatePreviewPath({
-    //       slug: typeof data?.slug === 'string' ? data.slug : '',
-    //       collection: 'posts',
-    //     })
-
-    //     return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
-    //   },
-    // },
-    // preview: (data) => {
-    //   const path = generatePreviewPath({
-    //     slug: typeof data?.slug === 'string' ? data.slug : '',
-    //     collection: 'posts',
-    //   })
-
-    //   return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
-    // },
+    livePreview: {
+      url: () => `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
+    },
+    preview: () => `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
     useAsTitle: 'title',
   },
   fields: [
