@@ -152,24 +152,26 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  async onInit(payload) {
-    const existingUsers = await payload.find({
-      collection: 'users',
-      limit: 1,
-    })
-
-    // This is useful for local development
-    // so you do not need to create a first-user every time
-    if (existingUsers.docs.length === 0) {
-      await payload.create({
+  ...(process.env.NODE_ENV === 'development' && {
+    onInit: async (payload) => {
+      const existingUsers = await payload.find({
         collection: 'users',
-        data: {
-          name: 'Admin',
-          email: 'admin@bonavistaleisurescapes.com',
-          password: 'devs',
-          roles: ['admin'],
-        },
+        limit: 1,
       })
-    }
-  },
+
+      // This is useful for local development
+      // so you do not need to create a first-user every time
+      if (existingUsers.docs.length === 0) {
+        await payload.create({
+          collection: 'users',
+          data: {
+            name: 'Admin',
+            email: 'admin@bonavistaleisurescapes.com',
+            password: 'devs',
+            roles: ['admin'],
+          },
+        })
+      }
+    },
+  }),
 })
