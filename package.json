@@ -16,7 +16,8 @@
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "sitemap:generate": "cross-env NODE_OPTIONS=--no-deprecation bun ./src/lib/scripts/build-sitemaps.ts"
+    "sitemap:generate": "cross-env NODE_OPTIONS=--no-deprecation bun ./src/lib/scripts/build-sitemaps.ts",
+    "ci": "payload migrate && pnpm build && pnpm sitemap:generate"
   },
   "dependencies": {
     "@hookform/resolvers": "latest",
