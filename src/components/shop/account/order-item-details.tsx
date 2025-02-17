@@ -9,7 +9,7 @@ function ThumbnailSkeleton() {
   return <div className="h-24 w-24 flex-shrink-0 rounded-md bg-neutral-100 animate-pulse" />
 }
 
-async function ThumbnailImage({ id }: { id: string }) {
+async function ThumbnailImage({ id }: { id: number }) {
   const payload = await getPayload()
   const media = await payload.findByID({
     collection: 'media',
@@ -29,8 +29,7 @@ async function ThumbnailImage({ id }: { id: string }) {
 
 export async function OrderItemThumbnail({ line }: { line: OrderItem }) {
   const product = typeof line.product === 'object' ? line.product : null
-  const mediaId =
-    typeof line.thumbnailMediaId === 'object' ? line.thumbnailMediaId.id : line.thumbnailMediaId
+  const mediaId = typeof line.thumbnail === 'object' ? line.thumbnail.id : line.thumbnail
 
   return (
     <div className="w-16 sm:w-24">
@@ -55,9 +54,7 @@ export async function OrderItemThumbnail({ line }: { line: OrderItem }) {
 export default function OrderItemDetails({ item }: { item: OrderItem }) {
   const productTitle = typeof item.product === 'object' ? item.product.title : item.product
   const isVariant = item.isVariant
-  const variantOptions = isVariant
-    ? item.variant.variantOptions.map((v) => v.value.label).join(', ')
-    : null
+  const variantOptions = isVariant ? item.variantOptions.map((v) => v.value.label).join(', ') : null
 
   return (
     <div className="">

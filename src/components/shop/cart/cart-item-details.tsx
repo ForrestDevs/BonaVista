@@ -7,7 +7,8 @@ export function CartItemThumbnail({ line }: { line: CartItem }) {
   const product = typeof line.product === 'object' ? line.product : null
   const isVariant = line.isVariant
   const thumbnail = isVariant
-    ? product?.variants.variantProducts.find((v) => v.id === line.variantId)?.images[0]?.image
+    ? product?.variants.variantProducts.find((v) => v.id === line.variantId.toString())?.images[0]
+        ?.image
     : product?.baseProduct?.images[0]?.image
 
   return (

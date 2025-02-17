@@ -1,12 +1,12 @@
 import React from 'react'
-import { ShopCollection } from '@payload-types'
 import { Card, CardHeader, CardContent, CardFooter, CardTitle } from '@components/ui/card'
 import { SparklesIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@components/ui/button'
 import { ChevronRightIcon } from 'lucide-react'
+import { ProductCollection } from '@payload-types'
 
-export default function ProductCollectionCard({ collection }: { collection: ShopCollection }) {
+export default function ProductCollectionCard({ collection }: { collection: ProductCollection }) {
   return (
     <Card className="group hover:shadow-lg transition-shadow duration-300">
       <CardHeader>

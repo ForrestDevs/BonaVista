@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server'
 const allowedOrigins = [
   process.env.NEXT_PUBLIC_SERVER_URL,
   'https://bonavistaleisurescapes.com',
+  'https://bona-vista.vercel.app',
 ].filter(Boolean) // Filter out any undefined values
 
 const corsOptions = {

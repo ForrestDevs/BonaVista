@@ -43,7 +43,7 @@ export default async function ProductDetail({ params }: Props) {
     notFound()
   }
 
-  const brands = product.brand?.map((brand) => (typeof brand === 'string' ? brand : brand.name))
+  const brands = product.brand?.map((brand) => (typeof brand === 'object' ? brand.name : brand))
   const price = product.enableVariants
     ? product.variants.variantProducts[0].price
     : product.baseProduct.price
@@ -139,7 +139,7 @@ export default async function ProductDetail({ params }: Props) {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {product.relatedProducts.map(
                   (relatedProduct) =>
-                    typeof relatedProduct !== 'string' && (
+                    typeof relatedProduct !== 'number' && (
                       <ProductCard key={relatedProduct.id} product={relatedProduct} />
                     ),
                 )}

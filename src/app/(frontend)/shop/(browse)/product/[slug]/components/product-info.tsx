@@ -16,11 +16,11 @@ export function ProductInfo() {
     },
     {
       label: 'Compatibility',
-      value: currentCompatibility 
+      value: currentCompatibility
         ? currentCompatibility
             .join('-')
             .split(/[-_]/)
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join(' ')
         : 'N/A',
     },
@@ -28,7 +28,7 @@ export function ProductInfo() {
       label: 'Collections',
       value: productCollections?.length
         ? productCollections
-            .map((collection) => (typeof collection === 'string' ? collection : collection.title))
+            .map((collection) => (typeof collection === 'object' ? collection.title : collection))
             .join(', ')
         : 'N/A',
     },
@@ -38,13 +38,16 @@ export function ProductInfo() {
     <div className="rounded-lg border p-6 shadow-sm">
       <div className="grid gap-6">
         {infoSections.map(({ label, value }) => (
-          <div key={label} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+          <div
+            key={label}
+            className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
+          >
             <span className="font-medium text-muted-foreground">{label}</span>
             {label === 'Collections' && value !== 'N/A' ? (
               <div className="flex flex-wrap gap-2 justify-end">
                 {(typeof value === 'string' ? value.split(', ') : value).map((collection) => (
-                  <Badge 
-                    key={collection} 
+                  <Badge
+                    key={collection}
                     variant="secondary"
                     className="px-3 py-1 text-sm font-medium"
                   >

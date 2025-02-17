@@ -9,8 +9,8 @@ type ProductContextType = {
   selectedVariant: EnhancedProductVariant | null
   setSelectedVariant: (variant: EnhancedProductVariant | null) => void
   currentPrice: number
-  currentImages: Array<{ image?: (string | null) | Media; id?: string | null }>
-  allImages: Array<{ image?: (string | null) | Media; id?: string | null }>
+  currentImages: Array<{ image?: (number | null) | Media; id?: string | null }>
+  allImages: Array<{ image?: (number | null) | Media; id?: string | null }>
   isVariantSelected: boolean
   quantity: number
   setQuantity: (quantity: number) => void

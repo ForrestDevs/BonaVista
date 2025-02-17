@@ -28,7 +28,7 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
     const isVariant = line.isVariant
     const variantProduct = isVariant
       ? (product?.variants.variantProducts.find(
-          (v) => v.id === line.variantId,
+          (v) => v.id === line.variantId.toString(),
         ) as EnhancedProductVariant)
       : null
 
@@ -55,10 +55,8 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
       quantity: quantity,
       thumbnailMediaId: thumbnail,
       isVariant: isVariant,
-      variant: {
-        id: line.variantId,
-        variantOptions: variantOptions,
-      },
+      variantId: line.variantId,
+      variantOptions: variantOptions,
     }
 
     return newCheckoutLineItem
@@ -109,7 +107,7 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
           amount={subtotal}
           currencyCode="CAD"
           description={`Order for ${cart.items.length} items`}
-          cartId={cart.id.toString()}
+          cartId={cart.id}
           lineItems={lineItems}
           stripeCustomerId={customer?.stripeCustomerId}
           customerEmail={customer?.email}

@@ -23,7 +23,7 @@ interface ShippingStepProps {
 export function ShippingStep({ initialAddress, onComplete, onBack }: ShippingStepProps) {
   const [address, setAddress] = useState<StripeAddress | null>(null)
   const [shippingMethods, setShippingMethods] = useState<ShippingOption[]>([])
-  const [selectedMethod, setSelectedMethod] = useState<string | null>(null)
+  const [selectedMethod, setSelectedMethod] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const elements = useElements()
   const { session, updateSession } = useCheckoutContext()
@@ -192,11 +192,14 @@ export function ShippingStep({ initialAddress, onComplete, onBack }: ShippingSte
           {address && shippingMethods.length > 0 && (
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Shipping Method</h3>
-              <RadioGroup value={selectedMethod || undefined} onValueChange={setSelectedMethod}>
+              <RadioGroup
+                value={selectedMethod?.toString() || undefined}
+                onValueChange={(value) => setSelectedMethod(parseInt(value))}
+              >
                 {shippingMethods.map((method) => (
                   <div key={method.id} className="flex items-center space-x-3 space-y-0">
-                    <RadioGroupItem value={method.id} id={method.id} />
-                    <Label htmlFor={method.id} className="flex-1">
+                    <RadioGroupItem value={method.id.toString()} id={method.id.toString()} />
+                    <Label htmlFor={method.id.toString()} className="flex-1">
                       <div className="flex justify-between">
                         <span>{method.name}</span>
                         <span>

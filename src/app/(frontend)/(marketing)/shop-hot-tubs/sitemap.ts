@@ -8,7 +8,7 @@ export async function generateSitemaps() {
   const hotTubs = await getAllHotTubs()
   const totalHotTubs = hotTubs.length
   const numSitemaps = Math.ceil(totalHotTubs / 50000)
-  return Array.from({ length: numSitemaps }, (_, i) => ({ id: i }))
+  return Array.from({ length: numSitemaps }, (_, i) => ({ id: i + 1 }))
 }
 
 export default async function sitemap({ id }: { id: number }): Promise<MetadataRoute.Sitemap> {

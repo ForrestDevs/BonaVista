@@ -4,15 +4,6 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { cache, Fragment, Suspense } from 'react'
 import { Button } from '@components/ui/button'
-import { Input } from '@components/ui/input'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@components/ui/card'
 import {
   ChevronRightIcon,
   SparklesIcon,
@@ -26,12 +17,6 @@ import {
   Truck,
   Star,
 } from 'lucide-react'
-import { draftMode } from 'next/headers'
-import { generateMeta } from '@lib/utils/generateMeta'
-import { Page } from '@payload-types'
-import { getDocument, getCachedDocument } from '@lib/utils/getDocument'
-import { RenderBlocks } from '@components/payload/blocks'
-import { RenderHero } from '@components/payload/heros'
 import { Carousel } from '@/components/shop/carousel'
 import Image from 'next/image'
 import { ProductCard } from '@/components/shop/products/product-card'

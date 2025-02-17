@@ -100,19 +100,19 @@ export function ShippingRatesSection({
           const rate = calculateShippingRate(option, cartTotal)
           return (
             <div key={option.id} className="flex items-center space-x-3">
-              <RadioGroupItem value={option.id} id={option.id} />
-              <Label htmlFor={option.id} className="flex-1">
+              <RadioGroupItem value={option.id.toString()} id={option.id.toString()} />
+              <Label htmlFor={option.id.toString()} className="flex-1">
                 <div className="flex justify-between items-center">
                   <span>{option.name}</span>
-                  <span className="font-medium">
-                    {rate === 0 ? 'FREE' : formatCurrency(rate)}
-                  </span>
+                  <span className="font-medium">{rate === 0 ? 'FREE' : formatCurrency(rate)}</span>
                 </div>
-                {option.shippingRules?.freeShippingThreshold && cartTotal < option.shippingRules.freeShippingThreshold && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Spend {formatCurrency(option.shippingRules.freeShippingThreshold - cartTotal)} more for free shipping
-                  </p>
-                )}
+                {option.shippingRules?.freeShippingThreshold &&
+                  cartTotal < option.shippingRules.freeShippingThreshold && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Spend {formatCurrency(option.shippingRules.freeShippingThreshold - cartTotal)}{' '}
+                      more for free shipping
+                    </p>
+                  )}
               </Label>
             </div>
           )

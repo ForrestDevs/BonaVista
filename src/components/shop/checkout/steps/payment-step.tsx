@@ -65,7 +65,7 @@ export function PaymentStep({ session, onBack }: PaymentStepProps) {
 
       const params = new URLSearchParams({
         pid: hashedPaymentIntent,
-        cart_id: session.cartId,
+        cart_id: session.cartId.toString(),
       })
       router.push('/shop/confirmation?' + params.toString())
     } catch (error: any) {

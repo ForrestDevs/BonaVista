@@ -50,17 +50,17 @@ export default async function ProductsPage() {
 
   const categories = categoryDocs.map((cat) => ({
     label: cat.title,
-    value: cat.id,
+    value: cat.slug,
   }))
 
   const collections = collectionDocs.map((collection) => ({
     label: collection.title,
-    value: collection.id,
+    value: collection.slug,
   }))
 
   const brands = brandDocs.map((brand) => ({
     label: brand.name,
-    value: brand.id,
+    value: brand.slug,
   }))
 
   const filterOptions = {

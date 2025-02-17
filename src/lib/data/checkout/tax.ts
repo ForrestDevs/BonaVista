@@ -14,8 +14,8 @@ export async function calculateTax(session: CheckoutSession) {
       line_items: session.lineItems.map((item) => ({
         amount: Math.round(item.price),
         quantity: item.quantity,
-        reference: item.productId,
-        tax_behavior: 'exclusive'
+        reference: item.productId.toString(),
+        tax_behavior: 'exclusive',
       })),
       ...(session.stripeCustomerId
         ? {

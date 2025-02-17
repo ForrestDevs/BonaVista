@@ -45,7 +45,8 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
       ? line.variantOptions.map((v) => v.value.label).join(', ')
       : null
     const thumbnail = isVariant
-      ? product?.variants.variantProducts.find((v) => v.id === line.variantId)?.images[0]?.image
+      ? product?.variants.variantProducts.find((v) => v.id === line.variantId.toString())?.images[0]
+          ?.image
       : product?.baseProduct?.images[0]?.image
 
     const debouncedExecute = useMemo(

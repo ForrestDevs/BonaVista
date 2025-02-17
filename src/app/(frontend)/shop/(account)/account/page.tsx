@@ -96,7 +96,7 @@ export default async function Dashboard() {
                             <div className="space-y-1.5">
                               <p className="text-muted-foreground font-medium">Order number</p>
                               <p className="font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-md inline-block">
-                                #{order.id.substring(0, 8)}
+                                #{order.id}
                               </p>
                             </div>
                             <div className="space-y-1.5">

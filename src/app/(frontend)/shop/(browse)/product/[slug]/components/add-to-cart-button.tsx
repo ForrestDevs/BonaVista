@@ -36,15 +36,6 @@ export function AddToCartButton() {
               },
             })),
           },
-          // variant: [
-          //   {
-          //     id: selectedVariant.sku,
-          //     option:
-          //       typeof selectedVariant.info === 'object' && 'options' in selectedVariant.info
-          //         ? selectedVariant.info.options[0]?.label
-          //         : undefined,
-          //   },
-          // ],
         }),
       }
 

@@ -107,6 +107,7 @@ const Orders: CollectionConfig = {
       label: 'Items',
       name: 'items',
       type: 'array',
+      interfaceName: 'OrderItems',
       fields: [
         {
           type: 'row',
@@ -187,7 +188,6 @@ const Orders: CollectionConfig = {
           relationTo: 'media',
         },
       ],
-      interfaceName: 'OrderItems',
     },
     {
       name: 'paymentIntent',

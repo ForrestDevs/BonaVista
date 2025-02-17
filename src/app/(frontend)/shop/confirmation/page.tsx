@@ -39,7 +39,7 @@ export default async function ConfirmationPage({ searchParams }: ConfirmationPag
   return (
     <Suspense fallback={<SkeletonOrderConfirmed />}>
       <div className="container py-8">
-        <ClearCookieClientComponent cartId={cart_id} />
+        <ClearCookieClientComponent cartId={parseInt(cart_id)} />
         <div className="max-w-2xl mx-auto">
           {result.error ? (
             <Fragment>

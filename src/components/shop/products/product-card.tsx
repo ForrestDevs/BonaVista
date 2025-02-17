@@ -44,7 +44,7 @@ export function ProductCard({ product }: { product: Product }) {
         const cartItem: CartItem = {
           product: product,
           isVariant: true,
-          variantId: variant.id,
+          variantId: parseInt(variant.id),
           variantOptions: variant.info.options.map((o) => ({
             key: o.key,
             value: {
@@ -66,7 +66,7 @@ export function ProductCard({ product }: { product: Product }) {
         quantity: 1,
         price: product.baseProduct.price,
         url: `/product/${product.slug}`,
-        id: product.id,
+        id: product.id.toString(),
       })
     }
     setIsAddingToCart(false)

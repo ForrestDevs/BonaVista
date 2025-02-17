@@ -1,4 +1,4 @@
-import type { CartItems, Cart, Address } from '@payload-types'
+import type { CartItems, Cart } from '@payload-types'
 
 export type CartItem = Exclude<NonNullable<CartItems>[number], null>
 
@@ -26,14 +26,6 @@ export type CartAction =
   | {
       payload: string
       type: 'INCREMENT_QUANTITY'
-    }
-  | {
-      payload: Address
-      type: 'SET_SHIPPING_ADDRESS'
-    }
-  | {
-      payload: Address
-      type: 'SET_BILLING_ADDRESS'
     }
   | {
       type: 'CLEAR_CART'
