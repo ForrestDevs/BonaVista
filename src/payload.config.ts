@@ -31,6 +31,7 @@ const allowedOrigins = [
   serverURL,
   'https://www2.bonavistaleisurescapes.com',
   'https://bonavistaleisurescapes.com',
+  'https://bona-vista.vercel.app',
 ].filter(Boolean)
 
 export default buildConfig({
@@ -118,35 +119,6 @@ export default buildConfig({
   globals,
   cors: allowedOrigins,
   csrf: allowedOrigins,
-  endpoints: [
-    // {
-    //   handler: createPaymentIntent,
-    //   method: 'post',
-    //   path: '/create-payment-intent',
-    // },
-    // {
-    //   handler: customersProxy,
-    //   method: 'get',
-    //   path: '/stripe/customers',
-    // },
-    // {
-    //   handler: productsProxy,
-    //   method: 'get',
-    //   path: '/stripe/products',
-    // },
-    // {
-    //   handler: pricesProxy,
-    //   method: 'get',
-    //   path: '/stripe/prices',
-    // },
-    // The seed endpoint is used to populate the database with some example data
-    // You should delete this endpoint before deploying your site to production
-    // {
-    //   handler: seed,
-    //   method: 'get',
-    //   path: '/seed',
-    // },
-  ],
   plugins: [...plugins],
   secret: process.env.PAYLOAD_SECRET || 'a10c2070-903e-4297-918d-b6917b92eb36',
   sharp,
