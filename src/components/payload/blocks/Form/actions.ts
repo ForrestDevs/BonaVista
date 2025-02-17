@@ -6,7 +6,7 @@ import getPayload from '@/lib/utils/getPayload'
 export async function submitForm(values: FormValues) {
   try {
     const payload = await getPayload()
-    
+
     // Create form submission in Payload
     const submission = await payload.create({
       collection: 'form-submissions',
@@ -17,10 +17,16 @@ export async function submitForm(values: FormValues) {
         email: values.email,
         phone: values.phone,
         postalCode: values.postalCode,
-        interestedIn: values.interestedIn.map(value => ({ value })),
+        interestedIn: values.interestedIn.map((value) => ({ value })),
         message: values.message,
         subscribeToMailingList: values.subscribeToMailingList,
       },
+    })
+
+    //make post request to zoho webhook
+    await fetch(process.env.ZOHO_CONTACT_FORM_WEBHOOK_URL, {
+      method: 'POST',
+      body: JSON.stringify(values),
     })
 
     // If user opted in to mailing list, add them to your email service
@@ -34,4 +40,4 @@ export async function submitForm(values: FormValues) {
     console.error('Form submission error:', error)
     return { success: false, error: 'Failed to submit form' }
   }
-} 
+}

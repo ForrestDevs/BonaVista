@@ -12,7 +12,7 @@ export const StoreHours: GlobalConfig = {
     group: 'Admin',
   },
   hooks: {
-    afterChange: [async () => revalidateTag('store-hours')],
+    afterChange: [async () => revalidateTag('global_store-hours')],
   },
   fields: [
     {

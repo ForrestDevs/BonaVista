@@ -3,9 +3,9 @@ import { z } from 'zod'
 export const interestedInOptions = [
   { label: 'Hot Tubs', value: 'hot-tubs' },
   { label: 'Swim Spas', value: 'swim-spas' },
-  { label: 'Saunas', value: 'saunas' },
-  { label: 'Service & Maintenance', value: 'service' },
-  { label: 'Accessories', value: 'accessories' },
+  { label: 'Outdoor Living', value: 'outdoor-living' },
+  { label: 'Water Care', value: 'water-care' },
+  { label: 'Questions/Support', value: 'questions-support' },
 ] as const
 
 export const formSchema = z.object({
@@ -19,4 +19,4 @@ export const formSchema = z.object({
   subscribeToMailingList: z.boolean().default(true),
 })
 
-export type FormValues = z.infer<typeof formSchema> 
+export type FormValues = z.infer<typeof formSchema>
