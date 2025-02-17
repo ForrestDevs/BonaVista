@@ -59,6 +59,10 @@ export default buildConfig({
         },
       ],
     },
+    timezones: {
+      defaultTimezone: 'America/Toronto',
+      supportedTimezones: ({ defaultTimezones }) => [...defaultTimezones],
+    },
   },
   editor: lexicalEditor({
     features: () => {

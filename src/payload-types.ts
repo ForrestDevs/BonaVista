@@ -337,8 +337,6 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
-  _verified?: boolean | null;
-  _verificationToken?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   password?: string | null;
@@ -1814,8 +1812,6 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
-  _verified?: T;
-  _verificationToken?: T;
   loginAttempts?: T;
   lockUntil?: T;
 }
@@ -3002,7 +2998,9 @@ export interface StoreHours {
     dayOfWeek: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
     isClosed?: boolean | null;
     openTime?: string | null;
+    openTime_tz: SupportedTimezones;
     closeTime?: string | null;
+    closeTime_tz: SupportedTimezones;
     id?: string | null;
   }[];
   updatedAt?: string | null;
@@ -3215,7 +3213,9 @@ export interface StoreHoursSelect<T extends boolean = true> {
         dayOfWeek?: T;
         isClosed?: T;
         openTime?: T;
+        openTime_tz?: T;
         closeTime?: T;
+        closeTime_tz?: T;
         id?: T;
       };
   updatedAt?: T;

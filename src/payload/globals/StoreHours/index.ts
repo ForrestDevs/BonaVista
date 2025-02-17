@@ -57,6 +57,8 @@ export const StoreHours: GlobalConfig = {
           name: 'openTime',
           type: 'date',
           required: true,
+          timezone: true,
+
           admin: {
             condition: (data, siblingData) => !siblingData.isClosed,
             date: {
@@ -69,6 +71,7 @@ export const StoreHours: GlobalConfig = {
           name: 'closeTime',
           type: 'date',
           required: true,
+          timezone: true,
           admin: {
             condition: (data, siblingData) => !siblingData.isClosed,
             date: {
