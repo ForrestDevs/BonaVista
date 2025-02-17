@@ -7,6 +7,7 @@ import { Metadata } from 'next'
 import { GalleryList } from '@/components/marketing/gallery/gallery-list'
 import { SearchParams } from 'nuqs'
 import LoadingGallery from '@/components/layout/suspense/loading-gallery'
+import { notFound } from 'next/navigation'
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await queryPageBySlug('gallery')
@@ -20,6 +21,10 @@ export default async function GalleryHome({
   searchParams: Promise<SearchParams>
 }) {
   const page = await queryPageBySlug('gallery')
+
+  if (!page) {
+    return notFound()
+  }
 
   return (
     <Suspense fallback={<LoadingGallery />}>

@@ -5,12 +5,18 @@ import { RenderBlocks } from '@/components/payload/blocks'
 import { SearchParams } from 'nuqs'
 import HotTubList from '@/components/marketing/spas/hot-tub/hot-tub-list'
 import LoadingPage from '@/components/layout/suspense/loading-page'
+import { notFound } from 'next/navigation'
+
 export default async function ShopHotTubsHome({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>
 }) {
   const page = await queryPageBySlug('shop-hot-tubs')
+
+  if (!page) {
+    return notFound()
+  }
 
   return (
     <Suspense fallback={<LoadingPage />}>

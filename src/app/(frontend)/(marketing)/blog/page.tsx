@@ -9,6 +9,7 @@ import { generateMeta } from '@/lib/utils/generateMeta'
 import { BLOG_CATEGORY_SLUG, PAGE_SLUG } from '@/payload/collections/constants'
 import { getCachedDocuments } from '@/lib/utils/getDocument'
 import LoadingPage from '@/components/layout/suspense/loading-page'
+import { notFound } from 'next/navigation'
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await queryPageBySlug('blog')
@@ -26,6 +27,11 @@ export default async function Page({ searchParams }: Args) {
   const searchParams_ = await searchParams
   const { category, page } = blogFiltersCache.parse(searchParams_)
   const blogLayout = await queryPageBySlug('blog')
+
+  if (!blogLayout) {
+    return notFound()
+  }
+
   const categories = await getCachedDocuments({
     collection: BLOG_CATEGORY_SLUG,
     depth: 0,
