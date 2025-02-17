@@ -60,7 +60,7 @@ export default async function CategoryPage({ params }: Props) {
   })
 
   const filterOptions = {
-    categories: [{ label: category.title, value: category.id }],
+    categories: [{ label: category.title, value: category.slug }],
     collections: [],
     brands: [],
     compatibility: [
@@ -149,7 +149,12 @@ export default async function CategoryPage({ params }: Props) {
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
                       </svg>
                     </div>
                   </div>
@@ -160,8 +165,13 @@ export default async function CategoryPage({ params }: Props) {
             {/* Newsletter Section */}
             <div className="bg-primary/5 rounded-2xl p-8 md:p-12">
               <div className="max-w-2xl mx-auto text-center">
-                <h2 className="text-2xl md:text-3xl font-bold mb-4">Stay Updated with Our Latest Products</h2>
-                <p className="text-muted-foreground mb-6">Subscribe to our newsletter and get exclusive offers, new product alerts, and expert tips delivered to your inbox.</p>
+                <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                  Stay Updated with Our Latest Products
+                </h2>
+                <p className="text-muted-foreground mb-6">
+                  Subscribe to our newsletter and get exclusive offers, new product alerts, and
+                  expert tips delivered to your inbox.
+                </p>
                 <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                   <input
                     type="email"
@@ -179,8 +189,18 @@ export default async function CategoryPage({ params }: Props) {
             <div className="grid md:grid-cols-3 gap-8 bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-sm">
               <div className="text-center">
                 <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  <svg
+                    className="w-6 h-6 text-primary"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
                   </svg>
                 </div>
                 <h3 className="font-semibold mb-2">Free Shipping</h3>
@@ -188,8 +208,18 @@ export default async function CategoryPage({ params }: Props) {
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  <svg
+                    className="w-6 h-6 text-primary"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
                   </svg>
                 </div>
                 <h3 className="font-semibold mb-2">Secure Shopping</h3>
@@ -197,8 +227,18 @@ export default async function CategoryPage({ params }: Props) {
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-6 h-6 text-primary"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
                 <h3 className="font-semibold mb-2">24/7 Support</h3>
@@ -207,7 +247,6 @@ export default async function CategoryPage({ params }: Props) {
             </div>
           </div>
         ) : (
-          // Show products if this is a leaf category
           <div className="flex flex-col gap-8 md:flex-row">
             {category.products.docs.length > 0 ? (
               <FilteredProducts

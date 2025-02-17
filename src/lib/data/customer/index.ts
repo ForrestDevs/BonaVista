@@ -52,7 +52,7 @@ export type CustomerDTO = {
   firstName: string
   lastName: string
   phone: string
-  billingAddress: PayloadJSON
+  billingAddress: PayloadJSON[]
   shippingAddresses: PayloadJSON[]
   stripeCustomerId: string
   cart: number | Cart
@@ -91,7 +91,7 @@ const getCachedCustomerDTO = cache(
         firstName: user.firstName ?? '',
         lastName: user.lastName ?? '',
         phone: user.phone ?? '',
-        billingAddress: customer.billing_address,
+        billingAddress: customer.billing_addresses,
         shippingAddresses: customer.shipping_addresses,
         stripeCustomerId: customer.stripeCustomerID ?? '',
         cart: customer.cart,

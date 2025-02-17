@@ -42,7 +42,6 @@ const Users: CollectionConfig = {
       name: 'roles',
       type: 'select',
       access: {
-        /* create: admins, */
         read: admins,
         update: admins,
       },

@@ -26,23 +26,24 @@ const Pages: CollectionConfig = {
   admin: {
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
-      url: ({ data }) => {
+      url: ({ data, req }) => {
         const path = generatePreviewPath({
           slug: typeof data?.slug === 'string' ? data.slug : '',
           collection: 'pages',
+          req,
         })
 
-        return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
+        return path
       },
     },
-    preview: (data) => {
-      const path = generatePreviewPath({
-        slug: typeof data?.slug === 'string' ? data.slug : '',
-        collection: 'pages',
-      })
+    // preview: (data) => {
+    //   const path = generatePreviewPath({
+    //     slug: typeof data?.slug === 'string' ? data.slug : '',
+    //     collection: 'pages',
+    //   })
 
-      return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
-    },
+    //   return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
+    // },
     group: 'Website',
     useAsTitle: 'title',
   },
