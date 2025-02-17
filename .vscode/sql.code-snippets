@@ -1,0 +1,32 @@
+{
+    "Wrap CREATE TYPE with IF NOT EXISTS": {
+        "prefix": "!type",
+        "body": [
+            "DO $$ ",
+            "BEGIN",
+            "    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = '${1:type_name}') THEN",
+            "        $TM_SELECTED_TEXT",
+            "    END IF;",
+            "END",
+            "$$;"
+        ],
+        "description": "Wrap CREATE TYPE with IF NOT EXISTS check"
+    },
+    "Wrap ADD CONSTRAINT with IF NOT EXISTS": {
+        "prefix": "!constraint",
+        "body": [
+            "DO $$ ",
+            "BEGIN",
+            "    IF NOT EXISTS (",
+            "        SELECT 1 ",
+            "        FROM information_schema.table_constraints ",
+            "        WHERE constraint_name = '${1:constraint_name}'",
+            "    ) THEN",
+            "        $TM_SELECTED_TEXT",
+            "    END IF;",
+            "END",
+            "$$;"
+        ],
+        "description": "Wrap ADD CONSTRAINT with IF NOT EXISTS check"
+    }
+}
