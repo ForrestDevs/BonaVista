@@ -6,7 +6,7 @@ declare global {
       NEXT_PUBLIC_IS_LIVE: string
       NEXT_PRIVATE_DRAFT_SECRET: string
       REVALIDATION_KEY: string
-      DATABASE_URI: string
+      DATABASE_URL: string
       BLOB_READ_WRITE_TOKEN: string
       ZOHO_CLIENT_ID: string
       ZOHO_CLIENT_SECRET: string

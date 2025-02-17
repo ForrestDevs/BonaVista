@@ -109,7 +109,7 @@ export default buildConfig({
   }),
   db: vercelPostgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URI || '',
+      connectionString: process.env.DATABASE_URL || '',
     },
     migrationDir: path.resolve(dirname, 'lib/migrations'),
   }),
