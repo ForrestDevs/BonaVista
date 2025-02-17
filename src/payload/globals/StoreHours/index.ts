@@ -58,7 +58,6 @@ export const StoreHours: GlobalConfig = {
           type: 'date',
           required: true,
           timezone: true,
-
           admin: {
             condition: (data, siblingData) => !siblingData.isClosed,
             date: {

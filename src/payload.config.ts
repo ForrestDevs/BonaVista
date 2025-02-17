@@ -60,7 +60,7 @@ export default buildConfig({
       ],
     },
     timezones: {
-      defaultTimezone: 'America/Toronto',
+      defaultTimezone: 'America/New_York',
       supportedTimezones: ({ defaultTimezones }) => [...defaultTimezones],
     },
   },
