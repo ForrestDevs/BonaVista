@@ -1,10 +1,9 @@
 import type { GlobalConfig } from 'payload'
-
-import { link } from '../../fields/link'
 import { revalidateHeader } from './hooks/revalidateHeader'
 import { navItem } from '@/payload/fields/nav-item'
 import { HEADER_SLUG } from '../constants'
 import { createRowLabel } from '@/components/payload/AdminViews/RowLabels/create-row-label'
+import { admin, admins, anyone } from '@/payload/access'
 
 export const Header: GlobalConfig = {
   slug: HEADER_SLUG,
@@ -12,7 +11,8 @@ export const Header: GlobalConfig = {
     group: 'Website',
   },
   access: {
-    read: () => true,
+    read: anyone,
+    update: admin,
   },
   fields: [
     {

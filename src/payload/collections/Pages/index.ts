@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { authenticated, authenticatedOrPublished } from '@payload/access'
+import { admin, anyone } from '@payload/access'
 import { hero } from '@payload/fields/hero'
 import { pageBlocks } from '@/payload/blocks'
 import { slugField } from '@/payload/fields/slug'
@@ -18,10 +18,10 @@ import { PAGE_SLUG } from '../constants'
 const Pages: CollectionConfig = {
   slug: PAGE_SLUG,
   access: {
-    create: authenticated,
-    delete: authenticated,
-    read: authenticatedOrPublished,
-    update: authenticated,
+    create: admin,
+    delete: admin,
+    read: anyone,
+    update: admin,
   },
   admin: {
     defaultColumns: ['title', 'slug', 'updatedAt'],
