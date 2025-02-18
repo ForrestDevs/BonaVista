@@ -31,24 +31,24 @@ export const SliderHero: React.FC<Page['hero']> = ({ slides, autoplay, fade, del
                 className="absolute inset-0"
               />
               <div className="absolute inset-0 bg-black opacity-40"></div>
-              <div className="relative z-10 text-left text-white max-w-3xl mx-4 sm:mx-8 md:mx-12 lg:mx-24 xl:mx-40">
-                <p className="text-base sm:text-lg md:text-xl font-thin mb-2 md:mb-3">
+              <div className="relative z-10 text-left text-white max-w-[90%] w-full mx-auto lg:max-w-[80%] xl:max-w-[1400px] px-4 sm:px-6 lg:px-8">
+                <p className="text-base sm:text-lg font-light tracking-wider uppercase mb-3 sm:mb-4">
                   {slide.pretitle}
                 </p>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 sm:mb-6 md:mb-8 leading-[1.1] tracking-tight">
                   {slide.title}
                 </h1>
-                <p className="text-base sm:text-lg md:text-xl mb-4 md:mb-6 max-w-2xl">
+                <p className="text-lg sm:text-xl leading-relaxed mb-6 sm:mb-8 max-w-4xl">
                   {slide.description}
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4">
+
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                   {slide.links.map((link, index) => (
                     <CMSLink
                       key={index}
                       {...link.link}
-                      className="rounded-none w-full sm:w-auto text-center"
+                      className="transition-all duration-200 hover:translate-y-[-2px] hover:shadow-lg"
                       size="lg"
-                      appearance="default"
                     />
                   ))}
                 </div>
