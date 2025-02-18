@@ -15,7 +15,7 @@ export const LatestPostsBlock: React.FC<
     id?: string
   } & Props
 > = async (props) => {
-  const { title, subtitle, body, link } = props
+  const { title, subtitle, body, link, id } = props
 
   const payload = await getPayload()
 
@@ -26,8 +26,8 @@ export const LatestPostsBlock: React.FC<
   })
 
   return (
-    <section className="w-full py-8 sm:py-12 lg:py-16">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="w-full container py-8 sm:py-12" id={`block-${id}`}>
+      <div className="px-4 sm:px-0">
         <h3 className="text-sm md:text-base font-light tracking-wider uppercase text-primary mb-3 md:mb-4">
           {subtitle}
         </h3>
@@ -35,9 +35,7 @@ export const LatestPostsBlock: React.FC<
           {title}
         </h2>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-8">
-          <p className="text-base md:text-lg leading-relaxed text-gray-700 max-w-3xl">
-            {body}
-          </p>
+          <p className="text-base md:text-lg leading-relaxed text-gray-700 max-w-3xl">{body}</p>
           <div className="flex-shrink-0">
             <CMSLink
               {...link}
@@ -49,11 +47,7 @@ export const LatestPostsBlock: React.FC<
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
           {blogPosts.map((post, index) => (
-            <PostCard 
-              key={index} 
-              doc={post} 
-              showCategories 
-            />
+            <PostCard key={index} doc={post} showCategories />
           ))}
         </div>
       </div>

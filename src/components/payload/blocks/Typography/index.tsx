@@ -19,6 +19,7 @@ export const TypographyBlock: React.FC<
     subtitleFontColor,
     titleFontColor,
     bodyFontColor,
+    id,
   } = props
 
   const alignClasses = {
@@ -27,7 +28,7 @@ export const TypographyBlock: React.FC<
     right: 'text-right',
   }
 
-  const baseContainerClasses = 'max-w-[85ch] mx-auto px-4 md:px-6 py-8 md:py-12'
+  const baseContainerClasses = 'max-w-[85ch] py-8 md:py-0'
   const subtitleClasses = cn(
     'text-sm md:text-base font-light tracking-wider uppercase',
     'mb-3 md:mb-4',
@@ -53,21 +54,12 @@ export const TypographyBlock: React.FC<
   const shouldShowBody = ['sub-title-body', 'title-body', 'body'].includes(type)
 
   return (
-    <section className="w-full">
+    <section className="w-full" id={`block-${id}`}>
       <div className={baseContainerClasses}>
-        {shouldShowSubtitle && (
-          <h3 className={subtitleClasses}>{subTitle}</h3>
-        )}
-        {shouldShowTitle && (
-          <h2 className={titleClasses}>{title}</h2>
-        )}
+        {shouldShowSubtitle && <h3 className={subtitleClasses}>{subTitle}</h3>}
+        {shouldShowTitle && <h2 className={titleClasses}>{title}</h2>}
         {shouldShowBody && (
-          <RichText 
-            content={body} 
-            enableGutter={false} 
-            enableProse 
-            className={bodyClasses} 
-          />
+          <RichText content={body} enableGutter={false} enableProse className={bodyClasses} />
         )}
 
         {links?.length > 0 && (
@@ -87,6 +79,8 @@ export const TypographyBlock: React.FC<
                 className={cn(
                   'transition-all duration-200',
                   'hover:translate-y-[-2px] hover:shadow-lg',
+                  'bg-primary hover:bg-primary/90',
+                  'text-white',
                 )}
                 size="lg"
               />

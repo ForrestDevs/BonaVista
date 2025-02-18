@@ -38,8 +38,8 @@ export const TestimonialBlock: React.FC<
   }
 
   return (
-    <section className={cn('w-full')} id={`block-${id}`}>
-      <div className="container px-4 md:px-6 py-8 md:py-12">
+    <section className="w-full container py-8 sm:py-12" id={`block-${id}`}>
+      <div className="px-4 sm:px-0">
         <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
           <div className="w-full lg:w-1/2 text-left">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight mb-4 md:mb-6">

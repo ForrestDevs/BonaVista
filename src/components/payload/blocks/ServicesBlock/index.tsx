@@ -12,8 +12,8 @@ export const ServicesBlock: React.FC<
   const { id, title, subtitle, body, link, offerings } = props
 
   return (
-    <div className="py-8 sm:py-12 lg:py-16" id={`block-${id}`}>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="w-full container py-8 sm:py-12" id={`block-${id}`}>
+      <div className="px-4 sm:px-0">
         <h3 className="text-sm md:text-base font-light tracking-wider uppercase text-primary mb-3 md:mb-4">
           {subtitle}
         </h3>
@@ -40,7 +40,7 @@ export const ServicesBlock: React.FC<
           ))}
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -50,7 +50,7 @@ interface OfferingCardProps {
 
 function OfferingCard({ offering }: OfferingCardProps) {
   return (
-    <div className="w-full max-w-[300px] sm:max-w-none relative aspect-[3/4] max-h-[400px] rounded-xl overflow-hidden group transform transition-transform duration-200 hover:scale-[1.01] shadow-md hover:shadow-lg">
+    <div className="w-full max-w-[400px] sm:max-w-none relative aspect-[3/4] max-h-[400px] rounded-xl overflow-hidden group transform transition-transform duration-200 hover:scale-[1.01] shadow-md hover:shadow-lg">
       <Media
         resource={offering.image}
         fill

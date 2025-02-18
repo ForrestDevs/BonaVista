@@ -16,6 +16,7 @@ export const FeaturedSpas: React.FC<FeaturedSpasBlockProps> = ({
   body,
   spas,
   link,
+  id,
 }) => {
   let spasToShow: Spa[] = []
 
@@ -27,8 +28,8 @@ export const FeaturedSpas: React.FC<FeaturedSpasBlockProps> = ({
     spasToShow = filteredSpas
   }
   return (
-    <section className="w-full">
-      <div className="container px-4 md:px-6 py-8 md:py-12">
+    <section className="w-full container py-8 sm:py-12" id={`block-${id}`}>
+      <div className="px-4 sm:px-0">
         <div className="flex flex-col items-center text-center gap-4 mb-8 md:mb-12">
           {preTitle && (
             <p className="text-sm md:text-base font-light tracking-wider uppercase text-primary">
