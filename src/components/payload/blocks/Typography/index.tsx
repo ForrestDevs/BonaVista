@@ -79,8 +79,6 @@ export const TypographyBlock: React.FC<
                 className={cn(
                   'transition-all duration-200',
                   'hover:translate-y-[-2px] hover:shadow-lg',
-                  'bg-primary hover:bg-primary/90',
-                  'text-white',
                 )}
                 size="lg"
               />
