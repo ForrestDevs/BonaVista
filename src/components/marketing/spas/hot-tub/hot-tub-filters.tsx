@@ -74,7 +74,7 @@ export default function HotTubFilters() {
       {/* Filter Content */}
       <div
         className={cn(
-          'space-y-6 p-4 bg-white rounded-lg shadow h-fit mt-2',
+          'space-y-6 p-4 bg-white rounded-lg shadow h-fit',
           'lg:block', // Always visible on lg+
           'overflow-hidden transition-all duration-300',
           isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 lg:max-h-none lg:opacity-100', // Expand animation

@@ -101,8 +101,9 @@ const Pages: CollectionConfig = {
   },
   versions: {
     drafts: {
+      validate: true,
       autosave: {
-        interval: 100, // We set this interval for optimal live preview
+        interval: 10000, // We set this interval for optimal live preview
       },
     },
     maxPerDoc: 50,

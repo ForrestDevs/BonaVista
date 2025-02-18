@@ -27,120 +27,73 @@ export const TypographyBlock: React.FC<
     right: 'text-right',
   }
 
-  let content
+  const baseContainerClasses = 'max-w-[85ch] mx-auto px-4 md:px-6 py-8 md:py-12'
+  const subtitleClasses = cn(
+    'text-sm md:text-base font-light tracking-wider uppercase',
+    'mb-3 md:mb-4',
+    alignClasses[align],
+    subtitleFontColor || 'text-primary',
+  )
+  const titleClasses = cn(
+    'text-3xl md:text-4xl lg:text-5xl font-bold',
+    'leading-tight tracking-tight',
+    'mb-6 md:mb-8',
+    alignClasses[align],
+    titleFontColor || 'text-gray-900',
+  )
+  const bodyClasses = cn(
+    'text-base md:text-lg leading-relaxed',
+    'mb-8 md:mb-10',
+    alignClasses[align],
+    bodyFontColor || 'text-gray-700',
+  )
 
-  switch (type) {
-    case 'sub-title-body':
-      content = (
-        <div>
-          <h3
-            className={cn(
-              'text-sm font-light tracking-widest mb-2 uppercase',
-              alignClasses[align],
-              subtitleFontColor ? subtitleFontColor : 'text-gray-600',
-            )}
-          >
-            {subTitle}
-          </h3>
-          <h2
-            className={cn(
-              'text-3xl lg:text-4xl font-bold mb-4',
-              alignClasses[align],
-              titleFontColor ? titleFontColor : 'text-gray-900',
-            )}
-          >
-            {title}
-          </h2>
-          <RichText
-            content={body}
-            enableGutter={false}
-            enableProse
-            className={cn(
-              'mb-4',
-              alignClasses[align],
-              bodyFontColor ? bodyFontColor : 'text-gray-700',
-            )}
-          />
-        </div>
-      )
-      break
-    case 'title-body':
-      content = (
-        <div>
-          <h2
-            className={cn(
-              'text-3xl lg:text-4xl font-bold mb-4',
-              alignClasses[align],
-              titleFontColor ? titleFontColor : 'text-gray-900',
-            )}
-          >
-            {title}
-          </h2>
-          <RichText
-            content={body}
-            enableGutter={false}
-            enableProse
-            className={cn(
-              'mb-4',
-              alignClasses[align],
-              bodyFontColor ? bodyFontColor : 'text-gray-700',
-            )}
-          />
-        </div>
-      )
-      break
-    case 'title':
-      content = (
-        <h2
-          className={cn(
-            'text-3xl lg:text-4xl font-bold mb-4',
-            alignClasses[align],
-            titleFontColor ? titleFontColor : 'text-gray-900',
-          )}
-        >
-          {title}
-        </h2>
-      )
-      break
-    case 'subtitle':
-      content = (
-        <h3
-          className={cn(
-            'text-sm font-light tracking-widest mb-2 uppercase',
-            alignClasses[align],
-            subtitleFontColor ? subtitleFontColor : 'text-gray-600',
-          )}
-        >
-          {subTitle}
-        </h3>
-      )
-      break
-    case 'body':
-      content = (
-        <RichText
-          content={body}
-          enableGutter={false}
-          enableProse
-          className={cn(
-            'mb-4',
-            alignClasses[align],
-            bodyFontColor ? bodyFontColor : 'text-gray-700',
-          )}
-        />
-      )
-      break
-  }
+  const shouldShowSubtitle = ['sub-title-body', 'subtitle'].includes(type)
+  const shouldShowTitle = ['sub-title-body', 'title-body', 'title'].includes(type)
+  const shouldShowBody = ['sub-title-body', 'title-body', 'body'].includes(type)
 
   return (
-    <>
-      {content}
-      {links?.length > 0 && (
-        <div className="flex flex-col sm:flex-row gap-4">
-          {links.map((link, i) => (
-            <CMSLink key={i} {...link.link} className="rounded-none" size="lg" />
-          ))}
-        </div>
-      )}
-    </>
+    <section className="w-full">
+      <div className={baseContainerClasses}>
+        {shouldShowSubtitle && (
+          <h3 className={subtitleClasses}>{subTitle}</h3>
+        )}
+        {shouldShowTitle && (
+          <h2 className={titleClasses}>{title}</h2>
+        )}
+        {shouldShowBody && (
+          <RichText 
+            content={body} 
+            enableGutter={false} 
+            enableProse 
+            className={bodyClasses} 
+          />
+        )}
+
+        {links?.length > 0 && (
+          <div
+            className={cn(
+              'flex flex-col sm:flex-row gap-4',
+              'mt-6 md:mt-8',
+              align === 'center' && 'justify-center',
+              align === 'right' && 'justify-end',
+              align === 'left' && 'justify-start',
+            )}
+          >
+            {links.map((link, i) => (
+              <CMSLink
+                key={i}
+                {...link.link}
+                className={cn(
+                  'transition-all duration-200',
+                  'hover:translate-y-[-2px] hover:shadow-lg',
+                )}
+                size="lg"
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   )
 }

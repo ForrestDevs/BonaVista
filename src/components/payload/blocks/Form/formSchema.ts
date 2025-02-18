@@ -14,7 +14,7 @@ export const formSchema = z.object({
   email: z.string().email('Invalid email address'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   postalCode: z.string().min(5, 'Postal code must be at least 5 characters'),
-  interestedIn: z.array(z.string()).min(1, 'Please select at least one option'),
+  interestedIn: z.string().min(1, 'Please select at least one option'),
   message: z.string().min(10, 'Message must be at least 10 characters'),
   subscribeToMailingList: z.boolean().default(true),
 })

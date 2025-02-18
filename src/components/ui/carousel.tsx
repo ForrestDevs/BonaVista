@@ -3,10 +3,12 @@
 import * as React from 'react'
 import useEmblaCarousel, { type UseEmblaCarouselType } from 'embla-carousel-react'
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
-
 import { cn } from '@/lib/utils/cn'
 import { Button } from '@/components/ui/button'
 
+import { useEffect } from 'react'
+import { useCallback } from 'react'
+import { useState } from 'react'
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
 type CarouselOptions = UseCarouselParameters[0]
@@ -26,6 +28,9 @@ type CarouselContextProps = {
   scrollNext: () => void
   canScrollPrev: boolean
   canScrollNext: boolean
+  selectedIndex: number
+  scrollSnaps: number[]
+  onDotButtonClick: (index: number) => void
 } & CarouselProps
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null)
@@ -40,6 +45,46 @@ function useCarousel() {
   return context
 }
 
+type UseDotButtonType = {
+  selectedIndex: number
+  scrollSnaps: number[]
+  onDotButtonClick: (index: number) => void
+}
+const useDotButton = (emblaApi: UseEmblaCarouselType[1] | undefined): UseDotButtonType => {
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
+
+  const onDotButtonClick = useCallback(
+    (index: number) => {
+      if (!emblaApi) return
+      emblaApi.scrollTo(index)
+    },
+    [emblaApi],
+  )
+
+  const onInit = useCallback((emblaApi: UseEmblaCarouselType[1]) => {
+    setScrollSnaps(emblaApi.scrollSnapList())
+  }, [])
+
+  const onSelect = useCallback((emblaApi: UseEmblaCarouselType[1]) => {
+    setSelectedIndex(emblaApi.selectedScrollSnap())
+  }, [])
+
+  useEffect(() => {
+    if (!emblaApi) return
+
+    onInit(emblaApi)
+    onSelect(emblaApi)
+    emblaApi.on('reInit', onInit).on('reInit', onSelect).on('select', onSelect)
+  }, [emblaApi, onInit, onSelect])
+
+  return {
+    selectedIndex,
+    scrollSnaps,
+    onDotButtonClick,
+  }
+}
+
 const Carousel = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & CarouselProps
@@ -51,6 +96,7 @@ const Carousel = React.forwardRef<
     },
     plugins,
   )
+  const { selectedIndex, scrollSnaps, onDotButtonClick } = useDotButton(api)
   const [canScrollPrev, setCanScrollPrev] = React.useState(false)
   const [canScrollNext, setCanScrollNext] = React.useState(false)
 
@@ -117,6 +163,9 @@ const Carousel = React.forwardRef<
         scrollNext,
         canScrollPrev,
         canScrollNext,
+        selectedIndex,
+        scrollSnaps,
+        onDotButtonClick,
       }}
     >
       <div
@@ -232,4 +281,39 @@ const CarouselNext = React.forwardRef<HTMLButtonElement, React.ComponentProps<ty
 )
 CarouselNext.displayName = 'CarouselNext'
 
-export { type CarouselApi, Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext }
+const CarouselDots = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { buttonClassName?: string; selectedClassName?: string }
+>(({ className, buttonClassName, selectedClassName, ...props }, ref) => {
+  const { scrollSnaps, selectedIndex, onDotButtonClick } = useCarousel()
+
+  return (
+    <div ref={ref} className={cn('flex flex-wrap justify-end items-center', className)} {...props}>
+      {scrollSnaps.map((_, index) => (
+        <button
+          key={index}
+          type="button"
+          onClick={() => onDotButtonClick(index)}
+          className={cn(
+            'w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center rounded-full cursor-pointer appearance-none touch-manipulation p-0 mx-0.5 sm:mx-1',
+            'after:content-[""] after:w-2 after:h-2 sm:after:w-3 sm:after:h-3 after:rounded-full after:transition-all after:duration-200',
+            'after:bg-gray-200 hover:after:bg-gray-300',
+            index === selectedIndex && (selectedClassName || 'after:bg-gray-800 hover:after:bg-gray-900'),
+            buttonClassName,
+          )}
+        />
+      ))}
+    </div>
+  )
+})
+CarouselDots.displayName = 'CarouselDots'
+
+export {
+  type CarouselApi,
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  CarouselDots,
+}

@@ -21,6 +21,7 @@ export const ContactBlock: React.FC<
 
             <div className="aspect-video w-full overflow-hidden rounded-lg shadow-lg">
               <iframe
+                title="google-maps-location"
                 src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d16597.637402172124!2d-79.3602809!3d43.7119336!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89d4ccd862404cb7%3A0xbe869bedd32b1fa4!2sBonaVista%20LeisureScapes!5e1!3m2!1sen!2sca!4v1729451945220!5m2!1sen!2sca"
                 allowFullScreen
                 loading="lazy"

@@ -8,7 +8,6 @@ export const ServicesBlock: React.FC<
     id?: string
   }
 > = (props) => {
-  
   const { id, title, subtitle, body, link, offerings } = props
 
   return (
@@ -25,7 +24,7 @@ export const ServicesBlock: React.FC<
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
           {offerings.map((offering, index) => (
             <OfferingCard key={index} offering={offering} />
           ))}
@@ -42,7 +41,12 @@ interface OfferingCardProps {
 function OfferingCard({ offering }: OfferingCardProps) {
   return (
     <div className="relative h-[300px] md:h-[400px] rounded-lg overflow-hidden group">
-      <Media resource={offering.image} fill imgClassName="object-cover" />
+      <Media
+        resource={offering.image}
+        fill
+        imgClassName="object-cover"
+        className="absolute inset-0"
+      />
       <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-6 transition-opacity duration-300 opacity-100 group-hover:opacity-90">
         <h3 className="text-xl md:text-2xl font-semibold text-white mb-2">{offering.title}</h3>
         <p className="text-sm md:text-base text-white mb-4 line-clamp-3">{offering.description}</p>

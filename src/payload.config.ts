@@ -116,7 +116,8 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
-    push: process.env.NODE_ENV === 'production' ? false : true,
+    push: false,
+    // push: process.env.NODE_ENV === 'production' ? false : true,
     migrationDir: path.resolve(dirname, 'lib/migrations'),
   }),
   collections,

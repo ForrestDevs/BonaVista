@@ -53,10 +53,11 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
   if (appearance === 'inline') {
     return (
       <OptimizedLink
+        aria-description={label}
         className={cn(className)}
         href={href || url || ''}
-        {...newTabProps}
         onClick={onClick}
+        {...newTabProps}
       >
         {label && label}
         {children && children}
@@ -67,10 +68,11 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
   if (isNavItem) {
     return (
       <OptimizedLink
+        aria-description={label}
         className={cn(className)}
         href={href || url || ''}
-        {...newTabProps}
         onClick={onClick}
+        {...newTabProps}
       >
         {label && label}
         {children && children}

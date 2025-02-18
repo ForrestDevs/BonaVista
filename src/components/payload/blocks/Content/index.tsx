@@ -68,7 +68,8 @@ export const ContentBlock: React.FC<
                     <Media
                       resource={backgroundImage}
                       fill
-                      imgClassName="absolute inset-0 object-cover"
+                      imgClassName="object-cover object-center"
+                      className="absolute inset-0"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-50 z-20"></div>
                   </>

@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/payload/Logo'
 import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa'
 import { InstagramLogoIcon } from '@radix-ui/react-icons'
+import Copyright from './copyright'
+import { NewsletterForm } from './newsletter-form'
 
 export function Footer() {
   return (
@@ -18,8 +20,8 @@ export function Footer() {
             </Link>
 
             <p className="text-sm leading-relaxed">
-              Bringing relaxation and luxury to Toronto and surrounding areas with our premium hot
-              tubs and swim spas. Come visit our showroom!
+              Bringing relaxation and luxury to Toronto and surrounding areas with our premium swim
+              spas, hot tubs and outdoor living. Come visit our showroom!
             </p>
 
             <div className="flex space-x-4">
@@ -46,27 +48,14 @@ export function Footer() {
               </Link>
             </div>
           </div>
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Stay Updated</h3>
-            <p className="text-sm">Subscribe to our newsletter for exclusive offers and updates.</p>
-            <form className="flex space-x-2">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="bg-primary-foreground text-primary flex-grow"
-              />
-              <Button type="submit" variant="secondary">
-                Subscribe
-              </Button>
-            </form>
-          </div>
+          <NewsletterForm />
         </div>
       </div>
 
       {/* Copyright and Policy Links */}
       <div className="container border-t border-foreground/10">
         <div className="mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center text-sm">
-          <p>&copy; {new Date().getFullYear()} BonaVista Leisurescapes. All rights reserved.</p>
+          <Copyright />
           <div className="flex space-x-4 mt-4 md:mt-0">
             <Link href="/privacy" className="hover:underline">
               Privacy Policy

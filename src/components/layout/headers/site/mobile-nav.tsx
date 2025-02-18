@@ -30,7 +30,13 @@ export default function MobileNav({ header }: { header: Header }) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden" style={{ zIndex: 10 }}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="lg:hidden"
+          style={{ zIndex: 10 }}
+          aria-label="Open Mobile Navigation Menu"
+        >
           <MenuIcon />
         </Button>
       </SheetTrigger>
