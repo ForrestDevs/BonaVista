@@ -31,9 +31,10 @@ const Trigger = React.forwardRef<
 >(({ className, children, showChevron = true, ...props }, ref) => (
   <NavigationMenuPrimitive.Trigger
     ref={ref}
-    className={
-      'relative group text-base lg:text-lg xl:text-xl hover:text-gray-700 transition-colors duration-200 flex items-center'
-    }
+    className={cn(
+      'relative group text-base lg:text-lg xl:text-xl hover:text-gray-700 transition-colors duration-200 flex items-center',
+      className,
+    )}
     {...props}
   >
     {children}{' '}
@@ -63,6 +64,7 @@ interface SingleLinkProps {
   title: string
   variant?: 'sm' | 'md' | 'lg' | 'none'
   isNavItem?: boolean
+  className?: string
 }
 
 const SingleLink: React.FC<SingleLinkProps> = ({
@@ -70,6 +72,7 @@ const SingleLink: React.FC<SingleLinkProps> = ({
   title,
   variant = 'md',
   isNavItem = false,
+  className,
 }) => {
   const sizeClasses = {
     sm: 'text-sm lg:text-base xl:text-lg',
@@ -83,6 +86,7 @@ const SingleLink: React.FC<SingleLinkProps> = ({
       ? 'text-black hover:text-gray-700 transition-colors duration-200 relative group'
       : '',
     sizeClasses[variant],
+    className,
   )
 
   if (isNavItem) {

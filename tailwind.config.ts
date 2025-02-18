@@ -46,6 +46,8 @@ export default {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'nav-enter': 'nav-enter 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+        'nav-exit': 'nav-exit 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
       },
       backgroundImage: {
         'header-gradient':
@@ -107,6 +109,30 @@ export default {
         'accordion-up': {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' },
+        },
+        'nav-enter': {
+          '0%': {
+            opacity: '0',
+            transform: 'translate(-50%, -4px) scale(0.97)',
+            clipPath: 'inset(0% 0% 100% 0%)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translate(-50%, 0) scale(1)',
+            clipPath: 'inset(0% 0% 0% 0%)',
+          },
+        },
+        'nav-exit': {
+          '0%': {
+            opacity: '1',
+            transform: 'translate(-50%, 0) scale(1)',
+            clipPath: 'inset(0% 0% 0% 0%)',
+          },
+          '100%': {
+            opacity: '0',
+            transform: 'translate(-50%, -4px) scale(0.97)',
+            clipPath: 'inset(0% 0% 100% 0%)',
+          },
         },
       },
       typography: () => ({

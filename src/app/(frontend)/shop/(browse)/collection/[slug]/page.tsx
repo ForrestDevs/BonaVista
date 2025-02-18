@@ -6,6 +6,7 @@ import { getCachedDocument, getCachedDocuments } from '@lib/utils/getDocument'
 import { FilteredProducts } from '@components/shop/filter3/FilteredProducts'
 import { SortOption } from '@/components/shop/filter3/types'
 import Link from 'next/link'
+
 type Props = {
   params: Promise<{ slug: string }>
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
@@ -15,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const collection = await getCachedDocument<typeof PRODUCT_COLLECTION_SLUG>(
     PRODUCT_COLLECTION_SLUG,
-    slug[0],
+    slug,
   )
   if (!collection) {
     notFound()
@@ -32,7 +33,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
 
   const collection = await getCachedDocument<typeof PRODUCT_COLLECTION_SLUG>(
     PRODUCT_COLLECTION_SLUG,
-    collectionSlug,
+    slug,
     2,
   )
 
