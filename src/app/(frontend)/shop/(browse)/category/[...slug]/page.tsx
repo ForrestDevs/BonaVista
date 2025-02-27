@@ -3,17 +3,16 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PRODUCT_CATEGORY_SLUG, PRODUCT_SLUG } from '@payload/collections/constants'
 import { getCachedDocument, getCachedDocuments } from '@lib/utils/getDocument'
-import { FilteredProducts } from '@components/shop/filter3/FilteredProducts'
-import { ResultsSkeleton } from '@components/shop/skeletons/layout/product-results-skeleton'
 import Link from 'next/link'
-import getPayload from '@/lib/utils/getPayload'
-import { ProductCard } from '@/components/shop/products/product-card'
-import { SortOption } from '@/components/shop/filter3/types'
-import { Product } from '@payload-types'
-import ProductBreadcrumb from '../../product/[slug]/components/product-breadcrumb'
+import { FilterConfig, SortOption } from '@/components/shop/filter/types'
+import { mergeOpenGraph } from '@/lib/utils/mergeOpenGraph'
+import ProductLayout from '@/components/shop/filter/product-layout'
+import { browseParamsCache } from '@/components/shop/filter/product-browse-params'
+import { SearchParams } from 'nuqs/server'
 
 type Props = {
   params: Promise<{ slug: string[] }>
+  searchParams: Promise<SearchParams>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -29,12 +28,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${category.title} | BonaVista Leisurescapes`,
     description: category.description || '',
+    openGraph: mergeOpenGraph({
+      title: `${category.title} | BonaVista Leisurescapes`,
+      description: category.description || '',
+      url: `${process.env.NEXT_PUBLIC_PUBLIC_URL}/shop/category/${slug.join('/')}`,
+    }),
   }
 }
 
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params, searchParams }: Props) {
   const { slug } = await params
   const lastSlug = slug[slug.length - 1]
+  await browseParamsCache.parse(searchParams)
 
   const category = await getCachedDocument<typeof PRODUCT_CATEGORY_SLUG>(
     PRODUCT_CATEGORY_SLUG,
@@ -46,40 +51,25 @@ export default async function CategoryPage({ params }: Props) {
     notFound()
   }
 
-  const products = await getCachedDocuments<typeof PRODUCT_SLUG>({
-    collection: PRODUCT_SLUG,
-    depth: 1,
-    limit: 1000,
-    where: {
-      categories: {
-        in: category.id,
-      },
-    },
-  })
-
-  const filterOptions = {
-    categories: [{ label: category.title, value: category.slug }],
-    collections: [],
-    brands: [],
-    compatibility: [
-      { label: 'Hot Tub', value: 'hottub' },
-      { label: 'Swim Spa', value: 'swimspa' },
-      { label: 'Pool', value: 'pool' },
-    ],
-  }
-
-  // Configure which filters to enable
-  const config = {
+  const config: FilterConfig = {
     enabledFilters: {
-      categories: true,
-      collections: true,
-      brands: true,
-      compatibility: true,
+      categories: false,
+      collections: false,
+      brands: false,
+      compatibility: false,
       price: true,
       search: true,
     },
-    sortOptions: ['title', 'price', '-price', '-createdAt'] as SortOption[],
-    defaultSort: '-createdAt' as SortOption,
+    sortOptions: ['title', 'priceMin', '-priceMax', '-createdAt'] as SortOption[],
+    defaultSort: 'title' as SortOption,
+    defaultPageSize: 12,
+    defaultCategory: category.id,
+    options: {
+      categories: [],
+      collections: [],
+      brands: [],
+      compatibility: [],
+    },
   }
 
   return (
@@ -247,12 +237,7 @@ export default async function CategoryPage({ params }: Props) {
         ) : (
           <div className="flex flex-col gap-8 md:flex-row">
             {category.products.docs.length > 0 ? (
-              <FilteredProducts
-                key={category.id}
-                initialProducts={products}
-                config={config}
-                options={filterOptions}
-              />
+              <ProductLayout config={config} />
             ) : (
               <div className="flex flex-col items-center justify-center w-full py-16">
                 <div className="text-4xl mb-4">🔍</div>
@@ -283,10 +268,6 @@ export default async function CategoryPage({ params }: Props) {
                 </Link>
               </div>
             )}
-
-            {/* <div className="order-none flex-none md:order-last md:w-[125px]">
-              <FilterList list={sorting} title="Sort by" />
-            </div> */}
           </div>
         )}
       </div>

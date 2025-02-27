@@ -520,13 +520,109 @@ export const enum_footer_shop_footer_nav_items_link_type = pgEnum(
   ['reference', 'custom'],
 )
 export const enum_store_hours_days_day_of_week = pgEnum('enum_store_hours_days_day_of_week', [
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday',
-  'sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+])
+export const enum_store_hours_days_opentime_tz = pgEnum('enum_store_hours_days_opentime_tz', [
+  'Pacific/Midway',
+  'Pacific/Niue',
+  'Pacific/Honolulu',
+  'Pacific/Rarotonga',
+  'America/Anchorage',
+  'Pacific/Gambier',
+  'America/Los_Angeles',
+  'America/Tijuana',
+  'America/Denver',
+  'America/Phoenix',
+  'America/Chicago',
+  'America/Guatemala',
+  'America/New_York',
+  'America/Bogota',
+  'America/Caracas',
+  'America/Santiago',
+  'America/Buenos_Aires',
+  'America/Sao_Paulo',
+  'Atlantic/South_Georgia',
+  'Atlantic/Azores',
+  'Atlantic/Cape_Verde',
+  'Europe/London',
+  'Europe/Berlin',
+  'Africa/Lagos',
+  'Europe/Athens',
+  'Africa/Cairo',
+  'Europe/Moscow',
+  'Asia/Riyadh',
+  'Asia/Dubai',
+  'Asia/Baku',
+  'Asia/Karachi',
+  'Asia/Tashkent',
+  'Asia/Calcutta',
+  'Asia/Dhaka',
+  'Asia/Almaty',
+  'Asia/Jakarta',
+  'Asia/Bangkok',
+  'Asia/Shanghai',
+  'Asia/Singapore',
+  'Asia/Tokyo',
+  'Asia/Seoul',
+  'Australia/Sydney',
+  'Pacific/Guam',
+  'Pacific/Noumea',
+  'Pacific/Auckland',
+  'Pacific/Fiji',
+])
+export const enum_store_hours_days_closetime_tz = pgEnum('enum_store_hours_days_closetime_tz', [
+  'Pacific/Midway',
+  'Pacific/Niue',
+  'Pacific/Honolulu',
+  'Pacific/Rarotonga',
+  'America/Anchorage',
+  'Pacific/Gambier',
+  'America/Los_Angeles',
+  'America/Tijuana',
+  'America/Denver',
+  'America/Phoenix',
+  'America/Chicago',
+  'America/Guatemala',
+  'America/New_York',
+  'America/Bogota',
+  'America/Caracas',
+  'America/Santiago',
+  'America/Buenos_Aires',
+  'America/Sao_Paulo',
+  'Atlantic/South_Georgia',
+  'Atlantic/Azores',
+  'Atlantic/Cape_Verde',
+  'Europe/London',
+  'Europe/Berlin',
+  'Africa/Lagos',
+  'Europe/Athens',
+  'Africa/Cairo',
+  'Europe/Moscow',
+  'Asia/Riyadh',
+  'Asia/Dubai',
+  'Asia/Baku',
+  'Asia/Karachi',
+  'Asia/Tashkent',
+  'Asia/Calcutta',
+  'Asia/Dhaka',
+  'Asia/Almaty',
+  'Asia/Jakarta',
+  'Asia/Bangkok',
+  'Asia/Shanghai',
+  'Asia/Singapore',
+  'Asia/Tokyo',
+  'Asia/Seoul',
+  'Australia/Sydney',
+  'Pacific/Guam',
+  'Pacific/Noumea',
+  'Pacific/Auckland',
+  'Pacific/Fiji',
 ])
 
 export const blog_categories = pgTable(
@@ -635,8 +731,6 @@ export const users = pgTable(
     }),
     salt: varchar('salt'),
     hash: varchar('hash'),
-    _verified: boolean('_verified'),
-    _verificationToken: varchar('_verificationtoken'),
     loginAttempts: numeric('login_attempts').default('0'),
     lockUntil: timestamp('lock_until', { mode: 'string', withTimezone: true, precision: 3 }),
   },
@@ -972,6 +1066,8 @@ export const products = pgTable(
     baseProduct_enableInventory: boolean('base_product_enable_inventory').default(false),
     baseProduct_inventory: numeric('base_product_inventory').default('0'),
     baseProduct_price: numeric('base_product_price'),
+    priceMin: numeric('price_min').default('0'),
+    priceMax: numeric('price_max').default('0'),
     updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
       .defaultNow()
       .notNull(),
@@ -982,6 +1078,9 @@ export const products = pgTable(
   },
   (columns) => ({
     products_slug_idx: index('products_slug_idx').on(columns.slug),
+    products_title_idx: index('products_title_idx').on(columns.title),
+    products_price_min_idx: index('products_price_min_idx').on(columns.priceMin),
+    products_price_max_idx: index('products_price_max_idx').on(columns.priceMax),
     products_updated_at_idx: index('products_updated_at_idx').on(columns.updatedAt),
     products_created_at_idx: index('products_created_at_idx').on(columns.createdAt),
     products__status_idx: index('products__status_idx').on(columns._status),
@@ -1235,6 +1334,8 @@ export const _products_v = pgTable(
     ),
     version_baseProduct_inventory: numeric('version_base_product_inventory').default('0'),
     version_baseProduct_price: numeric('version_base_product_price'),
+    version_priceMin: numeric('version_price_min').default('0'),
+    version_priceMax: numeric('version_price_max').default('0'),
     version_updatedAt: timestamp('version_updated_at', {
       mode: 'string',
       withTimezone: true,
@@ -1260,6 +1361,15 @@ export const _products_v = pgTable(
     _products_v_version_version_slug_idx: index('_products_v_version_version_slug_idx').on(
       columns.version_slug,
     ),
+    _products_v_version_version_title_idx: index('_products_v_version_version_title_idx').on(
+      columns.version_title,
+    ),
+    _products_v_version_version_price_min_idx: index(
+      '_products_v_version_version_price_min_idx',
+    ).on(columns.version_priceMin),
+    _products_v_version_version_price_max_idx: index(
+      '_products_v_version_version_price_max_idx',
+    ).on(columns.version_priceMax),
     _products_v_version_version_updated_at_idx: index(
       '_products_v_version_version_updated_at_idx',
     ).on(columns.version_updatedAt),
@@ -4346,7 +4456,13 @@ export const store_hours_days = pgTable(
     dayOfWeek: enum_store_hours_days_day_of_week('day_of_week').notNull(),
     isClosed: boolean('is_closed').default(false),
     openTime: timestamp('open_time', { mode: 'string', withTimezone: true, precision: 3 }),
+    openTime_tz: enum_store_hours_days_opentime_tz('opentime_tz')
+      .notNull()
+      .default('America/New_York'),
     closeTime: timestamp('close_time', { mode: 'string', withTimezone: true, precision: 3 }),
+    closeTime_tz: enum_store_hours_days_closetime_tz('closetime_tz')
+      .notNull()
+      .default('America/New_York'),
   },
   (columns) => ({
     _orderIdx: index('store_hours_days_order_idx').on(columns._order),
@@ -6139,6 +6255,8 @@ type DatabaseSchema = {
   enum_footer_site_footer_nav_items_link_type: typeof enum_footer_site_footer_nav_items_link_type
   enum_footer_shop_footer_nav_items_link_type: typeof enum_footer_shop_footer_nav_items_link_type
   enum_store_hours_days_day_of_week: typeof enum_store_hours_days_day_of_week
+  enum_store_hours_days_opentime_tz: typeof enum_store_hours_days_opentime_tz
+  enum_store_hours_days_closetime_tz: typeof enum_store_hours_days_closetime_tz
   blog_categories: typeof blog_categories
   media: typeof media
   users_roles: typeof users_roles

@@ -409,3 +409,62 @@
 // //   .catch((error) => {
 // //     process.exit(1)
 // //   })
+
+// import getPayload from '../utils/getPayload'
+// import { PRODUCT_SLUG } from '@/payload/collections/constants'
+
+/**
+ * Updates all products to have a _status of 'draft'
+ * This is useful when you want to temporarily hide all products from the frontend
+ * while still being able to edit them in the admin panel.
+ */
+// async function updateProductsToDraft() {
+//   const payload = await getPayload()
+
+//   try {
+//     // Get all products
+//     const { docs: products, totalDocs } = await payload.find({
+//       collection: PRODUCT_SLUG,
+//       limit: 1000, // Adjust if you have more products
+//     })
+
+//     payload.logger.info(`— Found ${totalDocs} products to update to draft status`)
+
+//     // Update each product to draft status
+//     let successCount = 0
+//     let errorCount = 0
+
+//     for (const product of products) {
+//       try {
+//         await payload.update({
+//           collection: PRODUCT_SLUG,
+//           id: product.id,
+//           data: {
+//             _status: 'published',
+//           },
+//         })
+
+//         payload.logger.info(`— Updated product "${product.title}" to draft status`)
+//         successCount++
+//       } catch (error) {
+//         payload.logger.error(error, `— Error updating product "${product.title}" to draft status`)
+//         errorCount++
+//       }
+//     }
+
+//     payload.logger.info(`— Completed updating products to draft status`)
+//     payload.logger.info(`— Success: ${successCount}, Errors: ${errorCount}`)
+//   } catch (error) {
+//     payload.logger.error(`— Error fetching products`, error)
+//   }
+// }
+
+// // Uncomment to run the script
+// updateProductsToDraft()
+//   .then(() => {
+//     process.exit(0)
+//   })
+//   .catch((error) => {
+//     console.error('Script failed:', error)
+//     process.exit(1)
+//   })

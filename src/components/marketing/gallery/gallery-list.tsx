@@ -1,17 +1,14 @@
 import React, { Suspense } from 'react'
-import type { Gallery } from '@/payload-types'
 import { GalleryCard } from '@/components/marketing/gallery/gallery-card'
 import { OptimizedLink } from '@/components/payload/Link/optimized-link'
 import { cn } from '@/lib/utils/cn'
 import { buttonVariants } from '@/components/ui/button'
-import { parseAsString, useQueryStates } from 'nuqs'
 import { gallerySearchParamsCache } from './gallery-search-params'
-import { SearchParams } from 'nuqs'
 import { GALLERIES_SLUG } from '@/payload/collections/constants'
 import getPayload from '@/lib/utils/getPayload'
 import GalleryFilters from './gallery-filters'
-import LoadingGallery from '@/components/layout/suspense/loading-gallery'
 import { cache } from '@/lib/utils/cache'
+import { LoadingGalleryFilters } from '@/components/layout/suspense/loading-gallery'
 
 async function getCachedGallery(slug: string) {
   const payload = await getPayload()
@@ -63,14 +60,16 @@ async function getCachedGallerySlugs() {
   return await cacheFn()
 }
 
-export async function GalleryList({ searchParams }: { searchParams: Promise<SearchParams> }) {
+export async function GalleryList() {
   const gallerySlugs = await getCachedGallerySlugs()
-  const { collection } = await gallerySearchParamsCache.parse(searchParams)
+  const { collection } = gallerySearchParamsCache.all()
   const gallery = await getCachedGallery(collection)
 
   return (
     <div>
-      <GalleryFilters collections={gallerySlugs} />
+      <Suspense fallback={<LoadingGalleryFilters />}>
+        <GalleryFilters collections={gallerySlugs} />
+      </Suspense>
       {gallery ? (
         <section className="container flex flex-col justify-center gap-10 py-10">
           <div className="grid grid-cols-4 sm:grid-cols-8 lg:grid-cols-12 gap-4">

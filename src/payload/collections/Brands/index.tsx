@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { anyone, admins } from '@payload/access'
-import { BRAND_SLUG } from '../constants'
+import { BRAND_SLUG, PRODUCT_SLUG } from '../constants'
 import { slugField } from '@payload/fields/slug'
 
 export const Brands: CollectionConfig = {
@@ -21,6 +21,18 @@ export const Brands: CollectionConfig = {
       name: 'name',
       type: 'text',
       required: true,
+    },
+    {
+      name: 'products',
+      type: 'join',
+      collection: PRODUCT_SLUG,
+      on: 'brand',
+      label: 'Products',
+      admin: {
+        position: 'sidebar',
+        allowCreate: false,
+        defaultColumns: ['title'],
+      },
     },
   ],
 } as const

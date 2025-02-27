@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useTransition } from 'react'
 import { Gallery } from '@payload-types'
 import {
   Select,
@@ -11,9 +11,7 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import clsx from 'clsx'
-import { parseAsString, useQueryStates } from 'nuqs'
-import getPayload from '@/lib/utils/getPayload'
-import { GALLERIES_SLUG } from '@/payload/collections/constants'
+import { useQueryState } from 'nuqs'
 import { gallerySearchParamsParsers } from './gallery-search-params'
 
 type GalleryFiltersProps = {
@@ -21,18 +19,26 @@ type GalleryFiltersProps = {
 }
 
 export default function GalleryFilters({ collections }: GalleryFiltersProps) {
-  const [currentCollection, setCurrentCollection] = useQueryStates(gallerySearchParamsParsers)
+  const [isPending, startTransition] = useTransition()
+  const [currentCollection, setCurrentCollection] = useQueryState(
+    'collection',
+    gallerySearchParamsParsers.collection.withOptions({
+      shallow: false,
+      startTransition,
+    }),
+  )
 
   return (
     <section className="container">
       <div className="hidden md:flex flex-wrap justify-center gap-4">
         {collections.map((collection) => (
           <Button
+            disabled={isPending}
             key={collection.id}
-            onClick={() => setCurrentCollection({ collection: collection.slug })}
+            onClick={() => setCurrentCollection(collection.slug)}
             className={clsx(
               'p-7 text-lg rounded-none hover:text-white',
-              currentCollection.collection === collection.slug
+              currentCollection === collection.slug
                 ? 'bg-primary text-white'
                 : 'bg-gray-200 text-black',
             )}
@@ -46,8 +52,9 @@ export default function GalleryFilters({ collections }: GalleryFiltersProps) {
 
       <div className="md:hidden">
         <Select
-          onValueChange={(value) => setCurrentCollection({ collection: value })}
-          defaultValue={currentCollection.collection}
+          onValueChange={(value) => setCurrentCollection(value)}
+          defaultValue={currentCollection ?? ''}
+          disabled={isPending}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select a collection" />

@@ -153,3 +153,12 @@ cache optimizations:
    - blog-cateogires (revalidateTag)
    - posts (revalidateTag)
    - pages (revalidateTag)
+
+
+FINALIZE SHOP
+- add mobile nav to shop
+ - Use SKUS for Cart Items
+ - Restructure Checkout Flow
+ - Make sure guest order page works
+ - When order is successful, add zoho webhook and send email to admin notifying the new order. (Add spire integration to this email)
+ 

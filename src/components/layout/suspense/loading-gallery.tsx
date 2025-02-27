@@ -16,17 +16,7 @@ export default function LoadingGallery() {
       </section>
 
       {/* Filter Skeletons */}
-      <section className="container">
-        <div className="hidden md:flex flex-wrap justify-center gap-4">
-          {[...Array(3)].map((_, i) => (
-            <Skeleton key={i} className="h-[72px] w-[200px] bg-gray-200" />
-          ))}
-        </div>
-
-        <div className="md:hidden">
-          <Skeleton className="h-10 w-full bg-gray-200" />
-        </div>
-      </section>
+      <LoadingGalleryFilters />
 
       {/* Gallery Grid Skeleton */}
       <section className="container flex flex-col justify-center gap-10 py-10">
@@ -43,5 +33,21 @@ export default function LoadingGallery() {
         </div>
       </section>
     </div>
+  )
+}
+
+export function LoadingGalleryFilters() {
+  return (
+    <section className="container">
+      <div className="hidden md:flex flex-wrap justify-center gap-4">
+        {[...Array(3)].map((_, i) => (
+          <Skeleton key={i} className="h-[72px] w-[200px] bg-gray-200" />
+        ))}
+      </div>
+
+      <div className="md:hidden">
+        <Skeleton className="h-10 w-full bg-gray-200" />
+      </div>
+    </section>
   )
 }

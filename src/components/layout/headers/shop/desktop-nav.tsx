@@ -55,7 +55,7 @@ export const ShopDesktopNav = async ({ className }: { className?: string }) => {
                 {featuredCollections.map((collection) => (
                   <SingleLink
                     key={collection.id}
-                    href={`/shop/collections/${collection.slug}`}
+                    href={`/shop/collection/${collection.slug}`}
                     title={collection.title}
                     variant="lg"
                     className="p-4 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm"

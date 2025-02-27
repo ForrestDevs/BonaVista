@@ -8,6 +8,7 @@ import { GalleryList } from '@/components/marketing/gallery/gallery-list'
 import { SearchParams } from 'nuqs'
 import LoadingGallery from '@/components/layout/suspense/loading-gallery'
 import { notFound } from 'next/navigation'
+import { gallerySearchParamsCache } from '@/components/marketing/gallery/gallery-search-params'
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await queryPageBySlug('gallery')
@@ -21,6 +22,7 @@ export default async function GalleryHome({
   searchParams: Promise<SearchParams>
 }) {
   const page = await queryPageBySlug('gallery')
+  await gallerySearchParamsCache.parse(searchParams)
 
   if (!page) {
     return notFound()
@@ -31,7 +33,7 @@ export default async function GalleryHome({
       <div className="flex flex-col min-h-screen space-y-10">
         <RenderHero {...page.hero} />
         <GalleryIntro />
-        <GalleryList searchParams={searchParams} />
+        <GalleryList />
       </div>
     </Suspense>
   )

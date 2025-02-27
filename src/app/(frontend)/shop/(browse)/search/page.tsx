@@ -1,6 +1,11 @@
 import React, { Suspense } from 'react'
 import { ResultsSkeleton } from '@components/shop/skeletons/layout/product-results-skeleton'
 import { Metadata } from 'next'
+import ProductLayout from '@/components/shop/filter/product-layout'
+import { SortOption } from '@/components/shop/filter/types'
+import { FilterConfig } from '@/components/shop/filter/types'
+import { browseParamsCache } from '@/components/shop/filter/product-browse-params'
+import { SearchParams } from 'nuqs/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,23 +16,37 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default async function SearchPage({
-  searchParams,
-}: {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
-}) {
-  const params = await searchParams
-  const { q: searchValue, sort, category } = params as { [key: string]: string }
+type PageProps = {
+  searchParams: Promise<SearchParams>
+}
+
+export default async function SearchPage({ searchParams }: PageProps) {
+  const { q: searchValue } = await browseParamsCache.parse(searchParams)
+
+  const config: FilterConfig = {
+    enabledFilters: {
+      categories: false,
+      collections: false,
+      brands: false,
+      compatibility: false,
+      price: true,
+      search: true,
+    },
+    sortOptions: ['title', 'priceMin', '-priceMax', '-createdAt'] as SortOption[],
+    defaultSort: 'title' as SortOption,
+    defaultPageSize: 12,
+    options: {
+      categories: [],
+      collections: [],
+      brands: [],
+      compatibility: [],
+    },
+  }
 
   return (
-    <Suspense fallback={<ResultsSkeleton />}>
-      <div className="container flex flex-col gap-8 my-16 pb-4 text-black md:flex-row dark:text-white">
-        {/* <FilteredProducts searchValue={searchValue} category={category} sort={sort} />
-
-        <div className="order-none flex-none md:order-last md:w-[125px]">
-          <FilterList list={sorting} title="Sort by" />
-        </div> */}
-      </div>
-    </Suspense>
+    <div className="container py-8">
+      <h1 className="text-3xl font-bold mb-4">Search Results for {searchValue}</h1>
+      <ProductLayout config={config} />
+    </div>
   )
 }

@@ -26,6 +26,7 @@ import {
   BRAND_SLUG,
   PRODUCT_COLLECTION_SLUG,
 } from '../constants'
+import { setPriceMinMax } from './hooks/setPriceMinMax'
 
 const Products: CollectionConfig = {
   slug: 'products',
@@ -51,6 +52,7 @@ const Products: CollectionConfig = {
       type: 'text',
       required: true,
       label: 'Title',
+      index: true,
     },
     {
       name: 'description',
@@ -502,11 +504,34 @@ const Products: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'priceMin',
+      label: 'Minimum Price',
+      type: 'number',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Minimum price for this product',
+        position: 'sidebar',
+      },
+      defaultValue: 0,
+    },
+    {
+      name: 'priceMax',
+      label: 'Maximum Price',
+      type: 'number',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Maximum price for this product',
+        position: 'sidebar',
+      },
+      defaultValue: 0,
+    },
   ],
   hooks: {
     afterChange: [revalidateProduct],
-    // afterDelete: [deleteProductFromCarts],
-    // beforeChange: [beforeProductChange],
+    beforeChange: [setPriceMinMax],
   },
   versions: {
     drafts: {

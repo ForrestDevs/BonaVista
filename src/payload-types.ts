@@ -192,6 +192,12 @@ export interface Config {
       children: 'product-categories';
       products: 'products';
     };
+    'product-collections': {
+      products: 'products';
+    };
+    brands: {
+      products: 'products';
+    };
   };
   collectionsSelect: {
     'blog-categories': BlogCategoriesSelect<false> | BlogCategoriesSelect<true>;
@@ -557,6 +563,14 @@ export interface Product {
    * Select which equipment types this product is compatible with
    */
   compatibility?: ('swimspa' | 'hottub' | 'pool')[] | null;
+  /**
+   * Minimum price for this product
+   */
+  priceMin?: number | null;
+  /**
+   * Maximum price for this product
+   */
+  priceMax?: number | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -570,6 +584,10 @@ export interface Brand {
   slug?: string | null;
   slugLock?: boolean | null;
   name: string;
+  products?: {
+    docs?: (number | Product)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -591,6 +609,10 @@ export interface ProductCollection {
   startDate?: string | null;
   endDate?: string | null;
   publishedOn?: string | null;
+  products?: {
+    docs?: (number | Product)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1970,6 +1992,8 @@ export interface ProductsSelect<T extends boolean = true> {
   collections?: T;
   categories?: T;
   compatibility?: T;
+  priceMin?: T;
+  priceMax?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -2481,6 +2505,7 @@ export interface ProductCollectionsSelect<T extends boolean = true> {
   startDate?: T;
   endDate?: T;
   publishedOn?: T;
+  products?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -2493,6 +2518,7 @@ export interface BrandsSelect<T extends boolean = true> {
   slug?: T;
   slugLock?: T;
   name?: T;
+  products?: T;
   updatedAt?: T;
   createdAt?: T;
 }
