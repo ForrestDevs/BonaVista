@@ -90,25 +90,25 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
       <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
         <h2 className="text-xl font-semibold mb-6">Items</h2>
         <div className="divide-y divide-gray-100">
-          {order.items?.map((item) => (
+          {order.lineItems?.map(({ lineItem }) => (
             <div
-              key={item.id}
+              key={lineItem.sku}
               className="flex flex-col sm:flex-row sm:items-center justify-between py-4 hover:bg-gray-50 transition-colors rounded-lg px-3 gap-4"
             >
               <div className="flex items-center gap-x-4 sm:gap-x-6">
                 <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-lg border overflow-hidden flex-shrink-0">
-                  <OrderItemThumbnail line={item} />
+                  <OrderItemThumbnail lineItem={lineItem} />
                 </div>
-                <OrderItemDetails item={item} />
+                <OrderItemDetails lineItem={lineItem} />
               </div>
               <div className="text-left sm:text-right">
                 <p className="text-gray-600">
-                  {item.quantity}x{' '}
-                  {formatStripeMoney({ amount: item.price, currency: order.currency })}
+                  {lineItem.quantity}x{' '}
+                  {formatStripeMoney({ amount: lineItem.price, currency: order.currency })}
                 </p>
                 <p className="font-medium text-lg mt-1">
                   {formatStripeMoney({
-                    amount: item.quantity * item.price,
+                    amount: lineItem.quantity * lineItem.price,
                     currency: order.currency,
                   })}
                 </p>

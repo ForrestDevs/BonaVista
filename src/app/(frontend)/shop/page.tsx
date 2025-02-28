@@ -104,14 +104,18 @@ export default async function StoreHome() {
         <section className="container mx-auto px-4 py-16">
           <div className="bg-gradient-to-br from-white to-[#f8fbfd] rounded-3xl p-12 shadow-lg max-w-6xl mx-auto">
             <div className="text-center mb-10">
-              <span className="inline-block px-4 py-1 bg-[#e8f1f5] text-[#1e365c] text-sm font-medium rounded-full mb-3">PREMIUM WATER CARE</span>
+              <span className="inline-block px-4 py-1 bg-[#e8f1f5] text-[#1e365c] text-sm font-medium rounded-full mb-3">
+                PREMIUM WATER CARE
+              </span>
               <h2 className="text-4xl font-bold text-[#1e365c] mt-2">
                 The Mineraluxe Hot Tub Care System
               </h2>
               <div className="w-24 h-1 bg-[#1e365c] mx-auto mt-4 rounded-full" />
-              <p className="text-gray-600 mt-4 max-w-2xl mx-auto">Experience crystal clear water with our advanced hot tub care solution</p>
+              <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
+                Experience crystal clear water with our advanced hot tub care solution
+              </p>
             </div>
-            
+
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-[#1e365c] to-[#4a7eb5] rounded-lg blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
@@ -128,10 +132,13 @@ export default async function StoreHome() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="space-y-8">
                 {mineraluxeSteps.map((step) => (
-                  <div key={step.number} className="flex gap-5 items-start group transition-all duration-200 hover:translate-x-1">
+                  <div
+                    key={step.number}
+                    className="flex gap-5 items-start group transition-all duration-200 hover:translate-x-1"
+                  >
                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#1e365c] flex items-center justify-center text-white font-bold shadow-md">
                       {step.number}
                     </div>
@@ -141,7 +148,7 @@ export default async function StoreHome() {
                     </div>
                   </div>
                 ))}
-                
+
                 <div className="pt-4">
                   <OptimizedLink
                     href="/shop/brand/mineraluxe"

@@ -27,9 +27,10 @@ async function ThumbnailImage({ id }: { id: number }) {
   )
 }
 
-export async function OrderItemThumbnail({ line }: { line: OrderItem }) {
-  const product = typeof line.product === 'object' ? line.product : null
-  const mediaId = typeof line.thumbnail === 'object' ? line.thumbnail.id : line.thumbnail
+export async function OrderItemThumbnail({ lineItem }: { lineItem: OrderItem }) {
+  const product = typeof lineItem.product === 'object' ? lineItem.product : null
+  const mediaId =
+    typeof lineItem.thumbnail === 'object' ? lineItem.thumbnail.id : lineItem.thumbnail
 
   return (
     <div className="w-16 sm:w-24">
@@ -51,10 +52,13 @@ export async function OrderItemThumbnail({ line }: { line: OrderItem }) {
   )
 }
 
-export default function OrderItemDetails({ item }: { item: OrderItem }) {
-  const productTitle = typeof item.product === 'object' ? item.product.title : item.product
-  const isVariant = item.isVariant
-  const variantOptions = isVariant ? item.variantOptions.map((v) => v.value.label).join(', ') : null
+export default function OrderItemDetails({ lineItem }: { lineItem: OrderItem }) {
+  const productTitle =
+    typeof lineItem.product === 'object' ? lineItem.product.title : lineItem.product
+  const isVariant = lineItem.isVariant
+  const variantOptions = isVariant
+    ? lineItem.variantOptions.map((v) => v.value.label).join(', ')
+    : null
 
   return (
     <div className="">

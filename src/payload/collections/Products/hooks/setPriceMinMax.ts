@@ -10,15 +10,15 @@ export const setPriceMinMax: CollectionBeforeChangeHook<Product> = async ({
   const newData = { ...data }
 
   // Skip if we're not changing price-related fields
-//   if (
-//     data.priceMin === originalDoc?.priceMin &&
-//     data.priceMax === originalDoc?.priceMax &&
-//     data.baseProduct?.price === originalDoc?.baseProduct?.price &&
-//     JSON.stringify(data.variants?.variantProducts) ===
-//       JSON.stringify(originalDoc?.variants?.variantProducts)
-//   ) {
-//     return data
-//   }
+  //   if (
+  //     data.priceMin === originalDoc?.priceMin &&
+  //     data.priceMax === originalDoc?.priceMax &&
+  //     data.baseProduct?.price === originalDoc?.baseProduct?.price &&
+  //     JSON.stringify(data.variants?.variantProducts) ===
+  //       JSON.stringify(originalDoc?.variants?.variantProducts)
+  //   ) {
+  //     return data
+  //   }
 
   try {
     // Case 1: Base product (no variants)

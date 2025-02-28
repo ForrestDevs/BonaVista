@@ -101,7 +101,8 @@ export default async function Orders() {
                 </div>
                 <div className="space-y-1 sm:text-right">
                   <p className="text-sm text-gray-500">Status</p>
-                  <p className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+                  <p
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
                     ${order.status === 'succeeded' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}
                   >
                     {order.status || 'Processing'}
@@ -149,7 +150,7 @@ export default async function Orders() {
 
 // Generate a secure hash for the order authentication
 function generateOrderAuthHash(orderId: string, orderNumber: string): string {
-  const crypto = require('crypto');
+  const crypto = require('crypto')
   return crypto
     .createHash('sha256')
     .update(`${orderId}-${orderNumber}-${process.env.NEXTAUTH_SECRET || 'order-secret'}`)

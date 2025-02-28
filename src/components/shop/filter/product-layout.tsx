@@ -3,6 +3,8 @@ import ProductList from './product-list'
 import { ProductFilters } from './product-filters'
 import { FilterConfig } from './types'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 // Skeleton loader for product list during suspense
 function ProductListSkeleton() {
@@ -35,7 +37,15 @@ export default function ProductLayout({ config }: { config: FilterConfig }) {
       <div className="grid grid-cols-1 xl:grid-cols-[280px_1fr] gap-6">
         {/* Filters - only visible as sidebar on xl (1280px+) screens */}
         <aside className="hidden xl:block xl:sticky xl:top-24 xl:self-start xl:max-h-[calc(100vh-4rem)]">
-          <ProductFilters config={config} />
+          <Suspense
+            fallback={
+              <Button variant="outline" className="w-full" disabled>
+                <Loader2 className="h-4 w-4 animate-spin" />
+              </Button>
+            }
+          >
+            <ProductFilters config={config} />
+          </Suspense>
         </aside>
 
         {/* Product listing */}

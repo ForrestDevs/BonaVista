@@ -13,7 +13,7 @@ export const updateUserOrders: CollectionAfterChangeHook<Order> = async ({
 }) => {
   const { payload } = req
 
-  if ((operation === 'create' || operation === 'update') && doc.orderedBy && doc.items) {
+  if ((operation === 'create' || operation === 'update') && doc.orderedBy && doc.lineItems) {
     const orderedBy = typeof doc.orderedBy === 'object' ? doc.orderedBy.id : doc.orderedBy
 
     const user = await payload.findByID({

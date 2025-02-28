@@ -16,14 +16,14 @@ export const deleteProductFromCarts: CollectionAfterDeleteHook<Product> = async 
   if (cartsWithProductInCart.totalDocs > 0) {
     await Promise.all(
       cartsWithProductInCart.docs.map(async (cart) => {
-        if (cart?.items?.length) {
-          const itemsWithoutProduct = cart.items.filter((item) => item.product !== id)
+        if (cart?.lineItems?.length) {
+          const itemsWithoutProduct = cart.lineItems.filter((item) => item.lineItem.product !== id)
 
           return req.payload.update({
             id: cart.id,
             collection: 'cart',
             data: {
-              items: itemsWithoutProduct,
+              lineItems: itemsWithoutProduct,
             },
           })
         }

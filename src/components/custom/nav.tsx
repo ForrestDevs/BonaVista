@@ -82,9 +82,7 @@ const SingleLink: React.FC<SingleLinkProps> = ({
   }
 
   const styleClasses = cn(
-    variant !== 'none'
-      ? 'text-black transition-colors duration-200 relative group'
-      : '',
+    variant !== 'none' ? 'text-black transition-colors duration-200 relative group' : '',
     sizeClasses[variant],
     className,
   )

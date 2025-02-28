@@ -26,9 +26,7 @@ export default async function Profile() {
           You can also update your billing address, or change your password.
         </p>
       </div>
-      <div className="flex flex-col gap-y-8 w-full">
-        {/* <ProfileForm user={user} /> */}
-      </div>
+      <div className="flex flex-col gap-y-8 w-full">{/* <ProfileForm user={user} /> */}</div>
     </div>
   )
 }

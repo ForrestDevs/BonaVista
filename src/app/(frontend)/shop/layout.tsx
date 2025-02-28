@@ -6,15 +6,8 @@ import { CartDrawerProvider } from '@/components/shop/cart/drawer/cart-drawer-co
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <CartDrawerProvider>
-        <ShopHeader />
-        <TooltipProvider>
-          <div className="flex-1">
-            {children}
-            <CartDrawer />
-          </div>
-        </TooltipProvider>
-      </CartDrawerProvider>
+      {children}
+     
     </div>
   )
 }

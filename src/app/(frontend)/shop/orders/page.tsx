@@ -172,7 +172,7 @@ export default async function OrderPage({ searchParams }: OrderPageProps) {
   )
 }
 
-function OrderLineItem({ lineItem }: { lineItem: OrderItem['lineItem'] }) {
+function OrderLineItem({ lineItem }: { lineItem: OrderItem }) {
   return (
     <div className="flex justify-between border-b pb-4">
       <div>
@@ -183,7 +183,9 @@ function OrderLineItem({ lineItem }: { lineItem: OrderItem['lineItem'] }) {
         </p>
         {lineItem.variantOptions && lineItem.variantOptions.length > 0 && (
           <p className="text-sm text-gray-500">
-            {lineItem.variantOptions.map((opt) => `${opt.keyLabel}: ${opt.valueLabel}`).join(', ')}
+            {lineItem.variantOptions
+              .map((opt) => `${opt.key?.label}: ${opt.value?.label}`)
+              .join(', ')}
           </p>
         )}
         <p className="text-sm">Quantity: {lineItem.quantity}</p>

@@ -1,3 +1,3 @@
-import { OrderItems } from '@payload-types'
+import { LineItems } from '@payload-types'
 
-export type OrderItem = NonNullable<OrderItems[number]>
+export type OrderItem = NonNullable<LineItems[number]['lineItem']>
