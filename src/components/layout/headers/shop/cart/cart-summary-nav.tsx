@@ -24,12 +24,15 @@ const CartSummaryNavInner = async () => {
   if (!cart) {
     return <CartFallback />
   }
-  if (!cart.items.length) {
+  if (!cart.lineItems.length) {
     return <CartFallback />
   }
 
-  const total = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0)
-  const totalItems = cart.items.reduce((acc, item) => acc + item.quantity, 0)
+  const total = cart.lineItems.reduce(
+    (acc, item) => acc + item.lineItem.price * item.lineItem.quantity,
+    0,
+  )
+  const totalItems = cart.lineItems.reduce((acc, item) => acc + item.lineItem.quantity, 0)
 
   return (
     <TooltipProvider>

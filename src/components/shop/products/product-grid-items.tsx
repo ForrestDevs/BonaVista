@@ -1,7 +1,7 @@
 import React from 'react'
 import Grid from '@components/payload/grid'
 import type { Product } from '@payload-types'
-import { ProductCard } from './products/product-card'
+import { ProductCard } from './product-card'
 
 export default function ProductGridItems({ products }: { products: Product[] }) {
   return (

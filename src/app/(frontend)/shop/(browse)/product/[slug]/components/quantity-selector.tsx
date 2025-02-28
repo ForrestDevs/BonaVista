@@ -65,4 +65,4 @@ export function QuantitySelector({ min = 1, max = 99 }: { min?: number; max?: nu
       </Button>
     </div>
   )
-} 
+}

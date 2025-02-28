@@ -5,6 +5,7 @@ import { clearUserCart } from './hooks/clearUserCart'
 import { populateOrderedBy } from './hooks/populateOrderedBy'
 import { updateUserOrders } from './hooks/updateUserOrders'
 import { CUSTOMER_SLUG } from '../constants'
+import { lineItems } from '@/payload/fields/line-items'
 
 const Orders: CollectionConfig = {
   slug: 'orders',
@@ -22,9 +23,11 @@ const Orders: CollectionConfig = {
   },
   fields: [
     {
+      label: 'Order Number',
       name: 'orderNumber',
       type: 'text',
       admin: {
+        readOnly: true,
         position: 'sidebar',
       },
       required: true,
@@ -47,9 +50,7 @@ const Orders: CollectionConfig = {
       name: 'orderedBy',
       type: 'relationship',
       relationTo: CUSTOMER_SLUG,
-      // hooks: {
-      //   beforeChange: [populateOrderedBy],
-      // },
+      hasMany: false,
     },
     {
       name: 'stripePaymentIntentID',
@@ -103,92 +104,7 @@ const Orders: CollectionConfig = {
         },
       ],
     },
-    {
-      label: 'Items',
-      name: 'items',
-      type: 'array',
-      interfaceName: 'OrderItems',
-      fields: [
-        {
-          type: 'row',
-          fields: [
-            {
-              name: 'product',
-              type: 'relationship',
-              relationTo: 'products',
-              hasMany: false,
-              required: true,
-            },
-            {
-              name: 'isVariant',
-              type: 'checkbox',
-              defaultValue: false,
-            },
-            {
-              name: 'variantId',
-              type: 'number',
-            },
-            {
-              name: 'variantOptions',
-              type: 'array',
-              fields: [
-                {
-                  name: 'key',
-                  type: 'group',
-                  fields: [
-                    {
-                      name: 'slug',
-                      type: 'text',
-                    },
-                    {
-                      name: 'label',
-                      type: 'text',
-                    },
-                  ],
-                },
-                {
-                  name: 'value',
-                  type: 'group',
-                  fields: [
-                    {
-                      name: 'slug',
-                      type: 'text',
-                    },
-                    {
-                      name: 'label',
-                      type: 'text',
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          name: 'price',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'quantity',
-          type: 'number',
-          admin: {
-            step: 1,
-          },
-          min: 0,
-          required: true,
-        },
-        {
-          name: 'url',
-          type: 'text',
-        },
-        {
-          name: 'thumbnail',
-          type: 'upload',
-          relationTo: 'media',
-        },
-      ],
-    },
+    lineItems(),
     {
       name: 'paymentIntent',
       type: 'json',
@@ -197,6 +113,7 @@ const Orders: CollectionConfig = {
   hooks: {
     // afterChange: [updateUserOrders, clearUserCart],
   },
+  timestamps: true,
 } as const
 
 export default Orders

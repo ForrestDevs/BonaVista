@@ -16,6 +16,8 @@ import {
   HandlePaymentSuccessParams,
   PaymentSuccessResult,
   StripeAddress,
+  UpdateCheckoutSessionParams,
+  CheckoutLineItem,
 } from '@/lib/types/checkout'
 import { CART_SLUG } from '@/payload/collections/constants'
 import { deleteCart } from '../cart'
@@ -60,16 +62,6 @@ export async function getStoredCheckoutSession(
     return null
   }
 
-  // Check if session has expired
-  // if (Date.now() > checkoutSession.expiresAt) {
-  //   console.error('Checkout session has expired')
-  //   await redis.del(redisKey)
-  //   if (redirectTo) {
-  //     redirect(redirectTo)
-  //   }
-  //   return null
-  // }
-
   return checkoutSession
 }
 
@@ -91,10 +83,10 @@ export async function createStoredCheckoutSession(
   } = props
 
   try {
-    const amountInCents = Math.round(amount * 100)
+    const totalAmountInCents = amount + shippingTotal + taxAmount
 
     const paymentIntent = await createPaymentIntent({
-      amount: amountInCents,
+      amount: totalAmountInCents, // Pass total amount in cents
       currencyCode,
       description,
       stripeCustomerId,
@@ -111,12 +103,15 @@ export async function createStoredCheckoutSession(
     }
 
     const newCheckoutSession: CheckoutSession = {
-      id: Math.floor(Math.random() * 9007199254740991),
+      id: uuidv4(),
       status: 'pending',
       cartId,
       paymentIntentId: paymentIntent.id,
-      clientSecret: paymentIntent.client_secret!,
-      amount,
+      clientSecret: paymentIntent.client_secret,
+      subtotal: amount,
+      shippingTotal: shippingTotal,
+      taxAmount: taxAmount,
+      amount: totalAmountInCents,
       currencyCode,
       description,
       lineItems,
@@ -125,8 +120,8 @@ export async function createStoredCheckoutSession(
       customerId,
       steps: {
         email: {
-          completed: Boolean(customerEmail),
-          value: customerEmail,
+          completed: Boolean(customerEmail) || false,
+          value: customerEmail ?? undefined,
         },
         shipping: {
           completed: false,
@@ -139,8 +134,6 @@ export async function createStoredCheckoutSession(
           completed: false,
         },
       },
-      shippingTotal,
-      taxAmount,
       lastUpdated: Date.now(),
       expiresAt: Date.now() + CHECKOUT_SESSION_EXPIRY,
     }
@@ -157,36 +150,122 @@ export async function createStoredCheckoutSession(
 
 export async function beginCheckoutSession(props: BeginCheckoutParams): Promise<void | null> {
   const { redirectTo, ...sessionProps } = props
-  console.log('begining new checkout session for cart', sessionProps.cartId)
-  // Check for existing checkout session
-  const checkoutSession = await getStoredCheckoutSession()
+  console.log('beginning new checkout session for cart', sessionProps.cartId)
 
-  // If checkout session exists and is valid, redirect to checkout
+  // Check for existing checkout session
+  const checkoutSession = await getStoredCheckoutSession({ cartId: sessionProps.cartId })
+
+  // Calculate initial subtotal from line items
+  const initialSubtotal = Math.round(
+    sessionProps.lineItems.reduce((sum, item) => sum + item.price * item.quantity, 0) * 100,
+  )
+
+  // If checkout session exists, check if line items have changed
   if (checkoutSession) {
-    console.log('checkout session found, redirecting to', redirectTo)
+    console.log('checkout session found')
+
+    // Check if line items have changed by comparing them
+    const lineItemsChanged = checkoutSessionLineItemsChanged(
+      checkoutSession.lineItems,
+      sessionProps.lineItems,
+    )
+
+    if (lineItemsChanged) {
+      console.log('line items have changed, updating checkout session')
+
+      // Update the checkout session with new line items and recalculated subtotal
+      const updatedSession = await updateCheckoutSession({
+        cartId: sessionProps.cartId,
+        lineItems: sessionProps.lineItems,
+        amount: initialSubtotal, // Using amount instead of subtotal to match the interface
+        taxAmount: 0,
+        shippingTotal: 0,
+        // Keep the amount as the sum of components
+        // This will get recalculated in updateCheckoutSession
+      })
+
+      if (!updatedSession) {
+        console.error('Error updating checkout session with new line items')
+        return null
+      }
+
+      // Update the payment intent with the new details
+      await updatePaymentIntentWithDetails(updatedSession)
+
+      console.log('checkout session updated, redirecting to', redirectTo)
+      redirect(redirectTo)
+    }
+
+    console.log('no changes to line items, redirecting to', redirectTo)
     redirect(redirectTo)
   }
+
   console.log('no checkout session found, creating new one')
-  // Create new checkout session
+
+  // Create new checkout session with zero shipping and tax to start
   const newCheckoutSession = await createStoredCheckoutSession({
     ...sessionProps,
-    shippingTotal: 0,
-    taxAmount: 0,
+    amount: initialSubtotal, // Initial amount is just the subtotal
+    shippingTotal: 0, // No shipping selected yet
+    taxAmount: 0, // No tax calculated yet
   })
 
   if (!newCheckoutSession) {
     console.error('Error creating checkout session')
     return null
   }
+
   console.log('new checkout session created, redirecting to', redirectTo)
   redirect(redirectTo)
 }
 
-export async function updateCheckoutStep<T extends CheckoutStep>({
-  cartId,
-  step,
-  data,
-}: UpdateCheckoutStepParams<T>): Promise<CheckoutSession | null> {
+// Helper function to check if line items have changed
+function checkoutSessionLineItemsChanged(
+  existingLineItems: CheckoutLineItem[],
+  newLineItems: CheckoutLineItem[],
+): boolean {
+  // First, create maps for both existing and new items using SKU as key
+  const existingItemsMap = new Map(
+    existingLineItems.map((item) => [item.sku, { quantity: item.quantity, price: item.price }]),
+  )
+
+  const newItemsMap = new Map(
+    newLineItems.map((item) => [item.sku, { quantity: item.quantity, price: item.price }]),
+  )
+
+  // Check if SKU sets are different
+  if (existingItemsMap.size !== newItemsMap.size) {
+    return true
+  }
+
+  // Check for any SKUs in existing items that don't exist in new items
+  for (const [sku, existingItem] of existingItemsMap) {
+    const newItem = newItemsMap.get(sku)
+
+    // Item doesn't exist in new items or quantity/price changed
+    if (
+      !newItem ||
+      existingItem.quantity !== newItem.quantity ||
+      existingItem.price !== newItem.price
+    ) {
+      return true
+    }
+  }
+
+  // Check for any SKUs in new items that don't exist in existing items
+  for (const [sku, _] of newItemsMap) {
+    if (!existingItemsMap.has(sku)) {
+      return true
+    }
+  }
+
+  return false
+}
+
+export async function updateCheckoutSession(
+  props: UpdateCheckoutSessionParams,
+): Promise<CheckoutSession | null> {
+  const { cartId, ...sessionProps } = props
   const redisKey = `cart_checkout_session:${cartId}`
   const session = await redis.get<CheckoutSession>(redisKey)
 
@@ -195,6 +274,68 @@ export async function updateCheckoutStep<T extends CheckoutStep>({
     return null
   }
 
+  // Create a deep merge of the session and new props
+  // This ensures nested properties like lineItems are properly updated
+  const updatedSession: CheckoutSession = {
+    ...session,
+    ...sessionProps,
+    // If lineItems are provided, completely replace them
+    lineItems: sessionProps.lineItems || session.lineItems,
+    // Update the lastUpdated timestamp
+    lastUpdated: Date.now(),
+    expiresAt: Date.now() + CHECKOUT_SESSION_EXPIRY,
+  }
+
+  // If we're updating monetary values, ensure they're all consistent
+  if (
+    sessionProps.amount !== undefined ||
+    sessionProps.shippingTotal !== undefined ||
+    sessionProps.taxAmount !== undefined
+  ) {
+    // Use new values or fall back to existing ones
+    const subtotal = sessionProps.amount !== undefined ? sessionProps.amount : session.amount
+    const shippingTotal =
+      sessionProps.shippingTotal !== undefined
+        ? sessionProps.shippingTotal
+        : session.shippingTotal || 0
+    const taxAmount =
+      sessionProps.taxAmount !== undefined ? sessionProps.taxAmount : session.taxAmount || 0
+
+    // Update the total amount to ensure consistency
+    updatedSession.subtotal = subtotal
+    updatedSession.amount = subtotal + shippingTotal + taxAmount
+    updatedSession.shippingTotal = shippingTotal
+    updatedSession.taxAmount = taxAmount
+  }
+
+  await redis.set(redisKey, updatedSession)
+  return updatedSession
+}
+
+export async function updateCheckoutStep<T extends CheckoutStep>({
+  cartId,
+  step,
+  data,
+}: UpdateCheckoutStepParams<T>): Promise<CheckoutSession | null> {
+  console.log(`[updateCheckoutStep] Updating step ${step} with data:`, data);
+  
+  const redisKey = `cart_checkout_session:${cartId}`
+  const session = await redis.get<CheckoutSession>(redisKey)
+
+  if (!session) {
+    console.error('Checkout session not found')
+    return null
+  }
+
+  // Log previous step states
+  console.log(`[updateCheckoutStep] Previous step states:`, {
+    email: session.steps.email.completed,
+    shipping: session.steps.shipping.completed,
+    billing: session.steps.billing.completed,
+    payment: session.steps.payment.completed,
+  });
+
+  // Preserve completion states of other steps
   const updatedSession: CheckoutSession = {
     ...session,
     steps: {
@@ -260,9 +401,9 @@ export async function updatePaymentIntentWithDetails(
       }
     }
 
-    // Update payment intent
+    // Update payment intent - amount is already in cents
     const updatedPaymentIntent = await stripeClient.paymentIntents.update(session.paymentIntentId, {
-      amount: session.amount,
+      amount: session.amount, // Total amount in cents
       customer: stripeCustomerId,
       shipping: session.steps.shipping.address
         ? {
@@ -279,17 +420,11 @@ export async function updatePaymentIntentWithDetails(
           }
         : undefined,
       metadata: {
-        taxCalculationId: session.taxCalculationId,
+        ...(session.taxCalculationId && { taxCalculationId: session.taxCalculationId }),
+        subtotal: session.subtotal.toString(),
+        shippingTotal: session.shippingTotal.toString(),
+        taxAmount: session.taxAmount.toString(),
       },
-      // ...(session.taxCalculationId && {
-      //   async_workflows: {
-      //     inputs: {
-      //       tax: {
-      //         calculation: session.taxCalculationId,
-      //       },
-      //     },
-      //   },
-      // }),
     })
 
     // Update session with new details
@@ -368,7 +503,7 @@ export async function handlePaymentSuccess({
       console.warn('checkout session already completed, returning')
       return {
         success: true,
-        orderId: parseInt(checkoutSession.orderId),
+        order: parseInt(checkoutSession.orderId),
       }
     }
 
@@ -386,15 +521,17 @@ export async function handlePaymentSuccess({
       },
       taxTotal: checkoutSession.taxAmount,
       total: checkoutSession.amount,
-      items: checkoutSession.lineItems.map((item) => ({
-        product: item.productId,
-        isVariant: item.isVariant,
-        variantId: item.variantId,
-        variantOptions: item.variantOptions ?? [],
-        thumbnailMediaId: item.thumbnailMediaId,
-        price: item.price,
-        quantity: item.quantity,
-        url: `${process.env.NEXT_PUBLIC_URL}/shop/product/${item.productId}`,
+      lineItems: checkoutSession.lineItems.map((item) => ({
+        lineItem: {
+          product: item.productId,
+          sku: item.sku,
+          price: item.price,
+          quantity: item.quantity,
+          isVariant: item.isVariant,
+          variantOptions: item.variantOptions,
+          thumbnailMediaId: item.thumbnailMediaId,
+          url: item.url,
+        },
       })),
     }
 
@@ -446,13 +583,13 @@ export async function handlePaymentSuccess({
     // Trigger post-order processes
     void triggerPostOrderProcesses({
       orderId: order.id,
-      email: checkoutSession.customerEmail!,
+      email: checkoutSession.customerEmail,
       cartId: parseInt(cartId),
     })
 
     return {
       success: true,
-      orderId: order.id,
+      order,
     }
   } catch (error) {
     console.error('Error handling successful payment:', error)

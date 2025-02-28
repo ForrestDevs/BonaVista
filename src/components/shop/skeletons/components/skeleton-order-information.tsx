@@ -1,5 +1,4 @@
-import SkeletonCartTotals from "./skeleton-cart-totals"
-
+import SkeletonCartTotals from './skeleton-cart-totals'
 
 const SkeletonOrderInformation = () => {
   return (

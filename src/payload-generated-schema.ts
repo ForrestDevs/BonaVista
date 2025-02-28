@@ -742,8 +742,8 @@ export const users = pgTable(
   }),
 )
 
-export const cart_items_variant_options = pgTable(
-  'cart_items_variant_options',
+export const cart_line_items_line_item_variant_options = pgTable(
+  'cart_line_items_line_item_variant_options',
   {
     _order: integer('_order').notNull(),
     _parentID: varchar('_parent_id').notNull(),
@@ -754,41 +754,51 @@ export const cart_items_variant_options = pgTable(
     value_label: varchar('value_label'),
   },
   (columns) => ({
-    _orderIdx: index('cart_items_variant_options_order_idx').on(columns._order),
-    _parentIDIdx: index('cart_items_variant_options_parent_id_idx').on(columns._parentID),
+    _orderIdx: index('cart_line_items_line_item_variant_options_order_idx').on(columns._order),
+    _parentIDIdx: index('cart_line_items_line_item_variant_options_parent_id_idx').on(
+      columns._parentID,
+    ),
     _parentIDFk: foreignKey({
       columns: [columns['_parentID']],
-      foreignColumns: [cart_items.id],
-      name: 'cart_items_variant_options_parent_id_fk',
+      foreignColumns: [cart_line_items.id],
+      name: 'cart_line_items_line_item_variant_options_parent_id_fk',
     }).onDelete('cascade'),
   }),
 )
 
-export const cart_items = pgTable(
-  'cart_items',
+export const cart_line_items = pgTable(
+  'cart_line_items',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     id: varchar('id').primaryKey(),
-    product: integer('product_id')
+    lineItem_product: integer('line_item_product_id')
       .notNull()
       .references(() => products.id, {
         onDelete: 'set null',
       }),
-    isVariant: boolean('is_variant').default(false),
-    variantId: numeric('variant_id'),
-    price: numeric('price').notNull(),
-    quantity: numeric('quantity').notNull(),
-    url: varchar('url'),
+    lineItem_isVariant: boolean('line_item_is_variant').default(false),
+    lineItem_sku: varchar('line_item_sku').notNull(),
+    lineItem_price: numeric('line_item_price').notNull(),
+    lineItem_quantity: numeric('line_item_quantity').notNull(),
+    lineItem_thumbnail: integer('line_item_thumbnail_id').references(() => media.id, {
+      onDelete: 'set null',
+    }),
+    lineItem_url: varchar('line_item_url'),
   },
   (columns) => ({
-    _orderIdx: index('cart_items_order_idx').on(columns._order),
-    _parentIDIdx: index('cart_items_parent_id_idx').on(columns._parentID),
-    cart_items_product_idx: index('cart_items_product_idx').on(columns.product),
+    _orderIdx: index('cart_line_items_order_idx').on(columns._order),
+    _parentIDIdx: index('cart_line_items_parent_id_idx').on(columns._parentID),
+    cart_line_items_line_item_line_item_product_idx: index(
+      'cart_line_items_line_item_line_item_product_idx',
+    ).on(columns.lineItem_product),
+    cart_line_items_line_item_line_item_thumbnail_idx: index(
+      'cart_line_items_line_item_line_item_thumbnail_idx',
+    ).on(columns.lineItem_thumbnail),
     _parentIDFk: foreignKey({
       columns: [columns['_parentID']],
       foreignColumns: [cart.id],
-      name: 'cart_items_parent_id_fk',
+      name: 'cart_line_items_parent_id_fk',
     }).onDelete('cascade'),
   }),
 )
@@ -827,8 +837,8 @@ export const cart = pgTable(
   }),
 )
 
-export const orders_items_variant_options = pgTable(
-  'orders_items_variant_options',
+export const orders_line_items_line_item_variant_options = pgTable(
+  'orders_line_items_line_item_variant_options',
   {
     _order: integer('_order').notNull(),
     _parentID: varchar('_parent_id').notNull(),
@@ -839,45 +849,51 @@ export const orders_items_variant_options = pgTable(
     value_label: varchar('value_label'),
   },
   (columns) => ({
-    _orderIdx: index('orders_items_variant_options_order_idx').on(columns._order),
-    _parentIDIdx: index('orders_items_variant_options_parent_id_idx').on(columns._parentID),
+    _orderIdx: index('orders_line_items_line_item_variant_options_order_idx').on(columns._order),
+    _parentIDIdx: index('orders_line_items_line_item_variant_options_parent_id_idx').on(
+      columns._parentID,
+    ),
     _parentIDFk: foreignKey({
       columns: [columns['_parentID']],
-      foreignColumns: [orders_items.id],
-      name: 'orders_items_variant_options_parent_id_fk',
+      foreignColumns: [orders_line_items.id],
+      name: 'orders_line_items_line_item_variant_options_parent_id_fk',
     }).onDelete('cascade'),
   }),
 )
 
-export const orders_items = pgTable(
-  'orders_items',
+export const orders_line_items = pgTable(
+  'orders_line_items',
   {
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     id: varchar('id').primaryKey(),
-    product: integer('product_id')
+    lineItem_product: integer('line_item_product_id')
       .notNull()
       .references(() => products.id, {
         onDelete: 'set null',
       }),
-    isVariant: boolean('is_variant').default(false),
-    variantId: numeric('variant_id'),
-    price: numeric('price').notNull(),
-    quantity: numeric('quantity').notNull(),
-    url: varchar('url'),
-    thumbnail: integer('thumbnail_id').references(() => media.id, {
+    lineItem_isVariant: boolean('line_item_is_variant').default(false),
+    lineItem_sku: varchar('line_item_sku').notNull(),
+    lineItem_price: numeric('line_item_price').notNull(),
+    lineItem_quantity: numeric('line_item_quantity').notNull(),
+    lineItem_thumbnail: integer('line_item_thumbnail_id').references(() => media.id, {
       onDelete: 'set null',
     }),
+    lineItem_url: varchar('line_item_url'),
   },
   (columns) => ({
-    _orderIdx: index('orders_items_order_idx').on(columns._order),
-    _parentIDIdx: index('orders_items_parent_id_idx').on(columns._parentID),
-    orders_items_product_idx: index('orders_items_product_idx').on(columns.product),
-    orders_items_thumbnail_idx: index('orders_items_thumbnail_idx').on(columns.thumbnail),
+    _orderIdx: index('orders_line_items_order_idx').on(columns._order),
+    _parentIDIdx: index('orders_line_items_parent_id_idx').on(columns._parentID),
+    orders_line_items_line_item_line_item_product_idx: index(
+      'orders_line_items_line_item_line_item_product_idx',
+    ).on(columns.lineItem_product),
+    orders_line_items_line_item_line_item_thumbnail_idx: index(
+      'orders_line_items_line_item_line_item_thumbnail_idx',
+    ).on(columns.lineItem_thumbnail),
     _parentIDFk: foreignKey({
       columns: [columns['_parentID']],
       foreignColumns: [orders.id],
-      name: 'orders_items_parent_id_fk',
+      name: 'orders_line_items_parent_id_fk',
     }).onDelete('cascade'),
   }),
 )
@@ -3347,18 +3363,18 @@ export const customers_billing_addresses = pgTable(
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     id: varchar('id').primaryKey(),
-    company: varchar('company').notNull(),
-    first_name: varchar('first_name').notNull(),
-    last_name: varchar('last_name').notNull(),
-    line_1: varchar('line_1').notNull(),
-    line_2: varchar('line_2').notNull(),
-    city: varchar('city').notNull(),
-    country: varchar('country').notNull(),
-    state: varchar('state').notNull(),
-    postal_code: varchar('postal_code').notNull(),
-    phone: varchar('phone').notNull(),
-    email: varchar('email').notNull(),
-    metadata: jsonb('metadata'),
+    address_first_name: varchar('address_first_name'),
+    address_last_name: varchar('address_last_name'),
+    address_company: varchar('address_company'),
+    address_line_1: varchar('address_line_1').notNull(),
+    address_line_2: varchar('address_line_2'),
+    address_city: varchar('address_city').notNull(),
+    address_country: varchar('address_country').notNull(),
+    address_state: varchar('address_state').notNull(),
+    address_postal_code: varchar('address_postal_code').notNull(),
+    address_phone: varchar('address_phone').notNull(),
+    address_email: varchar('address_email').notNull(),
+    address_metadata: jsonb('address_metadata'),
   },
   (columns) => ({
     _orderIdx: index('customers_billing_addresses_order_idx').on(columns._order),
@@ -3377,18 +3393,18 @@ export const customers_shipping_addresses = pgTable(
     _order: integer('_order').notNull(),
     _parentID: integer('_parent_id').notNull(),
     id: varchar('id').primaryKey(),
-    company: varchar('company').notNull(),
-    first_name: varchar('first_name').notNull(),
-    last_name: varchar('last_name').notNull(),
-    line_1: varchar('line_1').notNull(),
-    line_2: varchar('line_2').notNull(),
-    city: varchar('city').notNull(),
-    country: varchar('country').notNull(),
-    state: varchar('state').notNull(),
-    postal_code: varchar('postal_code').notNull(),
-    phone: varchar('phone').notNull(),
-    email: varchar('email').notNull(),
-    metadata: jsonb('metadata'),
+    address_first_name: varchar('address_first_name'),
+    address_last_name: varchar('address_last_name'),
+    address_company: varchar('address_company'),
+    address_line_1: varchar('address_line_1').notNull(),
+    address_line_2: varchar('address_line_2'),
+    address_city: varchar('address_city').notNull(),
+    address_country: varchar('address_country').notNull(),
+    address_state: varchar('address_state').notNull(),
+    address_postal_code: varchar('address_postal_code').notNull(),
+    address_phone: varchar('address_phone').notNull(),
+    address_email: varchar('address_email').notNull(),
+    address_metadata: jsonb('address_metadata'),
   },
   (columns) => ({
     _orderIdx: index('customers_shipping_addresses_order_idx').on(columns._order),
@@ -3781,6 +3797,18 @@ export const shipping_options = pgTable(
     type: enum_shipping_options_type('type').notNull(),
     shippingRules_baseRate: numeric('shipping_rules_base_rate'),
     shippingRules_freeShippingThreshold: numeric('shipping_rules_free_shipping_threshold'),
+    pickupLocation_first_name: varchar('pickup_location_first_name'),
+    pickupLocation_last_name: varchar('pickup_location_last_name'),
+    pickupLocation_company: varchar('pickup_location_company'),
+    pickupLocation_line_1: varchar('pickup_location_line_1'),
+    pickupLocation_line_2: varchar('pickup_location_line_2'),
+    pickupLocation_city: varchar('pickup_location_city'),
+    pickupLocation_country: varchar('pickup_location_country'),
+    pickupLocation_state: varchar('pickup_location_state'),
+    pickupLocation_postal_code: varchar('pickup_location_postal_code'),
+    pickupLocation_phone: varchar('pickup_location_phone'),
+    pickupLocation_email: varchar('pickup_location_email'),
+    pickupLocation_metadata: jsonb('pickup_location_metadata'),
     isActive: boolean('is_active').notNull().default(true),
     updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
       .defaultNow()
@@ -3792,6 +3820,64 @@ export const shipping_options = pgTable(
   (columns) => ({
     shipping_options_updated_at_idx: index('shipping_options_updated_at_idx').on(columns.updatedAt),
     shipping_options_created_at_idx: index('shipping_options_created_at_idx').on(columns.createdAt),
+  }),
+)
+
+export const product_reviews = pgTable(
+  'product_reviews',
+  {
+    id: serial('id').primaryKey(),
+    title: varchar('title').notNull(),
+    rating: numeric('rating').notNull(),
+    review: varchar('review').notNull(),
+    isVerifiedPurchase: boolean('is_verified_purchase').default(false),
+    reviewer: integer('reviewer_id').references(() => customers.id, {
+      onDelete: 'set null',
+    }),
+    product: integer('product_id').references(() => products.id, {
+      onDelete: 'set null',
+    }),
+    updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => ({
+    product_reviews_reviewer_idx: index('product_reviews_reviewer_idx').on(columns.reviewer),
+    product_reviews_product_idx: index('product_reviews_product_idx').on(columns.product),
+    product_reviews_updated_at_idx: index('product_reviews_updated_at_idx').on(columns.updatedAt),
+    product_reviews_created_at_idx: index('product_reviews_created_at_idx').on(columns.createdAt),
+  }),
+)
+
+export const product_reviews_rels = pgTable(
+  'product_reviews_rels',
+  {
+    id: serial('id').primaryKey(),
+    order: integer('order'),
+    parent: integer('parent_id').notNull(),
+    path: varchar('path').notNull(),
+    mediaID: integer('media_id'),
+  },
+  (columns) => ({
+    order: index('product_reviews_rels_order_idx').on(columns.order),
+    parentIdx: index('product_reviews_rels_parent_idx').on(columns.parent),
+    pathIdx: index('product_reviews_rels_path_idx').on(columns.path),
+    product_reviews_rels_media_id_idx: index('product_reviews_rels_media_id_idx').on(
+      columns.mediaID,
+    ),
+    parentFk: foreignKey({
+      columns: [columns['parent']],
+      foreignColumns: [product_reviews.id],
+      name: 'product_reviews_rels_parent_fk',
+    }).onDelete('cascade'),
+    mediaIdFk: foreignKey({
+      columns: [columns['mediaID']],
+      foreignColumns: [media.id],
+      name: 'product_reviews_rels_media_fk',
+    }).onDelete('cascade'),
   }),
 )
 
@@ -3899,6 +3985,7 @@ export const payload_locked_documents_rels = pgTable(
     galleriesID: integer('galleries_id'),
     'form-submissionsID': integer('form_submissions_id'),
     'shipping-optionsID': integer('shipping_options_id'),
+    'product-reviewsID': integer('product_reviews_id'),
     redirectsID: integer('redirects_id'),
   },
   (columns) => ({
@@ -3956,6 +4043,9 @@ export const payload_locked_documents_rels = pgTable(
     payload_locked_documents_rels_shipping_options_id_idx: index(
       'payload_locked_documents_rels_shipping_options_id_idx',
     ).on(columns['shipping-optionsID']),
+    payload_locked_documents_rels_product_reviews_id_idx: index(
+      'payload_locked_documents_rels_product_reviews_id_idx',
+    ).on(columns['product-reviewsID']),
     payload_locked_documents_rels_redirects_id_idx: index(
       'payload_locked_documents_rels_redirects_id_idx',
     ).on(columns.redirectsID),
@@ -4048,6 +4138,11 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns['shipping-optionsID']],
       foreignColumns: [shipping_options.id],
       name: 'payload_locked_documents_rels_shipping_options_fk',
+    }).onDelete('cascade'),
+    'product-reviewsIdFk': foreignKey({
+      columns: [columns['product-reviewsID']],
+      foreignColumns: [product_reviews.id],
+      name: 'payload_locked_documents_rels_product_reviews_fk',
     }).onDelete('cascade'),
     redirectsIdFk: foreignKey({
       columns: [columns['redirectsID']],
@@ -4503,69 +4598,74 @@ export const relations_users = relations(users, ({ one, many }) => ({
     relationName: 'customer',
   }),
 }))
-export const relations_cart_items_variant_options = relations(
-  cart_items_variant_options,
+export const relations_cart_line_items_line_item_variant_options = relations(
+  cart_line_items_line_item_variant_options,
   ({ one }) => ({
-    _parentID: one(cart_items, {
-      fields: [cart_items_variant_options._parentID],
-      references: [cart_items.id],
-      relationName: 'variantOptions',
+    _parentID: one(cart_line_items, {
+      fields: [cart_line_items_line_item_variant_options._parentID],
+      references: [cart_line_items.id],
+      relationName: 'lineItem_variantOptions',
     }),
   }),
 )
-export const relations_cart_items = relations(cart_items, ({ one, many }) => ({
+export const relations_cart_line_items = relations(cart_line_items, ({ one, many }) => ({
   _parentID: one(cart, {
-    fields: [cart_items._parentID],
+    fields: [cart_line_items._parentID],
     references: [cart.id],
-    relationName: 'items',
+    relationName: 'lineItems',
   }),
-  product: one(products, {
-    fields: [cart_items.product],
+  lineItem_product: one(products, {
+    fields: [cart_line_items.lineItem_product],
     references: [products.id],
-    relationName: 'product',
+    relationName: 'lineItem_product',
   }),
-  variantOptions: many(cart_items_variant_options, {
-    relationName: 'variantOptions',
+  lineItem_variantOptions: many(cart_line_items_line_item_variant_options, {
+    relationName: 'lineItem_variantOptions',
+  }),
+  lineItem_thumbnail: one(media, {
+    fields: [cart_line_items.lineItem_thumbnail],
+    references: [media.id],
+    relationName: 'lineItem_thumbnail',
   }),
 }))
 export const relations_cart = relations(cart, ({ one, many }) => ({
+  lineItems: many(cart_line_items, {
+    relationName: 'lineItems',
+  }),
   customer: one(customers, {
     fields: [cart.customer],
     references: [customers.id],
     relationName: 'customer',
   }),
-  items: many(cart_items, {
-    relationName: 'items',
-  }),
 }))
-export const relations_orders_items_variant_options = relations(
-  orders_items_variant_options,
+export const relations_orders_line_items_line_item_variant_options = relations(
+  orders_line_items_line_item_variant_options,
   ({ one }) => ({
-    _parentID: one(orders_items, {
-      fields: [orders_items_variant_options._parentID],
-      references: [orders_items.id],
-      relationName: 'variantOptions',
+    _parentID: one(orders_line_items, {
+      fields: [orders_line_items_line_item_variant_options._parentID],
+      references: [orders_line_items.id],
+      relationName: 'lineItem_variantOptions',
     }),
   }),
 )
-export const relations_orders_items = relations(orders_items, ({ one, many }) => ({
+export const relations_orders_line_items = relations(orders_line_items, ({ one, many }) => ({
   _parentID: one(orders, {
-    fields: [orders_items._parentID],
+    fields: [orders_line_items._parentID],
     references: [orders.id],
-    relationName: 'items',
+    relationName: 'lineItems',
   }),
-  product: one(products, {
-    fields: [orders_items.product],
+  lineItem_product: one(products, {
+    fields: [orders_line_items.lineItem_product],
     references: [products.id],
-    relationName: 'product',
+    relationName: 'lineItem_product',
   }),
-  variantOptions: many(orders_items_variant_options, {
-    relationName: 'variantOptions',
+  lineItem_variantOptions: many(orders_line_items_line_item_variant_options, {
+    relationName: 'lineItem_variantOptions',
   }),
-  thumbnail: one(media, {
-    fields: [orders_items.thumbnail],
+  lineItem_thumbnail: one(media, {
+    fields: [orders_line_items.lineItem_thumbnail],
     references: [media.id],
-    relationName: 'thumbnail',
+    relationName: 'lineItem_thumbnail',
   }),
 }))
 export const relations_orders = relations(orders, ({ one, many }) => ({
@@ -4574,8 +4674,8 @@ export const relations_orders = relations(orders, ({ one, many }) => ({
     references: [customers.id],
     relationName: 'orderedBy',
   }),
-  items: many(orders_items, {
-    relationName: 'items',
+  lineItems: many(orders_line_items, {
+    relationName: 'lineItems',
   }),
 }))
 export const relations_products_base_product_images = relations(
@@ -5806,6 +5906,33 @@ export const relations_shipping_options = relations(shipping_options, ({ many })
     relationName: 'shippingRules_regions',
   }),
 }))
+export const relations_product_reviews_rels = relations(product_reviews_rels, ({ one }) => ({
+  parent: one(product_reviews, {
+    fields: [product_reviews_rels.parent],
+    references: [product_reviews.id],
+    relationName: '_rels',
+  }),
+  mediaID: one(media, {
+    fields: [product_reviews_rels.mediaID],
+    references: [media.id],
+    relationName: 'media',
+  }),
+}))
+export const relations_product_reviews = relations(product_reviews, ({ one, many }) => ({
+  reviewer: one(customers, {
+    fields: [product_reviews.reviewer],
+    references: [customers.id],
+    relationName: 'reviewer',
+  }),
+  product: one(products, {
+    fields: [product_reviews.product],
+    references: [products.id],
+    relationName: 'product',
+  }),
+  _rels: many(product_reviews_rels, {
+    relationName: '_rels',
+  }),
+}))
 export const relations_redirects_rels = relations(redirects_rels, ({ one }) => ({
   parent: one(redirects, {
     fields: [redirects_rels.parent],
@@ -5920,6 +6047,11 @@ export const relations_payload_locked_documents_rels = relations(
       fields: [payload_locked_documents_rels['shipping-optionsID']],
       references: [shipping_options.id],
       relationName: 'shipping-options',
+    }),
+    'product-reviewsID': one(product_reviews, {
+      fields: [payload_locked_documents_rels['product-reviewsID']],
+      references: [product_reviews.id],
+      relationName: 'product-reviews',
     }),
     redirectsID: one(redirects, {
       fields: [payload_locked_documents_rels.redirectsID],
@@ -6261,11 +6393,11 @@ type DatabaseSchema = {
   media: typeof media
   users_roles: typeof users_roles
   users: typeof users
-  cart_items_variant_options: typeof cart_items_variant_options
-  cart_items: typeof cart_items
+  cart_line_items_line_item_variant_options: typeof cart_line_items_line_item_variant_options
+  cart_line_items: typeof cart_line_items
   cart: typeof cart
-  orders_items_variant_options: typeof orders_items_variant_options
-  orders_items: typeof orders_items
+  orders_line_items_line_item_variant_options: typeof orders_line_items_line_item_variant_options
+  orders_line_items: typeof orders_line_items
   orders: typeof orders
   products_base_product_images: typeof products_base_product_images
   products_variants_options_values: typeof products_variants_options_values
@@ -6360,6 +6492,8 @@ type DatabaseSchema = {
   form_submissions: typeof form_submissions
   shipping_options_shipping_rules_regions: typeof shipping_options_shipping_rules_regions
   shipping_options: typeof shipping_options
+  product_reviews: typeof product_reviews
+  product_reviews_rels: typeof product_reviews_rels
   redirects: typeof redirects
   redirects_rels: typeof redirects_rels
   payload_locked_documents: typeof payload_locked_documents
@@ -6389,11 +6523,11 @@ type DatabaseSchema = {
   relations_media: typeof relations_media
   relations_users_roles: typeof relations_users_roles
   relations_users: typeof relations_users
-  relations_cart_items_variant_options: typeof relations_cart_items_variant_options
-  relations_cart_items: typeof relations_cart_items
+  relations_cart_line_items_line_item_variant_options: typeof relations_cart_line_items_line_item_variant_options
+  relations_cart_line_items: typeof relations_cart_line_items
   relations_cart: typeof relations_cart
-  relations_orders_items_variant_options: typeof relations_orders_items_variant_options
-  relations_orders_items: typeof relations_orders_items
+  relations_orders_line_items_line_item_variant_options: typeof relations_orders_line_items_line_item_variant_options
+  relations_orders_line_items: typeof relations_orders_line_items
   relations_orders: typeof relations_orders
   relations_products_base_product_images: typeof relations_products_base_product_images
   relations_products_variants_options_values: typeof relations_products_variants_options_values
@@ -6488,6 +6622,8 @@ type DatabaseSchema = {
   relations_form_submissions: typeof relations_form_submissions
   relations_shipping_options_shipping_rules_regions: typeof relations_shipping_options_shipping_rules_regions
   relations_shipping_options: typeof relations_shipping_options
+  relations_product_reviews_rels: typeof relations_product_reviews_rels
+  relations_product_reviews: typeof relations_product_reviews
   relations_redirects_rels: typeof relations_redirects_rels
   relations_redirects: typeof relations_redirects
   relations_payload_locked_documents_rels: typeof relations_payload_locked_documents_rels

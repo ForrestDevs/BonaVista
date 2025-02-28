@@ -108,3 +108,89 @@ const getCachedCustomerDTO = cache(
     tags: (user: User) => ['getCustomerDTO', user.id.toString()],
   },
 )
+
+/**
+ * Finds an existing customer by email or creates a new one for checkout
+ * @param email The customer's email address
+ * @returns Object containing customer info and login requirement
+ */
+export async function findOrCreateCheckoutCustomer(email: string) {
+  const payload = await getPayload()
+  const user = await getCurrentUser()
+  const isLoggedIn = !!user
+
+  try {
+    // First check if a customer with this email exists
+    const { docs: customers } = await payload.find({
+      collection: CUSTOMER_SLUG,
+      where: {
+        email: {
+          equals: email.toLowerCase(),
+        },
+      },
+      limit: 1,
+    })
+
+    const customer = customers[0] || null
+
+    // If customer has an account and user is not logged in, they need to login
+    if (customer?.has_account && !isLoggedIn) {
+      return {
+        customer,
+        needsLogin: true,
+      }
+    }
+
+    // If no customer exists, create a new one
+    if (!customer) {
+      const newCustomer = await payload.create({
+        collection: CUSTOMER_SLUG,
+        data: {
+          email: email.toLowerCase(),
+          // Link to user if logged in
+          account: user?.id || undefined,
+          has_account: !!user,
+        },
+      })
+
+      return {
+        customer: newCustomer,
+        needsLogin: false,
+      }
+    }
+
+    // Return existing customer
+    return {
+      customer,
+      needsLogin: false,
+    }
+  } catch (error) {
+    console.error('Error in findOrCreateCheckoutCustomer:', error)
+    throw error
+  }
+}
+
+export async function getCachedCustomerById(id: number) {
+  const cachedFn = cache(
+    async (id: number) => {
+      const payload = await getPayload()
+      const customer = await payload.findByID({
+        collection: CUSTOMER_SLUG,
+        id,
+      })
+
+      if (!customer) {
+        console.error('No customer found')
+
+        return null
+      }
+
+      return customer
+    },
+    {
+      tags: [`customer-${id}`],
+    },
+  )
+
+  return cachedFn(id)
+}

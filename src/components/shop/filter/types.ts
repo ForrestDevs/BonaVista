@@ -2,6 +2,15 @@ import type { Product } from '@/payload-types'
 
 export type SortOption = 'title' | 'priceMin' | '-priceMax' | '-createdAt'
 
+// Modern sort descriptor format: field_direction
+export type SortDescriptor = 
+  | 'createdAt_desc' 
+  | 'createdAt_asc' 
+  | 'price_asc' 
+  | 'price_desc' 
+  | 'title_asc' 
+  | 'title_desc'
+
 // Basic filter option structure
 export interface FilterOption {
   label: string

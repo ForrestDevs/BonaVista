@@ -4,11 +4,10 @@ import { CartItem } from '@/lib/types/cart'
 import React from 'react'
 
 export function CartItemThumbnail({ line }: { line: CartItem }) {
-  const product = typeof line.product === 'object' ? line.product : null
-  const isVariant = line.isVariant
+  const product = typeof line.lineItem.product === 'object' ? line.lineItem.product : null
+  const isVariant = line.lineItem.isVariant
   const thumbnail = isVariant
-    ? product?.variants.variantProducts.find((v) => v.id === line.variantId.toString())?.images[0]
-        ?.image
+    ? product?.variants.variantProducts.find((v) => v.sku === line.lineItem.sku)?.images[0]?.image
     : product?.baseProduct?.images[0]?.image
 
   return (
@@ -35,10 +34,11 @@ export function CartItemThumbnail({ line }: { line: CartItem }) {
 }
 
 export default function CartItemDetails({ item }: { item: CartItem }) {
-  const productTitle = typeof item.product === 'object' ? item.product.title : item.product
-  const isVariant = item.isVariant
+  const productTitle =
+    typeof item.lineItem.product === 'object' ? item.lineItem.product.title : item.lineItem.product
+  const isVariant = item.lineItem.isVariant
   const variantOptions = isVariant
-    ? item.variantOptions?.map((v) => v.value.label).join(', ')
+    ? item.lineItem.variantOptions?.map((v) => v.value.label).join(', ')
     : null
 
   return (

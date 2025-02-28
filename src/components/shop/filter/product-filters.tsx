@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useState, useTransition } from 'react'
+import { Fragment, useState, useTransition, type TransitionStartFunction } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -28,9 +28,24 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils/cn'
 
-export function ProductFilters({ config }: { config: FilterConfig }) {
+interface ProductFiltersProps {
+  config: FilterConfig
+  useDrawerLayout?: boolean
+  startTransition?: TransitionStartFunction
+}
+
+export function ProductFilters({
+  config,
+  useDrawerLayout = false,
+  startTransition: externalStartTransition,
+}: ProductFiltersProps) {
   const [filterSheetOpen, setFilterSheetOpen] = useState(false)
-  const [isPending, startTransition] = useTransition()
+  const [internalPending, internalStartTransition] = useTransition()
+
+  // Use external transition if provided, otherwise use internal one
+  const startTransition = externalStartTransition || internalStartTransition
+  const isPending = internalPending // We'll always use internal pending state for now
+
   const { criteria, setters, clearFilters } = useFilterState(startTransition)
   const [priceMin, setPriceMin] = useState<string>(criteria.price_min?.toString() || '')
   const [priceMax, setPriceMax] = useState<string>(criteria.price_max?.toString() || '')
@@ -129,28 +144,6 @@ export function ProductFilters({ config }: { config: FilterConfig }) {
     }
   }
 
-  // Filter section component to reduce duplication
-  const FilterSection = ({
-    title,
-    count,
-    children,
-  }: {
-    title: string
-    count?: number
-    children: React.ReactNode
-  }) => (
-    <div className="py-4 border-b border-border">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium uppercase tracking-wider">{title}</h3>
-        {count !== undefined && count > 0 && (
-          <Badge variant="secondary" className="text-xs font-normal">
-            {count}
-          </Badge>
-        )}
-      </div>
-      {children}
-    </div>
-  )
 
   // Option item component for checkbox filters
   const OptionItem = ({
@@ -239,7 +232,7 @@ export function ProductFilters({ config }: { config: FilterConfig }) {
                   key={option.value}
                   option={option}
                   filterKey="categories"
-                  id={`desktop-category-${option.value}`}
+                  id={`category-${option.value}`}
                 />
               ))}
             </div>
@@ -266,7 +259,7 @@ export function ProductFilters({ config }: { config: FilterConfig }) {
                   key={option.value}
                   option={option}
                   filterKey="collections"
-                  id={`desktop-collection-${option.value}`}
+                  id={`collection-${option.value}`}
                 />
               ))}
             </div>
@@ -303,7 +296,7 @@ export function ProductFilters({ config }: { config: FilterConfig }) {
                   key={option.value}
                   option={option}
                   filterKey="brands"
-                  id={`desktop-brand-${option.value}`}
+                  id={`brand-${option.value}`}
                 />
               ))}
             </div>
@@ -330,7 +323,7 @@ export function ProductFilters({ config }: { config: FilterConfig }) {
                   key={option.value}
                   option={option}
                   filterKey="compatibility"
-                  id={`desktop-compatibility-${option.value}`}
+                  id={`compatibility-${option.value}`}
                 />
               ))}
             </div>
@@ -350,7 +343,7 @@ export function ProductFilters({ config }: { config: FilterConfig }) {
           <div className="space-y-3">
             <div className="grid gap-2">
               <div className="grid gap-2">
-                <label htmlFor="desktop-price-min" className="text-xs text-muted-foreground">
+                <label htmlFor="price-min" className="text-xs text-muted-foreground">
                   Min Price
                 </label>
                 <div className="relative">
@@ -358,7 +351,7 @@ export function ProductFilters({ config }: { config: FilterConfig }) {
                     $
                   </span>
                   <Input
-                    id="desktop-price-min"
+                    id="price-min"
                     type="number"
                     min="0"
                     step="1"
@@ -371,7 +364,7 @@ export function ProductFilters({ config }: { config: FilterConfig }) {
                 </div>
               </div>
               <div className="grid gap-2">
-                <label htmlFor="desktop-price-max" className="text-xs text-muted-foreground">
+                <label htmlFor="price-max" className="text-xs text-muted-foreground">
                   Max Price
                 </label>
                 <div className="relative">
@@ -379,7 +372,7 @@ export function ProductFilters({ config }: { config: FilterConfig }) {
                     $
                   </span>
                   <Input
-                    id="desktop-price-max"
+                    id="price-max"
                     type="number"
                     min="0"
                     step="1"
@@ -407,128 +400,157 @@ export function ProductFilters({ config }: { config: FilterConfig }) {
     </div>
   )
 
-  return (
-    <div>
-      <div className="md:hidden mb-4">
-        <Sheet open={filterSheetOpen} onOpenChange={setFilterSheetOpen}>
-          <SheetTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full flex items-center justify-between gap-2"
-              disabled={isPending}
-            >
-              <span className="flex items-center gap-2">
-                {isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Filter className="h-4 w-4" />
-                )}
-                <span>Filters</span>
-              </span>
-              {activeFilterCount > 0 && (
-                <Badge variant="secondary" className="rounded-full">
-                  {activeFilterCount}
-                </Badge>
+  // Conditionally render the mobile filter button if not in drawer layout
+  // We don't need to show the mobile trigger in the drawer layout as it's already in a drawer
+  const renderMobileFilterButton = !useDrawerLayout && (
+    <div className="md:hidden mb-4">
+      <Sheet open={filterSheetOpen} onOpenChange={setFilterSheetOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full flex items-center justify-between gap-2"
+            disabled={isPending}
+          >
+            <span className="flex items-center gap-2">
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Filter className="h-4 w-4" />
               )}
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-full sm:max-w-lg flex flex-col">
-            <SheetHeader className="mb-2">
-              <SheetTitle>Refine Results</SheetTitle>
-              {activeFilterCount > 0 && (
-                <Button
-                  variant="ghost"
-                  onClick={clearFilters}
-                  size="sm"
-                  className="absolute right-12 top-4"
-                  disabled={isPending}
-                >
-                  Clear all
-                </Button>
-              )}
-            </SheetHeader>
-
-            <ScrollArea className="flex-1">
-              <Accordion
-                type="multiple"
-                defaultValue={['categories', 'collections', 'brands', 'compatibility', 'price']}
-                className="w-full"
-              >
-                <FilterAccordionContent />
-              </Accordion>
-            </ScrollArea>
-
-            <SheetFooter className="pt-4 border-t border-border mt-auto">
-              <SheetClose asChild>
-                <Button size="sm" className="w-full" disabled={isPending}>
-                  View Results
-                </Button>
-              </SheetClose>
-            </SheetFooter>
-          </SheetContent>
-        </Sheet>
-      </div>
-
-      {activeFilterCount > 0 && (
-        <div className="bg-card rounded-md border mb-6">
-          <div className="p-3">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium">Active Filters</h3>
+              <span>Filters</span>
+            </span>
+            {activeFilterCount > 0 && (
+              <Badge variant="secondary" className="rounded-full">
+                {activeFilterCount}
+              </Badge>
+            )}
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-full sm:max-w-lg flex flex-col">
+          <SheetHeader className="mb-2">
+            <SheetTitle>Refine Results</SheetTitle>
+            {activeFilterCount > 0 && (
               <Button
                 variant="ghost"
-                size="sm"
                 onClick={clearFilters}
-                className="h-8 px-2 py-0 text-xs hover:bg-secondary"
+                size="sm"
+                className="absolute right-12 top-4"
                 disabled={isPending}
               >
                 Clear all
               </Button>
-            </div>
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {activeFilters.map(
-                (filter) =>
-                  filter && (
-                    <Badge
-                      key={`${filter.type}-${filter.value}`}
-                      variant="secondary"
-                      className="flex items-center gap-1 pl-2 py-1.5"
-                    >
-                      <span className="text-xs">{filter.label}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => filter && removeFilter(filter.type, filter.value)}
-                        className="h-5 w-5 p-0 ml-1 rounded-full hover:bg-secondary-foreground/20"
-                        disabled={isPending}
-                      >
-                        <X className="h-3 w-3" />
-                        <span className="sr-only">Remove {filter.label} filter</span>
-                      </Button>
-                    </Badge>
-                  ),
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="hidden md:block">
-        <div className="bg-card rounded-md border overflow-hidden">
-          <div className="p-4 border-b flex items-center justify-between">
-            <h2 className="font-medium">Filters</h2>
-            {isPending && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="animate-spin h-3 w-3" />
-                <span className="text-xs">Updating</span>
-              </div>
             )}
-          </div>
-          <Accordion type="single" collapsible defaultValue="categories" className="w-full">
-            <FilterAccordionContent />
-          </Accordion>
+          </SheetHeader>
+
+          <ScrollArea className="flex-1">
+            <Accordion
+              type="multiple"
+              defaultValue={['categories', 'collections', 'brands', 'compatibility', 'price']}
+              className="w-full"
+            >
+              <FilterAccordionContent />
+            </Accordion>
+          </ScrollArea>
+
+          <SheetFooter className="pt-4 border-t border-border mt-auto">
+            <SheetClose asChild>
+              <Button size="sm" className="w-full" disabled={isPending}>
+                View Results
+              </Button>
+            </SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    </div>
+  )
+
+  // Active Filters display
+  const renderActiveFilters = activeFilterCount > 0 && (
+    <div className={cn('bg-card rounded-md border mb-6', useDrawerLayout && 'mb-4')}>
+      <div className="p-3">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-medium">Active Filters</h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="h-8 px-2 py-0 text-xs hover:bg-secondary"
+            disabled={isPending}
+          >
+            Clear all
+          </Button>
+        </div>
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          {activeFilters.map(
+            (filter) =>
+              filter && (
+                <Badge
+                  key={`${filter.type}-${filter.value}`}
+                  variant="secondary"
+                  className="flex items-center gap-1 pl-2 py-1.5"
+                >
+                  <span className="text-xs">{filter.label}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => filter && removeFilter(filter.type, filter.value)}
+                    className="h-5 w-5 p-0 ml-1 rounded-full hover:bg-secondary-foreground/20"
+                    disabled={isPending}
+                  >
+                    <X className="h-3 w-3" />
+                    <span className="sr-only">Remove {filter.label} filter</span>
+                  </Button>
+                </Badge>
+              ),
+          )}
         </div>
       </div>
+    </div>
+  )
+
+  // Desktop filter sidebar (only shown in sidebar layout)
+  const renderDesktopFilters = !useDrawerLayout && (
+    <div className="hidden xl:block">
+      <div className="bg-card rounded-md border overflow-hidden">
+        <div className="p-4 border-b flex items-center justify-between">
+          <h2 className="font-medium">Filters</h2>
+          {isPending && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="animate-spin h-3 w-3" />
+              <span className="text-xs">Updating</span>
+            </div>
+          )}
+        </div>
+        <Accordion type="single" collapsible defaultValue="categories" className="w-full">
+          <FilterAccordionContent />
+        </Accordion>
+      </div>
+    </div>
+  )
+
+  // For drawer layout, we display a simplified version with just the filter content
+  if (useDrawerLayout) {
+    return (
+      <div>
+        {renderActiveFilters}
+        <Accordion
+          type="multiple"
+          defaultValue={['categories', 'collections', 'brands', 'compatibility', 'price']}
+          className="w-full"
+        >
+          <FilterAccordionContent />
+        </Accordion>
+      </div>
+    )
+  }
+
+  // Standard layout includes mobile trigger, active filters, and desktop sidebar
+  return (
+    <div>
+      {renderMobileFilterButton}
+      {renderActiveFilters}
+      {renderDesktopFilters}
     </div>
   )
 }

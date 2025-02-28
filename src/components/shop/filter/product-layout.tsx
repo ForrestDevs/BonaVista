@@ -31,14 +31,15 @@ function ProductListSkeleton() {
 export default function ProductLayout({ config }: { config: FilterConfig }) {
   return (
     <div className="py-8">
-      <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-4">
-        {/* Filters - left side on desktop, hidden on mobile */}
-        <aside className="md:sticky md:top-24 md:self-start md:max-h-[calc(100vh-2rem)] md:mb-20">
+      {/* Responsive layout with filters as drawer on medium screens and sidebar on large screens */}
+      <div className="grid grid-cols-1 xl:grid-cols-[280px_1fr] gap-6">
+        {/* Filters - only visible as sidebar on xl (1280px+) screens */}
+        <aside className="hidden xl:block xl:sticky xl:top-24 xl:self-start xl:max-h-[calc(100vh-4rem)]">
           <ProductFilters config={config} />
         </aside>
 
-        {/* Product listing - right side on desktop */}
-        <main>
+        {/* Product listing */}
+        <main className="w-full min-h-[500px]">
           <Suspense fallback={<ProductListSkeleton />}>
             <ProductList config={config} />
           </Suspense>

@@ -1,6 +1,6 @@
-import type { CartItems, Cart } from '@payload-types'
+import type { LineItems, Cart } from '@payload-types'
 
-export type CartItem = Exclude<NonNullable<CartItems>[number], null>
+export type CartItem = Exclude<NonNullable<LineItems>[number], null>
 
 export type CartAction =
   | {

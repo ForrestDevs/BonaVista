@@ -20,3 +20,4 @@ export const SPA_SLUG = 'spas' as const
 export const GALLERIES_SLUG = 'galleries' as const
 export const MEDIA_FOLDER_SLUG = 'media-folders' as const
 export const SHIPPING_OPTION_SLUG = 'shipping-options' as const
+export const PRODUCT_REVIEW_SLUG = 'product-reviews' as const

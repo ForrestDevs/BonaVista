@@ -8,29 +8,11 @@
 
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CartItems".
+ * via the `definition` "LineItems".
  */
-export type CartItems =
+export type LineItems =
   | {
-      product: number | Product;
-      isVariant?: boolean | null;
-      variantId?: number | null;
-      variantOptions?:
-        | {
-            key?: {
-              slug?: string | null;
-              label?: string | null;
-            };
-            value?: {
-              slug?: string | null;
-              label?: string | null;
-            };
-            id?: string | null;
-          }[]
-        | null;
-      price: number;
-      quantity: number;
-      url?: string | null;
+      lineItem: LineItem;
       id?: string | null;
     }[]
   | null;
@@ -74,35 +56,6 @@ export type ProductVariant =
             id?: string | null;
           }[]
         | null;
-      id?: string | null;
-    }[]
-  | null;
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "OrderItems".
- */
-export type OrderItems =
-  | {
-      product: number | Product;
-      isVariant?: boolean | null;
-      variantId?: number | null;
-      variantOptions?:
-        | {
-            key?: {
-              slug?: string | null;
-              label?: string | null;
-            };
-            value?: {
-              slug?: string | null;
-              label?: string | null;
-            };
-            id?: string | null;
-          }[]
-        | null;
-      price: number;
-      quantity: number;
-      url?: string | null;
-      thumbnail?: (number | null) | Media;
       id?: string | null;
     }[]
   | null;
@@ -182,12 +135,16 @@ export interface Config {
     galleries: Gallery;
     'form-submissions': FormSubmission;
     'shipping-options': ShippingOption;
+    'product-reviews': ProductReview;
     redirects: Redirect;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {
+    products: {
+      reviews: 'product-reviews';
+    };
     'product-categories': {
       children: 'product-categories';
       products: 'products';
@@ -217,6 +174,7 @@ export interface Config {
     galleries: GalleriesSelect<false> | GalleriesSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     'shipping-options': ShippingOptionsSelect<false> | ShippingOptionsSelect<true>;
+    'product-reviews': ProductReviewsSelect<false> | ProductReviewsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -363,51 +321,13 @@ export interface Customer {
   cart?: (number | null) | Cart;
   billing_addresses?:
     | {
-        company: string;
-        first_name: string;
-        last_name: string;
-        line_1: string;
-        line_2: string;
-        city: string;
-        country: string;
-        state: string;
-        postal_code: string;
-        phone: string;
-        email: string;
-        metadata?:
-          | {
-              [k: string]: unknown;
-            }
-          | unknown[]
-          | string
-          | number
-          | boolean
-          | null;
+        address: Address;
         id?: string | null;
       }[]
     | null;
   shipping_addresses?:
     | {
-        company: string;
-        first_name: string;
-        last_name: string;
-        line_1: string;
-        line_2: string;
-        city: string;
-        country: string;
-        state: string;
-        postal_code: string;
-        phone: string;
-        email: string;
-        metadata?:
-          | {
-              [k: string]: unknown;
-            }
-          | unknown[]
-          | string
-          | number
-          | boolean
-          | null;
+        address: Address;
         id?: string | null;
       }[]
     | null;
@@ -433,8 +353,8 @@ export interface Customer {
  */
 export interface Cart {
   id: number;
+  lineItems?: LineItems;
   customer?: (number | null) | Customer;
-  items?: CartItems;
   payment_intent?:
     | {
         [k: string]: unknown;
@@ -478,6 +398,32 @@ export interface Cart {
   subtotal?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LineItem".
+ */
+export interface LineItem {
+  product: number | Product;
+  isVariant?: boolean | null;
+  variantOptions?:
+    | {
+        key?: {
+          slug?: string | null;
+          label?: string | null;
+        };
+        value?: {
+          slug?: string | null;
+          label?: string | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  sku: string;
+  price: number;
+  quantity: number;
+  thumbnail?: (number | null) | Media;
+  url?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -571,6 +517,10 @@ export interface Product {
    * Maximum price for this product
    */
   priceMax?: number | null;
+  reviews?: {
+    docs?: (number | ProductReview)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -652,6 +602,48 @@ export interface ProductCategory {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-reviews".
+ */
+export interface ProductReview {
+  id: number;
+  title: string;
+  rating: number;
+  review: string;
+  isVerifiedPurchase?: boolean | null;
+  images?: (number | Media)[] | null;
+  reviewer?: (number | null) | Customer;
+  product?: (number | null) | Product;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Address".
+ */
+export interface Address {
+  first_name?: string | null;
+  last_name?: string | null;
+  company?: string | null;
+  line_1: string;
+  line_2?: string | null;
+  city: string;
+  country: string;
+  state: string;
+  postal_code: string;
+  phone: string;
+  email: string;
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
  */
 export interface Order {
@@ -677,7 +669,7 @@ export interface Order {
   total: number;
   taxTotal: number;
   currency: string;
-  items?: OrderItems;
+  lineItems?: LineItems;
   paymentIntent?:
     | {
         [k: string]: unknown;
@@ -1619,6 +1611,7 @@ export interface ShippingOption {
         }[]
       | null;
   };
+  pickupLocation?: Address;
   isActive: boolean;
   updatedAt: string;
   createdAt: string;
@@ -1723,6 +1716,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'shipping-options';
         value: number | ShippingOption;
+      } | null)
+    | ({
+        relationTo: 'product-reviews';
+        value: number | ProductReview;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1842,8 +1839,8 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "cart_select".
  */
 export interface CartSelect<T extends boolean = true> {
+  lineItems?: T | LineItemsSelect<T>;
   customer?: T;
-  items?: T | CartItemsSelect<T>;
   payment_intent?: T;
   checkout_session?: T;
   taxCalculationId?: T;
@@ -1858,12 +1855,19 @@ export interface CartSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CartItems_select".
+ * via the `definition` "LineItems_select".
  */
-export interface CartItemsSelect<T extends boolean = true> {
+export interface LineItemsSelect<T extends boolean = true> {
+  lineItem?: T | LineItemSelect<T>;
+  id?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LineItem_select".
+ */
+export interface LineItemSelect<T extends boolean = true> {
   product?: T;
   isVariant?: T;
-  variantId?: T;
   variantOptions?:
     | T
     | {
@@ -1881,10 +1885,11 @@ export interface CartItemsSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  sku?: T;
   price?: T;
   quantity?: T;
+  thumbnail?: T;
   url?: T;
-  id?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1904,41 +1909,10 @@ export interface OrdersSelect<T extends boolean = true> {
   total?: T;
   taxTotal?: T;
   currency?: T;
-  items?: T | OrderItemsSelect<T>;
+  lineItems?: T | LineItemsSelect<T>;
   paymentIntent?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "OrderItems_select".
- */
-export interface OrderItemsSelect<T extends boolean = true> {
-  product?: T;
-  isVariant?: T;
-  variantId?: T;
-  variantOptions?:
-    | T
-    | {
-        key?:
-          | T
-          | {
-              slug?: T;
-              label?: T;
-            };
-        value?:
-          | T
-          | {
-              slug?: T;
-              label?: T;
-            };
-        id?: T;
-      };
-  price?: T;
-  quantity?: T;
-  url?: T;
-  thumbnail?: T;
-  id?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1994,6 +1968,7 @@ export interface ProductsSelect<T extends boolean = true> {
   compatibility?: T;
   priceMin?: T;
   priceMax?: T;
+  reviews?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -2535,41 +2510,37 @@ export interface CustomersSelect<T extends boolean = true> {
   billing_addresses?:
     | T
     | {
-        company?: T;
-        first_name?: T;
-        last_name?: T;
-        line_1?: T;
-        line_2?: T;
-        city?: T;
-        country?: T;
-        state?: T;
-        postal_code?: T;
-        phone?: T;
-        email?: T;
-        metadata?: T;
+        address?: T | AddressSelect<T>;
         id?: T;
       };
   shipping_addresses?:
     | T
     | {
-        company?: T;
-        first_name?: T;
-        last_name?: T;
-        line_1?: T;
-        line_2?: T;
-        city?: T;
-        country?: T;
-        state?: T;
-        postal_code?: T;
-        phone?: T;
-        email?: T;
-        metadata?: T;
+        address?: T | AddressSelect<T>;
         id?: T;
       };
   orders?: T;
   metadata?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Address_select".
+ */
+export interface AddressSelect<T extends boolean = true> {
+  first_name?: T;
+  last_name?: T;
+  company?: T;
+  line_1?: T;
+  line_2?: T;
+  city?: T;
+  country?: T;
+  state?: T;
+  postal_code?: T;
+  phone?: T;
+  email?: T;
+  metadata?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2755,7 +2726,23 @@ export interface ShippingOptionsSelect<T extends boolean = true> {
               id?: T;
             };
       };
+  pickupLocation?: T | AddressSelect<T>;
   isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-reviews_select".
+ */
+export interface ProductReviewsSelect<T extends boolean = true> {
+  title?: T;
+  rating?: T;
+  review?: T;
+  isVerifiedPurchase?: T;
+  images?: T;
+  reviewer?: T;
+  product?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -83,7 +83,7 @@ const SingleLink: React.FC<SingleLinkProps> = ({
 
   const styleClasses = cn(
     variant !== 'none'
-      ? 'text-black hover:text-gray-700 transition-colors duration-200 relative group'
+      ? 'text-black transition-colors duration-200 relative group'
       : '',
     sizeClasses[variant],
     className,

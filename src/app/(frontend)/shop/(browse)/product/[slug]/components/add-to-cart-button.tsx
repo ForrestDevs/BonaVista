@@ -7,9 +7,10 @@ import { addToCart } from '@/lib/data/cart'
 import { toast } from 'sonner'
 import { QuantitySelector } from './quantity-selector'
 import { useState } from 'react'
+import { CartItem } from '@/lib/types/cart'
 
 export function AddToCartButton() {
-  const { product, selectedVariant, currentPrice, isVariantSelected, quantity } = useProduct()
+  const { product, selectedVariant, isVariantSelected, quantity } = useProduct()
   const [isLoading, setIsLoading] = useState(false)
 
   const handleAddToCart = async () => {
@@ -20,23 +21,30 @@ export function AddToCartButton() {
 
     try {
       setIsLoading(true)
-      const cartItem = {
-        product: product.id,
-        price: currentPrice,
-        quantity,
-        ...(selectedVariant && {
-          isVariant: true,
-          variant: {
-            id: selectedVariant.id,
-            variantOptions: selectedVariant.info.options.map((option) => ({
-              key: option.key,
-              value: {
-                slug: option.slug,
-                label: option.label,
-              },
-            })),
-          },
-        }),
+      const cartItem: CartItem = {
+        lineItem: {
+          product: product,
+          sku: product.enableVariants ? selectedVariant?.sku : product.baseProduct.sku,
+          price: product.enableVariants ? selectedVariant?.price : product.baseProduct.price,
+          url: `${process.env.NEXT_PUBLIC_URL}/shop/product/${product.slug}`,
+          quantity,
+          thumbnail: product.enableVariants
+            ? selectedVariant?.images[0].image
+            : product.baseProduct.images[0].image,
+          isVariant: product.enableVariants,
+          variantOptions: product.enableVariants
+            ? selectedVariant?.info.options.map((option) => ({
+                key: {
+                  slug: option.key.slug,
+                  label: option.key.label,
+                },
+                value: {
+                  slug: option.slug,
+                  label: option.label,
+                },
+              }))
+            : undefined,
+        },
       }
 
       await addToCart(cartItem)

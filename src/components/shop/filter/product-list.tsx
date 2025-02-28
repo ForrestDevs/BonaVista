@@ -7,13 +7,14 @@ import {
   PRODUCT_COLLECTION_SLUG,
   PRODUCT_SLUG,
 } from '@/payload/collections/constants'
-import ProductGridItems from '../product-grid-items'
+import ProductGridItems from '../products/product-grid-items'
 import Grid from '@components/payload/grid'
 import ProductPagination from './product-pagination'
 import ProductSort from './product-sort'
 import { FilterConfig } from './types'
 import { AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { FilterDrawerButton } from './filter-drawer-button'
 
 export default async function ProductList({ config }: { config: FilterConfig }) {
   const {
@@ -154,13 +155,39 @@ export default async function ProductList({ config }: { config: FilterConfig }) 
     depth: 1,
   })
 
+  // Calculate total active filters for badge display
+  const activeFilterCount = 
+    (categories?.length || 0) + 
+    (collections?.length || 0) + 
+    (brands?.length || 0) + 
+    (compatibility?.length || 0) + 
+    ((price_min || price_max) ? 1 : 0);
+
   return (
     <div className="w-full min-h-[500px]">
-      <ProductSort config={config} totalProducts={products.totalDocs} />
+      <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
+        {/* Results count - always first in the wrap order */}
+        <p className="text-sm md:text-base tracking-tight text-muted-foreground font-medium order-first">
+          <span>{products.totalDocs}</span> results
+        </p>
+        
+        {/* Controls container - for mobile layout */}
+        <div className="flex items-center gap-2 sm:gap-4 ml-auto order-last">
+          {/* Filter button for small/medium screens */}
+          <div className="xl:hidden order-first">
+            <FilterDrawerButton config={config} activeFilterCount={activeFilterCount} />
+          </div>
+          
+          {/* Sort dropdown */}
+          <div>
+            <ProductSort config={config}/>
+          </div>
+        </div>
+      </div>
 
       {products.docs.length > 0 ? (
         <>
-          <Grid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Grid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
             <ProductGridItems products={products.docs} />
           </Grid>
 

@@ -1,6 +1,7 @@
 import { CollectionConfig } from 'payload'
 import { CART_SLUG, CUSTOMER_SLUG, ORDER_SLUG, USER_SLUG } from '../constants'
 import { admins, anyone, authenticated } from '@payload/access'
+import { address } from '@/payload/fields/address'
 
 const Customers: CollectionConfig = {
   slug: CUSTOMER_SLUG,
@@ -64,79 +65,7 @@ const Customers: CollectionConfig = {
       },
       name: 'billing_addresses',
       type: 'array',
-      fields: [
-        {
-          name: 'company',
-          type: 'text',
-          required: true,
-          label: 'Company',
-        },
-        {
-          name: 'first_name',
-          type: 'text',
-          required: true,
-          label: 'First Name',
-        },
-        {
-          name: 'last_name',
-          type: 'text',
-          required: true,
-          label: 'Last Name',
-        },
-        {
-          name: 'line_1',
-          type: 'text',
-          required: true,
-          label: 'Address Line 1',
-        },
-        {
-          name: 'line_2',
-          type: 'text',
-          required: true,
-          label: 'Address Line 2',
-        },
-        {
-          name: 'city',
-          type: 'text',
-          required: true,
-          label: 'City',
-        },
-        {
-          name: 'country',
-          type: 'text',
-          required: true,
-          label: 'Country Code',
-        },
-        {
-          name: 'state',
-          type: 'text',
-          required: true,
-          label: 'Province',
-        },
-        {
-          name: 'postal_code',
-          type: 'text',
-          required: true,
-          label: 'Postal Code',
-        },
-        {
-          name: 'phone',
-          type: 'text',
-          required: true,
-          label: 'Phone',
-        },
-        {
-          name: 'email',
-          type: 'text',
-          required: true,
-          label: 'Email',
-        },
-        {
-          name: 'metadata',
-          type: 'json',
-          label: 'Metadata',
-        },
-      ],
+      fields: [address()],
     },
     {
       label: {
@@ -145,90 +74,18 @@ const Customers: CollectionConfig = {
       },
       name: 'shipping_addresses',
       type: 'array',
-      fields: [
-        {
-          name: 'company',
-          type: 'text',
-          required: true,
-          label: 'Company',
-        },
-        {
-          name: 'first_name',
-          type: 'text',
-          required: true,
-          label: 'First Name',
-        },
-        {
-          name: 'last_name',
-          type: 'text',
-          required: true,
-          label: 'Last Name',
-        },
-        {
-          name: 'line_1',
-          type: 'text',
-          required: true,
-          label: 'Address Line 1',
-        },
-        {
-          name: 'line_2',
-          type: 'text',
-          required: true,
-          label: 'Address Line 2',
-        },
-        {
-          name: 'city',
-          type: 'text',
-          required: true,
-          label: 'City',
-        },
-        {
-          name: 'country',
-          type: 'text',
-          required: true,
-          label: 'Country Code',
-        },
-        {
-          name: 'state',
-          type: 'text',
-          required: true,
-          label: 'Province',
-        },
-        {
-          name: 'postal_code',
-          type: 'text',
-          required: true,
-          label: 'Postal Code',
-        },
-        {
-          name: 'phone',
-          type: 'text',
-          required: true,
-          label: 'Phone',
-        },
-        {
-          name: 'email',
-          type: 'text',
-          required: true,
-          label: 'Email',
-        },
-        {
-          name: 'metadata',
-          type: 'json',
-          label: 'Metadata',
-        },
-      ],
+      fields: [address()],
     },
     {
+      label: 'Orders',
       name: 'orders',
+      relationTo: ORDER_SLUG,
       type: 'relationship',
       access: {
         create: admins,
         update: admins,
       },
       hasMany: true,
-      label: 'Orders',
-      relationTo: ORDER_SLUG,
     },
     {
       name: 'metadata',

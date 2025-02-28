@@ -74,16 +74,11 @@ export default function Login({ setCurrentView }: Props) {
               </FormItem>
             )}
           />
-          {state.status === 'error' && (
-            <p className="text-red-500 text-sm mt-2">
-              {state.message}
-            </p>
-          )}
+          {state.status === 'error' && <p className="text-red-500 text-sm mt-2">{state.message}</p>}
           <Button
             type="submit"
             className="w-full mt-6"
             disabled={isPending || !form.formState.isValid}
-           
           >
             {isPending ? 'Signing in...' : 'Sign in'}
           </Button>
@@ -92,11 +87,7 @@ export default function Login({ setCurrentView }: Props) {
 
       <span className="text-center text-ui-fg-base text-small-regular mt-6">
         Not a member?{' '}
-        <button
-          onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="underline"
-        
-        >
+        <button onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)} className="underline">
           Join us
         </button>
         .

@@ -22,65 +22,51 @@ const getSortOptionLabel = (option: string): string => {
   return option
 }
 
-export default function ProductSort({
-  config,
-  totalProducts,
-}: {
-  config: FilterConfig
-  totalProducts: number
-}) {
+export default function ProductSort({ config }: { config: FilterConfig }) {
   const [isPending, startTransition] = useTransition()
   const { criteria, setters } = useFilterState(startTransition)
 
   return (
-    <div className="flex flex-col space-y-1 mb-4">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <p className="text-sm md:text-base tracking-tight text-muted-foreground font-medium">
-          <span>{totalProducts}</span> results
-        </p>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9 gap-1 border-dashed min-w-[140px] justify-between"
-              disabled={isPending}
-            >
-              {isPending ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  <span>Sorting...</span>
-                </div>
-              ) : (
-                <>
-                  <span className="flex items-center gap-1">
-                    <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span>Sort by</span>
-                  </span>
-                  <span className="font-medium text-xs">{getSortOptionLabel(criteria.sort)}</span>
-                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                </>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[200px]">
-            {config.sortOptions.map((option) => (
-              <DropdownMenuItem
-                key={option}
-                onClick={() => setters.setSort(option)}
-                className={cn(
-                  'flex items-center justify-between',
-                  criteria.sort === option && 'font-medium',
-                )}
-              >
-                <span>{getSortOptionLabel(option)}</span>
-                {criteria.sort === option && <Check className="h-4 w-4 ml-2" />}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 gap-1 border-dashed min-w-[140px] justify-between"
+          disabled={isPending}
+        >
+          {isPending ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <span>Sorting...</span>
+            </div>
+          ) : (
+            <>
+              <span className="flex items-center gap-1">
+                <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                <span>Sort by</span>
+              </span>
+              <span className="font-medium text-xs">{getSortOptionLabel(criteria.sort)}</span>
+              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+            </>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[200px]">
+        {config.sortOptions.map((option) => (
+          <DropdownMenuItem
+            key={option}
+            onClick={() => setters.setSort(option)}
+            className={cn(
+              'flex items-center justify-between',
+              criteria.sort === option && 'font-medium',
+            )}
+          >
+            <span>{getSortOptionLabel(option)}</span>
+            {criteria.sort === option && <Check className="h-4 w-4 ml-2" />}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

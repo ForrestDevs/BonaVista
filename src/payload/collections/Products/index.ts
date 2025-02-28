@@ -25,11 +25,12 @@ import {
   PRODUCT_SLUG,
   BRAND_SLUG,
   PRODUCT_COLLECTION_SLUG,
+  PRODUCT_REVIEW_SLUG,
 } from '../constants'
 import { setPriceMinMax } from './hooks/setPriceMinMax'
 
 const Products: CollectionConfig = {
-  slug: 'products',
+  slug: PRODUCT_SLUG,
   access: {
     create: admins,
     delete: admins,
@@ -528,6 +529,15 @@ const Products: CollectionConfig = {
       },
       defaultValue: 0,
     },
+    {
+      name: 'reviews',
+      type: 'join',
+      collection: PRODUCT_REVIEW_SLUG,
+      on: 'product',
+      admin: {
+        position: 'sidebar',
+      },
+    },
   ],
   hooks: {
     afterChange: [revalidateProduct],
@@ -539,6 +549,7 @@ const Products: CollectionConfig = {
     },
     maxPerDoc: 50,
   },
+  timestamps: true,
 } as const
 
 export default Products

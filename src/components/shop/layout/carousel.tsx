@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 interface CarouselProps {
   slides: {
@@ -36,7 +36,6 @@ export function Carousel({ slides }: CarouselProps) {
             index === current ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          
           <Image
             src={slide.image}
             alt={slide.title}
@@ -77,4 +76,3 @@ export function Carousel({ slides }: CarouselProps) {
     </div>
   )
 }
-

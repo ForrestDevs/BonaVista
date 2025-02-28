@@ -22,7 +22,7 @@ export default async function CartPage() {
   const cart = await getCart(2)
   const customer = await getCustomerDTO()
 
-  if (!cart || cart.items.length === 0) {
+  if (!cart || cart.lineItems.length === 0) {
     return (
       <div className="min-h-[calc(100dvh-7rem)] container">
         <CartEmpty />

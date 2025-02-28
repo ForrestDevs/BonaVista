@@ -17,7 +17,7 @@ import {
   Truck,
   Star,
 } from 'lucide-react'
-import { Carousel } from '@/components/shop/carousel'
+import { Carousel } from '@/components/shop/layout/carousel'
 import Image from 'next/image'
 import { ProductCard } from '@/components/shop/products/product-card'
 import SkeletonShopHome from '@/components/shop/skeletons/layout/skele-shop-home'

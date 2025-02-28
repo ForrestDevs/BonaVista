@@ -30,7 +30,7 @@ export const DesktopNav: React.FC<{ className?: string; header: Header }> = ({
                         <NavigationMenuItem key={subItem.id} className="relative">
                           <Trigger
                             showChevron={subItem.links?.length > 0}
-                            className="py-2 flex items-center gap-1 hover:underline font-medium"
+                            className="py-2 flex items-center gap-1"
                           >
                             <SingleLink
                               link={subItem.link}

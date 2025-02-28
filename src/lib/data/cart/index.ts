@@ -5,7 +5,7 @@ import { CartItem } from '@lib/types/cart'
 import getPayload from '@lib/utils/getPayload'
 import { Cart } from '@payload-types'
 import { CART_SLUG, CUSTOMER_SLUG } from '@payload/collections/constants'
-import { deleteCartCookie, getCartCookie, setCartCookie } from '@lib/data/cookies'
+import { getCartCookie, setCartCookie } from '@lib/data/cookies'
 import { revalidateTag } from 'next/cache'
 import { cache } from '@/lib/utils/cache'
 
@@ -173,29 +173,43 @@ export async function getOrSetCart(): Promise<Cart | null> {
       if (!newCart) {
         return null
       }
-      await setCartCookie({ id: newCart.id, linesCount: newCart.items.length })
+      await setCartCookie({ id: newCart.id, linesCount: newCart.lineItems.length })
       return structuredClone(newCart)
     }
   }
 }
 
 function mergeItems(guestCart: Cart, customerCart: Cart): CartItem[] {
-  const syncedItems: CartItem[] = [
-    ...(guestCart?.items.map((item) => ({
-      ...item,
-      product: typeof item.product === 'object' ? item.product?.id : item.product,
-    })) || []),
-    ...(customerCart?.items.map((item) => ({
-      ...item,
-      product: typeof item.product === 'object' ? item.product?.id : item.product,
-    })) || []),
-  ].reduce((acc: CartItem[], item) => {
-    const indexInAcc = acc.findIndex(({ id }) => id === item.id)
+  // Extract line items from both carts and convert to CartItem format
+  const guestItems =
+    guestCart?.lineItems?.map(({ lineItem, id }) => ({
+      lineItem: {
+        ...lineItem,
+        product: typeof lineItem.product === 'object' ? lineItem.product?.id : lineItem.product,
+      },
+      id,
+    })) || []
+
+  const customerItems =
+    customerCart?.lineItems?.map(({ lineItem, id }) => ({
+      lineItem: {
+        ...lineItem,
+        product: typeof lineItem.product === 'object' ? lineItem.product?.id : lineItem.product,
+      },
+      id,
+    })) || []
+
+  // Combine and merge items with the same ID
+  const mergedItems = [...guestItems, ...customerItems].reduce((acc: typeof guestItems, item) => {
+    const indexInAcc = acc.findIndex((accItem) => accItem.id === item.id)
 
     if (indexInAcc > -1) {
       acc[indexInAcc] = {
         ...acc[indexInAcc],
-        quantity: acc[indexInAcc].quantity + item.quantity,
+        lineItem: {
+          ...acc[indexInAcc].lineItem,
+          quantity: acc[indexInAcc].lineItem.quantity + item.lineItem.quantity,
+        },
       }
     } else {
       acc.push(item)
@@ -203,7 +217,7 @@ function mergeItems(guestCart: Cart, customerCart: Cart): CartItem[] {
     return acc
   }, [])
 
-  return syncedItems
+  return mergedItems
 }
 
 /**
@@ -235,7 +249,7 @@ export async function mergeCarts(customerId: number): Promise<Cart | null> {
         collection: CART_SLUG,
         id: customerCart.id,
         data: {
-          items: mergedItems,
+          lineItems: mergedItems,
         },
       })
       if (!updatedCustomerCart) {
@@ -247,7 +261,7 @@ export async function mergeCarts(customerId: number): Promise<Cart | null> {
         id: guestCart.id,
       })
 
-      await setCartCookie({ id: customerCart.id, linesCount: customerCart.items.length })
+      await setCartCookie({ id: customerCart.id, linesCount: customerCart.lineItems.length })
       revalidateTag(`cart-${customerCart.id}`)
 
       return updatedCustomerCart
@@ -269,7 +283,10 @@ export async function mergeCarts(customerId: number): Promise<Cart | null> {
         data: { cart: updatedGuestCart.id },
       })
 
-      await setCartCookie({ id: updatedGuestCart.id, linesCount: updatedGuestCart.items.length })
+      await setCartCookie({
+        id: updatedGuestCart.id,
+        linesCount: updatedGuestCart.lineItems.length,
+      })
       revalidateTag(`cart-${updatedGuestCart.id}`)
 
       return updatedGuestCart
@@ -312,25 +329,18 @@ export async function addToCart(cartItem: CartItem): Promise<Cart | null> {
       throw 'Error retrieving or creating cart'
     }
 
-    const { product } = cartItem
+    const { product } = cartItem.lineItem
     const productId = typeof product === 'object' ? product?.id : product
 
     // Find the index of the item in the cart that matches the new item
-    // This checks both the product ID and variant (if applicable)
-    const existingItemIndex = cart.items.findIndex(({ product: existingProduct, variantId }) => {
-      const existingProductId =
-        typeof existingProduct === 'object' ? existingProduct?.id : existingProduct
-      const newProductId =
-        typeof cartItem.product === 'object' ? cartItem.product?.id : cartItem.product
-      const existingVariantId = variantId ?? null
-      const newVariantId = cartItem.variantId ?? null
-
-      return existingProductId === newProductId && existingVariantId === newVariantId
+    // We can simply compare SKUs as they uniquely identify products and their variants
+    const existingItemIndex = cart.lineItems.findIndex(({ lineItem }) => {
+      return lineItem.sku === cartItem.lineItem.sku
     })
 
     // Create a new array of cart items to avoid mutating the original cart
     let updatedCartItems = [
-      ...cart.items.map((item) => ({
+      ...cart.lineItems.map((item) => ({
         ...item,
       })),
     ]
@@ -339,21 +349,22 @@ export async function addToCart(cartItem: CartItem): Promise<Cart | null> {
     if (existingItemIndex !== -1) {
       updatedCartItems[existingItemIndex] = {
         ...updatedCartItems[existingItemIndex], // Spread existing item properties
-        quantity: Math.max(
-          0, // Ensure quantity is never negative
-          (updatedCartItems[existingItemIndex].quantity || 0) + // Current quantity (default to 0 if undefined)
-            (cartItem.quantity || 0), // New quantity to add (default to 0 if undefined)
-        ),
+        lineItem: {
+          ...updatedCartItems[existingItemIndex].lineItem,
+          quantity: Math.max(
+            0, // Ensure quantity is never negative
+            (updatedCartItems[existingItemIndex].lineItem.quantity || 0) + // Current quantity (default to 0 if undefined)
+              (cartItem.lineItem.quantity || 0), // New quantity to add (default to 0 if undefined)
+          ),
+        },
       }
     } else {
       updatedCartItems.push({
         id: cartItem.id,
-        product: productId,
-        price: cartItem.price,
-        variantId: cartItem.variantId,
-        variantOptions: cartItem.variantOptions,
-        isVariant: cartItem.isVariant,
-        quantity: Math.max(0, cartItem.quantity || 0), // Ensure quantity is never negative
+        lineItem: {
+          ...cartItem.lineItem,
+          product: productId,
+        },
       })
     }
 
@@ -362,14 +373,17 @@ export async function addToCart(cartItem: CartItem): Promise<Cart | null> {
       collection: CART_SLUG,
       id: cart.id,
       data: {
-        subtotal: updatedCartItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
-        items: updatedCartItems,
+        subtotal: updatedCartItems.reduce(
+          (acc, item) => acc + item.lineItem.price * item.lineItem.quantity,
+          0,
+        ),
+        lineItems: updatedCartItems,
       },
     })
     if (updatedCart) {
       await setCartCookie({
         id: updatedCart.id,
-        linesCount: updatedCart.items.length,
+        linesCount: updatedCart.lineItems.length,
       })
 
       revalidateTag(`cart-${updatedCart.id}`)
@@ -417,21 +431,14 @@ export async function deleteCartItem({
     let updatedCartItems = []
 
     if (cartItemId) {
-      updatedCartItems = cart.items.filter((item) => item.id !== cartItemId)
+      updatedCartItems = cart.lineItems.filter((item) => item.id !== cartItemId)
     } else {
-      const { product } = cartItem
-      const productId = typeof product === 'object' ? product?.id : product
+      // Use SKU for simpler comparison - SKU is unique for each product variant combination
+      const { sku } = cartItem.lineItem
 
-      updatedCartItems = cart.items.filter((item) => {
-        const existingProductId = typeof item.product === 'object' ? item.product?.id : item.product
-        // If variant is provided, only delete items matching both ID and variant options
-        if (cartItem?.variantId) {
-          const existingVariantId = item.variantId ?? null
-          const newVariantId = cartItem.variantId ?? null
-          return !(existingProductId === productId && existingVariantId === newVariantId)
-        }
-        // If no variant, just filter by ID
-        return existingProductId !== productId
+      updatedCartItems = cart.lineItems.filter((item) => {
+        // Keep all items that don't match the SKU we're trying to remove
+        return item.lineItem.sku !== sku
       })
     }
 
@@ -440,15 +447,18 @@ export async function deleteCartItem({
       collection: CART_SLUG,
       id: cart.id,
       data: {
-        subtotal: updatedCartItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
-        items: updatedCartItems,
+        subtotal: updatedCartItems.reduce(
+          (acc, item) => acc + item.lineItem.price * item.lineItem.quantity,
+          0,
+        ),
+        lineItems: updatedCartItems,
       },
     })
 
     if (updatedCart) {
       await setCartCookie({
         id: updatedCart.id,
-        linesCount: updatedCart.items.length,
+        linesCount: updatedCart.lineItems.length,
       })
 
       revalidateTag(`cart-${updatedCart.id}`)
@@ -484,9 +494,9 @@ export async function updateCartItemQuantity(
       throw 'No cart found'
     }
 
-    const updatedCartItems = cart.items.map((item) => {
+    const updatedCartItems = cart.lineItems.map((item) => {
       if (item.id === cartItemId) {
-        return { ...item, quantity }
+        return { ...item, lineItem: { ...item.lineItem, quantity } }
       }
       return item
     })
@@ -495,8 +505,11 @@ export async function updateCartItemQuantity(
       collection: CART_SLUG,
       id: cart.id,
       data: {
-        subtotal: updatedCartItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
-        items: updatedCartItems,
+        subtotal: updatedCartItems.reduce(
+          (acc, item) => acc + item.lineItem.price * item.lineItem.quantity,
+          0,
+        ),
+        lineItems: updatedCartItems,
       },
     })
 
@@ -532,14 +545,14 @@ export async function clearCartItems(): Promise<Cart> {
       collection: CART_SLUG,
       id: cart.id,
       data: {
-        items: [],
+        lineItems: [],
       },
     })
 
     if (updatedCart) {
       await setCartCookie({
         id: updatedCart.id,
-        linesCount: updatedCart.items.length,
+        linesCount: updatedCart.lineItems.length,
       })
 
       revalidateTag(`cart-${updatedCart.id}`)

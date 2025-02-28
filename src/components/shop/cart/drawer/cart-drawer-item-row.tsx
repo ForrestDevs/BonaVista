@@ -26,7 +26,7 @@ export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
     ref,
   ) => {
     const router = useRouter()
-    const [optimisticQuantity, setOptimisticQuantity] = useState(line.quantity)
+    const [optimisticQuantity, setOptimisticQuantity] = useState(line.lineItem.quantity)
     const { execute, hasErrored } = useAction(updateCartItemQuantityAction, {
       onSuccess: () => {
         setTimeout(() => {
@@ -35,15 +35,17 @@ export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
       },
     })
 
-    const product = typeof line.product === 'object' ? line.product : null
-    const productTitle = typeof line.product === 'object' ? line.product.title : line.product
-    const isVariant = line.isVariant
+    const product = typeof line.lineItem.product === 'object' ? line.lineItem.product : null
+    const productTitle =
+      typeof line.lineItem.product === 'object'
+        ? line.lineItem.product.title
+        : line.lineItem.product
+    const isVariant = line.lineItem.isVariant
     const variantOptions = isVariant
-      ? line.variantOptions.map((v) => v.value.label).join(', ')
+      ? line.lineItem.variantOptions.map((v) => v.value.label).join(', ')
       : null
     const thumbnail = isVariant
-      ? product?.variants.variantProducts.find((v) => v.id === line.variantId.toString())?.images[0]
-          ?.image
+      ? product?.variants.variantProducts.find((v) => v.sku === line.lineItem.sku)?.images[0]?.image
       : product?.baseProduct?.images[0]?.image
 
     const debouncedExecute = useMemo(
@@ -57,9 +59,9 @@ export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
     useEffect(() => {
       if (hasErrored) {
         // Rollback on error
-        setOptimisticQuantity(line.quantity)
+        setOptimisticQuantity(line.lineItem.quantity)
       }
-    }, [hasErrored, line.quantity])
+    }, [hasErrored, line.lineItem.quantity])
 
     const handleUpdateQuantity = (quantity: number) => {
       setOptimisticQuantity(quantity) // Immediate UI update
@@ -157,12 +159,15 @@ export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
                 <div className="flex flex-col items-end">
                   {optimisticQuantity > 1 && (
                     <p className="flex text-sm text-neutral-500">
-                      {optimisticQuantity} &times; ${line.price.toFixed(2)}
+                      {optimisticQuantity} &times; ${line.lineItem.price.toFixed(2)}
                     </p>
                   )}
                   <p className="flex text-sm text-neutral-900">
                     <span>
-                      {formatCurrency({ amount: line.price * optimisticQuantity, currency: 'CAD' })}
+                      {formatCurrency({
+                        amount: line.lineItem.price * optimisticQuantity,
+                        currency: 'CAD',
+                      })}
                     </span>
                   </p>
                 </div>

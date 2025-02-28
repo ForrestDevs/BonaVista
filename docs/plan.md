@@ -162,3 +162,7 @@ FINALIZE SHOP
  - Make sure guest order page works
  - When order is successful, add zoho webhook and send email to admin notifying the new order. (Add spire integration to this email)
  
+
+
+ECOM FLOW
+- Add product to cart from card or page (create cart if none)

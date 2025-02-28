@@ -14,7 +14,8 @@ import Spas from './Spas'
 import Galleries from './Galleries'
 import FormSubmissions from './FormSubmissions'
 import ProductCollection from './ProductCollection'
-import { ShippingOptions } from './ShippingOption'
+import ShippingOptions from './ShippingOption'
+import ProductReviews from './ProductReviews'
 
 export const collections = [
   BlogCategory,
@@ -34,6 +35,7 @@ export const collections = [
   Galleries,
   FormSubmissions,
   ShippingOptions,
+  ProductReviews,
 ]
 
 export default collections

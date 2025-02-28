@@ -14,7 +14,7 @@ interface CartSummaryListProps {
 export function CartSummaryList({ cart }: CartSummaryListProps) {
   const { setIsUpdating } = useCart()
   const { execute, optimisticState } = useOptimisticAction(deleteCartItemAction, {
-    currentState: { items: cart.items },
+    currentState: { items: cart.lineItems },
     updateFn: (state, newItems) => {
       const updatedItems = state.items.filter((item) => item.id !== newItems.cartItemId)
       return {
@@ -26,7 +26,7 @@ export function CartSummaryList({ cart }: CartSummaryListProps) {
     },
   })
 
-  if (cart.items.length === 0) {
+  if (cart.lineItems.length === 0) {
     return <p className="text-center text-gray-500">Your cart is empty.</p>
   }
 

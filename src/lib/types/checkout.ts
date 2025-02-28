@@ -1,4 +1,4 @@
-import { ShippingOption } from '@payload-types'
+import { Order, ShippingOption } from '@payload-types'
 
 export type CheckoutStep = 'email' | 'shipping' | 'billing' | 'payment'
 
@@ -19,13 +19,13 @@ export interface StripeAddress {
 
 export interface CheckoutLineItem {
   productId: number
-  variantId?: number
   title: string
   sku: string
   description?: string
   price: number
   quantity: number
   thumbnailMediaId?: number
+  url?: string
   isVariant?: boolean
   variantOptions?: {
     key: {
@@ -40,10 +40,26 @@ export interface CheckoutLineItem {
 }
 
 export interface CheckoutSession {
-  id: number
+  id: string
   cartId: number
   paymentIntentId: string
   clientSecret: string
+  /**
+   * Subtotal in cents - sum of (line item price × quantity) for all items
+   */
+  subtotal: number
+  /**
+   * Shipping total in cents - from the selected shipping option
+   * Will be 0 if free shipping is available
+   */
+  shippingTotal: number
+  /**
+   * Tax amount in cents - calculated by Stripe based on subtotal and shipping
+   */
+  taxAmount: number
+  /**
+   * Total amount in cents - subtotal + shippingTotal + taxAmount
+   */
   amount: number
   currencyCode: string
   description?: string
@@ -71,8 +87,6 @@ export interface CheckoutSession {
       method?: string
     }
   }
-  shippingTotal: number
-  taxAmount: number
   taxCalculationId?: string
   taxTransactionId?: string
   lastUpdated: number
@@ -94,6 +108,19 @@ export interface BeginCheckoutParams {
   metadata?: Record<string, string>
 }
 
+export interface UpdateCheckoutSessionParams {
+  cartId: number
+  amount?: number
+  shippingTotal?: number
+  taxAmount?: number
+  lineItems?: CheckoutLineItem[]
+  stripeCustomerId?: string
+  customerEmail?: string
+  customerId?: number
+  redirectTo?: string
+  metadata?: Record<string, string>
+}
+
 export interface CreateStoredCheckoutParams extends Omit<BeginCheckoutParams, 'redirectTo'> {
   shippingTotal: number
   taxAmount: number
@@ -112,6 +139,6 @@ export interface HandlePaymentSuccessParams {
 
 export interface PaymentSuccessResult {
   success: boolean
-  orderId?: number
+  order?: Order | number
   error?: string
 }
