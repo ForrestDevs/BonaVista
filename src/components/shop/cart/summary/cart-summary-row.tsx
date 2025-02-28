@@ -13,6 +13,7 @@ import { formatCurrency } from '@/lib/utils/formatMoney'
 import { debounce } from 'lodash'
 import { useCart } from './cart-summary-context'
 import { useRouter } from 'next/navigation'
+import { OptimizedLink } from '@/components/payload/Link/optimized-link'
 
 type CartSummaryRowProps = {
   line: CartItem
@@ -39,6 +40,7 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
     })
 
     const product = typeof line.lineItem.product === 'object' ? line.lineItem.product : null
+    const slug = product?.slug
     const productTitle =
       typeof line.lineItem.product === 'object'
         ? line.lineItem.product.title
@@ -97,7 +99,11 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
           <div className="flex flex-1 flex-col">
             <div className="flex justify-between">
               <div>
-                <h3 className="font-medium text-neutral-900">{productTitle}</h3>
+                <OptimizedLink href={`/shop/product/${slug}`}>
+                  <h3 className="font-medium text-neutral-900 hover:underline hover:text-blue-500 transition-colors duration-200">
+                    {productTitle}
+                  </h3>
+                </OptimizedLink>
                 {isVariant && <p className="mt-1 text-sm text-neutral-500">{variantOptions}</p>}
               </div>
               <p className="text-sm font-medium text-neutral-900">

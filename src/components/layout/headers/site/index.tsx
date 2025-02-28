@@ -3,7 +3,7 @@ import { getCachedGlobal } from '@/lib/utils/getGlobals'
 import Link from 'next/link'
 import MobileNav from './mobile-nav'
 import { DesktopNav } from './desktop-nav'
-import { Logo } from '@/components/payload/Logo'
+import { Logo } from '@/components/layout/logo'
 import { RemoveScroll } from 'react-remove-scroll'
 import { cn } from '@/lib/utils/cn'
 
@@ -25,7 +25,7 @@ export default async function MarketingHeader() {
             <div className="grid grid-cols-2 lg:grid-cols-3 items-center justify-center">
               <div className="col-span-1 flex items-center justify-start">
                 <Link href="/" className="relative">
-                  <Logo />
+                  <Logo className='h-[40px] sm:h-[45px] md:h-[50px] lg:h-[55px]' />
                 </Link>
               </div>
               <div className="col-span-1 items-center justify-center h-full hidden lg:flex">

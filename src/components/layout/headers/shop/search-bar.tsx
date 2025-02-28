@@ -8,8 +8,13 @@ import { useDebouncedValue } from '@/lib/hooks/useDebounce'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
+import { cn } from '@/lib/utils/cn'
 
-export function SearchBar() {
+interface SearchBarProps {
+  className?: string
+}
+
+export function SearchBar({ className }: SearchBarProps = {}) {
   const [isOpen, setIsOpen] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
 
@@ -66,8 +71,14 @@ export function SearchBar() {
   }, [])
 
   return (
-    <div>
-      <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
+    <div className={cn(className)}>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={() => setIsOpen(true)}
+        className="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors"
+        aria-label="Search products"
+      >
         <Search className="h-5 w-5" />
         <span className="sr-only">Search</span>
       </Button>

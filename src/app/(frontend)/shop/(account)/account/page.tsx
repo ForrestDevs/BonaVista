@@ -8,6 +8,7 @@ import { Container } from '@components/ui/container'
 import { Button } from '@components/ui/button'
 import { CustomerDTO, getCustomerDTO } from '@/lib/data/customer'
 import { formatStripeMoney } from '@/lib/utils/formatMoney'
+import { redirect } from 'next/navigation'
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -20,11 +21,15 @@ export default async function Dashboard() {
   const payload = await getPayload()
   const customer = await getCustomerDTO()
 
+  if (!customer) {
+    redirect('/shop/auth/login')
+  }
+
   const { docs } = await payload.find({
     collection: ORDER_SLUG,
     where: {
       orderedBy: {
-        equals: customer.id,
+        equals: customer?.id,
       },
     },
   })

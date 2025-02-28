@@ -11,7 +11,7 @@ export function Logo({ className }: { className?: string }) {
       alt="BonaVista Logo"
       width={200}
       height={160}
-      className={cn('object-contain aspect-auto w-auto h-auto', className)}
+      className={cn('object-contain aspect-auto w-auto', className)}
     />
   )
 }

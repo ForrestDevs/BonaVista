@@ -21,63 +21,177 @@ import { Carousel } from '@/components/shop/layout/carousel'
 import Image from 'next/image'
 import { ProductCard } from '@/components/shop/products/product-card'
 import SkeletonShopHome from '@/components/shop/skeletons/layout/skele-shop-home'
+import { queryPageBySlug } from '@/lib/utils/queryBySlug'
+import { generateMeta } from '@/lib/utils/generateMeta'
+import { notFound } from 'next/navigation'
+import { RenderHero } from '@/components/payload/heros'
+import { OptimizedLink } from '@/components/payload/Link/optimized-link'
 
-export const metadata: Metadata = {
-  title: 'Shop | BonaVista Leisurescapes',
-  description: 'Shop online at BonaVista Leisurescapes for premium water care solutions',
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await queryPageBySlug('shop')
+
+  return generateMeta({ doc: page, collectionSlug: PAGE_SLUG })
 }
 
-const carouselSlides = [
-  {
-    title: "Got a hot tub? We've got you.",
-    description: 'Complete water care solutions for your perfect spa experience',
-    image: '/728.jpg',
-    cta: 'Shop Now',
-    link: '/products',
-  },
-  {
-    title: 'Mineraluxe Hot Tub Care System',
-    description: 'Advanced fusion of natural minerals for crystal clear water',
-    image: '/swimspa.jpg',
-    cta: 'Learn More',
-    link: '/mineraluxe',
-  },
-  {
-    title: 'Professional Pool Care',
-    description: 'Everything you need for pristine pool maintenance',
-    image: '/chems.webp',
-    cta: 'Explore Products',
-    link: '/pool-care',
-  },
-]
+export default async function StoreHome() {
+  const payload = await getPayload()
 
-const featuredProducts = [
-  {
-    id: 1,
-    name: 'Mineraluxe Oxygen',
-    price: '40.24',
-    maxPrice: '92.80',
-    image: '/placeholder.svg?height=300&width=300',
-  },
-  {
-    id: 2,
-    name: 'Dazzle Alkalinity Plus',
-    price: '24.76',
-    image: '/placeholder.svg?height=300&width=300',
-  },
-  {
-    id: 3,
-    name: 'Pristiva Salt Pool Maintenance Kit',
-    price: '207.95',
-    image: '/placeholder.svg?height=300&width=300',
-  },
-  {
-    id: 4,
-    name: 'Dazzle Amaze Plus',
-    price: '42.44',
-    image: '/placeholder.svg?height=300&width=300',
-  },
-]
+  const shopLayout = await queryPageBySlug('shop')
+
+  if (!shopLayout) {
+    return notFound()
+  }
+
+  const bestSellers = await payload
+    .find({
+      collection: PRODUCT_SLUG,
+      depth: 1,
+      where: {
+        collections: {
+          in: [1],
+        },
+      },
+    })
+    .then((res) => {
+      return res.docs
+    })
+
+  return (
+    <Suspense fallback={<SkeletonShopHome />}>
+      <div className="flex flex-col min-h-screen gap-20">
+        <RenderHero {...shopLayout.hero} />
+
+        <section className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-[#1e365c]">Shop Our Top Selling Products</h2>
+            <div className="w-48 h-px bg-gray-200 mx-auto mt-4" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {bestSellers.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-white py-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-[#1e365c]">Shop by Category</h2>
+              <div className="w-48 h-px bg-gray-200 mx-auto mt-4" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {categories.map((category, index) => (
+                <Link
+                  key={index}
+                  className="relative overflow-hidden rounded-lg group"
+                  href={`/shop/category/${category.slug}`}
+                >
+                  <Image
+                    src={category.image}
+                    alt={category.name}
+                    width={400}
+                    height={400}
+                    className="w-full h-64 object-cover transition-transform group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                    <h3 className="text-white text-2xl font-bold">{category.name}</h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+        <section className="container mx-auto px-4 py-16">
+          <div className="bg-gradient-to-br from-white to-[#f8fbfd] rounded-3xl p-12 shadow-lg max-w-6xl mx-auto">
+            <div className="text-center mb-10">
+              <span className="inline-block px-4 py-1 bg-[#e8f1f5] text-[#1e365c] text-sm font-medium rounded-full mb-3">PREMIUM WATER CARE</span>
+              <h2 className="text-4xl font-bold text-[#1e365c] mt-2">
+                The Mineraluxe Hot Tub Care System
+              </h2>
+              <div className="w-24 h-1 bg-[#1e365c] mx-auto mt-4 rounded-full" />
+              <p className="text-gray-600 mt-4 max-w-2xl mx-auto">Experience crystal clear water with our advanced hot tub care solution</p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#1e365c] to-[#4a7eb5] rounded-lg blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+                <div className="relative">
+                  <Image
+                    src="/mineraluxe.jpg"
+                    alt="Mineraluxe Hot Tub Care System"
+                    width={600}
+                    height={600}
+                    className="rounded-lg shadow-md object-cover w-full h-auto"
+                  />
+                  <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg">
+                    <span className="text-[#1e365c] font-semibold">Trusted by professionals</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-8">
+                {mineraluxeSteps.map((step) => (
+                  <div key={step.number} className="flex gap-5 items-start group transition-all duration-200 hover:translate-x-1">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#1e365c] flex items-center justify-center text-white font-bold shadow-md">
+                      {step.number}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[#1e365c] text-xl">{step.title}</h3>
+                      <p className="text-gray-600 mt-2 leading-relaxed">{step.description}</p>
+                    </div>
+                  </div>
+                ))}
+                
+                <div className="pt-4">
+                  <OptimizedLink
+                    href="/shop/brand/mineraluxe"
+                    className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-white rounded-lg transition-all duration-300 transform hover:scale-105 bg-[#1e365c] hover:bg-[#2a4a7c] shadow-md hover:shadow-xl"
+                  >
+                    <ShoppingCartIcon className="w-5 h-5 mr-2" />
+                    SHOP MINERALUXE
+                  </OptimizedLink>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-[#c5e8f7] py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-[#1e365c] text-center mb-12">
+              Why Choose BonaVista
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <Star className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-[#1e365c] mb-2">Expert Advice</h3>
+                <p className="text-gray-600">
+                  Our team of pool and spa experts are here to help you make the best choices for
+                  your needs.
+                </p>
+              </div>
+              <div className="text-center">
+                <Truck className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-[#1e365c] mb-2">Fast Shipping</h3>
+                <p className="text-gray-600">
+                  Enjoy free shipping on orders over $250 in Toronto and quick delivery to your
+                  doorstep.
+                </p>
+              </div>
+              <div className="text-center">
+                <Shield className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-[#1e365c] mb-2">Quality Guarantee</h3>
+                <p className="text-gray-600">
+                  We stand behind the quality of our products with our satisfaction guarantee.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </Suspense>
+  )
+}
 
 const mineraluxeSteps = [
   {
@@ -102,168 +216,15 @@ const mineraluxeSteps = [
 
 const categories = [
   { name: 'Water Care', image: '/mineraluxe.jpg', slug: 'water-care' },
-  { name: 'Filters', image: '/mineraluxe.jpg', slug: 'filters' },
-  { name: 'Accessories', image: '/mineraluxe.jpg', slug: 'accessories' },
-  { name: 'Fragrances', image: '/mineraluxe.jpg', slug: 'fragrances' },
+  { name: 'Filters', image: '/api/media/file/75sqft-filter-5x20-18.webp', slug: 'filters' },
+  {
+    name: 'Accessories',
+    image: '/api/media/file/zephira-maintenance-kit.webp',
+    slug: 'accessories',
+  },
+  {
+    name: 'Fragrances',
+    image: '/api/media/file/aromatherapy-eucalyptus-salts-385-gm.webp',
+    slug: 'fragrances',
+  },
 ]
-
-export const dynamic = 'force-dynamic'
-
-export default async function StoreHome() {
-  const payload = await getPayload()
-
-  // const { docs: collections } = await payload.find({
-  //   collection: SHOP_COLLECTION_SLUG,
-  // })
-
-  // const page = await getCachedDocument<typeof PAGE_SLUG>(PAGE_SLUG, 'shop', 1)
-
-  // if (!page) {
-  //   return <div>Page not found</div>
-  // }
-
-  const bestSellers = await payload
-    .find({
-      collection: PRODUCT_SLUG,
-      depth: 1,
-      where: {
-        collections: {
-          in: [1],
-        },
-      },
-    })
-    .then((res) => {
-      return res.docs
-    })
-
-  return (
-    <Suspense fallback={<SkeletonShopHome />}>
-      <div className="flex flex-col min-h-screen bg-white">
-        <div className="flex-grow">
-          <div className="space-y-24 py-12">
-            <div className="container mx-auto px-4 z-0">
-              <Carousel slides={carouselSlides} />
-            </div>
-
-            {/* Top Selling Products */}
-            <section className="container mx-auto px-4">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-[#1e365c]">Shop Our Top Selling Products</h2>
-                <div className="w-48 h-px bg-gray-200 mx-auto mt-4" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {bestSellers.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            </section>
-
-            {/* Categories */}
-            <section className="bg-white py-16">
-              <div className="container mx-auto px-4">
-                <div className="text-center mb-12">
-                  <h2 className="text-3xl font-bold text-[#1e365c]">Shop by Category</h2>
-                  <div className="w-48 h-px bg-gray-200 mx-auto mt-4" />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                  {categories.map((category, index) => (
-                    <Link
-                      key={index}
-                      className="relative overflow-hidden rounded-lg group"
-                      href={`/shop/category/${category.slug}`}
-                    >
-                      <Image
-                        src={category.image}
-                        alt={category.name}
-                        width={400}
-                        height={400}
-                        className="w-full h-64 object-cover transition-transform group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                        <h3 className="text-white text-2xl font-bold">{category.name}</h3>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            {/* Mineraluxe System */}
-            <section className="container mx-auto px-4">
-              <div className="bg-white rounded-3xl p-12">
-                <div className="text-center mb-8">
-                  <h3 className="text-gray-600 uppercase tracking-wide">Allow us to introduce</h3>
-                  <h2 className="text-3xl font-bold text-[#1e365c] mt-2">
-                    The Mineraluxe Hot Tub Care System
-                  </h2>
-                  <p className="text-gray-600 mt-2">advanced hot tub care</p>
-                </div>
-                <div className="grid md:grid-cols-2 gap-12 items-center">
-                  <div className="relative">
-                    <Image
-                      src="/mineraluxe.jpg"
-                      alt="Mineraluxe Hot Tub Care System"
-                      width={600}
-                      height={600}
-                      className="rounded-lg"
-                    />
-                  </div>
-                  <div className="space-y-8">
-                    {mineraluxeSteps.map((step) => (
-                      <div key={step.number} className="flex gap-4">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#e8f1f5] flex items-center justify-center text-[#1e365c] font-bold">
-                          {step.number}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-[#1e365c] text-lg">{step.title}</h3>
-                          <p className="text-gray-600 mt-1">{step.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                    <Button className="w-full md:w-auto bg-[#1e365c] hover:bg-[#2a4a7c]">
-                      SHOP NOW!
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Why Choose Us */}
-            <section className="bg-[#c5e8f7] py-16">
-              <div className="container mx-auto px-4">
-                <h2 className="text-3xl font-bold text-[#1e365c] text-center mb-12">
-                  Why Choose BonaVista
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <div className="text-center">
-                    <Star className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-[#1e365c] mb-2">Expert Advice</h3>
-                    <p className="text-gray-600">
-                      Our team of pool and spa experts are here to help you make the best choices
-                      for your needs.
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <Truck className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-[#1e365c] mb-2">Fast Shipping</h3>
-                    <p className="text-gray-600">
-                      Enjoy free shipping on orders over $250 in Toronto and quick delivery to your
-                      doorstep.
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <Shield className="w-12 h-12 text-[#1e365c] mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-[#1e365c] mb-2">Quality Guarantee</h3>
-                    <p className="text-gray-600">
-                      We stand behind the quality of our products with our satisfaction guarantee.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
-        </div>
-      </div>
-    </Suspense>
-  )
-}

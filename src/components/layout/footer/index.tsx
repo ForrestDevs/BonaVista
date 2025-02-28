@@ -1,9 +1,5 @@
-// import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Logo } from '@/components/payload/Logo'
+import { Logo } from '@/components/layout/logo'
 import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa'
 import { InstagramLogoIcon } from '@radix-ui/react-icons'
 import Copyright from './copyright'
@@ -16,7 +12,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div className="space-y-6 flex flex-col">
             <Link href="/" className="flex items-center space-x-3">
-              <Logo />
+              <Logo className='h-[50px] sm:h-[55px] md:h-[60px] lg:h-[65px]' />
             </Link>
 
             <p className="text-sm leading-relaxed">

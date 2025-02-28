@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils/cn'
 import { formatMoney, formatStripeMoney } from '@/lib/utils/formatMoney'
 import { Media } from '@/components/payload/Media'
 import { Button } from '@/components/ui/button'
-import { PencilIcon } from '@/components/icons/PencilIcon'
+import { PencilIcon } from '@/components/icons/pencil'
 import { LineItemThumbnail } from './line-item-thumbnail'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
@@ -53,7 +53,7 @@ export function CheckoutForm({ initialSession }: CheckoutFormProps) {
       //     return
       //   }
       // }
-      
+
       // Update on server
       const updatedSession = await updateCheckoutStep({
         cartId: session.cartId,

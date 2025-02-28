@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils/cn'
 import { formatCurrency } from '@/lib/utils/formatMoney'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/navigation'
+import { OptimizedLink } from '@/components/payload/Link/optimized-link'
 
 type CartDrawerItemProps = {
   line: CartItem
@@ -36,6 +37,7 @@ export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
     })
 
     const product = typeof line.lineItem.product === 'object' ? line.lineItem.product : null
+    const slug = product?.slug
     const productTitle =
       typeof line.lineItem.product === 'object'
         ? line.lineItem.product.title
@@ -120,7 +122,11 @@ export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
             <div className="flex flex-col ml-4 gap-4 w-full h-full ">
               <div className="flex flex-row justify-between items-start w-full">
                 <div className="flex flex-col gap-1">
-                  <h3 className="font-medium text-neutral-900 text-base">{productTitle}</h3>
+                  <OptimizedLink href={`/shop/product/${slug}`}>
+                    <h3 className="font-medium text-neutral-900 text-base hover:underline hover:text-blue-500 transition-colors duration-200">
+                      {productTitle}
+                    </h3>
+                  </OptimizedLink>
                   {isVariant && (
                     <div className="text-sm text-neutral-700 font-normal">{variantOptions}</div>
                   )}

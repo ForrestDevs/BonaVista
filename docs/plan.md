@@ -128,7 +128,7 @@ Clean up admin dashboard add overview page
 
 Add pagination to product results
 Fix filtering and sort options
-finish up shop home page
+
 
 cart cookie expires in 7 days so we need to make a payload job to check if any cart docs are older than 7 days and not completed orders and delete them
 
@@ -137,7 +137,7 @@ add suspense to shop all hottubs/swimspas + shop home page
 
 optimize payload calls because sometimes images dont load on the shop page
 
-add product link on title to cart item 
+
 add thumbnail url + media id to the lineItem 
 
 add return and exchange policy page
@@ -155,14 +155,26 @@ cache optimizations:
    - pages (revalidateTag)
 
 
-FINALIZE SHOP
-- add mobile nav to shop
- - Use SKUS for Cart Items
- - Restructure Checkout Flow
- - Make sure guest order page works
- - When order is successful, add zoho webhook and send email to admin notifying the new order. (Add spire integration to this email)
+
+
  
 
 
 ECOM FLOW
 - Add product to cart from card or page (create cart if none)
+
+
+
+TODO
+- check cart merge logic with guest and customers cart 
+- add category images 
+- add product link on title to line item in order
+- Update orders page
+- Send email on order complete
+ - When order is successful, add zoho webhook and send email to admin notifying the new order. (Add spire integration to this email)
+- Handle customers and stripeIds
+- save shipping and billing address to customer account (after checkout is complete)
+- fix checkout race condition with steps
+
+- deploy to prod with live stripe keys
+- make sure payment button stays disabled until page is re routed to confirmation page

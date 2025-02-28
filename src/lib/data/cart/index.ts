@@ -36,6 +36,7 @@ export async function getGuestCart(): Promise<Cart | null> {
 }
 
 export async function getCustomerCart(customerId: number): Promise<Cart | null> {
+  console.log('getCustomerCart', customerId)
   const payload = await getPayload()
 
   try {
@@ -51,6 +52,7 @@ export async function getCustomerCart(customerId: number): Promise<Cart | null> 
     if (docs.length === 0) {
       return null
     }
+    console.log('docs', docs)
 
     return docs[0]
   } catch (error) {
@@ -243,6 +245,8 @@ export async function mergeCarts(customerId: number): Promise<Cart | null> {
 
   try {
     if (guestCart && customerCart) {
+      console.log('guestCart', guestCart)
+      console.log('customerCart', customerCart)
       const mergedItems = mergeItems(guestCart, customerCart)
       // Update customer's cart in the database
       const updatedCustomerCart = await payload.update({
@@ -291,12 +295,17 @@ export async function mergeCarts(customerId: number): Promise<Cart | null> {
 
       return updatedGuestCart
     } else if (customerCart && !guestCart) {
-    } else if (customerCart && !guestCart) {
+      // update the cart cookie
+      await setCartCookie({
+        id: customerCart.id,
+        linesCount: customerCart.lineItems.length,
+      })
+      revalidateTag(`cart-${customerCart.id}`)
       // Customer already has a cart, no need to merge
       return customerCart
     } else {
       // Both carts are null, this should only happen if a user registers with an empty cart
-      // In this case, we create a new cart for the customer
+      // In this case, we create a new cart for the customer when they add something to their cart
       return null
     }
   } catch (error) {
