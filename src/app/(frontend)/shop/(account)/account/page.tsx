@@ -10,6 +10,8 @@ import { CustomerDTO, getCustomerDTO } from '@/lib/data/customer'
 import { formatStripeMoney } from '@/lib/utils/formatMoney'
 import { redirect } from 'next/navigation'
 
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Account | BonaVista LeisureScapes',

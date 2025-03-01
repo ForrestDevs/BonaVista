@@ -25,7 +25,6 @@ export const ShopDesktopNav = async ({ className }: { className?: string }) => {
   return (
     <NavigationMenu className={className}>
       <NavigationMenuList className="flex flex-1 list-none items-center justify-center space-x-5 lg:space-x-6">
-        {/* All Products Link */}
         <NavigationMenuItem className="flex-none">
           <SingleLink
             href="/shop/products"
@@ -34,8 +33,6 @@ export const ShopDesktopNav = async ({ className }: { className?: string }) => {
             className="hover:underline underline-offset-4"
           />
         </NavigationMenuItem>
-
-        {/* Categories Dropdown */}
         <NavigationMenuItem className="relative">
           <Trigger className="text-lg">Categories</Trigger>
           <NavigationMenuContent className={cn(mainDropdownClass(), 'category-nav-content')}>
@@ -44,8 +41,6 @@ export const ShopDesktopNav = async ({ className }: { className?: string }) => {
             </NavigationMenuSub>
           </NavigationMenuContent>
         </NavigationMenuItem>
-
-        {/* Collections Dropdown */}
         <NavigationMenuItem className="relative">
           <Trigger className="text-lg">Collections</Trigger>
           <NavigationMenuContent className={collectionsDropdownClass()}>

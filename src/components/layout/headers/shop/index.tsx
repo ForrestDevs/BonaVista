@@ -1,14 +1,14 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import Link from 'next/link'
 import { Logo } from '@/components/layout/logo'
-import { YnsLink } from '@components/ui/link'
 import { UserIcon } from 'lucide-react'
 import { CartSummaryNav } from './cart/cart-summary-nav'
-import { SearchBar } from './search-bar'
+import { SearchBar, SearchFallback } from './search-bar'
 import { cn } from '@/lib/utils/cn'
 import { RemoveScroll } from 'react-remove-scroll'
 import { ShopDesktopNav } from './desktop-nav'
 import { MobileNav } from './mobile-nav'
+import { OptimizedLink } from '@/components/payload/Link/optimized-link'
 
 export async function ShopHeader() {
   return (
@@ -24,7 +24,7 @@ export async function ShopHeader() {
             <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 md:gap-4">
               <div className="flex items-center justify-start min-w-0">
                 <Link href="/" className="relative">
-                  <Logo className='h-[40px] sm:h-[45px] md:h-[50px] lg:h-[55px]' />
+                  <Logo className="h-[40px] sm:h-[45px] md:h-[50px] lg:h-[55px]" />
                 </Link>
               </div>
 
@@ -33,15 +33,17 @@ export async function ShopHeader() {
               </div>
 
               <div className="lg:col-span-1 flex items-center justify-end gap-1 sm:gap-1.5 md:gap-2 lg:gap-4 min-w-0">
-                <SearchBar />
+                <Suspense fallback={<SearchFallback />}>
+                  <SearchBar />
+                </Suspense>
                 <CartSummaryNav />
-                <YnsLink
+                <OptimizedLink
                   href="/shop/account"
                   className="hidden lg:flex relative items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors"
                 >
                   <UserIcon className="h-5 w-5" />
                   <span className="sr-only">User Account</span>
-                </YnsLink>
+                </OptimizedLink>
                 <MobileNav />
               </div>
             </div>

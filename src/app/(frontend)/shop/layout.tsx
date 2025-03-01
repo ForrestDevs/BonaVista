@@ -7,7 +7,15 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-screen flex flex-col">
       {children}
-     
+      <CartDrawerProvider>
+        <ShopHeader />
+        <TooltipProvider>
+          <div className="flex-1">
+            {children}
+            <CartDrawer />
+          </div>
+        </TooltipProvider>
+      </CartDrawerProvider>
     </div>
   )
 }

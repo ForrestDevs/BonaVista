@@ -117,6 +117,7 @@ export interface Config {
   auth: {
     users: UserAuthOperations;
   };
+  blocks: {};
   collections: {
     'blog-categories': BlogCategory;
     media: Media;
@@ -518,9 +519,10 @@ export interface Product {
    */
   priceMax?: number | null;
   reviews?: {
-    docs?: (number | ProductReview)[] | null;
-    hasNextPage?: boolean | null;
-  } | null;
+    docs?: (number | ProductReview)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -535,9 +537,10 @@ export interface Brand {
   slugLock?: boolean | null;
   name: string;
   products?: {
-    docs?: (number | Product)[] | null;
-    hasNextPage?: boolean | null;
-  } | null;
+    docs?: (number | Product)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -560,9 +563,10 @@ export interface ProductCollection {
   endDate?: string | null;
   publishedOn?: string | null;
   products?: {
-    docs?: (number | Product)[] | null;
-    hasNextPage?: boolean | null;
-  } | null;
+    docs?: (number | Product)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -590,13 +594,15 @@ export interface ProductCategory {
    */
   isLeaf?: boolean | null;
   children?: {
-    docs?: (number | ProductCategory)[] | null;
-    hasNextPage?: boolean | null;
-  } | null;
+    docs?: (number | ProductCategory)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   products?: {
-    docs?: (number | Product)[] | null;
-    hasNextPage?: boolean | null;
-  } | null;
+    docs?: (number | Product)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
 }

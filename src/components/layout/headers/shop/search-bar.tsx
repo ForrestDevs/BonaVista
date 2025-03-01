@@ -72,9 +72,9 @@ export function SearchBar({ className }: SearchBarProps = {}) {
 
   return (
     <div className={cn(className)}>
-      <Button 
-        variant="ghost" 
-        size="icon" 
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={() => setIsOpen(true)}
         className="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors"
         aria-label="Search products"
@@ -115,5 +115,20 @@ export function SearchBar({ className }: SearchBarProps = {}) {
         </div>
       )}
     </div>
+  )
+}
+
+export function SearchFallback() {
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      disabled
+      className="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors"
+      aria-label="Search products"
+    >
+      <Search className="h-5 w-5" />
+      <span className="sr-only">Search</span>
+    </Button>
   )
 }
