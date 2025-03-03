@@ -36,7 +36,7 @@ export const LatestPostsBlock: React.FC<
         </h2>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-8">
           <p className="text-base md:text-lg leading-relaxed text-gray-700 max-w-3xl">{body}</p>
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <CMSLink
               {...link}
               className="transition-all duration-200 hover:translate-y-[-2px] hover:shadow-lg"

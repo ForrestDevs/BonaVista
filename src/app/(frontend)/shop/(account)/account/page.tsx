@@ -52,7 +52,7 @@ export default async function Dashboard() {
 
           <div className="border-t border-ui-border-base dark:border-ui-border-base pt-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-12">
-              <div className="bg-ui-bg-base dark:bg-ui-bg-base p-6 rounded-lg shadow-sm">
+              <div className="bg-ui-bg-base dark:bg-ui-bg-base p-6 rounded-lg shadow-xs">
                 <h3 className="text-lg font-semibold mb-4 text-ui-fg-base dark:text-ui-fg-base">
                   Profile
                 </h3>
@@ -66,7 +66,7 @@ export default async function Dashboard() {
                 </div>
               </div>
 
-              <div className="bg-ui-bg-base dark:bg-ui-bg-base p-6 rounded-lg shadow-sm">
+              <div className="bg-ui-bg-base dark:bg-ui-bg-base p-6 rounded-lg shadow-xs">
                 <h3 className="text-lg font-semibold mb-4 text-ui-fg-base dark:text-ui-fg-base">
                   Addresses
                 </h3>

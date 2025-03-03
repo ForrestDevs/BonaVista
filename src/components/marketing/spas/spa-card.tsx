@@ -73,7 +73,7 @@ export function SpaCard({ spa, type }: SwimSpaCardProps) {
 
       <CardFooter className="bg-muted/50 p-4 mt-auto">
         <Link href={`/${prefix}/${spa.slug}`} className="w-full group">
-          <div className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-md inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
+          <div className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-md inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
             <span className="mr-2">View Details + Price</span>
             <ArrowUpRight className="w-4 h-4 transition-transform duration-100 ease-in-out group-hover:rotate-45" />
           </div>

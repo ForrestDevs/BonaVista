@@ -53,7 +53,7 @@ export const ShopDesktopNav = async ({ className }: { className?: string }) => {
                     href={`/shop/collection/${collection.slug}`}
                     title={collection.title}
                     variant="lg"
-                    className="p-4 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm"
+                    className="p-4 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-xs"
                     description="Explore our latest selection"
                   />
                 ))}

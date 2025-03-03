@@ -88,7 +88,7 @@ export function SearchBar({ className }: SearchBarProps = {}) {
             <form onSubmit={handleSubmit} className="flex items-center">
               <Input
                 placeholder="Search products..."
-                className="flex-grow"
+                className="grow"
                 autoFocus
                 type="search"
                 enterKeyHint="search"

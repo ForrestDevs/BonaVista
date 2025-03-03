@@ -35,7 +35,7 @@ export function ProductInfo() {
   ]
 
   return (
-    <div className="rounded-lg border p-6 shadow-sm">
+    <div className="rounded-lg border p-6 shadow-xs">
       <div className="grid gap-6">
         {infoSections.map(({ label, value }) => (
           <div

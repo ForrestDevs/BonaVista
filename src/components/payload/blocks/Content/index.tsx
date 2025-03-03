@@ -18,10 +18,10 @@ export const ContentBlock: React.FC<
   const { columns, gapX, gapY, id } = props
 
   const colsSpanClasses = {
-    full: '12',
-    half: '6',
-    oneThird: '4',
-    twoThirds: '8',
+    full: 'lg:col-span-12',
+    half: 'lg:col-span-6',
+    oneThird: 'lg:col-span-4',
+    twoThirds: 'lg:col-span-8',
   }
 
   const alignClasses = {
@@ -57,11 +57,12 @@ export const ContentBlock: React.FC<
 
               return (
                 <div
-                  className={cn(`relative col-span-4 lg:col-span-${colsSpanClasses[size!]}`, {
+                  className={cn('relative col-span-4', colsSpanClasses[size!], {
                     'md:col-span-2': size !== 'full',
-
-                    [`min-h-[${height}px]`]: height,
                   })}
+                  style={{
+                    minHeight: height ? `${height}px` : '',
+                  }}
                   key={index}
                 >
                   {enableBackgroundImage && backgroundImage && (

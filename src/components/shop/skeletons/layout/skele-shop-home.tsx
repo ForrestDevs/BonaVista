@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 export default function SkeletonShopHome() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <main className="flex-grow">
+      <main className="grow">
         <div className="space-y-24 py-12">
           {/* Hero Carousel Skeleton */}
           <div className="container mx-auto px-4">

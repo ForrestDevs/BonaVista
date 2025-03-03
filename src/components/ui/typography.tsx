@@ -35,7 +35,7 @@ export function H4(props: Props) {
 }
 
 export function P(props: Props) {
-  return <p className="leading-7 [&:not(:first-child)]:mt-6">{props.children}</p>
+  return <p className="leading-7 not-first:mt-6">{props.children}</p>
 }
 
 export function Blockquote(props: Props) {

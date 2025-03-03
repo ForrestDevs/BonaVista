@@ -275,7 +275,7 @@ export function ShippingStep({
                       className="flex flex-col p-4 border rounded-lg cursor-pointer hover:bg-gray-50 peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-50"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 mt-1">
+                        <div className="shrink-0 mt-1">
                           {isPickup ? (
                             <svg
                               xmlns="http://www.w3.org/2000/svg"

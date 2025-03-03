@@ -63,7 +63,7 @@ export function AddToCartButton() {
   return (
     <div className="mt-6 space-y-4">
       <div className="flex items-center gap-4">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <QuantitySelector />
         </div>
         <Button

@@ -3,7 +3,6 @@ import { cn } from '@lib/utils/cn'
 import { OptimizedLink } from './optimized-link'
 import type { Page, Post } from '@payload-types'
 import { Button, type ButtonProps } from '@components/ui/button'
-import Link from 'next/link'
 
 type CMSLinkType = {
   appearance?: 'inline' | ButtonProps['variant']

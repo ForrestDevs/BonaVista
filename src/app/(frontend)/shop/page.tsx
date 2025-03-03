@@ -2,8 +2,7 @@ import getPayload from '@lib/utils/getPayload'
 import { PAGE_SLUG, PRODUCT_SLUG } from '@payload/collections/constants'
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { cache, Fragment, Suspense } from 'react'
-import { Button } from '@components/ui/button'
+import { Suspense } from 'react'
 import {
   ChevronRightIcon,
   SparklesIcon,
@@ -101,8 +100,9 @@ export default async function StoreHome() {
             </div>
           </div>
         </section>
+
         <section className="container mx-auto px-4 py-16">
-          <div className="bg-gradient-to-br from-white to-[#f8fbfd] rounded-3xl p-12 shadow-lg max-w-6xl mx-auto">
+          <div className="bg-linear-to-br from-white to-[#f8fbfd] rounded-3xl p-12 shadow-lg max-w-6xl mx-auto">
             <div className="text-center mb-10">
               <span className="inline-block px-4 py-1 bg-[#e8f1f5] text-[#1e365c] text-sm font-medium rounded-full mb-3">
                 PREMIUM WATER CARE
@@ -118,7 +118,7 @@ export default async function StoreHome() {
 
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#1e365c] to-[#4a7eb5] rounded-lg blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+                <div className="absolute -inset-1 bg-linear-to-r from-[#1e365c] to-[#4a7eb5] rounded-lg blur-sm opacity-25 group-hover:opacity-40 transition duration-300"></div>
                 <div className="relative">
                   <Image
                     src="/mineraluxe.jpg"
@@ -127,7 +127,7 @@ export default async function StoreHome() {
                     height={600}
                     className="rounded-lg shadow-md object-cover w-full h-auto"
                   />
-                  <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg">
+                  <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-xs px-4 py-2 rounded-lg">
                     <span className="text-[#1e365c] font-semibold">Trusted by professionals</span>
                   </div>
                 </div>
@@ -139,7 +139,7 @@ export default async function StoreHome() {
                     key={step.number}
                     className="flex gap-5 items-start group transition-all duration-200 hover:translate-x-1"
                   >
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#1e365c] flex items-center justify-center text-white font-bold shadow-md">
+                    <div className="shrink-0 w-10 h-10 rounded-full bg-[#1e365c] flex items-center justify-center text-white font-bold shadow-md">
                       {step.number}
                     </div>
                     <div>

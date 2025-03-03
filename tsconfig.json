@@ -62,7 +62,6 @@
     ".next/types/**/*.ts",
     "redirects.js",
     "next.config.js", 
-    "tailwind.config.ts"
   ],
   "exclude": [
     "node_modules"

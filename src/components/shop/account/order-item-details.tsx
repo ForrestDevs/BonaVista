@@ -6,7 +6,7 @@ import getPayload from '@/lib/utils/getPayload'
 import { Suspense } from 'react'
 
 function ThumbnailSkeleton() {
-  return <div className="h-24 w-24 flex-shrink-0 rounded-md bg-neutral-100 animate-pulse" />
+  return <div className="h-24 w-24 shrink-0 rounded-md bg-neutral-100 animate-pulse" />
 }
 
 async function ThumbnailImage({ id }: { id: number }) {
@@ -38,7 +38,7 @@ export async function OrderItemThumbnail({ lineItem }: { lineItem: OrderItem }) 
         className="block w-full transition-all duration-200 hover:opacity-80"
         href={`/product/${product?.slug}`}
       >
-        <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
+        <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xs">
           {mediaId ? (
             <div className="absolute inset-0">
               <ThumbnailImage id={mediaId} />

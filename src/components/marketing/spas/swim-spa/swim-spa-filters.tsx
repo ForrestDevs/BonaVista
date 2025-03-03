@@ -71,7 +71,7 @@ export default function SpaFilters() {
     <div className="lg:block">
       {/* Mobile Filter Trigger */}
       <button
-        className="lg:hidden w-full flex items-center justify-between p-4 bg-white rounded-lg shadow"
+        className="lg:hidden w-full flex items-center justify-between p-4 bg-white rounded-lg shadow-sm"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="font-medium">Filters</span>
@@ -88,7 +88,7 @@ export default function SpaFilters() {
       {/* Filter Content */}
       <div
         className={cn(
-          'space-y-6 p-4 bg-white rounded-lg shadow h-fit',
+          'space-y-6 p-4 bg-white rounded-lg shadow-sm h-fit',
           'lg:block',
           'fixed lg:static inset-x-0 bottom-0 z-50',
           'transition-transform duration-300',

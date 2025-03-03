@@ -65,7 +65,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
         </p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 space-y-3">
+      <div className="bg-white rounded-xl shadow-xs p-4 sm:p-6 space-y-3">
         <p className="text-gray-600">
           Order date: <span className="text-gray-900">{formatDateTime(order.createdAt)}</span>
         </p>
@@ -87,7 +87,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Order Items */}
-      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+      <div className="bg-white rounded-xl shadow-xs p-4 sm:p-6">
         <h2 className="text-xl font-semibold mb-6">Items</h2>
         <div className="divide-y divide-gray-100">
           {order.lineItems?.map(({ lineItem }) => (
@@ -96,7 +96,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
               className="flex flex-col sm:flex-row sm:items-center justify-between py-4 hover:bg-gray-50 transition-colors rounded-lg px-3 gap-4"
             >
               <div className="flex items-center gap-x-4 sm:gap-x-6">
-                <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-lg border overflow-hidden flex-shrink-0">
+                <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-lg border overflow-hidden shrink-0">
                   <OrderItemThumbnail lineItem={lineItem} />
                 </div>
                 <OrderItemDetails lineItem={lineItem} />
@@ -119,7 +119,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Delivery Section */}
-      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+      <div className="bg-white rounded-xl shadow-xs p-4 sm:p-6">
         <h2 className="text-xl font-semibold mb-6">Delivery Information</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="space-y-3">
@@ -163,7 +163,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Order Summary */}
-      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+      <div className="bg-white rounded-xl shadow-xs p-4 sm:p-6">
         <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
         <div className="space-y-3 sm:max-w-md sm:ml-auto">
           <div className="flex justify-between text-gray-600">
