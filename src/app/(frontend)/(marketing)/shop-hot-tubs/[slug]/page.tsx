@@ -21,7 +21,6 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug } = await params
   const spa = await querySpaBySlug(slug)
 
-
   return generateMeta({ doc: spa, collectionSlug: SPA_SLUG })
 }
 
@@ -173,7 +172,7 @@ function Specs({ product }: { product: Spa }) {
     <div className="container">
       <div className="text-sm uppercase tracking-wide text-sky-600 mb-6">Specifications</div>
 
-      <div className="grid lg:grid-cols-[1fr,400px] gap-12">
+      <div className="grid lg:grid-cols-[1fr_400px] gap-12">
         <div className="space-y-12">
           <h1 className="text-4xl font-light tracking-tight text-slate-900 lg:text-5xl">
             {product.title}

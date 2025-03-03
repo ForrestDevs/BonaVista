@@ -38,15 +38,28 @@ export const TestimonialBlock: React.FC<
   }
 
   return (
-    <section className={cn('py-12 container')} id={`block-${id}`}>
-      <div className="flex flex-col lg:flex-row items-center gap-8">
-        <div className="w-full lg:w-1/2">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{title}</h2>
-          <p className="text-gray-700 mb-6">{body}</p>
-          <CMSLink {...link} className="rounded-none" />
-        </div>
+    <section className="w-full container py-8 sm:py-12" id={`block-${id}`}>
+      <div className="px-4 sm:px-0">
+        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+          <div className="w-full lg:w-1/2 text-left">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight mb-4 md:mb-6">
+              {title}
+            </h2>
+            <p className="text-base md:text-lg leading-relaxed text-gray-700 mb-4 md:mb-6">
+              {body}
+            </p>
+            <CMSLink
+              {...link}
+              className={cn(
+                'transition-all duration-200',
+                'hover:translate-y-[-2px] hover:shadow-lg',
+              )}
+              size="lg"
+            />
+          </div>
 
-        <TestimonialsCarousel testimonials={testimonials} />
+          <TestimonialsCarousel testimonials={testimonials} />
+        </div>
       </div>
     </section>
   )

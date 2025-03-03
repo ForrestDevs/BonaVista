@@ -7,6 +7,7 @@ import { CUSTOMER_SLUG, USER_SLUG } from '@payload/collections/constants'
 import { headers as getHeaders } from 'next/headers'
 import { cookies } from 'next/headers'
 import { mergeCarts } from '../cart'
+import { deleteCartCookie } from '../cookies'
 
 export async function login(data: LoginSchema) {
   const payload = await getPayload()
@@ -27,20 +28,22 @@ export async function login(data: LoginSchema) {
     console.log('user logged in')
   } catch (error) {
     console.error(error)
-    return { message: 'Invalid email or password' }
+    return { status: 'error', message: 'Invalid email or password' }
   }
 
-  const customerId = typeof user?.customer === 'string' ? user.customer : user.customer.id
+  const customerId = typeof user?.customer === 'number' ? user.customer : user.customer.id
 
   console.log('merging carts')
   const mergedCarts = await mergeCarts(customerId)
+  console.log('mergedCarts', mergedCarts)
 
   if (!mergedCarts) {
-    return { message: 'User logged in' }
+    return { status: 'success', message: 'Logged in successfully' }
   }
 
   return {
-    message: 'User logged in and carts merged',
+    status: 'success',
+    message: 'Logged in successfully',
   }
 }
 
@@ -59,6 +62,7 @@ export async function logout() {
 
   if (data.message) {
     cookiestore.delete('payload-token')
+    await deleteCartCookie()
     return {
       message: 'User logged out',
     }

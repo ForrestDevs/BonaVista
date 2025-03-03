@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button'
 import { beginCheckoutSession } from '@/lib/data/checkout'
 import { BeginCheckoutParams } from '@/lib/types/checkout'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 interface CheckoutButtonProps extends BeginCheckoutParams {

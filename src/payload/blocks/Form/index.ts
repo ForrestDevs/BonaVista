@@ -13,6 +13,8 @@ export const Form: Block = {
     plural: 'Form Blocks',
     singular: 'Form Block',
   },
+  imageAltText: 'FormBlock',
+  imageURL: '/block-icons/form.png',
   interfaceName: 'FormBlock',
   fields: [
     {

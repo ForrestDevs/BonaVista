@@ -13,7 +13,7 @@ const BRANDS = [
   'Pleatco',
   'Mursatt',
   'Pharma Spa',
-  'Inspairations',
+  'Insparations',
   'Dream Scents',
   'Solei',
   'Leader',
@@ -52,7 +52,9 @@ async function seedBrands() {
 seedBrands()
   .then(() => {
     console.log('Brands seeded')
+    process.exit(0)
   })
   .catch((error) => {
     console.error('Error seeding brands:', error)
+    process.exit(1)
   })

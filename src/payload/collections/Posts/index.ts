@@ -35,27 +35,13 @@ const Posts: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    group: 'Blog',
+    group: 'Website',
     description: 'Blog posts',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
-      url: ({ data }) => {
-        const path = generatePreviewPath({
-          slug: typeof data?.slug === 'string' ? data.slug : '',
-          collection: 'posts',
-        })
-
-        return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
-      },
+      url: () => `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
     },
-    preview: (data) => {
-      const path = generatePreviewPath({
-        slug: typeof data?.slug === 'string' ? data.slug : '',
-        collection: 'posts',
-      })
-
-      return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
-    },
+    preview: () => `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
     useAsTitle: 'title',
   },
   fields: [

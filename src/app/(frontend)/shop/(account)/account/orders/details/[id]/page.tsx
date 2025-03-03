@@ -41,14 +41,16 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
     notFound()
   }
 
-  const customer = typeof order.orderedBy === 'string' ? null : order.orderedBy
-  const user = typeof customer?.account === 'string' ? null : customer.account
+  const customer = typeof order.orderedBy === 'object' ? order.orderedBy : null
+  const user = typeof customer?.account === 'object' ? customer.account : null
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 px-4 sm:px-6 py-8 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">Order Details</h1>
-        <Link 
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
+          Order Details
+        </h1>
+        <Link
           href="/shop/account/orders"
           className="flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
         >
@@ -58,41 +60,55 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
 
       <div className="bg-blue-50 p-4 rounded-lg">
         <p className="text-blue-800 text-sm sm:text-base">
-          Order confirmation details have been sent to <span className="font-semibold">{customer?.email}</span>
+          Order confirmation details have been sent to{' '}
+          <span className="font-semibold">{customer?.email}</span>
         </p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 space-y-3">
-        <p className="text-gray-600">Order date: <span className="text-gray-900">{formatDateTime(order.createdAt)}</span></p>
-        <p>Order number: <span className="font-medium text-blue-600">{order.id}</span></p>
+      <div className="bg-white rounded-xl shadow-xs p-4 sm:p-6 space-y-3">
+        <p className="text-gray-600">
+          Order date: <span className="text-gray-900">{formatDateTime(order.createdAt)}</span>
+        </p>
+        <p>
+          Order number: <span className="font-medium text-blue-600">{order.id}</span>
+        </p>
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-12">
-          <p>Status: <span className="font-medium capitalize">{order.status || 'Not fulfilled'}</span></p>
-          <p>Payment: <span className="font-medium">{order.status === 'succeeded' ? 'Paid' : 'Awaiting Payment'}</span></p>
+          <p>
+            Status:{' '}
+            <span className="font-medium capitalize">{order.status || 'Not fulfilled'}</span>
+          </p>
+          <p>
+            Payment:{' '}
+            <span className="font-medium">
+              {order.status === 'succeeded' ? 'Paid' : 'Awaiting Payment'}
+            </span>
+          </p>
         </div>
       </div>
 
       {/* Order Items */}
-      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+      <div className="bg-white rounded-xl shadow-xs p-4 sm:p-6">
         <h2 className="text-xl font-semibold mb-6">Items</h2>
         <div className="divide-y divide-gray-100">
-          {order.items?.map((item) => (
-            <div 
-              key={item.id} 
+          {order.lineItems?.map(({ lineItem }) => (
+            <div
+              key={lineItem.sku}
               className="flex flex-col sm:flex-row sm:items-center justify-between py-4 hover:bg-gray-50 transition-colors rounded-lg px-3 gap-4"
             >
               <div className="flex items-center gap-x-4 sm:gap-x-6">
-                <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-lg border overflow-hidden flex-shrink-0">
-                  <OrderItemThumbnail line={item} />
+                <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-lg border overflow-hidden shrink-0">
+                  <OrderItemThumbnail lineItem={lineItem} />
                 </div>
-                <OrderItemDetails item={item} />
+                <OrderItemDetails lineItem={lineItem} />
               </div>
               <div className="text-left sm:text-right">
                 <p className="text-gray-600">
-                  {item.quantity}x {formatStripeMoney({ amount: item.price, currency: order.currency })}
+                  {lineItem.quantity}x{' '}
+                  {formatStripeMoney({ amount: lineItem.price, currency: order.currency })}
                 </p>
                 <p className="font-medium text-lg mt-1">
                   {formatStripeMoney({
-                    amount: item.quantity * item.price,
+                    amount: lineItem.quantity * lineItem.price,
                     currency: order.currency,
                   })}
                 </p>
@@ -103,7 +119,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Delivery Section */}
-      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+      <div className="bg-white rounded-xl shadow-xs p-4 sm:p-6">
         <h2 className="text-xl font-semibold mb-6">Delivery Information</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="space-y-3">
@@ -117,7 +133,8 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                 <p>{order.paymentIntent?.shipping.address.line2}</p>
               )}
               <p>
-                {order.paymentIntent?.shipping.address.city}, {order.paymentIntent?.shipping.address.state}
+                {order.paymentIntent?.shipping.address.city},{' '}
+                {order.paymentIntent?.shipping.address.state}
               </p>
               <p>{order.paymentIntent?.shipping.address.country}</p>
             </div>
@@ -146,7 +163,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
       </div>
 
       {/* Order Summary */}
-      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+      <div className="bg-white rounded-xl shadow-xs p-4 sm:p-6">
         <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
         <div className="space-y-3 sm:max-w-md sm:ml-auto">
           <div className="flex justify-between text-gray-600">
@@ -155,7 +172,9 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
           </div>
           <div className="flex justify-between text-gray-600">
             <p>Shipping</p>
-            <p>{formatStripeMoney({ amount: order.shippingRate.rate, currency: order.currency })}</p>
+            <p>
+              {formatStripeMoney({ amount: order.shippingRate.rate, currency: order.currency })}
+            </p>
           </div>
           <div className="flex justify-between text-gray-600">
             <p>Taxes</p>
@@ -163,7 +182,9 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
           </div>
           <div className="flex justify-between font-medium text-lg pt-3 border-t">
             <p>Total</p>
-            <p className="text-blue-600">{formatStripeMoney({ amount: order.total, currency: order.currency })}</p>
+            <p className="text-blue-600">
+              {formatStripeMoney({ amount: order.total, currency: order.currency })}
+            </p>
           </div>
         </div>
       </div>
@@ -172,14 +193,14 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
       <div className="bg-gray-50 rounded-xl p-4 sm:p-6">
         <h2 className="text-xl font-semibold mb-4">Need Help?</h2>
         <div className="space-y-3">
-          <Link 
-            href="/contact" 
+          <Link
+            href="/contact"
             className="block text-blue-600 hover:text-blue-800 transition-colors hover:underline"
           >
             Contact Support
           </Link>
-          <Link 
-            href="/returns" 
+          <Link
+            href="/returns"
             className="block text-blue-600 hover:text-blue-800 transition-colors hover:underline"
           >
             Returns & Exchanges Policy

@@ -1,383 +1,470 @@
-import Papa from 'papaparse'
-import getPayload from '../utils/getPayload'
-import { PRODUCT_SLUG } from '@/payload/collections/constants'
-import { Product } from '@payload-types'
-import { BasePayload } from 'payload'
+// import Papa from 'papaparse'
+// import getPayload from '../utils/getPayload'
+// import { PRODUCT_SLUG } from '@/payload/collections/constants'
+// import { Product } from '@payload-types'
+// import { BasePayload } from 'payload'
 
-function extractVariantInfo(
-  size: string,
-  payload: BasePayload,
-): { label: string; value: string } | null {
-  payload.logger.info(`— Extracting variant info for: ${size}`)
+// function extractVariantInfo(
+//   size: string,
+//   payload: BasePayload,
+// ): { label: string; value: string } | null {
+//   payload.logger.info(`— Extracting variant info for: ${size}`)
 
-  if (!size) {
-    payload.logger.info(`— No size provided`)
-    return null
-  }
+//   if (!size) {
+//     payload.logger.info(`— No size provided`)
+//     return null
+//   }
 
-  // First try to match weight/volume patterns
-  const weightMatch = size.match(/(\d+(?:\.\d+)?)\s*(kg|g|gm|ml|l|lb)\s*$/i)
-  if (weightMatch) {
-    // Standardize unit to lowercase and handle variations
-    let unit = weightMatch[2].toLowerCase()
-    switch (unit) {
-      case 'gm':
-        unit = 'g'
-        break
-      case 'l':
-        unit = 'L'
-        break
-      case 'ml':
-        unit = 'mL'
-        break
-      case 'kg':
-        unit = 'kg'
-        break
-      case 'lb':
-        unit = 'lb'
-        break
-      default:
-        payload.logger.error(`— Unknown unit: ${unit}`)
-        unit = weightMatch[2]
-        break
-    }
-    payload.logger.info(`— Weight Match found: ${weightMatch[1]} ${unit}`)
-    return {
-      label: 'Size',
-      value: `${weightMatch[1]} ${unit}`,
-    }
-  }
-}
+//   // First try to match weight/volume patterns
+//   const weightMatch = size.match(/(\d+(?:\.\d+)?)\s*(kg|g|gm|ml|l|lb)\s*$/i)
+//   if (weightMatch) {
+//     // Standardize unit to lowercase and handle variations
+//     let unit = weightMatch[2].toLowerCase()
+//     switch (unit) {
+//       case 'gm':
+//         unit = 'g'
+//         break
+//       case 'l':
+//         unit = 'L'
+//         break
+//       case 'ml':
+//         unit = 'mL'
+//         break
+//       case 'kg':
+//         unit = 'kg'
+//         break
+//       case 'lb':
+//         unit = 'lb'
+//         break
+//       default:
+//         payload.logger.error(`— Unknown unit: ${unit}`)
+//         unit = weightMatch[2]
+//         break
+//     }
+//     payload.logger.info(`— Weight Match found: ${weightMatch[1]} ${unit}`)
+//     return {
+//       label: 'Size',
+//       value: `${weightMatch[1]} ${unit}`,
+//     }
+//   }
+// }
 
-function getBaseProductTitle(title: string): string {
-  return title.replace(/\s+\d+(\.\d+)?\s*(kg|g|ml|l)\s*$/i, '').trim()
-}
+// function getBaseProductTitle(title: string): string {
+//   return title.replace(/\s+\d+(\.\d+)?\s*(kg|g|ml|l)\s*$/i, '').trim()
+// }
 
-async function updateProducts() {
-  const payload = await getPayload()
-  payload.logger.info('— Starting product updates')
+// async function updateProducts() {
+//   const payload = await getPayload()
+//   payload.logger.info('— Starting product updates')
 
-  // Cache existing products
-  const productCache = new Map<string, Product>()
+//   // Cache existing products
+//   const productCache = new Map<string, Product>()
 
-  const existingProducts = await payload.find({
-    collection: PRODUCT_SLUG,
-    limit: 1000,
-    depth: 1, // To get category references
-  })
+//   const existingProducts = await payload.find({
+//     collection: PRODUCT_SLUG,
+//     limit: 1000,
+//     depth: 1, // To get category references
+//   })
 
-  existingProducts.docs.forEach((product) => {
-    productCache.set(product.title, product)
-  })
+//   existingProducts.docs.forEach((product) => {
+//     productCache.set(product.title, product)
+//   })
 
-  payload.logger.info(`— Cached ${productCache.size} products`)
+//   payload.logger.info(`— Cached ${productCache.size} products`)
 
-  // Fetch CSV data
-  const response = await fetch(
-    'https://docs.google.com/spreadsheets/d/e/2PACX-1vQWhQK-G9A66WjSl753kkok8R1jQZLVt3apg3SJ2pNgIvomLL2rBnsfJNWe7Rbxro7veHBwpWI-mRKM/pub?gid=845501447&single=true&output=csv',
-  )
-  const csvText = await response.text()
+//   // Fetch CSV data
+//   const response = await fetch(
+//     'https://docs.google.com/spreadsheets/d/e/2PACX-1vQWhQK-G9A66WjSl753kkok8R1jQZLVt3apg3SJ2pNgIvomLL2rBnsfJNWe7Rbxro7veHBwpWI-mRKM/pub?gid=845501447&single=true&output=csv',
+//   )
+//   const csvText = await response.text()
 
-  const { data } = Papa.parse(csvText, {
-    header: true,
-    skipEmptyLines: true,
-  })
+//   const { data } = Papa.parse(csvText, {
+//     header: true,
+//     skipEmptyLines: true,
+//   })
 
-  // Group variants
-  const productGroups = new Map<string, any[]>()
+//   // Group variants
+//   const productGroups = new Map<string, any[]>()
 
-  data
-    .filter((row: any) => row.active === 'T')
-    .forEach((row: any) => {
-      const baseTitle = getBaseProductTitle(row.name)
-      if (!productGroups.has(baseTitle)) {
-        productGroups.set(baseTitle, [])
-      }
-      productGroups.get(baseTitle)!.push(row)
-    })
+//   data
+//     .filter((row: any) => row.active === 'T')
+//     .forEach((row: any) => {
+//       const baseTitle = getBaseProductTitle(row.name)
+//       if (!productGroups.has(baseTitle)) {
+//         productGroups.set(baseTitle, [])
+//       }
+//       productGroups.get(baseTitle)!.push(row)
+//     })
 
-  // Function to find related products
-  function findRelatedProducts(currentProduct: Product): string[] {
-    const relatedProducts = new Set<string>()
-    const otherProducts = Array.from(productCache.values()).filter(
-      (p) => p.id !== currentProduct.id,
-    )
+//   // Function to find related products
+//   function findRelatedProducts(currentProduct: Product): number[] {
+//     const MAX_RELATED_PRODUCTS = 5
+//     const MIN_CATEGORY_MATCHES = 2
 
-    // First try to find products in the same categories
-    const sameCategory = otherProducts
-      .filter((p) => p.categories?.some((cat) => currentProduct.categories?.includes(cat)))
-      .sort(() => Math.random() - 0.5) // Randomize selection
-      .slice(0, 5)
+//     // Filter out current product and get other products
+//     const otherProducts = Array.from(productCache.values()).filter(
+//       (p) => p.id !== currentProduct.id && p._status === 'published',
+//     )
 
-    sameCategory.forEach((p) => relatedProducts.add(p.id))
+//     // Score and sort products by relevance
+//     const scoredProducts = otherProducts.map((product) => {
+//       let score = 0
 
-    // If we need more, add random products from other categories
-    if (relatedProducts.size < 2) {
-      const remaining = otherProducts
-        .filter((p) => !relatedProducts.has(p.id))
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 2)
+//       // Category match score
+//       const categoryMatches =
+//         product.categories?.filter((cat) => currentProduct.categories?.includes(cat)).length ?? 0
+//       score += categoryMatches * 2
 
-      remaining.forEach((p) => relatedProducts.add(p.id))
-    }
+//       // Brand match score
+//       if (product.brand?.[0] === currentProduct.brand?.[0]) {
+//         score += 1
+//       }
 
-    return Array.from(relatedProducts).slice(0, 5)
-  }
+//       // Compatibility match score
+//       const compatibilityMatches =
+//         product.compatibility?.filter((c) => currentProduct.compatibility?.includes(c)).length ?? 0
+//       score += compatibilityMatches
 
-  // Update each product
-  for (const [baseTitle, variants] of productGroups) {
-    const existingProduct = productCache.get(baseTitle)
-    if (!existingProduct) {
-      payload.logger.warn(`— Product not found in database: ${baseTitle}`)
-      continue
-    }
-    payload.logger.info(`— Updating product: ${baseTitle}`)
-    const relatedProducts = findRelatedProducts(existingProduct)
-    const hasVariants = variants.length > 1
-    if (hasVariants) {
-      payload.logger.info(`— Product ${baseTitle} has variants: ${variants.length}`)
-    }
+//       return { id: product.id, score }
+//     })
 
-    if (!hasVariants) {
-      // Single product
-      try {
-        await payload.update({
-          collection: PRODUCT_SLUG,
-          id: existingProduct.id,
-          data: {
-            moreInfo: {
-              root: {
-                children: [
-                  {
-                    children: [
-                      {
-                        detail: 0,
-                        format: 0,
-                        mode: 'normal',
-                        style: '',
-                        text: variants[0].long_description,
-                        type: 'text',
-                        version: 1,
-                      },
-                    ],
-                    direction: 'ltr',
-                    format: '',
-                    indent: 0,
-                    type: 'paragraph',
-                    version: 1,
-                    textFormat: 0,
-                    textStyle: '',
-                  },
-                ],
-                direction: 'ltr',
-                format: '',
-                indent: 0,
-                type: 'root',
-                version: 1,
-              },
-            },
-            relatedProducts,
-          },
-        })
-      } catch (error) {
-        payload.logger.error(`— Error updating product ${baseTitle}:`, error)
-      }
-    } else {
-      // Process all variant info upfront
-      const variantsInfo = variants.map((v) => ({
-        ...v,
-        variantInfo: extractVariantInfo(v.size, payload),
-      }))
+//     // Sort by score and add randomization factor for variety
+//     const sortedProducts = scoredProducts
+//       .sort((a, b) => b.score - a.score || Math.random() - 0.5)
+//       .map((p) => p.id)
 
-      const firstVariantInfo = variantsInfo[0].variantInfo
-      if (!firstVariantInfo) {
-        payload.logger.error(`— No variant info found for: ${variants[0].name}`)
-        continue
-      }
-      try {
-        await payload.update({
-          collection: PRODUCT_SLUG,
-          id: existingProduct.id,
-          data: {
-            moreInfo: {
-              root: {
-                children: [
-                  {
-                    children: [
-                      {
-                        detail: 0,
-                        format: 0,
-                        mode: 'normal',
-                        style: '',
-                        text: variants[0].long_description,
-                        type: 'text',
-                        version: 1,
-                      },
-                    ],
-                    direction: 'ltr',
-                    format: '',
-                    indent: 0,
-                    type: 'paragraph',
-                    version: 1,
-                    textFormat: 0,
-                    textStyle: '',
-                  },
-                ],
-                direction: 'ltr',
-                format: '',
-                indent: 0,
-                type: 'root',
-                version: 1,
-              },
-            },
-            relatedProducts,
-            variants: {
-              variantProducts: existingProduct.variants.variantProducts.map((existingVariant) => {
-                const variant = variantsInfo.find((v) => v.sku === existingVariant.sku)
-                return {
-                  options: [variant.variantInfo?.value.toLowerCase().replace(/\s+/g, '-') || ''],
-                  sku: existingVariant.sku,
-                  price: existingVariant.price,
-                  productActive: existingVariant.productActive,
-                  soldOnline: existingVariant.soldOnline,
-                  images: existingVariant.images,
-                  info: {
-                    options: [
-                      {
-                        slug: variant.variantInfo?.value.toLowerCase().replace(/\s+/g, '-') || '',
-                        key: {
-                          slug: 'size',
-                          label: 'Size',
-                        },
-                        label: variant.variantInfo?.value || '',
-                      },
-                    ],
-                  },
-                }
-              }),
-            },
-          },
-        })
-      } catch (error) {
-        payload.logger.error(`— Error updating product ${baseTitle}:`, error)
-      }
-    }
-  }
+//     // Ensure minimum category matches if possible
+//     const relatedProducts = new Set<number>()
+//     const categoryMatches = otherProducts
+//       .filter((p) => p.categories?.some((cat) => currentProduct.categories?.includes(cat)))
+//       .map((p) => p.id)
+//       .slice(0, MIN_CATEGORY_MATCHES)
 
-  payload.logger.info('— Updates completed')
-}
+//     categoryMatches.forEach((id) => relatedProducts.add(id))
 
-// // Run the update
-updateProducts()
-  .then(() => {
-    console.log('Update completed successfully')
-    process.exit(0)
-  })
-  .catch((error) => {
-    console.error('Update failed:', error)
-    process.exit(1)
-  })
+//     // Fill remaining slots with highest scored products
+//     sortedProducts.forEach((id) => {
+//       if (relatedProducts.size < MAX_RELATED_PRODUCTS) {
+//         relatedProducts.add(id)
+//       }
+//     })
 
-async function updateAmazePlus() {
-  const payload = await getPayload()
-  payload.logger.info('— Starting Amaze Plus updates')
+//     return Array.from(relatedProducts)
+//   }
 
-  // Cache existing products
-  const productCache = new Map<string, Product>()
+//   // Update each product
+//   for (const [baseTitle, variants] of productGroups) {
+//     const existingProduct = productCache.get(baseTitle)
+//     if (!existingProduct) {
+//       payload.logger.warn(`— Product not found in database: ${baseTitle}`)
+//       continue
+//     }
+//     payload.logger.info(`— Updating product: ${baseTitle}`)
+//     const relatedProducts = findRelatedProducts(existingProduct)
+//     const hasVariants = variants.length > 1
+//     if (hasVariants) {
+//       payload.logger.info(`— Product ${baseTitle} has variants: ${variants.length}`)
+//     }
 
-  const existingProducts = await payload.find({
-    collection: PRODUCT_SLUG,
-    limit: 1000,
-    depth: 1, // To get category references
-  })
+//     if (!hasVariants) {
+//       // Single product
+//       try {
+//         await payload.update({
+//           collection: PRODUCT_SLUG,
+//           id: existingProduct.id,
+//           data: {
+//             moreInfo: {
+//               root: {
+//                 children: [
+//                   {
+//                     children: [
+//                       {
+//                         detail: 0,
+//                         format: 0,
+//                         mode: 'normal',
+//                         style: '',
+//                         text: variants[0].long_description,
+//                         type: 'text',
+//                         version: 1,
+//                       },
+//                     ],
+//                     direction: 'ltr',
+//                     format: '',
+//                     indent: 0,
+//                     type: 'paragraph',
+//                     version: 1,
+//                     textFormat: 0,
+//                     textStyle: '',
+//                   },
+//                 ],
+//                 direction: 'ltr',
+//                 format: '',
+//                 indent: 0,
+//                 type: 'root',
+//                 version: 1,
+//               },
+//             },
+//             relatedProducts,
+//           },
+//         })
+//       } catch (error) {
+//         payload.logger.error(`— Error updating product ${baseTitle}:`, error)
+//       }
+//     } else {
+//       // Process all variant info upfront
+//       const variantsInfo = variants.map((v) => ({
+//         ...v,
+//         variantInfo: extractVariantInfo(v.size, payload),
+//       }))
 
-  existingProducts.docs.forEach((product) => {
-    productCache.set(product.title, product)
-  })
+//       const firstVariantInfo = variantsInfo[0].variantInfo
+//       if (!firstVariantInfo) {
+//         payload.logger.error(`— No variant info found for: ${variants[0].name}`)
+//         continue
+//       }
+//       try {
+//         await payload.update({
+//           collection: PRODUCT_SLUG,
+//           id: existingProduct.id,
+//           data: {
+//             moreInfo: {
+//               root: {
+//                 children: [
+//                   {
+//                     children: [
+//                       {
+//                         detail: 0,
+//                         format: 0,
+//                         mode: 'normal',
+//                         style: '',
+//                         text: variants[0].long_description,
+//                         type: 'text',
+//                         version: 1,
+//                       },
+//                     ],
+//                     direction: 'ltr',
+//                     format: '',
+//                     indent: 0,
+//                     type: 'paragraph',
+//                     version: 1,
+//                     textFormat: 0,
+//                     textStyle: '',
+//                   },
+//                 ],
+//                 direction: 'ltr',
+//                 format: '',
+//                 indent: 0,
+//                 type: 'root',
+//                 version: 1,
+//               },
+//             },
+//             relatedProducts,
+//             variants: {
+//               variantProducts: existingProduct.variants.variantProducts.map((existingVariant) => {
+//                 const variant = variantsInfo.find((v) => v.sku === existingVariant.sku)
+//                 return {
+//                   options: [variant.variantInfo?.value.toLowerCase().replace(/\s+/g, '-') || ''],
+//                   sku: existingVariant.sku,
+//                   price: existingVariant.price,
+//                   productActive: existingVariant.productActive,
+//                   soldOnline: existingVariant.soldOnline,
+//                   images: existingVariant.images,
+//                   info: {
+//                     options: [
+//                       {
+//                         slug: variant.variantInfo?.value.toLowerCase().replace(/\s+/g, '-') || '',
+//                         key: {
+//                           slug: 'size',
+//                           label: 'Size',
+//                         },
+//                         label: variant.variantInfo?.value || '',
+//                       },
+//                     ],
+//                   },
+//                 }
+//               }),
+//             },
+//           },
+//         })
+//       } catch (error) {
+//         payload.logger.error(`— Error updating product ${baseTitle}:`, error)
+//       }
+//     }
+//   }
 
-  const amaze = await payload.findByID({
-    collection: PRODUCT_SLUG,
-    id: '67a1d872f69929cf5c183c32',
-    depth: 1,
-  })
+//   payload.logger.info('— Updates completed')
+// }
 
-  function findRelatedProducts(currentProduct: Product): string[] {
-    const relatedProducts = new Set<string>()
-    const otherProducts = Array.from(productCache.values()).filter(
-      (p) => p.id !== currentProduct.id,
-    )
+// // // Run the update
+// updateProducts()
+//   .then(() => {
+//     console.log('Update completed successfully')
+//     process.exit(0)
+//   })
+//   .catch((error) => {
+//     console.error('Update failed:', error)
+//     process.exit(1)
+//   })
 
-    // First try to find products in the same categories
-    const sameCategory = otherProducts
-      .filter((p) => p.categories?.some((cat) => currentProduct.categories?.includes(cat)))
-      .sort(() => Math.random() - 0.5) // Randomize selection
-      .slice(0, 5)
+// async function updateAmazePlus() {
+//   const payload = await getPayload()
+//   payload.logger.info('— Starting Amaze Plus updates')
 
-    sameCategory.forEach((p) => relatedProducts.add(p.id))
+//   // Cache existing products
+//   const productCache = new Map<string, Product>()
 
-    // If we need more, add random products from other categories
-    if (relatedProducts.size < 2) {
-      const remaining = otherProducts
-        .filter((p) => !relatedProducts.has(p.id))
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 2)
+//   const existingProducts = await payload.find({
+//     collection: PRODUCT_SLUG,
+//     limit: 1000,
+//     depth: 1, // To get category references
+//   })
 
-      remaining.forEach((p) => relatedProducts.add(p.id))
-    }
+//   existingProducts.docs.forEach((product) => {
+//     productCache.set(product.title, product)
+//   })
 
-    return Array.from(relatedProducts).slice(0, 5)
-  }
+//   const amaze = await payload.findByID({
+//     collection: PRODUCT_SLUG,
+//     id: '67a1d872f69929cf5c183c32',
+//     depth: 1,
+//   })
 
-  const relatedProducts = findRelatedProducts(amaze)
+//   function findRelatedProducts(currentProduct: Product): string[] {
+//     const relatedProducts = new Set<string>()
+//     const otherProducts = Array.from(productCache.values()).filter(
+//       (p) => p.id !== currentProduct.id,
+//     )
 
-  try {
-    await payload.update({
-      collection: PRODUCT_SLUG,
-      id: amaze.id,
-      data: {
-        relatedProducts,
-        moreInfo: {
-          root: {
-            children: [
-              {
-                children: [
-                  {
-                    detail: 0,
-                    format: 0,
-                    mode: 'normal',
-                    style: '',
-                    text: 'Powerful active oxygen shock treament with a chlorine boost. Use weekly to rid pool water of non-filterable wastes, restoring water sparkle and comfort while providing a gentle boost to the chlorine residual. Contains a blend of oxidizers, clarifiers and water enhancers for optimal performance. Ideal for use with chlorine sanitizers. Recommended as Step 1 of the PureWow Pool Care System.',
-                    type: 'text',
-                    version: 1,
-                  },
-                ],
-                direction: 'ltr',
-                format: '',
-                indent: 0,
-                type: 'paragraph',
-                version: 1,
-                textFormat: 0,
-                textStyle: '',
-              },
-            ],
-            direction: 'ltr',
-            format: '',
-            indent: 0,
-            type: 'root',
-            version: 1,
-          },
-        },
-      },
-    })
-  } catch (error) {
-    payload.logger.error(`— Error updating product Amaze Plus`, error)
-  }
-}
+//     // First try to find products in the same categories
+//     const sameCategory = otherProducts
+//       .filter((p) => p.categories?.some((cat) => currentProduct.categories?.includes(cat)))
+//       .sort(() => Math.random() - 0.5) // Randomize selection
+//       .slice(0, 5)
 
-// updateAmazePlus()
+//     sameCategory.forEach((p) => relatedProducts.add(p.id))
+
+//     // If we need more, add random products from other categories
+//     if (relatedProducts.size < 2) {
+//       const remaining = otherProducts
+//         .filter((p) => !relatedProducts.has(p.id))
+//         .sort(() => Math.random() - 0.5)
+//         .slice(0, 2)
+
+//       remaining.forEach((p) => relatedProducts.add(p.id))
+//     }
+
+//     return Array.from(relatedProducts).slice(0, 5)
+//   }
+
+//   const relatedProducts = findRelatedProducts(amaze)
+
+//   try {
+//     await payload.update({
+//       collection: PRODUCT_SLUG,
+//       id: amaze.id,
+//       data: {
+//         relatedProducts,
+//         moreInfo: {
+//           root: {
+//             children: [
+//               {
+//                 children: [
+//                   {
+//                     detail: 0,
+//                     format: 0,
+//                     mode: 'normal',
+//                     style: '',
+//                     text: 'Powerful active oxygen shock treament with a chlorine boost. Use weekly to rid pool water of non-filterable wastes, restoring water sparkle and comfort while providing a gentle boost to the chlorine residual. Contains a blend of oxidizers, clarifiers and water enhancers for optimal performance. Ideal for use with chlorine sanitizers. Recommended as Step 1 of the PureWow Pool Care System.',
+//                     type: 'text',
+//                     version: 1,
+//                   },
+//                 ],
+//                 direction: 'ltr',
+//                 format: '',
+//                 indent: 0,
+//                 type: 'paragraph',
+//                 version: 1,
+//                 textFormat: 0,
+//                 textStyle: '',
+//               },
+//             ],
+//             direction: 'ltr',
+//             format: '',
+//             indent: 0,
+//             type: 'root',
+//             version: 1,
+//           },
+//         },
+//       },
+//     })
+//   } catch (error) {
+//     payload.logger.error(`— Error updating product Amaze Plus`, error)
+//   }
+// }
+
+// // updateAmazePlus()
+// //   .then(() => {
+// //     process.exit(0)
+// //   })
+// //   .catch((error) => {
+// //     process.exit(1)
+// //   })
+
+// import getPayload from '../utils/getPayload'
+// import { PRODUCT_SLUG } from '@/payload/collections/constants'
+
+/**
+ * Updates all products to have a _status of 'draft'
+ * This is useful when you want to temporarily hide all products from the frontend
+ * while still being able to edit them in the admin panel.
+ */
+// async function updateProductsToDraft() {
+//   const payload = await getPayload()
+
+//   try {
+//     // Get all products
+//     const { docs: products, totalDocs } = await payload.find({
+//       collection: PRODUCT_SLUG,
+//       limit: 1000, // Adjust if you have more products
+//     })
+
+//     payload.logger.info(`— Found ${totalDocs} products to update to draft status`)
+
+//     // Update each product to draft status
+//     let successCount = 0
+//     let errorCount = 0
+
+//     for (const product of products) {
+//       try {
+//         await payload.update({
+//           collection: PRODUCT_SLUG,
+//           id: product.id,
+//           data: {
+//             _status: 'published',
+//           },
+//         })
+
+//         payload.logger.info(`— Updated product "${product.title}" to draft status`)
+//         successCount++
+//       } catch (error) {
+//         payload.logger.error(error, `— Error updating product "${product.title}" to draft status`)
+//         errorCount++
+//       }
+//     }
+
+//     payload.logger.info(`— Completed updating products to draft status`)
+//     payload.logger.info(`— Success: ${successCount}, Errors: ${errorCount}`)
+//   } catch (error) {
+//     payload.logger.error(`— Error fetching products`, error)
+//   }
+// }
+
+// // Uncomment to run the script
+// updateProductsToDraft()
 //   .then(() => {
 //     process.exit(0)
 //   })
 //   .catch((error) => {
+//     console.error('Script failed:', error)
 //     process.exit(1)
 //   })

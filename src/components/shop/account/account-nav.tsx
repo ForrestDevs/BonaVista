@@ -105,13 +105,6 @@ export default function AccountNav() {
               Log out
             </button>
           </form>
-          {/* <YnsLink
-            href="/logout"
-            className="flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50"
-          >
-            <ArrowRightSquare className="mr-3 h-6 w-6" aria-hidden="true" />
-            Log out
-          </YnsLink> */}
         </nav>
       </div>
     </div>

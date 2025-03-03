@@ -1,6 +1,4 @@
-'use client'
-
-import React, { useMemo } from 'react'
+import React from 'react'
 import {
   Table,
   TableBody,
@@ -9,22 +7,22 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { getCachedGlobal } from '@/lib/utils/getGlobals'
 
-const hoursConfig = [
-  { day: 'Monday', hours: 'Closed' },
-  { day: 'Tuesday', hours: 'Closed' },
-  { day: 'Wednesday', hours: '10am - 6pm' },
-  { day: 'Thursday', hours: '10am - 6pm' },
-  { day: 'Friday', hours: '10am - 6pm' },
-  { day: 'Saturday', hours: '10am - 5pm' },
-  { day: 'Sunday', hours: '10am - 3pm' },
-]
+function formatTime(time: string) {
+  return new Date(time).toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  })
+}
 
-export default function HoursTable() {
-  const currentDay = useMemo(() => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-    return days[new Date().getDay()]
-  }, [])
+export default async function HoursTable() {
+  const hours = await getCachedGlobal('store-hours')
+
+  const currentDay = hours.days.find(
+    (day) => day.dayOfWeek === new Date().toLocaleDateString('en-US', { weekday: 'long' }),
+  )
 
   return (
     <Table>
@@ -35,13 +33,19 @@ export default function HoursTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {hoursConfig.map((item) => (
+        {hours.days.map((item) => (
           <TableRow
-            key={item.day}
-            className={item.day === currentDay ? 'bg-primary text-primary-foreground' : ''}
+            key={item.dayOfWeek}
+            className={
+              item.dayOfWeek === currentDay?.dayOfWeek ? 'bg-primary text-primary-foreground' : ''
+            }
           >
-            <TableCell>{item.day}</TableCell>
-            <TableCell>{item.hours}</TableCell>
+            <TableCell>{item.dayOfWeek}</TableCell>
+            <TableCell>
+              {item.isClosed
+                ? 'Closed'
+                : `${formatTime(item.openTime)} - ${formatTime(item.closeTime)}`}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>

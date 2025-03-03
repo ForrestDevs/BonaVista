@@ -5,7 +5,6 @@ import { CallToActionBlock } from '@components/payload/blocks/CallToAction'
 import { ContentBlock } from '@components/payload/blocks/Content'
 import { FormBlock } from '@components/payload/blocks/Form'
 import { MediaBlock } from '@components/payload/blocks/MediaBlock'
-import { ShopArchiveBlock } from '@components/payload/blocks/ShopArchive'
 import { TestimonialBlock } from './TestimonialBlock'
 import { ContactBlock } from './ContactBlock'
 import { TypographyBlock } from './Typography'
@@ -21,7 +20,6 @@ const blockComponents = {
   cta: CallToActionBlock,
   form: FormBlock,
   mediaBlock: MediaBlock,
-  'shop-archive': ShopArchiveBlock,
   testimonials: TestimonialBlock,
   contact: ContactBlock,
   typography: TypographyBlock,

@@ -23,7 +23,7 @@ function getAllCategoryPaths(product: Product): BreadcrumbPath[] {
 
   // Convert each category's fullSlug into a path
   product.categories?.forEach((category) => {
-    if (typeof category === 'string') return // Skip if it's just an ID
+    if (typeof category === 'number') return // Skip if it's just an ID
 
     const slugs = category.fullSlug?.split('/') || []
 
@@ -88,8 +88,8 @@ export default function ProductBreadcrumb({
             <Link
               href={`/shop/category/${category.fullSlug}`}
               className={cn(
-                "hover:text-foreground transition-colors truncate max-w-[150px] sm:max-w-[200px]",
-                index === currentPath?.categories?.length - 1 && "font-medium text-foreground"
+                'hover:text-foreground transition-colors truncate max-w-[150px] sm:max-w-[200px]',
+                index === currentPath?.categories?.length - 1 && 'font-medium text-foreground',
               )}
               title={category.title}
             >
@@ -99,7 +99,10 @@ export default function ProductBreadcrumb({
         ))}
         <li className="flex items-center">
           <span className="mx-2 text-muted-foreground/50">/</span>
-          <span className="font-medium text-foreground truncate max-w-[150px] sm:max-w-[200px]" title={product.title}>
+          <span
+            className="font-medium text-foreground truncate max-w-[150px] sm:max-w-[200px]"
+            title={product.title}
+          >
             {product.title}
           </span>
         </li>

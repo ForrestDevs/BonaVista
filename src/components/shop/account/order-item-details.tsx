@@ -6,10 +6,10 @@ import getPayload from '@/lib/utils/getPayload'
 import { Suspense } from 'react'
 
 function ThumbnailSkeleton() {
-  return <div className="h-24 w-24 flex-shrink-0 rounded-md bg-neutral-100 animate-pulse" />
+  return <div className="h-24 w-24 shrink-0 rounded-md bg-neutral-100 animate-pulse" />
 }
 
-async function ThumbnailImage({ id }: { id: string }) {
+async function ThumbnailImage({ id }: { id: number }) {
   const payload = await getPayload()
   const media = await payload.findByID({
     collection: 'media',
@@ -27,10 +27,10 @@ async function ThumbnailImage({ id }: { id: string }) {
   )
 }
 
-export async function OrderItemThumbnail({ line }: { line: OrderItem }) {
-  const product = typeof line.product === 'object' ? line.product : null
+export async function OrderItemThumbnail({ lineItem }: { lineItem: OrderItem }) {
+  const product = typeof lineItem.product === 'object' ? lineItem.product : null
   const mediaId =
-    typeof line.thumbnailMediaId === 'object' ? line.thumbnailMediaId.id : line.thumbnailMediaId
+    typeof lineItem.thumbnail === 'object' ? lineItem.thumbnail.id : lineItem.thumbnail
 
   return (
     <div className="w-16 sm:w-24">
@@ -38,7 +38,7 @@ export async function OrderItemThumbnail({ line }: { line: OrderItem }) {
         className="block w-full transition-all duration-200 hover:opacity-80"
         href={`/product/${product?.slug}`}
       >
-        <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
+        <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xs">
           {mediaId ? (
             <div className="absolute inset-0">
               <ThumbnailImage id={mediaId} />
@@ -52,11 +52,12 @@ export async function OrderItemThumbnail({ line }: { line: OrderItem }) {
   )
 }
 
-export default function OrderItemDetails({ item }: { item: OrderItem }) {
-  const productTitle = typeof item.product === 'object' ? item.product.title : item.product
-  const isVariant = item.isVariant
+export default function OrderItemDetails({ lineItem }: { lineItem: OrderItem }) {
+  const productTitle =
+    typeof lineItem.product === 'object' ? lineItem.product.title : lineItem.product
+  const isVariant = lineItem.isVariant
   const variantOptions = isVariant
-    ? item.variant.variantOptions.map((v) => v.value.label).join(', ')
+    ? lineItem.variantOptions.map((v) => v.value.label).join(', ')
     : null
 
   return (

@@ -14,8 +14,8 @@ import { createHeadlessEditor } from '@lexical/headless'
 import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical'
 
 interface Cache {
-  brands: Map<string, string>
-  categories: Map<string, string>
+  brands: Map<string, number>
+  categories: Map<string, number>
 }
 
 const cache: Cache = {
@@ -84,7 +84,7 @@ function standardizeBrandName(name: string): string {
     .join(' ')
 }
 
-function getCachedBrand(brandName: string, payload: BasePayload): string | undefined {
+function getCachedBrand(brandName: string, payload: BasePayload): number | undefined {
   let standardizedName: string
 
   if (brandName === 'NatChem' || brandName === 'A&B') {
@@ -104,7 +104,7 @@ function getCachedBrand(brandName: string, payload: BasePayload): string | undef
   return brandId
 }
 
-function getCachedCategory(categoryName: string, payload: BasePayload): string | undefined {
+function getCachedCategory(categoryName: string, payload: BasePayload): number | undefined {
   const categoryId = cache.categories.get(categoryName.trim())
 
   if (!categoryId) {
@@ -121,7 +121,7 @@ async function createMedia(
   title: string,
   size: string,
   payload: BasePayload,
-): Promise<string> {
+): Promise<number | null> {
   payload.logger.info(`— Creating media for: ${title}`)
 
   const validatedUrl = validate_image_url(imageUrl)
@@ -249,7 +249,7 @@ async function getOrCreateMedia(
   title: string,
   size: string,
   payload: BasePayload,
-): Promise<string> {
+): Promise<number | null> {
   payload.logger.info(`— Checking media for: ${title}`)
 
   // First try to find existing media

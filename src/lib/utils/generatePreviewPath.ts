@@ -1,4 +1,4 @@
-import { CollectionSlug } from 'payload'
+import { CollectionSlug, PayloadRequest } from 'payload'
 import { previewAction } from '../data/preview'
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
@@ -10,22 +10,18 @@ const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
 type Props = {
   collection: keyof typeof collectionPrefixMap
   slug: string
+  req: PayloadRequest
 }
 
-export const generatePreviewPath = ({ collection, slug }: Props) => {
-  const path = `${collectionPrefixMap[collection]}/${slug}`
-
-  const params = {
+export const generatePreviewPath = async ({ collection, slug }: Props) => {
+  const encodedParams = new URLSearchParams({
     slug,
     collection,
-    path,
-  }
-
-  const encodedParams = new URLSearchParams()
-
-  Object.entries(params).forEach(([key, value]) => {
-    encodedParams.append(key, value)
+    path: `${collectionPrefixMap[collection]}/${slug}`,
+    previewSecret: process.env.NEXT_PUBLIC_DRAFT_SECRET || '',
   })
 
-  return previewAction(encodedParams.toString())
+  const url = `/live-preview?${encodedParams.toString()}`
+
+  return url
 }

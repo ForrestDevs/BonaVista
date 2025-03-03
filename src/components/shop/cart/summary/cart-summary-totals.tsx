@@ -16,19 +16,21 @@ interface CartSummaryTotalsProps {
 
 export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
   const { isUpdating } = useCart()
-  const subtotal = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0) ?? 0
+  const subtotal =
+    cart.lineItems.reduce((acc, item) => acc + item.lineItem.price * item.lineItem.quantity, 0) ?? 0
 
-  const lineItems: CheckoutLineItem[] = cart.items.map((line) => {
-    const price = line.price
-    const quantity = line.quantity
-    const productId = typeof line.product === 'object' ? line.product.id : line.product
-    const product = typeof line.product === 'object' ? line.product : null
+  const lineItems: CheckoutLineItem[] = cart.lineItems.map((line) => {
+    const price = line.lineItem.price
+    const quantity = line.lineItem.quantity
+    const productId =
+      typeof line.lineItem.product === 'object' ? line.lineItem.product.id : line.lineItem.product
+    const product = typeof line.lineItem.product === 'object' ? line.lineItem.product : null
     const productTitle = product?.title ?? 'N/A'
     const productDescription = product?.description ?? 'No description available'
-    const isVariant = line.isVariant
+    const isVariant = line.lineItem.isVariant
     const variantProduct = isVariant
       ? (product?.variants.variantProducts.find(
-          (v) => v.id === line.variantId,
+          (v) => v.sku === line.lineItem.sku,
         ) as EnhancedProductVariant)
       : null
 
@@ -39,26 +41,23 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
         label: option.label,
       },
     }))
-    const sku = isVariant ? variantProduct?.sku : (product?.baseProduct?.sku ?? '')
     const media = isVariant
       ? (variantProduct?.images[0]?.image ?? null)
       : (product?.baseProduct?.images[0]?.image ?? null)
 
-    const thumbnail = typeof media === 'string' ? media : media?.id
+    const thumbnail = typeof media === 'number' ? media : (media?.id ?? null)
 
     const newCheckoutLineItem: CheckoutLineItem = {
       productId: productId,
-      sku: sku,
+      sku: line.lineItem.sku,
       title: productTitle,
       description: productDescription,
-      price: price * 100, // Stripe expects the price in cents
+      price: price, // price in floating point will convert to cents within server action when creating checkout session
       quantity: quantity,
       thumbnailMediaId: thumbnail,
       isVariant: isVariant,
-      variant: {
-        id: line.variantId,
-        variantOptions: variantOptions,
-      },
+      variantOptions: variantOptions,
+      url: line.lineItem.url,
     }
 
     return newCheckoutLineItem
@@ -108,7 +107,7 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
         <CheckoutButton
           amount={subtotal}
           currencyCode="CAD"
-          description={`Order for ${cart.items.length} items`}
+          description={`Order for ${cart.lineItems.length} items`}
           cartId={cart.id}
           lineItems={lineItems}
           stripeCustomerId={customer?.stripeCustomerId}

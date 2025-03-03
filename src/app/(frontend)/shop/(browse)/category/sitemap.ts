@@ -8,7 +8,7 @@ export async function generateSitemaps() {
   const categories = await getAllCategories()
   const totalCategories = categories.length
   const numSitemaps = Math.ceil(totalCategories / 50000)
-  return Array.from({ length: numSitemaps }, (_, i) => ({ id: i }))
+  return Array.from({ length: numSitemaps }, (_, i) => ({ id: i + 1 }))
 }
 
 export default async function sitemap({ id }: { id: number }): Promise<MetadataRoute.Sitemap> {

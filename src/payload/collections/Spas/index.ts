@@ -12,6 +12,7 @@ export const Spas: CollectionConfig = {
   slug: SPA_SLUG,
   admin: {
     useAsTitle: 'title',
+    group: 'Website',
   },
   access: {
     create: admins,

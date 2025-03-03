@@ -16,12 +16,6 @@ export const PostTag: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'path', 'updatedAt', 'createdAt'],
   },
-  versions: {
-    drafts: {
-      autosave: false,
-    },
-    maxPerDoc: 10,
-  },
   fields: [
     ...slugField(),
     {

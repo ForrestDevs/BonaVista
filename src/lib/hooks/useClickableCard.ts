@@ -6,10 +6,10 @@ import { useCallback, useEffect, useRef } from 'react'
 
 type UseClickableCardType<T extends HTMLElement> = {
   card: {
-    ref: RefObject<T>
+    ref: RefObject<T | null>
   }
   link: {
-    ref: RefObject<HTMLAnchorElement>
+    ref: RefObject<HTMLAnchorElement | null>
   }
 }
 
@@ -93,12 +93,12 @@ function useClickableCard<T extends HTMLElement>({
 
   return {
     card: {
-      ref: card as RefObject<T>,
+      ref: card as RefObject<T | null>,
     },
     link: {
-      ref: link as RefObject<HTMLAnchorElement>,
+      ref: link as RefObject<HTMLAnchorElement | null>,
     },
-  }
+  };
 }
 
 export default useClickableCard

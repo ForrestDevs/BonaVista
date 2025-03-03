@@ -30,7 +30,13 @@ export default function MobileNav({ header }: { header: Header }) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden" style={{ zIndex: 10 }}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="lg:hidden"
+          style={{ zIndex: 10 }}
+          aria-label="Open Mobile Navigation Menu"
+        >
           <MenuIcon />
         </Button>
       </SheetTrigger>
@@ -136,34 +142,34 @@ export default function MobileNav({ header }: { header: Header }) {
         </nav> */}
         <nav className="flex flex-col gap-4 py-6">
           <div className="overflow-y-auto px-4 pb-12 pt-4">
-            {header.siteHeader.navItems.map((item) => (
-              <div key={item.navItem.label} className="py-2">
-                {item.navItem.isLink ? (
+            {header.site.items.map(({ item }) => (
+              <div key={item.label} className="py-2">
+                {item.isLink ? (
                   <CMSLink
-                    {...item.navItem.link}
+                    {...item.link}
                     className="block py-2 text-lg font-medium"
                     isNavItem
                     onClick={() => setOpen(false)}
                   >
-                    {item.navItem.label}
+                    {item.label}
                   </CMSLink>
                 ) : (
                   <Collapsible>
                     <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-lg font-medium [&[data-state=open]>svg]:rotate-90 [&>svg]:transition-transform [&>svg]:duration-300">
-                      {item.navItem.label}
+                      {item.label}
                       <ChevronRight className="h-4 w-4" />
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                      {item.navItem.submenu?.map((subItem) => (
+                      {item.submenu?.map((subItem) => (
                         <div key={subItem.label} className="pl-4">
-                          {subItem.sublinks?.length > 0 ? (
+                          {subItem.links?.length > 0 ? (
                             <Collapsible>
                               <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-base [&[data-state=open]>svg]:rotate-90 [&>svg]:transition-transform [&>svg]:duration-300">
                                 {subItem.label}
                                 <ChevronRight className="h-4 w-4 " />
                               </CollapsibleTrigger>
                               <CollapsibleContent>
-                                {subItem.sublinks.map((sublink) => (
+                                {subItem.links.map((sublink) => (
                                   <CMSLink
                                     key={sublink.label}
                                     {...sublink}

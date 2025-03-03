@@ -31,9 +31,10 @@ const Trigger = React.forwardRef<
 >(({ className, children, showChevron = true, ...props }, ref) => (
   <NavigationMenuPrimitive.Trigger
     ref={ref}
-    className={
-      'relative group text-base lg:text-lg xl:text-xl hover:text-gray-700 transition-colors duration-200 flex items-center'
-    }
+    className={cn(
+      'relative group text-base lg:text-lg xl:text-xl hover:text-gray-700 transition-colors duration-200 flex items-center',
+      className,
+    )}
     {...props}
   >
     {children}{' '}
@@ -59,12 +60,20 @@ NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName
 const NavigationMenuSub = NavigationMenuPrimitive.Sub
 
 interface SingleLinkProps {
-  link: Header['siteHeader']['navItems'][number]['navItem']['link']
+  link: Header['site']['items'][number]['item']['link']
   title: string
   variant?: 'sm' | 'md' | 'lg' | 'none'
+  isNavItem?: boolean
+  className?: string
 }
 
-const SingleLink: React.FC<SingleLinkProps> = ({ link, title, variant = 'md' }) => {
+const SingleLink: React.FC<SingleLinkProps> = ({
+  link,
+  title,
+  variant = 'md',
+  isNavItem = false,
+  className,
+}) => {
   const sizeClasses = {
     sm: 'text-sm lg:text-base xl:text-lg',
     md: 'text-base lg:text-lg xl:text-xl',
@@ -73,14 +82,17 @@ const SingleLink: React.FC<SingleLinkProps> = ({ link, title, variant = 'md' }) 
   }
 
   const styleClasses = cn(
-    variant !== 'none'
-      ? 'text-black hover:text-gray-700 transition-colors duration-200 relative group'
-      : '',
+    variant !== 'none' ? 'text-black transition-colors duration-200 relative group' : '',
     sizeClasses[variant],
+    className,
   )
 
+  if (isNavItem) {
+    return <span className={styleClasses}>{title}</span>
+  }
+
   return (
-    <CMSLink {...link} label={title} className={styleClasses} isNavItem>
+    <CMSLink {...link} label={title} className={styleClasses} isNavItem={true} appearance="link">
       <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-200 group-hover:w-full"></span>
     </CMSLink>
   )

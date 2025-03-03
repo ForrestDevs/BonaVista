@@ -4,10 +4,10 @@ import { CartItem } from '@/lib/types/cart'
 import React from 'react'
 
 export function CartItemThumbnail({ line }: { line: CartItem }) {
-  const product = typeof line.product === 'object' ? line.product : null
-  const isVariant = line.isVariant
+  const product = typeof line.lineItem.product === 'object' ? line.lineItem.product : null
+  const isVariant = line.lineItem.isVariant
   const thumbnail = isVariant
-    ? product?.variants.variantProducts.find((v) => v.id === line.variantId)?.images[0]?.image
+    ? product?.variants.variantProducts.find((v) => v.sku === line.lineItem.sku)?.images[0]?.image
     : product?.baseProduct?.images[0]?.image
 
   return (
@@ -16,16 +16,16 @@ export function CartItemThumbnail({ line }: { line: CartItem }) {
         className="transition-colors hover:text-muted-foreground w-full"
         href={`/product/${product?.slug}`}
       >
-        <div className="rounded-lg relative w-full overflow-hidden transition-shadow ease-in-out duration-150 aspect-[1/1] border border-muted">
+        <div className="rounded-lg relative w-full overflow-hidden transition-shadow ease-in-out duration-150 aspect-1/1 border border-muted">
           {thumbnail ? (
-            <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-neutral-200">
+            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md border border-neutral-200">
               <Media
                 resource={thumbnail}
                 imgClassName="absolute inset-0 h-full w-full object-cover object-center"
               />
             </div>
           ) : (
-            <div className="h-24 w-24 flex-shrink-0 rounded-md bg-neutral-100" />
+            <div className="h-24 w-24 shrink-0 rounded-md bg-neutral-100" />
           )}
         </div>
       </YnsLink>
@@ -34,10 +34,11 @@ export function CartItemThumbnail({ line }: { line: CartItem }) {
 }
 
 export default function CartItemDetails({ item }: { item: CartItem }) {
-  const productTitle = typeof item.product === 'object' ? item.product.title : item.product
-  const isVariant = item.isVariant
+  const productTitle =
+    typeof item.lineItem.product === 'object' ? item.lineItem.product.title : item.lineItem.product
+  const isVariant = item.lineItem.isVariant
   const variantOptions = isVariant
-    ? item.variantOptions?.map((v) => v.value.label).join(', ')
+    ? item.lineItem.variantOptions?.map((v) => v.value.label).join(', ')
     : null
 
   return (

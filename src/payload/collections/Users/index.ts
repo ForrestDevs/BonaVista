@@ -6,7 +6,7 @@ import { CUSTOMER_SLUG, USER_SLUG } from '../constants'
 const Users: CollectionConfig = {
   slug: USER_SLUG,
   access: {
-    admin: admins,
+    // admin: admins,
     create: anyone,
     delete: authenticated,
     read: anyone,
@@ -15,8 +15,10 @@ const Users: CollectionConfig = {
   admin: {
     defaultColumns: ['name', 'email', 'roles'],
     useAsTitle: 'name',
+    group: 'Admin',
   },
   auth: {
+    // verify: true,
     tokenExpiration: 60 * 60 * 24 * 30, // 30 days
   },
   fields: [
@@ -40,7 +42,6 @@ const Users: CollectionConfig = {
       name: 'roles',
       type: 'select',
       access: {
-        /* create: admins, */
         read: admins,
         update: admins,
       },

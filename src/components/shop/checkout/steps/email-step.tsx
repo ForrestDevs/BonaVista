@@ -1,28 +1,27 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { LinkAuthenticationElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { useState } from 'react'
 
 interface EmailStepProps {
   initialEmail?: string
   onComplete: (data: { value: string }) => void
+  isProcessing?: boolean
+  isDisabled?: boolean
 }
 
-export function EmailStep({ initialEmail, onComplete }: EmailStepProps) {
+export function EmailStep({ initialEmail, onComplete, isProcessing = false, isDisabled = false }: EmailStepProps) {
   const [email, setEmail] = useState<string>(initialEmail || '')
-  const [isLoading, setIsLoading] = useState(false)
+  const [isValid, setIsValid] = useState<boolean>(!!initialEmail)
   const stripe = useStripe()
   const elements = useElements()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!stripe || !elements) return
+    if (!stripe || !elements || isProcessing || isDisabled) return
 
     try {
-      setIsLoading(true)
-
       // Get the email from the LinkAuthenticationElement
       const { error } = await elements.submit()
 
@@ -36,43 +35,44 @@ export function EmailStep({ initialEmail, onComplete }: EmailStepProps) {
         return
       }
 
-      console.log('email', email)
-
       onComplete({ value: email })
     } catch (error) {
       console.error('Error submitting email:', error)
-    } 
+    }
   }
 
   return (
-    <Card className="p-6">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold">Contact Information</h2>
-          <p className="text-sm text-gray-500">
-            We&apos;ll use this email to send your order confirmation and updates
-          </p>
-        </div>
+    <div className={`space-y-6 ${isDisabled ? 'opacity-60 pointer-events-none' : ''}`}>
+      <p className="text-sm text-gray-500">
+        We&apos;ll use this email to send your order confirmation and updates
+      </p>
 
-        <div className="space-y-4">
-          <LinkAuthenticationElement
-            options={{
-              defaultValues: {
-                email: initialEmail ?? '',
-              },
-            }}
-            onChange={(event) => {
-              if (event.complete) {
-                setEmail(event.value.email)
-              }
-            }}
-          />
-        </div>
+      <div className="space-y-4">
+        <LinkAuthenticationElement
+          options={{
+            defaultValues: {
+              email: initialEmail ?? '',
+            },
+          }}
+          onChange={(event) => {
+            if (event.complete) {
+              setEmail(event.value.email)
+              setIsValid(true)
+            } else {
+              setIsValid(false)
+            }
+          }}
+        />
+      </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? 'Processing...' : 'Continue to Shipping'}
-        </Button>
-      </form>
-    </Card>
+      <Button 
+        type="button" 
+        className="w-full" 
+        disabled={isProcessing || !isValid || isDisabled}
+        onClick={handleSubmit}
+      >
+        {isProcessing ? 'Processing...' : 'Continue to Shipping'}
+      </Button>
+    </div>
   )
 }

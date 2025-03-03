@@ -4,7 +4,7 @@ import { Product } from '@payload-types'
 import { PRODUCT_SLUG } from '@payload/collections/constants'
 import getPayload from '@lib/utils/getPayload'
 
-export async function getProduct(productId: string): Promise<Product | null> {
+export async function getProduct(productId: number): Promise<Product | null> {
   const payload = await getPayload()
 
   try {

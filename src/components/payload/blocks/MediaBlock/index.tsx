@@ -37,29 +37,46 @@ export const MediaBlock: React.FC<Props> = (props) => {
   return (
     <div
       className={cn(
-        '',
+        'w-full',
         {
-          container: position === 'default' && enableGutter,
+          'container mx-auto px-4': position === 'default' && enableGutter,
         },
-        className,
+        className
       )}
     >
       {position === 'fullscreen' && (
-        <div className="relative aspect-[4/3] w-full">
-          <Media resource={media} src={staticImage} />
+        <div className="relative w-full">
+          <div className="aspect-16/9 md:aspect-21/9">
+            <Media 
+              resource={media} 
+              src={staticImage}
+              imgClassName="object-cover"
+            />
+          </div>
         </div>
       )}
       {position === 'default' && (
-        <Media imgClassName={cn('rounded', imgClassName)} resource={media} src={staticImage} />
+        <div className="relative w-full overflow-hidden rounded-lg">
+          <div className="aspect-4/3 md:aspect-16/9">
+            <Media 
+              resource={media} 
+              src={staticImage}
+              imgClassName={cn(
+                'object-cover transition-transform duration-300 hover:scale-105',
+                imgClassName
+              )}
+            />
+          </div>
+        </div>
       )}
       {caption && (
         <div
           className={cn(
-            'mt-6',
+            'mt-4 text-sm text-gray-600',
             {
-              container: position === 'fullscreen' && !disableInnerContainer,
+              'container mx-auto px-4': position === 'fullscreen' && !disableInnerContainer,
             },
-            captionClassName,
+            captionClassName
           )}
         >
           <RichText content={caption} enableGutter={false} />

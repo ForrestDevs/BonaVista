@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { authenticated, authenticatedOrPublished } from '@payload/access'
+import { admin, anyone } from '@payload/access'
 import { hero } from '@payload/fields/hero'
 import { pageBlocks } from '@/payload/blocks'
 import { slugField } from '@/payload/fields/slug'
@@ -18,31 +18,18 @@ import { PAGE_SLUG } from '../constants'
 const Pages: CollectionConfig = {
   slug: PAGE_SLUG,
   access: {
-    create: authenticated,
-    delete: authenticated,
-    read: authenticatedOrPublished,
-    update: authenticated,
+    create: admin,
+    delete: admin,
+    read: anyone,
+    update: admin,
   },
   admin: {
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
-      url: ({ data }) => {
-        const path = generatePreviewPath({
-          slug: typeof data?.slug === 'string' ? data.slug : '',
-          collection: 'pages',
-        })
-
-        return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
-      },
+      url: () => `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
     },
-    preview: (data) => {
-      const path = generatePreviewPath({
-        slug: typeof data?.slug === 'string' ? data.slug : '',
-        collection: 'pages',
-      })
-
-      return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
-    },
+    preview: () => `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
+    group: 'Website',
     useAsTitle: 'title',
   },
   fields: [
@@ -114,8 +101,9 @@ const Pages: CollectionConfig = {
   },
   versions: {
     drafts: {
+      validate: true,
       autosave: {
-        interval: 100, // We set this interval for optimal live preview
+        interval: 10000, // We set this interval for optimal live preview
       },
     },
     maxPerDoc: 50,

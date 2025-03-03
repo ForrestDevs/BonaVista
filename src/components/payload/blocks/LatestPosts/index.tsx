@@ -15,7 +15,7 @@ export const LatestPostsBlock: React.FC<
     id?: string
   } & Props
 > = async (props) => {
-  const { title, subtitle, body, link } = props
+  const { title, subtitle, body, link, id } = props
 
   const payload = await getPayload()
 
@@ -26,20 +26,30 @@ export const LatestPostsBlock: React.FC<
   })
 
   return (
-    <section className="container w-full bg-white">
-      <h3 className="text-sm font-thin tracking-widest text-gray-600 mb-2 uppercase">{subtitle}</h3>
-      <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{title}</h2>
-      <div className="flex flex-col md:flex-row md:items-end md:justify-start mb-6">
-        <p className="text-gray-700 md:mb-0 max-w-2xl">{body}</p>
-        <div className="mt-6 md:mt-0 md:ml-6 flex-shrink-0">
-          <CMSLink {...link} className="rounded-none" />
+    <section className="w-full container py-8 sm:py-12" id={`block-${id}`}>
+      <div className="px-4 sm:px-0">
+        <h3 className="text-sm md:text-base font-light tracking-wider uppercase text-primary mb-3 md:mb-4">
+          {subtitle}
+        </h3>
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 md:mb-4 leading-tight tracking-tight">
+          {title}
+        </h2>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-8">
+          <p className="text-base md:text-lg leading-relaxed text-gray-700 max-w-3xl">{body}</p>
+          <div className="shrink-0">
+            <CMSLink
+              {...link}
+              className="transition-all duration-200 hover:translate-y-[-2px] hover:shadow-lg"
+              size="lg"
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {blogPosts.map((post, index) => (
-          <PostCard key={index} doc={post} showCategories />
-        ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
+          {blogPosts.map((post, index) => (
+            <PostCard key={index} doc={post} showCategories />
+          ))}
+        </div>
       </div>
     </section>
   )

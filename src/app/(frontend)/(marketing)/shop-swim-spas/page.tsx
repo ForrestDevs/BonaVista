@@ -1,179 +1,91 @@
 import React from 'react'
-import getPayload from '@/lib/utils/getPayload'
 import { queryPageBySlug } from '@/lib/utils/queryBySlug'
 import { RenderHero } from '@/components/payload/heros'
 import { RenderBlocks } from '@/components/payload/blocks'
-import { Spa } from '@payload-types'
-import { Media } from '@/components/payload/Media'
-import Link from 'next/link'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
-import { ArrowUpRight, Users, Droplets } from 'lucide-react'
-import SpaFilters from './components/filter'
 import { SearchParams } from 'nuqs'
-import { filterParamsCache } from './searchParams'
+import SwimSpaList from '@/components/marketing/spas/swim-spa/swim-spa-list'
+import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
+import { generateMeta } from '@/lib/utils/generateMeta'
+import { PAGE_SLUG, SPA_SLUG } from '@/payload/collections/constants'
+import getPayload from '@/lib/utils/getPayload'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await queryPageBySlug('shop-swim-spas')
+
+  if (!page) {
+    return notFound()
+  }
+
+  return generateMeta({ doc: page, collectionSlug: PAGE_SLUG })
+}
+
+export async function generateStaticParams() {
+  let paths: { slug: string }[] = []
+  const payload = await getPayload()
+
+  const hotTubs = await payload.find({
+    collection: SPA_SLUG,
+    draft: false,
+    limit: 1000,
+    overrideAccess: false,
+    where: {
+      type: {
+        equals: 'swim-spa',
+      },
+    },
+    select: {
+      slug: true,
+    },
+  })
+
+  if (hotTubs && Array.isArray(hotTubs) && hotTubs.length > 0) {
+    paths = hotTubs.docs.map((hotTub) => {
+      return { slug: hotTub.slug }
+    })
+  }
+
+  return paths
+}
 
 type PageProps = {
   searchParams: Promise<SearchParams>
 }
 
 export default async function ShopSwimSpasHome({ searchParams }: PageProps) {
-  const [payload, page, { search, seats, price, collections }, { docs }] = await Promise.all([
-    getPayload(),
-    queryPageBySlug('shop-swim-spas'),
-    filterParamsCache.parse(searchParams),
-    (await getPayload()).find({
-      collection: 'spas',
-      where: {
-        type: { equals: 'swim-spa' },
-      },
-      sort: ['hotTubCollection'],
-      limit: 25,
-    }),
-  ])
+  const page = await queryPageBySlug('shop-swim-spas')
 
-  const filterSpas = (
-    docs: Spa[],
-    {
-      search,
-      seats,
-      price,
-      collections,
-    }: {
-      search: string
-      seats: number[]
-      price: number[]
-      collections: string[]
-    },
-  ) => {
-    return docs.filter((spa) => {
-      // Search filter
-      if (
-        search !== '' &&
-        (!spa.title || !spa.title.toLowerCase().includes(search.toLowerCase()))
-      ) {
-        return false
-      }
-
-      // Seats filter
-      if ((seats[0] !== 2 || seats[1] !== 6) && spa.seating) {
-        const seatingStr = spa.seating
-          .toLowerCase()
-          .replace(/\s+/g, '')
-          .replace(/persons?/g, '')
-
-        let minSeats: number, maxSeats: number
-
-        if (seatingStr.includes('-')) {
-          ;[minSeats, maxSeats] = seatingStr.split('-').map(Number)
-        } else {
-          minSeats = maxSeats = parseInt(seatingStr)
-        }
-
-        const isInRange =
-          seats[0] === seats[1]
-            ? minSeats <= seats[0] && maxSeats >= seats[0]
-            : !(maxSeats < seats[0] || minSeats > seats[1])
-
-        if (!isInRange) return false
-      }
-
-      // Price filter
-      if (price[0] !== 20000 || price[1] !== 50000) {
-        const actualPrice = (spa.startingPrice || 0) * 1000
-        if (actualPrice < price[0] || actualPrice > price[1]) return false
-      }
-
-      // Collection filter
-      if (collections.length > 0 && !collections.join(',').includes(spa.hotTubCollection)) {
-        return false
-      }
-
-      return true
-    })
+  if (!page) {
+    return notFound()
   }
-  const filteredDocs = filterSpas(docs, { search, seats, price, collections })
 
   return (
     <div className="flex flex-col min-h-screen gap-20">
       <RenderHero {...page.hero} />
-      <section className="container flex flex-col items-center text-center gap-4">
-        <p className="text-md font-medium text-primary tracking-wide">Browse Our Collection</p>
-        <h1 className="text-4xl font-medium tracking-tight sm:text-5xl">
-          Find Your Perfect Swim Spa
-        </h1>
-        <p className="mx-auto max-w-5xl text-lg text-muted-foreground">
-          Discover our extensive range of premium swim spas, designed for fitness, relaxation, and
-          year-round enjoyment. Use our filters to find the perfect match for your lifestyle.
-        </p>
-      </section>
-
-      <section className="container flex flex-col lg:flex-row gap-6">
-        <aside className="w-full lg:w-[250px] sticky top-24 z-10">
-          <SpaFilters />
-        </aside>
-        <div className="flex-1">
-          {filteredDocs.length > 0 ? (
-            <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-              {filteredDocs.map((spa) => (
-                <SpaCard key={spa.id} spa={spa} />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <h3 className="text-xl font-semibold mb-2">No Swim Spas Found</h3>
-              <p className="text-muted-foreground mb-6">
-                Try adjusting your filters to find what you&apos;re looking for.
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
+      <ShopSwimSpasIntro />
+      <SwimSpaList searchParams={searchParams} />
       <RenderBlocks blocks={page.layout} />
     </div>
   )
 }
 
-function SpaCard({ spa }: { spa: Spa }) {
+function ShopSwimSpasIntro() {
   return (
-    <Card className="max-w-sm mx-auto overflow-hidden transition-all hover:shadow-lg">
-      <CardContent className="p-6 space-y-6">
-        <div className="aspect-square relative rounded-lg overflow-hidden">
-          {spa.thumbnail && (
-            <Link href={`/shop-swim-spas/${spa.slug}`}>
-              <Media
-                resource={spa.thumbnail}
-                imgClassName="object-cover transition-transform hover:scale-105"
-              />
-            </Link>
-          )}
-        </div>
-
-        <div className="space-y-4">
-          <h2 className="text-3xl font-bold tracking-tight text-center">
-            {spa.title}
-            <span className="text-muted-foreground">™</span>
+    <section className="w-full">
+      <div className="container mx-auto px-4">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <p className="text-primary text-sm sm:text-base md:text-lg font-light uppercase tracking-wider mb-2 sm:mb-3">
+            Browse Our Collection
+          </p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
+            Find Your Perfect Swim Spa
           </h2>
-          <div className="flex justify-center space-x-4 text-sm text-muted-foreground">
-            <div className="flex items-center">
-              <Users className="w-4 h-4 mr-1" />
-              <span>{spa.seating}</span>
-            </div>
-            <div className="flex items-center">
-              <Droplets className="w-4 h-4 mr-1" />
-              <span>{spa.jets} Jets</span>
-            </div>
-          </div>
+          <p className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">
+            Discover our extensive range of premium swim spas, designed for fitness, relaxation, and
+            year-round enjoyment. Use our filters to find the perfect match for your lifestyle.
+          </p>
         </div>
-      </CardContent>
-
-      <CardFooter className="bg-muted/50 p-4">
-        <Link href={`/shop-swim-spas/${spa.slug}`} className="w-full group">
-          <div className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-md inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
-            <span className="mr-2">View Details + Price</span>
-            <ArrowUpRight className="w-4 h-4 transition-transform duration-100 ease-in-out group-hover:rotate-45" />
-          </div>
-        </Link>
-      </CardFooter>
-    </Card>
+      </div>
+    </section>
   )
 }

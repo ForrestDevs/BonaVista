@@ -1,14 +1,12 @@
-import React, { cache } from 'react'
+import React from 'react'
 import type { Metadata } from 'next'
 import getPayload from '@/lib/utils/getPayload'
 import { Media } from '@/components/payload/Media'
 import { PayloadRedirects } from '@/components/payload/PayloadRedirects'
-import { draftMode, headers } from 'next/headers'
-import { StandardHero } from '@/components/payload/heros/Standard'
-import { TypographyBlock } from '@/components/payload/blocks/Typography'
 import { cn } from '@/lib/utils/cn'
 import { RenderHero } from '@/components/payload/heros'
 import { GALLERIES_SLUG } from '@/payload/collections/constants'
+import { queryGalleryBySlug } from '@/lib/utils/queryBySlug'
 
 export async function generateStaticParams() {
   const payload = await getPayload()
@@ -17,6 +15,9 @@ export async function generateStaticParams() {
     collection: GALLERIES_SLUG,
     draft: false,
     overrideAccess: false,
+    select: {
+      slug: true,
+    },
   })
 
   return galleries.docs?.map(({ slug }) => ({
@@ -24,12 +25,22 @@ export async function generateStaticParams() {
   }))
 }
 
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { slug } = await params
+  const gallery = await queryGalleryBySlug(slug)
+
+  return {
+    title: gallery?.title + ` Gallery | BonaVista LeisureScapes`,
+    description: gallery?.description,
+  }
+}
+
 type Params = Promise<{ slug: string | undefined }>
 
 export default async function Gallery({ params }: { params: Params }) {
   const { slug } = await params
   const url = '/gallery/' + slug
-  const gallery = await queryGalleryBySlug({ slug })
+  const gallery = await queryGalleryBySlug(slug)
 
   if (!gallery) return <PayloadRedirects url={url} />
 
@@ -63,34 +74,4 @@ export default async function Gallery({ params }: { params: Params }) {
       </div>
     </div>
   )
-}
-
-const queryGalleryBySlug = cache(async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = await draftMode()
-
-  const payload = await getPayload()
-
-  const result = await payload.find({
-    collection: 'galleries',
-    draft,
-    limit: 1,
-    overrideAccess: draft,
-    where: {
-      slug: {
-        equals: slug,
-      },
-    },
-  })
-
-  return result.docs?.[0] || null
-})
-
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { slug } = await params
-  const gallery = await queryGalleryBySlug({ slug })
-
-  return {
-    title: gallery?.title + ` Gallery | BonaVista LeisureScapes`,
-    description: gallery?.description,
-  }
 }

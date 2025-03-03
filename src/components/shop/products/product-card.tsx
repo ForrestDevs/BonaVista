@@ -1,151 +1,240 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { Button } from '@components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@components/ui/card'
 import { Popover, PopoverContent, PopoverTrigger } from '@components/ui/popover'
-import { InfoIcon, Loader2Icon, ShoppingCartIcon } from 'lucide-react'
-import { Product, ProductVariant } from '@payload-types'
+import { Badge } from '@components/ui/badge'
+import { InfoIcon, Loader2Icon, ShoppingCartIcon, StarIcon } from 'lucide-react'
+import { Product } from '@payload-types'
 import { Media } from '@components/payload/Media'
 import Price from '@components/payload/Price'
 import { addToCart } from '@/lib/data/cart'
 import { CartItem } from '@/lib/types/cart'
-import { uniqueId } from 'lodash'
 import { useRouter } from 'next/navigation'
 import { EnhancedProductVariant } from '@/lib/types/product'
+import { cn } from '@/lib/utils/cn'
 
 export function ProductCard({ product }: { product: Product }) {
   const router = useRouter()
-  const [isAddingToCart, setIsAddingToCart] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const [selectedVariant, setSelectedVariant] = useState<EnhancedProductVariant | null>(() => {
     if (product.variants && product.variants.variantProducts.length > 0) {
-      const variant = product.variants.variantProducts[0] as EnhancedProductVariant
-      return {
-        ...variant,
-      }
+      return product.variants.variantProducts[0] as EnhancedProductVariant
     }
     return null
   })
 
-  const hasVariants =
-    product.enableVariants && (product?.variants?.variantProducts?.length ?? 0) > 1
-
+  const hasVariants = product.enableVariants && (product.variants?.variantProducts?.length ?? 0) > 0
   const price = hasVariants ? selectedVariant?.price : product.baseProduct.price
+  const hasPriceRange = hasVariants && product.priceMin !== product.priceMax
   const thumbnail = hasVariants
     ? (selectedVariant?.images[0]?.image ?? null)
-    : (product?.baseProduct?.images[0]?.image ?? null)
+    : (product.baseProduct?.images[0]?.image ?? null)
 
-  const handleAddToCart = async (variant: EnhancedProductVariant | null) => {
-    setIsAddingToCart(true)
-
-    if (hasVariants) {
-      if (variant) {
-        console.log('variant', variant)
-        const cartItem: CartItem = {
-          product: product,
-          isVariant: true,
-          variantId: variant.id,
-          variantOptions: variant.info.options.map((o) => ({
-            key: o.key,
-            value: {
-              slug: o.slug,
-              label: o.label,
-            },
-          })),
-          quantity: 1,
-          price: variant.price,
-          url: `/product/${product.slug}`,
-          id: variant.id,
-        }
-        await addToCart(cartItem)
-      }
-    } else {
-      await addToCart({
-        product: product,
-        isVariant: false,
-        quantity: 1,
-        price: product.baseProduct.price,
-        url: `/product/${product.slug}`,
-        id: product.id,
-      })
+  const brands = product.brand?.map((brand) => {
+    if (typeof brand === 'number') {
+      return
     }
-    setIsAddingToCart(false)
+    return brand
+  })
+
+  const collections = product.collections?.map((collection) => {
+    if (typeof collection === 'number') {
+      return
+    }
+    return collection
+  })
+
+  const handleAddToCart = () => {
+    startTransition(async () => {
+      const cartItem: CartItem = {
+        lineItem: {
+          product: product,
+          sku: hasVariants ? selectedVariant.sku : (product.baseProduct?.sku ?? ''),
+          quantity: 1,
+          price: hasVariants ? selectedVariant.price : (product.baseProduct.price ?? 0),
+          url: `${process.env.NEXT_PUBLIC_URL}/shop/product/${product.slug}`,
+          isVariant: hasVariants,
+          thumbnail: thumbnail,
+          variantOptions: hasVariants
+            ? selectedVariant.info.options.map((o) => ({
+                key: {
+                  slug: o.key.slug,
+                  label: o.key.label,
+                },
+                value: {
+                  slug: o.slug,
+                  label: o.label,
+                },
+              }))
+            : [],
+        },
+      }
+      await addToCart(cartItem)
+    })
   }
 
+  const navigateToProduct = () => router.push(`/shop/product/${product.slug}`)
+
   return (
-    <Card className="cursor-pointer group transition-all duration-300 hover:shadow-lg h-full flex flex-col">
+    <Card className="group h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg border border-gray-200 hover:border-blue-200 min-w-[240px]">
       <CardHeader
-        className="p-0 relative overflow-hidden"
-        onClick={() => {
-          router.push(`/shop/product/${product.slug}`)
-        }}
+        className="p-0 relative overflow-hidden cursor-pointer"
+        onClick={navigateToProduct}
       >
-        <Media
-          resource={thumbnail}
-          imgClassName="object-cover transition-transform duration-300 group-hover:scale-105 rounded-lg w-full aspect-square sm:h-[300px] md:h-[250px] lg:h-[300px]"
-        />
-        <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <InfoIcon className="h-5 w-5 text-blue-600" />
+        <div className="relative w-full h-64 overflow-hidden bg-gray-50">
+          <Media
+            resource={thumbnail}
+            className="w-full h-full"
+            imgClassName="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+          />
         </div>
       </CardHeader>
-      <CardContent className="p-4 flex flex-col gap-2">
-        <CardTitle className="text-lg font-semibold line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+
+      <CardContent className="p-4 sm:p-5 grow flex flex-col gap-3">
+        <div className="flex flex-wrap gap-1.5">
+          {brands?.filter(Boolean).map((brand, index) => (
+            <Badge
+              key={`brand-${index}`}
+              variant="outline"
+              className="bg-blue-50 text-blue-700 border-blue-200 text-xs sm:text-sm"
+            >
+              {brand.name}
+            </Badge>
+          ))}
+          {collections?.filter(Boolean).map((collection, index) => (
+            <Badge
+              key={`collection-${index}`}
+              variant="outline"
+              className="bg-green-50 text-green-700 border-green-200 text-xs sm:text-sm"
+            >
+              {collection.title}
+            </Badge>
+          ))}
+        </div>
+
+        <CardTitle
+          onClick={navigateToProduct}
+          className="text-base sm:text-lg font-semibold line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 cursor-pointer mt-1"
+        >
           {product.title}
         </CardTitle>
-        <div className="flex items-center gap-2">
-          <Price amount={price} currencyCode="CAD" className="text-lg font-bold text-blue-600" />
+
+        <div className="flex flex-col">
+          {hasPriceRange ? (
+            <>
+              <div className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-600">
+                <span>From:</span>
+                <Price amount={product.priceMin} currencyCode="CAD" className="font-medium" />
+                <span>-</span>
+                <Price amount={product.priceMax} currencyCode="CAD" className="font-medium" />
+              </div>
+              {selectedVariant && (
+                <div className="mt-2">
+                  <Price
+                    amount={selectedVariant.price}
+                    currencyCode="CAD"
+                    className="text-base sm:text-lg font-bold text-blue-600"
+                  />
+                </div>
+              )}
+            </>
+          ) : (
+            <Price
+              amount={price}
+              currencyCode="CAD"
+              className="text-base sm:text-lg font-bold text-blue-600"
+            />
+          )}
         </div>
+
         {product.description && (
-          <p className="text-sm text-gray-600 line-clamp-2">{product.description}</p>
+          <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 mt-1">
+            {product.description}
+          </p>
         )}
       </CardContent>
-      <CardFooter className="p-4 mt-auto">
+
+      <CardFooter className="p-4 border-t border-gray-100">
         {hasVariants ? (
           <div className="grid grid-cols-2 gap-2 w-full">
-            <Popover>
+            <Popover open={isOpen} onOpenChange={setIsOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="col-span-1">
-                  {selectedVariant ? selectedVariant.info.options[0].label : 'Select Variant'}
+                <Button
+                  variant="outline"
+                  className="col-span-1 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                >
+                  {selectedVariant ? selectedVariant.info.options[0].label : 'Select Option'}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-56">
-                <div className="grid gap-4">
-                  <h4 className="font-medium leading-none">Select Variant</h4>
+              <PopoverContent className="w-56 p-0 overflow-hidden border border-blue-100">
+                <div className="p-3 bg-blue-50 border-b border-blue-100">
+                  <h4 className="font-medium text-blue-800">Select Option</h4>
+                </div>
+                <div className="max-h-[200px] overflow-y-auto p-2">
                   {product.variants?.variantProducts?.map((variant: EnhancedProductVariant) => (
                     <Button
                       key={variant.id}
-                      variant="outline"
+                      variant="ghost"
+                      className={cn(
+                        'w-full justify-start text-left mb-1 hover:bg-blue-50',
+                        selectedVariant?.id === variant.id && 'bg-blue-50 text-blue-700',
+                      )}
                       onClick={() => {
+                        setIsOpen(false)
                         setSelectedVariant(variant)
                       }}
                     >
-                      {variant.info.options[0].label}
+                      {variant.info.options.map((o) => o.label).join(' / ')}
                     </Button>
                   ))}
                 </div>
               </PopoverContent>
             </Popover>
+            {/* <Select
+              onValueChange={(value) =>
+                setSelectedVariant(
+                  product.variants?.variantProducts.find(
+                    (v) => v.id === value,
+                  ) as EnhancedProductVariant,
+                )
+              }
+              value={selectedVariant?.sku}
+            >
+              <SelectTrigger id={'variant-select'}>
+                <SelectValue placeholder="Select variant" />
+              </SelectTrigger>
+              <SelectContent>
+                {product.variants?.variantProducts?.map((variant: EnhancedProductVariant) => (
+                  <SelectItem key={variant.sku} value={variant.sku}>
+                    {variant.info.options.map((o) => o.label).join(' / ')}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select> */}
 
             <Button
-              className="col-span-1"
-              disabled={!selectedVariant || isAddingToCart}
-              onClick={() => handleAddToCart(selectedVariant)}
+              className="col-span-1 bg-blue-600 hover:bg-blue-700"
+              disabled={!selectedVariant || isPending}
+              onClick={handleAddToCart}
             >
-              {isAddingToCart ? (
+              {isPending ? (
                 <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <ShoppingCartIcon className="mr-2 h-4 w-4" />
               )}
-              Add to Cart
+              Add
             </Button>
           </div>
         ) : (
           <Button
-            className="w-full"
-            onClick={() => handleAddToCart(null)}
-            disabled={isAddingToCart}
+            className="w-full bg-blue-600 hover:bg-blue-700 transition-all duration-300"
+            onClick={handleAddToCart}
+            disabled={isPending}
           >
-            {isAddingToCart ? (
+            {isPending ? (
               <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <ShoppingCartIcon className="mr-2 h-4 w-4" />
@@ -157,219 +246,3 @@ export function ProductCard({ product }: { product: Product }) {
     </Card>
   )
 }
-
-export function ShopWaterCare() {
-  const products: Product[] = []
-
-  return (
-    // ... (previous layout code)
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
-      ))}
-    </div>
-    // ... (rest of the layout)
-  )
-}
-
-const foo = [
-  {
-    id: 'prod_001',
-    name: 'Chlorine Tablets',
-    description: 'Stabilized chlorine tablets for effective sanitization of hot tubs and pools.',
-    image: 'chlorine_tablets.png',
-    variants: [
-      { size: '2 lbs', price: 19.99, sku: 'CHLORINE_2LBS' },
-      { size: '5 lbs', price: 44.99, sku: 'CHLORINE_5LBS' },
-      { size: '10 lbs', price: 79.99, sku: 'CHLORINE_10LBS' },
-    ],
-  },
-  {
-    id: 'prod_002',
-    name: 'pH Increaser',
-    description: 'Raises the pH level in your pool, hot tub, or spa to maintain water balance.',
-    image: 'ph_increaser.png',
-    variants: [
-      { size: '1 lb', price: 9.99, sku: 'PH_INC_1LB' },
-      { size: '4 lbs', price: 34.99, sku: 'PH_INC_4LBS' },
-    ],
-  },
-  {
-    id: 'prod_003',
-    name: 'pH Reducer',
-    description:
-      'Lowers the pH level in your pool, hot tub, or spa to prevent scaling and cloudiness.',
-    image: 'ph_reducer.png',
-    variants: [
-      { size: '1.5 lbs', price: 12.99, sku: 'PH_RED_1_5LBS' },
-      { size: '3 lbs', price: 21.99, sku: 'PH_RED_3LBS' },
-    ],
-  },
-  {
-    id: 'prod_004',
-    name: 'Alkalinity Increaser',
-    description: 'Boosts total alkalinity to prevent pH fluctuations in your water.',
-    image: 'alkalinity_increaser.png',
-    variants: [
-      { size: '3 lbs', price: 15.99, sku: 'ALK_INC_3LBS' },
-      { size: '6 lbs', price: 29.99, sku: 'ALK_INC_6LBS' },
-    ],
-  },
-  {
-    id: 'prod_005',
-    name: 'Calcium Hardness Increaser',
-    description: 'Increases calcium levels in your pool or spa to protect equipment and surfaces.',
-    image: 'calcium_hardness_increaser.png',
-    variants: [
-      { size: '4 lbs', price: 24.99, sku: 'CAL_INC_4LBS' },
-      { size: '8 lbs', price: 44.99, sku: 'CAL_INC_8LBS' },
-    ],
-  },
-  {
-    id: 'prod_006',
-    name: 'Spa Shock',
-    description: 'Non-chlorine shock treatment for quick oxidation of contaminants in spa water.',
-    image: 'spa_shock.png',
-    variants: [
-      { size: '2 lbs', price: 19.99, sku: 'SPA_SHOCK_2LBS' },
-      { size: '5 lbs', price: 39.99, sku: 'SPA_SHOCK_5LBS' },
-    ],
-  },
-  {
-    id: 'prod_007',
-    name: 'Pool Algaecide',
-    description: 'Concentrated formula to prevent and treat algae growth in pools and swim spas.',
-    image: 'pool_algaecide.png',
-    variants: [
-      { size: '1 quart', price: 22.99, sku: 'ALG_QUART' },
-      { size: '1 gallon', price: 74.99, sku: 'ALG_GALLON' },
-    ],
-  },
-  {
-    id: 'prod_008',
-    name: 'Stain & Scale Preventer',
-    description: 'Prevents stains and scale buildup on pool and spa surfaces.',
-    image: 'stain_scale_preventer.png',
-    variants: [
-      { size: '1 quart', price: 19.99, sku: 'STAIN_SCALE_1QT' },
-      { size: '1 gallon', price: 69.99, sku: 'STAIN_SCALE_1GAL' },
-    ],
-  },
-  {
-    id: 'prod_009',
-    name: 'Water Clarifier',
-    description: 'Clears cloudy water by helping filter out small particles in your pool or spa.',
-    image: 'water_clarifier.png',
-    variants: [
-      { size: '1 quart', price: 15.99, sku: 'CLARIFIER_1QT' },
-      { size: '1 gallon', price: 59.99, sku: 'CLARIFIER_1GAL' },
-    ],
-  },
-  {
-    id: 'prod_010',
-    name: 'Bromine Tablets',
-    description: 'Effective bromine tablets for sanitizing hot tubs and swim spas.',
-    image: 'bromine_tablets.png',
-    variants: [
-      { size: '2 lbs', price: 24.99, sku: 'BROMINE_2LBS' },
-      { size: '5 lbs', price: 59.99, sku: 'BROMINE_5LBS' },
-    ],
-  },
-  {
-    id: 'prod_011',
-    name: 'Spa Fragrance',
-    description: 'Enhance your spa experience with soothing scents that are safe for water.',
-    image: 'spa_fragrance.png',
-    variants: [
-      { size: '8 oz', price: 14.99, sku: 'FRAGRANCE_8OZ' },
-      { size: '16 oz', price: 24.99, sku: 'FRAGRANCE_16OZ' },
-    ],
-  },
-  {
-    id: 'prod_012',
-    name: 'Filter Cleaner',
-    description: 'Removes oils and debris from filters to improve water circulation and clarity.',
-    image: 'filter_cleaner.png',
-    variants: [
-      { size: '16 oz', price: 12.99, sku: 'FILTER_CLEAN_16OZ' },
-      { size: '32 oz', price: 21.99, sku: 'FILTER_CLEAN_32OZ' },
-    ],
-  },
-  {
-    id: 'prod_013',
-    name: 'Defoamer',
-    description: 'Eliminates unwanted foam in hot tubs, pools, and swim spas.',
-    image: 'defoamer.png',
-    variants: [
-      { size: '1 pint', price: 9.99, sku: 'DEFOAMER_1PT' },
-      { size: '1 quart', price: 16.99, sku: 'DEFOAMER_1QT' },
-    ],
-  },
-  {
-    id: 'prod_014',
-    name: 'Metal Control',
-    description: 'Prevents metal staining and discoloration in pool and spa water.',
-    image: 'metal_control.png',
-    variants: [
-      { size: '1 quart', price: 17.99, sku: 'METAL_CTRL_1QT' },
-      { size: '1 gallon', price: 64.99, sku: 'METAL_CTRL_1GAL' },
-    ],
-  },
-  {
-    id: 'prod_015',
-    name: 'Foam-Free',
-    description: 'Quickly removes and prevents foam in hot tubs and swim spas.',
-    image: 'foam_free.png',
-    variants: [
-      { size: '8 oz', price: 8.99, sku: 'FOAM_FREE_8OZ' },
-      { size: '16 oz', price: 14.99, sku: 'FOAM_FREE_16OZ' },
-    ],
-  },
-  {
-    id: 'prod_016',
-    name: 'Enzyme Cleaner',
-    description: 'Breaks down oils and organic contaminants for cleaner, fresher water.',
-    image: 'enzyme_cleaner.png',
-    variants: [
-      { size: '1 pint', price: 11.99, sku: 'ENZYME_CLEAN_1PT' },
-      { size: '1 quart', price: 19.99, sku: 'ENZYME_CLEAN_1QT' },
-    ],
-  },
-  {
-    id: 'prod_017',
-    name: 'Chlorine Granules',
-    description: 'Fast-dissolving chlorine granules for immediate sanitization of pool water.',
-    image: 'chlorine_granules.png',
-    variants: [
-      { size: '2 lbs', price: 22.99, sku: 'CHLORINE_GRAN_2LBS' },
-      { size: '5 lbs', price: 49.99, sku: 'CHLORINE_GRAN_5LBS' },
-    ],
-  },
-  {
-    id: 'prod_018',
-    name: 'Non-Chlorine Shock',
-    description: 'Powerful oxidizer to eliminate contaminants without chlorine.',
-    image: 'non_chlorine_shock.png',
-    variants: [
-      { size: '2 lbs', price: 18.99, sku: 'NON_CHL_SHOCK_2LBS' },
-      { size: '5 lbs', price: 37.99, sku: 'NON_CHL_SHOCK_5LBS' },
-    ],
-  },
-  {
-    id: 'prod_019',
-    name: 'Spa Test Strips',
-    description: 'Quick and easy test strips for monitoring spa water chemistry.',
-    image: 'spa_test_strips.png',
-    variants: [
-      { size: '50 strips', price: 12.99, sku: 'TEST_STRIPS_50' },
-      { size: '100 strips', price: 22.99, sku: 'TEST_STRIPS_100' },
-    ],
-  },
-  {
-    id: 'prod_020',
-    name: 'Total Alkalinity Test Kit',
-    description: 'Simple test kit to measure and maintain total alkalinity levels in water.',
-    image: 'alkalinity_test_kit.png',
-    variants: [{ size: '1 kit', price: 14.99, sku: 'ALK_TEST_KIT' }],
-  },
-]

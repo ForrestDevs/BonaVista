@@ -2,6 +2,7 @@ import { CollectionConfig } from 'payload'
 import { admins, anyone } from '@payload/access'
 import { CART_SLUG, ADDRESS_SLUG, CUSTOMER_SLUG } from '../constants'
 import Stripe from 'stripe'
+import { lineItems } from '@/payload/fields/line-items'
 
 const Cart: CollectionConfig = {
   slug: CART_SLUG,
@@ -12,96 +13,16 @@ const Cart: CollectionConfig = {
     delete: admins,
   },
   admin: {
-    group: 'Shop',
+    group: 'Ecommerce',
     useAsTitle: 'id',
   },
   fields: [
+    lineItems(),
     {
       name: 'customer',
       type: 'relationship',
       relationTo: CUSTOMER_SLUG,
       hasMany: false,
-    },
-    {
-      label: 'Items',
-      name: 'items',
-      type: 'array',
-      interfaceName: 'CartItems',
-      fields: [
-        {
-          type: 'row',
-          fields: [
-            {
-              name: 'product',
-              type: 'relationship',
-              relationTo: 'products',
-              hasMany: false,
-              required: true,
-            },
-            {
-              name: 'isVariant',
-              type: 'checkbox',
-              defaultValue: false,
-            },
-            {
-              name: 'variantId',
-              type: 'text',
-            },
-            {
-              name: 'variantOptions',
-              type: 'array',
-              fields: [
-                {
-                  name: 'key',
-                  type: 'group',
-                  fields: [
-                    {
-                      name: 'slug',
-                      type: 'text',
-                    },
-                    {
-                      name: 'label',
-                      type: 'text',
-                    },
-                  ],
-                },
-                {
-                  name: 'value',
-                  type: 'group',
-                  fields: [
-                    {
-                      name: 'slug',
-                      type: 'text',
-                    },
-                    {
-                      name: 'label',
-                      type: 'text',
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          name: 'price',
-          type: 'number',
-          required: true,
-        },
-        {
-          name: 'quantity',
-          type: 'number',
-          admin: {
-            step: 1,
-          },
-          min: 0,
-          required: true,
-        },
-        {
-          name: 'url',
-          type: 'text',
-        },
-      ],
     },
     {
       name: 'payment_intent',
@@ -140,6 +61,7 @@ const Cart: CollectionConfig = {
       type: 'number',
     },
   ],
+  timestamps: true,
 }
 
 export default Cart

@@ -2,6 +2,7 @@ import type { Field } from 'payload'
 
 import deepMerge from '../../lib/utils/deepMerge'
 import { MEDIA_SLUG, PAGE_SLUG } from '../collections/constants'
+import { createRowLabel } from '@/components/payload/AdminViews/RowLabels/create-row-label'
 
 type NavItemType = (options?: { overrides?: Record<string, unknown> }) => Field
 
@@ -53,7 +54,7 @@ export const navItem: NavItemType = ({ overrides = {} } = {}) => {
   ]
 
   const navItemResult: Field = {
-    name: 'navItem',
+    name: 'item',
     type: 'group',
     fields: [
       {
@@ -81,9 +82,6 @@ export const navItem: NavItemType = ({ overrides = {} } = {}) => {
         labels: {
           singular: 'Submenu Item',
           plural: 'Submenu Items',
-        },
-        admin: {
-          condition: (_, siblingData) => !siblingData?.isLink,
         },
         name: 'submenu',
         type: 'array',
@@ -113,7 +111,7 @@ export const navItem: NavItemType = ({ overrides = {} } = {}) => {
               singular: 'Sublink',
               plural: 'Sublinks',
             },
-            name: 'sublinks',
+            name: 'links',
             type: 'array',
             fields: [
               {
@@ -123,8 +121,31 @@ export const navItem: NavItemType = ({ overrides = {} } = {}) => {
               },
               ...linkFields,
             ],
+            admin: {
+              initCollapsed: true,
+              components: {
+                RowLabel: createRowLabel({
+                  defaultLabel: {
+                    en: 'Submenu',
+                  },
+                  path: 'label',
+                }),
+              },
+            },
           },
         ],
+        admin: {
+          condition: (_, siblingData) => !siblingData?.isLink,
+          initCollapsed: true,
+          components: {
+            RowLabel: createRowLabel({
+              defaultLabel: {
+                en: 'Submenu',
+              },
+              path: 'label',
+            }),
+          },
+        },
       },
     ],
   }

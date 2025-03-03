@@ -6,7 +6,11 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 // Notice that the hook itself is not async and we are not awaiting `revalidate`
 // Only revalidate existing docs that are published
 // Don't scope to `operation` in order to purge static demo pages
-export const revalidateProduct: CollectionAfterChangeHook = ({ doc, previousDoc, req: { payload } }) => {
+export const revalidateProduct: CollectionAfterChangeHook = ({
+  doc,
+  previousDoc,
+  req: { payload },
+}) => {
   if (doc._status === 'published') {
     const path = `/shop/product/${doc.slug}`
 
@@ -25,7 +29,7 @@ export const revalidateProduct: CollectionAfterChangeHook = ({ doc, previousDoc,
 
     payload.logger.info(`Revalidating old product at path: ${oldPath}`)
     revalidatePath(oldPath)
-    
+
     // Also revalidate the shop page
     payload.logger.info('Revalidating shop page')
     revalidatePath('/shop')

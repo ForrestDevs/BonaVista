@@ -12,7 +12,7 @@ export const ProductCollection: CollectionConfig = {
     delete: admin,
   },
   admin: {
-    group: 'Shop',
+    group: 'Ecommerce',
     useAsTitle: 'title',
     defaultColumns: ['title'],
     preview: (doc) => {
@@ -58,7 +58,7 @@ export const ProductCollection: CollectionConfig = {
       required: true,
       admin: {
         description: 'The collection type determines how the products are displayed.',
-      }
+      },
     },
     {
       label: 'Description',
@@ -104,6 +104,18 @@ export const ProductCollection: CollectionConfig = {
             return value
           },
         ],
+      },
+    },
+    {
+      name: 'products',
+      type: 'join',
+      collection: PRODUCT_SLUG,
+      on: 'collections',
+      label: 'Products',
+      admin: {
+        position: 'sidebar',
+        allowCreate: false,
+        defaultColumns: ['title'],
       },
     },
   ],

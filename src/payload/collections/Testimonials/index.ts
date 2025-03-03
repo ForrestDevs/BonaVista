@@ -12,6 +12,7 @@ const Testimonials: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
+    group: 'Website',
   },
   fields: [
     {

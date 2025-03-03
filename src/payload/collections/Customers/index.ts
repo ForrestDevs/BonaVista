@@ -1,8 +1,7 @@
 import { CollectionConfig } from 'payload'
-import { ADDRESS_SLUG, CART_SLUG, CUSTOMER_SLUG, ORDER_SLUG, USER_SLUG } from '../constants'
+import { CART_SLUG, CUSTOMER_SLUG, ORDER_SLUG, USER_SLUG } from '../constants'
 import { admins, anyone, authenticated } from '@payload/access'
-// import { customerProxy } from './endpoints/customer'
-import { createStripeCustomer } from './hooks/createStripeCustomer'
+import { address } from '@/payload/fields/address'
 
 const Customers: CollectionConfig = {
   slug: CUSTOMER_SLUG,
@@ -14,23 +13,8 @@ const Customers: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    group: 'Shop',
+    group: 'Ecommerce',
     useAsTitle: 'email',
-  },
-  endpoints: [
-    // {
-    //   handler: customerProxy,
-    //   method: 'get',
-    //   path: '/:teamID/customer',
-    // },
-    // {
-    //   handler: customerProxy,
-    //   method: 'patch',
-    //   path: '/:teamID/customer',
-    // },
-  ],
-  hooks: {
-    // beforeChange: [createStripeCustomer],
   },
   fields: [
     {
@@ -75,19 +59,13 @@ const Customers: CollectionConfig = {
       hasMany: false,
     },
     {
-      name: 'skipSync',
-      type: 'checkbox',
-      admin: {
-        hidden: true,
-        position: 'sidebar',
-        readOnly: true,
+      label: {
+        singular: 'Billing Address',
+        plural: 'Billing Addresses',
       },
-      label: 'Skip Sync',
-    },
-    {
-      label: 'Billing Address',
-      name: 'billing_address',
-      type: 'json',
+      name: 'billing_addresses',
+      type: 'array',
+      fields: [address()],
     },
     {
       label: {
@@ -96,23 +74,18 @@ const Customers: CollectionConfig = {
       },
       name: 'shipping_addresses',
       type: 'array',
-      fields: [
-        {
-          name: 'address',
-          type: 'json',
-        },
-      ],
+      fields: [address()],
     },
     {
+      label: 'Orders',
       name: 'orders',
+      relationTo: ORDER_SLUG,
       type: 'relationship',
       access: {
         create: admins,
         update: admins,
       },
       hasMany: true,
-      label: 'Orders',
-      relationTo: ORDER_SLUG,
     },
     {
       name: 'metadata',

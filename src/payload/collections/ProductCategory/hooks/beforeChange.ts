@@ -4,11 +4,19 @@ import { log } from '@/lib/utils/log'
 
 export const beforeChange: CollectionBeforeChangeHook = async ({
   data,
-  req: { payload },
+  req,
   operation,
+  context,
 }) => {
   log(`\n🔄 Starting beforeChange hook for ${data.title || 'new category'}`)
   log(`📋 Operation: ${operation}`)
+  log(`📋 Context: ${JSON.stringify(context)}`)
+
+
+  if (context.isInternalOperation) {
+    log('🔄 Internal operation - skipping slug construction')
+    return data
+  }
 
   // Compute fullSlug
   let fullSlug = data.slug
@@ -19,7 +27,8 @@ export const beforeChange: CollectionBeforeChangeHook = async ({
     const parentId = typeof data.parent === 'object' ? data.parent.id : data.parent
     log(`🔍 Looking up parent with ID: ${parentId}`)
 
-    const parent = await payload.findByID({
+    const parent = await req.payload.findByID({
+      req,
       collection: PRODUCT_CATEGORY_SLUG,
       id: parentId,
     })
@@ -35,7 +44,7 @@ export const beforeChange: CollectionBeforeChangeHook = async ({
     log('ℹ️ No parent - this is a root category')
   }
 
-  log('✅ beforeChange hook completed\n')
+  log('✅ beforeChange hook completed')
   return {
     ...data,
     fullSlug,

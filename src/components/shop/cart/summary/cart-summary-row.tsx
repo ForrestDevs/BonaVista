@@ -13,6 +13,7 @@ import { formatCurrency } from '@/lib/utils/formatMoney'
 import { debounce } from 'lodash'
 import { useCart } from './cart-summary-context'
 import { useRouter } from 'next/navigation'
+import { OptimizedLink } from '@/components/payload/Link/optimized-link'
 
 type CartSummaryRowProps = {
   line: CartItem
@@ -28,7 +29,7 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
   ) => {
     const router = useRouter()
     const { setIsUpdating } = useCart()
-    const [optimisticQuantity, setOptimisticQuantity] = useState(line.quantity)
+    const [optimisticQuantity, setOptimisticQuantity] = useState(line.lineItem.quantity)
     const { execute, hasErrored } = useAction(updateCartItemQuantityAction, {
       onSuccess: () => {
         setTimeout(() => {
@@ -38,14 +39,18 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
       },
     })
 
-    const product = typeof line.product === 'object' ? line.product : null
-    const productTitle = typeof line.product === 'object' ? line.product.title : line.product
-    const isVariant = line.isVariant
+    const product = typeof line.lineItem.product === 'object' ? line.lineItem.product : null
+    const slug = product?.slug
+    const productTitle =
+      typeof line.lineItem.product === 'object'
+        ? line.lineItem.product.title
+        : line.lineItem.product
+    const isVariant = line.lineItem.isVariant
     const variantOptions = isVariant
-      ? line.variantOptions.map((v) => v.value.label).join(', ')
+      ? line.lineItem.variantOptions.map((v) => v.value.label).join(', ')
       : null
     const thumbnail = isVariant
-      ? product?.variants.variantProducts.find((v) => v.id === line.variantId)?.images[0]?.image
+      ? product?.variants.variantProducts.find((v) => v.sku === line.lineItem.sku)?.images[0]?.image
       : product?.baseProduct?.images[0]?.image
 
     const debouncedExecute = useMemo(
@@ -58,9 +63,9 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
 
     useEffect(() => {
       if (hasErrored) {
-        setOptimisticQuantity(line.quantity)
+        setOptimisticQuantity(line.lineItem.quantity)
       }
-    }, [hasErrored, line.quantity])
+    }, [hasErrored, line.lineItem.quantity])
 
     const handleUpdateQuantity = (quantity: number) => {
       setIsUpdating(true)
@@ -81,24 +86,31 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
       >
         <div className="flex items-center gap-6">
           {thumbnail ? (
-            <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
               <Media
                 resource={thumbnail}
                 imgClassName="absolute inset-0 h-full w-full object-cover object-center"
               />
             </div>
           ) : (
-            <div className="h-24 w-24 flex-shrink-0 rounded-md bg-neutral-100" />
+            <div className="h-24 w-24 shrink-0 rounded-md bg-neutral-100" />
           )}
 
           <div className="flex flex-1 flex-col">
             <div className="flex justify-between">
               <div>
-                <h3 className="font-medium text-neutral-900">{productTitle}</h3>
+                <OptimizedLink href={`/shop/product/${slug}`}>
+                  <h3 className="font-medium text-neutral-900 hover:underline hover:text-blue-500 transition-colors duration-200">
+                    {productTitle}
+                  </h3>
+                </OptimizedLink>
                 {isVariant && <p className="mt-1 text-sm text-neutral-500">{variantOptions}</p>}
               </div>
               <p className="text-sm font-medium text-neutral-900">
-                {formatCurrency({ amount: line.price * optimisticQuantity, currency: 'CAD' })}
+                {formatCurrency({
+                  amount: line.lineItem.price * optimisticQuantity,
+                  currency: 'CAD',
+                })}
               </p>
             </div>
 
@@ -125,7 +137,9 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
                   </Button>
                 </div>
                 {optimisticQuantity > 1 && (
-                  <p className="text-sm text-neutral-500">(${line.price.toFixed(2)} each)</p>
+                  <p className="text-sm text-neutral-500">
+                    (${line.lineItem.price.toFixed(2)} each)
+                  </p>
                 )}
               </div>
               <Button

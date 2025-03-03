@@ -74,28 +74,10 @@ export async function generateStaticParams() {
         return doc.slug !== 'home'
       })
       .map((page) => {
-        const { slug, breadcrumbs } = page
+        const { slug } = page
 
         let slugs = [slug]
-
-        const hasBreadcrumbs = breadcrumbs && Array.isArray(breadcrumbs) && breadcrumbs.length > 0
-
-        if (hasBreadcrumbs) {
-          slugs = breadcrumbs
-            .map((crumb) => {
-              const { url } = crumb
-              let slug: string = ''
-
-              if (url) {
-                const split = url.split('/')
-                slug = split[split.length - 1]
-              }
-
-              return slug
-            })
-            ?.filter(Boolean)
-        }
-
+        
         return { slug: slugs }
       })
   }

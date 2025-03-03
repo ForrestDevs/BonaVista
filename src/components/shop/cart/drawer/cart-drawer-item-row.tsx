@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils/cn'
 import { formatCurrency } from '@/lib/utils/formatMoney'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/navigation'
+import { OptimizedLink } from '@/components/payload/Link/optimized-link'
 
 type CartDrawerItemProps = {
   line: CartItem
@@ -26,7 +27,7 @@ export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
     ref,
   ) => {
     const router = useRouter()
-    const [optimisticQuantity, setOptimisticQuantity] = useState(line.quantity)
+    const [optimisticQuantity, setOptimisticQuantity] = useState(line.lineItem.quantity)
     const { execute, hasErrored } = useAction(updateCartItemQuantityAction, {
       onSuccess: () => {
         setTimeout(() => {
@@ -35,14 +36,18 @@ export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
       },
     })
 
-    const product = typeof line.product === 'object' ? line.product : null
-    const productTitle = typeof line.product === 'object' ? line.product.title : line.product
-    const isVariant = line.isVariant
+    const product = typeof line.lineItem.product === 'object' ? line.lineItem.product : null
+    const slug = product?.slug
+    const productTitle =
+      typeof line.lineItem.product === 'object'
+        ? line.lineItem.product.title
+        : line.lineItem.product
+    const isVariant = line.lineItem.isVariant
     const variantOptions = isVariant
-      ? line.variantOptions.map((v) => v.value.label).join(', ')
+      ? line.lineItem.variantOptions.map((v) => v.value.label).join(', ')
       : null
     const thumbnail = isVariant
-      ? product?.variants.variantProducts.find((v) => v.id === line.variantId)?.images[0]?.image
+      ? product?.variants.variantProducts.find((v) => v.sku === line.lineItem.sku)?.images[0]?.image
       : product?.baseProduct?.images[0]?.image
 
     const debouncedExecute = useMemo(
@@ -56,9 +61,9 @@ export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
     useEffect(() => {
       if (hasErrored) {
         // Rollback on error
-        setOptimisticQuantity(line.quantity)
+        setOptimisticQuantity(line.lineItem.quantity)
       }
-    }, [hasErrored, line.quantity])
+    }, [hasErrored, line.lineItem.quantity])
 
     const handleUpdateQuantity = (quantity: number) => {
       setOptimisticQuantity(quantity) // Immediate UI update
@@ -104,20 +109,24 @@ export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
             transition={{ duration: 0.15, ease: 'easeOut' }}
           >
             {thumbnail ? (
-              <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md">
                 <Media
                   resource={thumbnail}
                   imgClassName="absolute inset-0 h-full w-full object-cover object-center"
                 />
               </div>
             ) : (
-              <div className="h-16 w-16 flex-shrink-0 rounded-md bg-neutral-100" />
+              <div className="h-16 w-16 shrink-0 rounded-md bg-neutral-100" />
             )}
 
             <div className="flex flex-col ml-4 gap-4 w-full h-full ">
               <div className="flex flex-row justify-between items-start w-full">
                 <div className="flex flex-col gap-1">
-                  <h3 className="font-medium text-neutral-900 text-base">{productTitle}</h3>
+                  <OptimizedLink href={`/shop/product/${slug}`}>
+                    <h3 className="font-medium text-neutral-900 text-base hover:underline hover:text-blue-500 transition-colors duration-200">
+                      {productTitle}
+                    </h3>
+                  </OptimizedLink>
                   {isVariant && (
                     <div className="text-sm text-neutral-700 font-normal">{variantOptions}</div>
                   )}
@@ -156,12 +165,15 @@ export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
                 <div className="flex flex-col items-end">
                   {optimisticQuantity > 1 && (
                     <p className="flex text-sm text-neutral-500">
-                      {optimisticQuantity} &times; ${line.price.toFixed(2)}
+                      {optimisticQuantity} &times; ${line.lineItem.price.toFixed(2)}
                     </p>
                   )}
                   <p className="flex text-sm text-neutral-900">
                     <span>
-                      {formatCurrency({ amount: line.price * optimisticQuantity, currency: 'CAD' })}
+                      {formatCurrency({
+                        amount: line.lineItem.price * optimisticQuantity,
+                        currency: 'CAD',
+                      })}
                     </span>
                   </p>
                 </div>

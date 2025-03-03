@@ -1,4 +1,4 @@
-import { ShippingOption } from '@payload-types'
+import { Order, ShippingOption } from '@payload-types'
 
 export type CheckoutStep = 'email' | 'shipping' | 'billing' | 'payment'
 
@@ -18,41 +18,55 @@ export interface StripeAddress {
 }
 
 export interface CheckoutLineItem {
-  productId: string
+  productId: number
   title: string
   sku: string
   description?: string
   price: number
   quantity: number
-  thumbnailMediaId?: string
+  thumbnailMediaId?: number
+  url?: string
   isVariant?: boolean
-  variant?: {
-    id?: string
-    variantOptions?: {
-      key: {
-        slug: string
-        label: string
-      }
-      value: {
-        slug: string
-        label: string
-      }
-    }[]
-  }
+  variantOptions?: {
+    key: {
+      slug: string
+      label: string
+    }
+    value: {
+      slug: string
+      label: string
+    }
+  }[]
 }
 
 export interface CheckoutSession {
   id: string
-  cartId: string
+  cartId: number
   paymentIntentId: string
   clientSecret: string
+  /**
+   * Subtotal in cents - sum of (line item price × quantity) for all items
+   */
+  subtotal: number
+  /**
+   * Shipping total in cents - from the selected shipping option
+   * Will be 0 if free shipping is available
+   */
+  shippingTotal: number
+  /**
+   * Tax amount in cents - calculated by Stripe based on subtotal and shipping
+   */
+  taxAmount: number
+  /**
+   * Total amount in cents - subtotal + shippingTotal + taxAmount
+   */
   amount: number
   currencyCode: string
   description?: string
   lineItems: CheckoutLineItem[]
   stripeCustomerId?: string
   customerEmail?: string
-  customerId?: string
+  customerId?: number
   steps: {
     email: {
       completed: boolean
@@ -73,8 +87,6 @@ export interface CheckoutSession {
       method?: string
     }
   }
-  shippingTotal: number
-  taxAmount: number
   taxCalculationId?: string
   taxTransactionId?: string
   lastUpdated: number
@@ -87,12 +99,25 @@ export interface BeginCheckoutParams {
   amount: number
   currencyCode: string
   description?: string
-  cartId: string
+  cartId: number
   lineItems: CheckoutLineItem[]
   stripeCustomerId?: string
   customerEmail?: string
-  customerId?: string
+  customerId?: number
   redirectTo: string
+  metadata?: Record<string, string>
+}
+
+export interface UpdateCheckoutSessionParams {
+  cartId: number
+  amount?: number
+  shippingTotal?: number
+  taxAmount?: number
+  lineItems?: CheckoutLineItem[]
+  stripeCustomerId?: string
+  customerEmail?: string
+  customerId?: number
+  redirectTo?: string
   metadata?: Record<string, string>
 }
 
@@ -102,7 +127,7 @@ export interface CreateStoredCheckoutParams extends Omit<BeginCheckoutParams, 'r
 }
 
 export interface UpdateCheckoutStepParams<T extends CheckoutStep> {
-  cartId: string
+  cartId: number
   step: T
   data: Partial<CheckoutSession['steps'][T]>
 }
@@ -114,6 +139,6 @@ export interface HandlePaymentSuccessParams {
 
 export interface PaymentSuccessResult {
   success: boolean
-  orderId?: string
+  order?: Order | number
   error?: string
 }

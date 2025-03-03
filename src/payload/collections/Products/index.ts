@@ -22,15 +22,15 @@ import { slugField } from '@payload/fields/slug'
 import { revalidateProduct } from './hooks/revalidateProduct'
 import {
   PRODUCT_CATEGORY_SLUG,
-  SHOP_COLLECTION_SLUG,
   PRODUCT_SLUG,
   BRAND_SLUG,
   PRODUCT_COLLECTION_SLUG,
+  PRODUCT_REVIEW_SLUG,
 } from '../constants'
-import { TableFeatureClient } from '@payloadcms/richtext-lexical/client'
+import { setPriceMinMax } from './hooks/setPriceMinMax'
 
 const Products: CollectionConfig = {
-  slug: 'products',
+  slug: PRODUCT_SLUG,
   access: {
     create: admins,
     delete: admins,
@@ -38,26 +38,12 @@ const Products: CollectionConfig = {
     update: admins,
   },
   admin: {
-    group: 'Shop',
+    group: 'Ecommerce',
     defaultColumns: ['title', 'stripeProductID', '_status'],
     livePreview: {
-      url: ({ data }) => {
-        const path = generatePreviewPath({
-          slug: typeof data?.slug === 'string' ? data.slug : '',
-          collection: 'products',
-        })
-
-        return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
-      },
+      url: () => `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
     },
-    preview: (data) => {
-      const path = generatePreviewPath({
-        slug: typeof data?.slug === 'string' ? data.slug : '',
-        collection: 'products',
-      })
-
-      return `${process.env.NEXT_PUBLIC_SERVER_URL}${path}`
-    },
+    preview: () => `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
     useAsTitle: 'title',
   },
   fields: [
@@ -67,6 +53,7 @@ const Products: CollectionConfig = {
       type: 'text',
       required: true,
       label: 'Title',
+      index: true,
     },
     {
       name: 'description',
@@ -518,11 +505,43 @@ const Products: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'priceMin',
+      label: 'Minimum Price',
+      type: 'number',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Minimum price for this product',
+        position: 'sidebar',
+      },
+      defaultValue: 0,
+    },
+    {
+      name: 'priceMax',
+      label: 'Maximum Price',
+      type: 'number',
+      index: true,
+      admin: {
+        readOnly: true,
+        description: 'Maximum price for this product',
+        position: 'sidebar',
+      },
+      defaultValue: 0,
+    },
+    {
+      name: 'reviews',
+      type: 'join',
+      collection: PRODUCT_REVIEW_SLUG,
+      on: 'product',
+      admin: {
+        position: 'sidebar',
+      },
+    },
   ],
   hooks: {
     afterChange: [revalidateProduct],
-    // afterDelete: [deleteProductFromCarts],
-    // beforeChange: [beforeProductChange],
+    beforeChange: [setPriceMinMax],
   },
   versions: {
     drafts: {
@@ -530,6 +549,7 @@ const Products: CollectionConfig = {
     },
     maxPerDoc: 50,
   },
+  timestamps: true,
 } as const
 
 export default Products

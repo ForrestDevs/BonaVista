@@ -1,5 +1,5 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@components/ui/tooltip'
-import { ShoppingBagIcon } from 'lucide-react'
+import { ShoppingBagIcon } from '@/components/icons/shopping-bag'
 import { Suspense } from 'react'
 import { CartLink } from '@/components/layout/headers/shop/cart/cart-link'
 import { getCart } from '@/lib/data/cart'
@@ -7,7 +7,7 @@ import { formatMoney } from '@/lib/utils/formatMoney'
 
 const CartFallback = () => (
   <div className="h-6 w-6 opacity-30">
-    <ShoppingBagIcon />
+    <ShoppingBagIcon className="h-6 w-6" />
   </div>
 )
 
@@ -24,21 +24,24 @@ const CartSummaryNavInner = async () => {
   if (!cart) {
     return <CartFallback />
   }
-  if (!cart.items.length) {
+  if (!cart.lineItems.length) {
     return <CartFallback />
   }
 
-  const total = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0)
-  const totalItems = cart.items.reduce((acc, item) => acc + item.quantity, 0)
+  const total = cart.lineItems.reduce(
+    (acc, item) => acc + item.lineItem.price * item.lineItem.quantity,
+    0,
+  )
+  const totalItems = cart.lineItems.reduce((acc, item) => acc + item.lineItem.quantity, 0)
 
   return (
     <TooltipProvider>
       <Tooltip delayDuration={100}>
         <TooltipTrigger asChild>
-          <div>
+          <div className="flex relative items-center justify-center min-w-10 min-h-10 rounded-full hover:bg-gray-100 transition-colors">
             <CartLink>
-              <ShoppingBagIcon />
-              <span className="absolute bottom-0 right-0 inline-flex h-5 w-5 translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border-2 bg-white text-center text-xs">
+              <ShoppingBagIcon className="h-6 w-6" />
+              <span className="absolute bottom-0 right-0 inline-flex h-4 w-4 translate-x-1/3 translate-y-1/3 items-center justify-center rounded-full border border-white bg-blue-600 text-[10px] font-medium text-white">
                 <span className="sr-only">Items in cart: </span>
                 {totalItems}
               </span>
@@ -48,7 +51,7 @@ const CartSummaryNavInner = async () => {
             </CartLink>
           </div>
         </TooltipTrigger>
-        <TooltipContent side="left" sideOffset={25}>
+        <TooltipContent side="left" sideOffset={30}>
           <p>Items: {totalItems}</p>
           <p>Total: {formatMoney({ amount: total, currency: 'CAD' })}</p>
         </TooltipContent>

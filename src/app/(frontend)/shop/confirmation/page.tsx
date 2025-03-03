@@ -8,6 +8,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ClearCookieClientComponent } from '@/components/shop/checkout/clear-cart-cookie'
 import { AlertCircle } from 'lucide-react'
 import SkeletonOrderConfirmed from '@components/shop/skeletons/layout/skeleton-order-confirmed'
+import crypto from 'crypto'
+import { generateOrderAuthHash } from '@/lib/data/order'
 
 interface ConfirmationPageProps {
   searchParams: Promise<{
@@ -36,10 +38,20 @@ export default async function ConfirmationPage({ searchParams }: ConfirmationPag
     clientSecret: paymentIntent.clientSecret,
   })
 
+  // Generate auth token for order access if the order was created successfully
+  let orderViewUrl = '/shop'
+
+  const order = typeof result.order === 'object' ? result.order : null
+
+  if (result.success && order) {
+    const authToken = await generateOrderAuthHash(order.id.toString(), order.orderNumber)
+    orderViewUrl = `/shop/orders?id=${order.id}&auth=${authToken}`
+  }
+
   return (
     <Suspense fallback={<SkeletonOrderConfirmed />}>
       <div className="container py-8">
-        <ClearCookieClientComponent cartId={cart_id} />
+        <ClearCookieClientComponent cartId={parseInt(cart_id)} />
         <div className="max-w-2xl mx-auto">
           {result.error ? (
             <Fragment>
@@ -79,12 +91,12 @@ export default async function ConfirmationPage({ searchParams }: ConfirmationPag
 
                 <div className="pt-6">
                   <p className="font-medium">Order number</p>
-                  <p className="text-gray-600">{result.orderId}</p>
+                  <p className="text-gray-600">{order?.id}</p>
                 </div>
 
                 <div className="pt-8 space-x-4">
                   <Button asChild>
-                    <Link href={`/shop/orders/${result.orderId}`}>View Order Details</Link>
+                    <Link href={orderViewUrl}>View Order Details</Link>
                   </Button>
                   <Button variant="outline" asChild>
                     <Link href="/shop">Continue Shopping</Link>

@@ -1,10 +1,12 @@
 import { CollectionConfig } from 'payload'
 import { SHIPPING_OPTION_SLUG } from '../constants'
+import { address } from '@/payload/fields/address'
 
-export const ShippingOptions: CollectionConfig = {
+const ShippingOptions: CollectionConfig = {
   slug: SHIPPING_OPTION_SLUG,
   admin: {
     useAsTitle: 'name',
+    group: 'Admin',
   },
   fields: [
     {
@@ -59,13 +61,22 @@ export const ShippingOptions: CollectionConfig = {
               type: 'text',
               required: true,
               admin: {
-                description: 'Enter a regex pattern to match postal codes. Example: For GTA use: ^[MmLl][0-9][A-Za-z]'
+                description:
+                  'Enter a regex pattern to match postal codes. Example: For GTA use: ^[MmLl][0-9][A-Za-z]',
               },
             },
           ],
         },
       ],
     },
+    address({
+      overrides: {
+        name: 'pickupLocation',
+        admin: {
+          condition: (data) => data.type === 'pickup',
+        },
+      },
+    }),
     {
       name: 'isActive',
       type: 'checkbox',
@@ -73,4 +84,7 @@ export const ShippingOptions: CollectionConfig = {
       required: true,
     },
   ],
-} 
+  timestamps: true,
+} as const
+
+export default ShippingOptions

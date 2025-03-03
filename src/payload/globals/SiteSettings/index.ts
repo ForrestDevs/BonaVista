@@ -7,6 +7,9 @@ export const SiteSettings: GlobalConfig = {
   access: {
     read: () => true,
   },
+  admin: {
+    group: 'Admin',
+  },
   hooks: {
     afterChange: [async () => revalidateTag('settings')],
   },

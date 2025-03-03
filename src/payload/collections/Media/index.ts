@@ -11,6 +11,9 @@ import { formatAltHook } from './hooks/formatAlt'
 
 const Media: CollectionConfig = {
   slug: MEDIA_SLUG,
+  admin: {
+    group: 'Files',
+  },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -18,12 +21,6 @@ const Media: CollectionConfig = {
     update: authenticated,
   },
   fields: [
-    {
-      name: 'folder',
-      type: 'relationship',
-      hasMany: true,
-      relationTo: MEDIA_FOLDER_SLUG,
-    },
     {
       name: 'alt',
       type: 'text',

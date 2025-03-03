@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { startTransition, useEffect, useState } from 'react'
 
 // if current order cartId is the same as the cookie, clear the cookie
-export const ClearCookieClientComponent = ({ cartId }: { cartId: string }) => {
+export const ClearCookieClientComponent = ({ cartId }: { cartId: number }) => {
   const router = useRouter()
   const [hasCleared, setHasCleared] = useState(false)
 

@@ -7,7 +7,6 @@ const activeAndTitles = 'bg-neutral-800 dark:bg-neutral-300'
 const items = 'bg-neutral-400 dark:bg-neutral-700'
 
 export function ResultsSkeleton() {
-
   return (
     <React.Fragment>
       <div className="order-first w-full flex-none md:max-w-[125px]">

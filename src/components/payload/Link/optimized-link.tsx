@@ -17,6 +17,7 @@ export function OptimizedLink(props: ComponentPropsWithRef<typeof Link>) {
   return (
     <Link
       {...props}
+      aria-description={props['aria-description']}
       prefetch={false}
       onMouseEnter={(e) => {
         conditionalPrefetch()
