@@ -29,11 +29,11 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
             priority
           />
         </div>
-        <div className="absolute inset-0 z-3 bg-gradient-to-br from-blue-700 to-blue-900 opacity-70" />
+        {/* <div className="absolute inset-0 z-3 bg-linear-to-br from-blue-700 to-blue-900 opacity-70" /> */}
 
         {/* Content container with container-like padding */}
-        <div className="relative z-10 flex flex-col justify-center h-full p-8 lg:p-12">
-          <div className="max-w-md mx-auto">
+        <div className="relative z-10 flex flex-col justify-center h-full p-8 lg:p-12 ">
+          <div className="max-w-md mx-auto bg-gray-900/40 backdrop-blur-lg border border-blue-400/70 rounded-lg p-8 shadow-lg">
             <h1 className="text-3xl font-bold mb-4">Transform Your Outdoor Space</h1>
             <p className="text-lg opacity-90 mb-6">
               Join the BonaVista LeisureScapes community to access exclusive offers, track orders,

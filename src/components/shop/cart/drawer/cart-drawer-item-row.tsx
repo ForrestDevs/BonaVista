@@ -109,14 +109,14 @@ export const CartDrawerItem = forwardRef<HTMLLIElement, CartDrawerItemProps>(
             transition={{ duration: 0.15, ease: 'easeOut' }}
           >
             {thumbnail ? (
-              <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md">
                 <Media
                   resource={thumbnail}
                   imgClassName="absolute inset-0 h-full w-full object-cover object-center"
                 />
               </div>
             ) : (
-              <div className="h-16 w-16 flex-shrink-0 rounded-md bg-neutral-100" />
+              <div className="h-16 w-16 shrink-0 rounded-md bg-neutral-100" />
             )}
 
             <div className="flex flex-col ml-4 gap-4 w-full h-full ">

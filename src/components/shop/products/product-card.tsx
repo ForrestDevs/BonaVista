@@ -93,7 +93,7 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 sm:p-5 flex-grow flex flex-col gap-3">
+      <CardContent className="p-4 sm:p-5 grow flex flex-col gap-3">
         <div className="flex flex-wrap gap-1.5">
           {brands?.filter(Boolean).map((brand, index) => (
             <Badge

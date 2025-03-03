@@ -22,7 +22,7 @@ export const ServicesBlock: React.FC<
         </h2>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-8">
           <p className="text-base md:text-lg leading-relaxed text-gray-700 max-w-3xl">{body}</p>
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <CMSLink
               {...link}
               className={cn(
@@ -50,14 +50,14 @@ interface OfferingCardProps {
 
 function OfferingCard({ offering }: OfferingCardProps) {
   return (
-    <div className="w-full max-w-[400px] sm:max-w-none relative aspect-[3/4] max-h-[400px] rounded-xl overflow-hidden group transform transition-transform duration-200 hover:scale-[1.01] shadow-md hover:shadow-lg">
+    <div className="w-full max-w-[400px] sm:max-w-none relative aspect-3/4 max-h-[400px] rounded-xl overflow-hidden group transform transition-transform duration-200 hover:scale-[1.01] shadow-md hover:shadow-lg">
       <Media
         resource={offering.image}
         fill
         imgClassName="object-cover object-center transition-transform duration-300 group-hover:scale-[1.02]"
         className="absolute inset-0"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex flex-col justify-end p-6">
+      <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/40 to-transparent flex flex-col justify-end p-6">
         <h3 className="text-xl md:text-2xl font-bold text-white mb-3">{offering.title}</h3>
         <p className="text-sm md:text-base text-gray-100 mb-5 line-clamp-3">
           {offering.description}

@@ -33,7 +33,7 @@ const SkeletonCartPage = () => {
               <Table>
                 <TableHeader className="border-t-0">
                   <TableRow>
-                    <TableHead className="!pl-0">
+                    <TableHead className="pl-0!">
                       <div className="w-10 h-6 bg-gray-200 animate-pulse" />
                     </TableHead>
                     <TableHead></TableHead>
@@ -43,7 +43,7 @@ const SkeletonCartPage = () => {
                     <TableHead>
                       <div className="w-12 h-6 bg-gray-200 animate-pulse" />
                     </TableHead>
-                    <TableHead className="!pr-0">
+                    <TableHead className="pr-0!">
                       <div className="flex justify-end">
                         <div className="w-12 h-6 bg-gray-200 animate-pulse" />
                       </div>

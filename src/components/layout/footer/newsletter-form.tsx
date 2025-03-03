@@ -16,7 +16,7 @@ export function NewsletterForm() {
           type="email"
           autoComplete="email"
           placeholder="Enter your email"
-          className="bg-primary-foreground text-primary flex-grow"
+          className="bg-primary-foreground text-primary grow"
           id="newsletter-email"
         />
         <Button type="submit" variant="secondary">

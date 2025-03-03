@@ -88,14 +88,14 @@ export function ProductGallery() {
             variant="ghost"
             size="icon"
             onClick={() => setIsZoomed(true)}
-            className="absolute bottom-5 right-4 rounded-full bg-background/80 p-2 shadow-sm backdrop-blur-sm transition-opacity hover:bg-background"
+            className="absolute bottom-5 right-4 rounded-full bg-background/80 p-2 shadow-xs backdrop-blur-xs transition-opacity hover:bg-background"
             aria-label="Zoom image"
           >
             <ZoomInIcon className="h-5 w-5" />
           </Button>
 
           {allImages.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 rounded-full bg-background/90 px-2 py-1 shadow-md backdrop-blur-sm">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 rounded-full bg-background/90 px-2 py-1 shadow-md backdrop-blur-xs">
               <Button
                 variant="ghost"
                 size="icon"
@@ -149,7 +149,7 @@ export function ProductGallery() {
       <Dialog open={isZoomed} onOpenChange={setIsZoomed}>
         <DialogTitle className="sr-only">{product.title}</DialogTitle>
         <DialogDescription className="sr-only">{product.description}</DialogDescription>
-        <DialogContent className="max-w-screen-lg">
+        <DialogContent className="max-w-(--breakpoint-lg)">
           <AspectRatio ratio={1} className="bg-background">
             <Media
               resource={allImages[current].image}

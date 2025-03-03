@@ -111,7 +111,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
                 href={`/shop/category/${slug.join('/')}/${child.slug}`}
                 className="group relative overflow-hidden rounded-lg border hover:border-gray-400 transition-all duration-300 hover:shadow-lg"
               >
-                <div className="aspect-[16/9] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+                <div className="aspect-16/9 bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
                   {/* Placeholder for when we have images */}
                   <div className="flex h-full items-center justify-center text-4xl text-gray-400 dark:text-gray-600">
                     {/* Show first letter of category name as icon */}
@@ -163,7 +163,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-hidden focus:ring-2 focus:ring-primary"
                 />
                 <button className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors">
                   Subscribe
@@ -173,7 +173,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           </div>
 
           {/* Why Shop With Us Banner */}
-          <div className="grid md:grid-cols-3 gap-8 bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-sm">
+          <div className="grid md:grid-cols-3 gap-8 bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-xs">
             <div className="text-center">
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                 <svg

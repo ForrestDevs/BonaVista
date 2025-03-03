@@ -33,10 +33,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
-      // className={cn(GeistSans.variable, GeistMono.variable, '!scroll-smooth')}
+      // className={cn(GeistSans.variable, GeistMono.variable, 'scroll-smooth!')}
       lang="en"
       suppressHydrationWarning
-      className="!scroll-smooth"
+      className="scroll-smooth!"
     >
       <head>
         {/* <script src="https://unpkg.com/react-scan/dist/auto.global.js" async /> */}

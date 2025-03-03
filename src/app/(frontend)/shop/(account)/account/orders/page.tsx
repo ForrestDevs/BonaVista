@@ -45,7 +45,7 @@ export default async function Orders() {
           <p className="text-gray-600 mb-6">When you place an order, it will appear here.</p>
           <OptimizedLink
             href="/shop"
-            className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-xs text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
           >
             Start Shopping
           </OptimizedLink>
@@ -75,7 +75,7 @@ export default async function Orders() {
         {orders.map((order) => (
           <div
             key={order.id}
-            className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+            className="bg-white rounded-xl shadow-xs hover:shadow-md transition-shadow duration-200 overflow-hidden"
           >
             <div className="p-6 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -113,8 +113,8 @@ export default async function Orders() {
               <div className="border-t border-gray-100 pt-6">
                 <div className="flex items-center gap-6 overflow-x-auto pb-4 px-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                   {order.lineItems?.slice(0, 4).map((item, index) => (
-                    <div key={index} className="flex-shrink-0 group relative">
-                      <div className="relative h-28 w-28 rounded-xl border border-gray-200 overflow-hidden shadow-sm transition-all duration-200 group-hover:shadow-md group-hover:border-gray-300">
+                    <div key={index} className="shrink-0 group relative">
+                      <div className="relative h-28 w-28 rounded-xl border border-gray-200 overflow-hidden shadow-xs transition-all duration-200 group-hover:shadow-md group-hover:border-gray-300">
                         {/* Product thumbnail */}
                         <div className="h-full w-full bg-gray-100 flex items-center justify-center text-gray-400">
                           <span className="text-xs">{item.lineItem.sku}</span>
@@ -135,7 +135,7 @@ export default async function Orders() {
               <div className="flex justify-end pt-4 border-t border-gray-100">
                 <OptimizedLink
                   href={`/shop/orders?id=${order.id}&auth=${generateOrderAuthHash(order.id.toString(), order.orderNumber)}`}
-                  className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                  className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-xs text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                 >
                   View Order Details →
                 </OptimizedLink>

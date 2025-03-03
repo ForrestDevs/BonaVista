@@ -40,7 +40,7 @@ const Main = ({ children, className, id }: MainProps) => {
         // Inline Links
         'prose-a:underline prose-a:decoration-primary/50 prose-a:underline-offset-2 prose-a:text-foreground/75 prose-a:transition-all',
         // Inline Link Hover
-        'hover:prose-a:decoration-primary hover:prose-a:text-foreground',
+        'prose-a:hover:decoration-primary prose-a:hover:text-foreground',
         // Blockquotes
         'prose-blockquote:not-italic',
         // Pre and Code Blocks
@@ -108,7 +108,7 @@ const Article = ({ children, className, id, dangerouslySetInnerHTML }: ArticlePr
         // Inline Links
         'prose-a:underline prose-a:decoration-primary/50 prose-a:underline-offset-2 prose-a:text-foreground/75 prose-a:transition-all',
         // Inline Link Hover
-        'hover:prose-a:decoration-primary hover:prose-a:text-foreground',
+        'prose-a:hover:decoration-primary prose-a:hover:text-foreground',
         // Blockquotes
         'prose-blockquote:not-italic',
         // Pre and Code Blocks

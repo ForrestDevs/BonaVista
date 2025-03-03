@@ -67,7 +67,7 @@ export function BillingStep({
 
   return (
     <div className={`space-y-6 ${isDisabled ? 'opacity-60 pointer-events-none' : ''}`}>
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100 mb-6">
+      <div className="bg-linear-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100 mb-6">
         <p className="text-sm text-slate-700 flex items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -88,7 +88,7 @@ export function BillingStep({
       </div>
 
       <div className="space-y-6">
-        <div className="flex items-center p-3 bg-white rounded-lg border border-gray-200 shadow-sm transition-all hover:border-blue-300">
+        <div className="flex items-center p-3 bg-white rounded-lg border border-gray-200 shadow-xs transition-all hover:border-blue-300">
           <Checkbox
             id="same-as-shipping"
             checked={sameAsShipping}
@@ -122,7 +122,7 @@ export function BillingStep({
 
         {sameAsShipping && shippingAddress && (
           <div className="transition-all duration-300 ease-in-out">
-            <div className="p-5 bg-white rounded-lg border border-gray-200 shadow-sm">
+            <div className="p-5 bg-white rounded-lg border border-gray-200 shadow-xs">
               <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b">
                 Shipping Address
               </h4>

@@ -11,7 +11,7 @@ export const CartDrawerWrapper = ({ children }: { children: ReactNode }) => {
   const isDesktop = useMediaQuery('(min-width: 640px)')
 
   return (
-    <Drawer open={open} shouldScaleBackground={true} direction={isDesktop ? 'right' : 'bottom'}>
+    <Drawer open={open} shouldScaleBackground direction={isDesktop ? 'right' : 'bottom'}>
       <DrawerTitle className="sr-only">Shopping cart</DrawerTitle>
       <DrawerDescription className="sr-only">Shopping cart</DrawerDescription>
       <DrawerContent

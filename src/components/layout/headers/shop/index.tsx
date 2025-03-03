@@ -13,7 +13,7 @@ import { OptimizedLink } from '@/components/payload/Link/optimized-link'
 export async function ShopHeader() {
   return (
     <header className="h-[var(--shop-header-height)]">
-      <div className="fixed top-0 left-0 right-0 z-50 shadow-sm min-w-[320px] select-none h-[var(--shop-header-height)]">
+      <div className="fixed top-0 left-0 right-0 z-50 shadow-xs min-w-[320px] select-none h-[var(--shop-header-height)]">
         <div
           className={cn(
             RemoveScroll.classNames.fullWidth,

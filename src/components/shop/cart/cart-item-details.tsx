@@ -16,16 +16,16 @@ export function CartItemThumbnail({ line }: { line: CartItem }) {
         className="transition-colors hover:text-muted-foreground w-full"
         href={`/product/${product?.slug}`}
       >
-        <div className="rounded-lg relative w-full overflow-hidden transition-shadow ease-in-out duration-150 aspect-[1/1] border border-muted">
+        <div className="rounded-lg relative w-full overflow-hidden transition-shadow ease-in-out duration-150 aspect-1/1 border border-muted">
           {thumbnail ? (
-            <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-neutral-200">
+            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md border border-neutral-200">
               <Media
                 resource={thumbnail}
                 imgClassName="absolute inset-0 h-full w-full object-cover object-center"
               />
             </div>
           ) : (
-            <div className="h-24 w-24 flex-shrink-0 rounded-md bg-neutral-100" />
+            <div className="h-24 w-24 shrink-0 rounded-md bg-neutral-100" />
           )}
         </div>
       </YnsLink>

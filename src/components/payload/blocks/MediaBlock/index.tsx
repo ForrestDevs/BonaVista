@@ -46,7 +46,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
     >
       {position === 'fullscreen' && (
         <div className="relative w-full">
-          <div className="aspect-[16/9] md:aspect-[21/9]">
+          <div className="aspect-16/9 md:aspect-21/9">
             <Media 
               resource={media} 
               src={staticImage}
@@ -57,7 +57,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
       )}
       {position === 'default' && (
         <div className="relative w-full overflow-hidden rounded-lg">
-          <div className="aspect-[4/3] md:aspect-[16/9]">
+          <div className="aspect-4/3 md:aspect-16/9">
             <Media 
               resource={media} 
               src={staticImage}

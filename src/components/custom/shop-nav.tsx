@@ -86,7 +86,7 @@ const NavigationMenuContent = React.forwardRef<
   <NavigationMenuPrimitive.Content
     ref={ref}
     className={cn(
-      'absolute top-[55px] left-1/2 -translate-x-1/2',
+      'absolute left-1/2 top-[55px] -translate-x-1/2',
       'data-[state=open]:animate-nav-enter data-[state=closed]:animate-nav-exit',
       dropdownAnimationClass(),
       className,
@@ -147,13 +147,7 @@ const SingleLink: React.FC<SingleLinkProps> = ({
 }
 
 const dropdownAnimationClass = () =>
-  cn(
-    'bg-white rounded-sm',
-    'border border-gray-200',
-    'shadow-sm',
-    'transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]',
-    'z-50',
-  )
+  cn('w-max', 'bg-white rounded-sm', 'border border-gray-200', 'shadow-xs', 'z-50')
 
 const mainDropdownClass = () =>
   cn(

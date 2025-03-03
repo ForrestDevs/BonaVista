@@ -23,7 +23,7 @@ export default function DeleteAccountSection() {
 
   return (
     <>
-      <h2 className="!mt-10 text-xl font-semibold">Danger Zone</h2>
+      <h2 className="mt-10! text-xl font-semibold">Danger Zone</h2>
       <Card className="border-red-500/40 dark:border-red-500/50">
         <CardContent className="space-y-2 pt-6">
           <h4 className="font-semibold">Delete Account</h4>

@@ -44,7 +44,7 @@ export function Carousel({ slides }: CarouselProps) {
             className="object-cover object-center z-0"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent">
+          <div className="absolute inset-0 bg-linear-to-r from-black/60 to-transparent">
             <div className="flex h-full items-center">
               <div className="ml-8 md:ml-16 max-w-xl space-y-4 text-white">
                 <h2 className="text-4xl md:text-6xl font-bold">{slide.title}</h2>

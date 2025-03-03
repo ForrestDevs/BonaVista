@@ -190,7 +190,7 @@ export function CheckoutForm({ initialSession }: CheckoutFormProps) {
             <CheckoutProgress session={session} />
 
             {error && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm shadow-sm">
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm shadow-xs">
                 {error}
               </div>
             )}
@@ -361,7 +361,7 @@ export function CheckoutForm({ initialSession }: CheckoutFormProps) {
 // Order Summary Component
 function OrderSummary({ session }: { session: CheckoutSession }) {
   return (
-    <Card className="overflow-hidden border border-gray-200 rounded-lg shadow-sm">
+    <Card className="overflow-hidden border border-gray-200 rounded-lg shadow-xs">
       <div className="p-4 border-b border-gray-100 bg-gray-50">
         <h3 className="text-base font-semibold text-gray-900">Order Summary</h3>
       </div>
@@ -372,7 +372,7 @@ function OrderSummary({ session }: { session: CheckoutSession }) {
           {session.lineItems.map((item) => {
             return (
               <div key={item.sku} className="flex py-3 first:pt-0 last:pb-0 group">
-                <div className="relative h-14 w-14 rounded-md border overflow-hidden flex-shrink-0 bg-gray-50">
+                <div className="relative h-14 w-14 rounded-md border overflow-hidden shrink-0 bg-gray-50">
                   {item.thumbnailMediaId ? (
                     <LineItemThumbnail
                       mediaId={item.thumbnailMediaId}
@@ -403,7 +403,7 @@ function OrderSummary({ session }: { session: CheckoutSession }) {
                     <h3 className="text-sm font-medium text-gray-900 truncate pr-2">
                       {item.title}
                     </h3>
-                    <p className="text-sm font-medium text-gray-900 flex-shrink-0 ml-2">
+                    <p className="text-sm font-medium text-gray-900 shrink-0 ml-2">
                       {formatStripeMoney({
                         amount: Math.round(item.price * item.quantity * 100), // Convert to cents for display
                         currency: session.currencyCode,
@@ -530,7 +530,7 @@ function CompletedStepSummary({
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-none transition-shadow duration-200">
+    <div className="bg-white rounded-lg border border-gray-200 shadow-xs hover:shadow-none transition-shadow duration-200">
       <div className="p-3">
         <div className="flex justify-between items-center mb-1">
           <h4 className="text-sm font-medium text-gray-900">{stepLabel}</h4>
@@ -585,7 +585,7 @@ function CheckoutSection({
         <div className="flex items-center">
           <div
             className={cn(
-              'flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-sm font-medium',
+              'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-medium',
               isActive
                 ? 'bg-blue-600 text-white ring-1 ring-blue-600'
                 : isCompleted
@@ -622,7 +622,7 @@ function CheckoutSection({
       {/* Section Content */}
       {showContent ? (
         <div className="mt-4 overflow-hidden transition-all duration-300 ease-in">
-          <Card className={cn('border p-4 shadow-sm', isActive && 'ring-1 ring-blue-200 bg-white')}>
+          <Card className={cn('border p-4 shadow-xs', isActive && 'ring-1 ring-blue-200 bg-white')}>
             {children}
           </Card>
         </div>

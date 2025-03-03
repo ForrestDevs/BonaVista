@@ -46,7 +46,7 @@ const ProfileForm = ({ user }: { user: User }) => {
               <Label className="text-base font-bold" htmlFor="user-email">
                 E-mail
               </Label>
-              <p className="!mb-4 text-sm text-zinc-500">
+              <p className="mb-4! text-sm text-zinc-500">
                 This is the email address you use to log in to your account.
               </p>
               <Fieldset>
@@ -67,7 +67,7 @@ const ProfileForm = ({ user }: { user: User }) => {
                 <Label className="text-base" htmlFor="user-name">
                   Name
                 </Label>
-                <p className="!mb-4 text-sm text-zinc-500">Display name for your account.</p>
+                <p className="mb-4! text-sm text-zinc-500">Display name for your account.</p>
                 <Input
                   id="user-name"
                   name="name"

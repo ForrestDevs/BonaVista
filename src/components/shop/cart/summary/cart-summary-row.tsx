@@ -86,14 +86,14 @@ export const CartSummaryRow = forwardRef<HTMLLIElement, CartSummaryRowProps>(
       >
         <div className="flex items-center gap-6">
           {thumbnail ? (
-            <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
               <Media
                 resource={thumbnail}
                 imgClassName="absolute inset-0 h-full w-full object-cover object-center"
               />
             </div>
           ) : (
-            <div className="h-24 w-24 flex-shrink-0 rounded-md bg-neutral-100" />
+            <div className="h-24 w-24 shrink-0 rounded-md bg-neutral-100" />
           )}
 
           <div className="flex flex-1 flex-col">
