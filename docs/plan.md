@@ -160,12 +160,7 @@ cache optimizations:
 TODO
 - check cart merge logic with guest and customers cart 
 - add category images 
-- add product link on title to line item in order
-- Update orders page
-- Send email on order complete
-- When order is successful, add zoho webhook and send email to admin notifying the new order. (Add spire integration to this email)
 - Handle customers and stripeIds
 - save shipping and billing address to customer account (after checkout is complete)
 - fix checkout race condition with steps
 - deploy to prod with live stripe keys
-- make sure payment button stays disabled until page is re routed to confirmation page

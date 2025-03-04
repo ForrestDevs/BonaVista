@@ -88,9 +88,9 @@ const getCachedCustomerDTO = cache(
       const customerDTO: CustomerDTO = {
         id: customer.id,
         email: user.email,
-        firstName: user.firstName ?? '',
-        lastName: user.lastName ?? '',
-        phone: user.phone ?? '',
+        firstName: customer.firstName ?? '',
+        lastName: customer.lastName ?? '',
+        phone: customer.phone ?? '',
         billingAddress: customer.billing_addresses,
         shippingAddresses: customer.shipping_addresses,
         stripeCustomerId: customer.stripeCustomerID ?? '',
@@ -133,13 +133,14 @@ export async function findOrCreateCheckoutCustomer(email: string) {
 
     const customer = customers[0] || null
 
-    // If customer has an account and user is not logged in, they need to login
-    if (customer?.has_account && !isLoggedIn) {
-      return {
-        customer,
-        needsLogin: true,
-      }
-    }
+
+    // // If customer has an account and user is not logged in, they need to login
+    // if (customer?.has_account && !isLoggedIn) {
+    //   return {
+    //     customer,
+    //     needsLogin: true,
+    //   }
+    // }
 
     // If no customer exists, create a new one
     if (!customer) {

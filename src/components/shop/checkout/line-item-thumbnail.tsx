@@ -43,7 +43,11 @@ export function LineItemThumbnail({
 
   if (!mediaId || isLoading) {
     return (
-      <div className={`flex items-center justify-center text-gray-400 ${className}`}>
+      <div
+        className={`flex items-center justify-center text-gray-400 ${className}`}
+        id={`line-item-thumbnail-${mediaId}-id`}
+        key={`line-item-thumbnail-${mediaId}`}
+      >
         <svg
           className="w-6 h-6"
           xmlns="http://www.w3.org/2000/svg"

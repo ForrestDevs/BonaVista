@@ -22,6 +22,7 @@ import {
 import { CART_SLUG } from '@/payload/collections/constants'
 import { deleteCart } from '../cart'
 import { Order } from '@payload-types'
+import { processOrderEmails } from '../email'
 
 const CHECKOUT_SESSION_EXPIRY = 1000 * 60 * 30 // 30 minutes
 const ORDER_ARCHIVE_EXPIRY = 1000 * 60 * 60 * 24 * 30 // 30 days
@@ -317,8 +318,8 @@ export async function updateCheckoutStep<T extends CheckoutStep>({
   step,
   data,
 }: UpdateCheckoutStepParams<T>): Promise<CheckoutSession | null> {
-  console.log(`[updateCheckoutStep] Updating step ${step} with data:`, data);
-  
+  console.log(`[updateCheckoutStep] Updating step ${step} with data:`, data)
+
   const redisKey = `cart_checkout_session:${cartId}`
   const session = await redis.get<CheckoutSession>(redisKey)
 
@@ -333,7 +334,7 @@ export async function updateCheckoutStep<T extends CheckoutStep>({
     shipping: session.steps.shipping.completed,
     billing: session.steps.billing.completed,
     payment: session.steps.payment.completed,
-  });
+  })
 
   // Preserve completion states of other steps
   const updatedSession: CheckoutSession = {
@@ -509,16 +510,34 @@ export async function handlePaymentSuccess({
 
     const newOrderNumber = uuidv4()
 
+    console.log('checkoutSession', checkoutSession.steps.shipping.address)
+
+
     const orderData: Omit<Order, 'createdAt' | 'updatedAt' | 'sizes' | 'id'> = {
       status: 'succeeded',
       orderNumber: newOrderNumber.toUpperCase(),
       currency: paymentIntent.currency,
       paymentIntent: paymentIntent as any,
       orderedBy: checkoutSession.customerId,
-      shippingRate: {
-        displayName: checkoutSession.steps.shipping.method?.name,
-        rate: checkoutSession.shippingTotal,
+      deliveryType: checkoutSession.steps.shipping.method.type,
+      shippingDetails: {
+        title: checkoutSession.steps.shipping.method.name,
+        description: '',
+        shipTo: {
+          first_name: checkoutSession.steps.shipping.address.firstName,
+          last_name: checkoutSession.steps.shipping.address.lastName,
+          line_1: checkoutSession.steps.shipping.address.address.line1,
+          line_2: checkoutSession.steps.shipping.address.address.line2,
+          city: checkoutSession.steps.shipping.address.address.city,
+          country: checkoutSession.steps.shipping.address.address.country,
+          state: checkoutSession.steps.shipping.address.address.state,
+          postal_code: checkoutSession.steps.shipping.address.address.postal_code,
+          phone: checkoutSession.steps.shipping.address?.phone ?? 'N/A',
+          email: checkoutSession.steps.email.value ?? '',
+        },
       },
+      subtotal: checkoutSession.subtotal,
+      shippingTotal: checkoutSession.shippingTotal,
       taxTotal: checkoutSession.taxAmount,
       total: checkoutSession.amount,
       lineItems: checkoutSession.lineItems.map((item) => ({
@@ -529,7 +548,7 @@ export async function handlePaymentSuccess({
           quantity: item.quantity,
           isVariant: item.isVariant,
           variantOptions: item.variantOptions,
-          thumbnailMediaId: item.thumbnailMediaId,
+          thumbnail: item.thumbnailMediaId,
           url: item.url,
         },
       })),
@@ -581,7 +600,7 @@ export async function handlePaymentSuccess({
     await archiveCheckoutSession(checkoutSession, order.id)
 
     // Trigger post-order processes
-    void triggerPostOrderProcesses({
+    await triggerPostOrderProcesses({
       orderId: order.id,
       email: checkoutSession.customerEmail,
       cartId: parseInt(cartId),
@@ -609,7 +628,15 @@ async function triggerPostOrderProcesses({
   email: string
   cartId: number
 }): Promise<void> {
+  // Delete the cart since order is completed
   await deleteCart(cartId)
+
+  // Send order confirmation emails
+  try {
+    await processOrderEmails(orderId)
+  } catch (error) {
+    console.error('Error sending order emails:', error)
+  }
 }
 
 export async function storeHashedPaymentIntent(id: string, clientSecret: string) {

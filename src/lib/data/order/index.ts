@@ -6,43 +6,46 @@ import { ORDER_SLUG } from '@/payload/collections/constants'
 import { getCurrentUser } from '@/lib/data/auth'
 import { cache } from '@/lib/utils/cache'
 import { createHash } from 'crypto'
+import { sendPickupReadyEmail, sendShippingConfirmationEmail } from '@/lib/data/email'
 
 /**
  * Get all orders for the currently authenticated user
  * @returns Array of user orders or null if no user is authenticated
  */
-export const getCurrentUserOrders = cache(
-  async (): Promise<Order[] | null> => {
-    const user = await getCurrentUser()
+export async function getCurrentUserOrders() {
+  const user = await getCurrentUser()
+  const cacheFn = cache(
+    async (): Promise<Order[] | null> => {
+      if (!user || !user.customer) {
+        return null
+      }
 
-    if (!user || !user.customer) {
-      return null
-    }
+      const customerId = typeof user.customer === 'object' ? user.customer.id : user.customer
 
-    const customerId = typeof user.customer === 'object' ? user.customer.id : user.customer
-
-    const payload = await getPayload()
-    try {
-      const { docs } = await payload.find({
-        collection: ORDER_SLUG,
-        where: {
-          orderedBy: {
-            equals: customerId,
+      const payload = await getPayload()
+      try {
+        const { docs } = await payload.find({
+          collection: ORDER_SLUG,
+          where: {
+            orderedBy: {
+              equals: customerId,
+            },
           },
-        },
-        sort: '-createdAt',
-      })
+          sort: '-createdAt',
+        })
 
-      return docs as Order[]
-    } catch (error) {
-      console.error('Error fetching user orders:', error)
-      return []
-    }
-  },
-  {
-    tags: ['orders'],
-  },
-)
+        return docs as Order[]
+      } catch (error) {
+        console.error('Error fetching user orders:', error)
+        return []
+      }
+    },
+    {
+      tags: ['orders'],
+    },
+  )
+  return await cacheFn()
+}
 
 /**
  * Get a specific order by ID and verify ownership if a user is logged in
@@ -223,4 +226,93 @@ export async function getCachedOrderById(orderId: number): Promise<Order | null>
   )
 
   return cachedFn(orderId)
+}
+
+/**
+ * Marks an order as ready for pickup and sends a notification email to the customer
+ */
+export async function markOrderReadyForPickup(
+  orderId: number,
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const payload = await getPayload()
+
+    // Update order status to indicate it's ready for pickup
+    await payload.update({
+      collection: ORDER_SLUG,
+      id: orderId,
+      data: {
+        status: 'ready_for_pickup',
+      },
+    })
+
+    // Send pickup ready email to the customer
+    try {
+      const emailSent = await sendPickupReadyEmail(orderId)
+      if (!emailSent) {
+        console.error(`Failed to send pickup ready email for order ${orderId}`)
+      }
+    } catch (error) {
+      console.error('Error sending pickup ready email:', error)
+    }
+
+    return {
+      success: true,
+      message: 'Order marked as ready for pickup and customer notified',
+    }
+  } catch (error) {
+    console.error('Error marking order as ready for pickup:', error)
+    return {
+      success: false,
+      message: 'Failed to mark order as ready for pickup',
+    }
+  }
+}
+
+interface MarkOrderShippedParams {
+  orderId: number
+  trackingNumber: string
+  trackingUrl: string
+  carrier?: string
+}
+
+/**
+ * Marks an order as shipped and sends a shipping confirmation email to the customer
+ */
+export async function markOrderShipped({
+  orderId,
+}: MarkOrderShippedParams): Promise<{ success: boolean; message: string }> {
+  try {
+    const payload = await getPayload()
+
+    // Update order status to indicate it's shipped
+    await payload.update({
+      collection: ORDER_SLUG,
+      id: orderId,
+      data: {
+        status: 'shipped',
+      },
+    })
+
+    // Send shipping confirmation email to the customer
+    try {
+      const emailSent = await sendShippingConfirmationEmail(orderId)
+      if (!emailSent) {
+        console.error(`Failed to send shipping confirmation email for order ${orderId}`)
+      }
+    } catch (error) {
+      console.error('Error sending shipping confirmation email:', error)
+    }
+
+    return {
+      success: true,
+      message: 'Order marked as shipped and customer notified',
+    }
+  } catch (error) {
+    console.error('Error marking order as shipped:', error)
+    return {
+      success: false,
+      message: 'Failed to mark order as shipped',
+    }
+  }
 }

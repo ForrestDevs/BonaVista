@@ -30,13 +30,13 @@ async function ThumbnailImage({ id }: { id: number }) {
 export async function OrderItemThumbnail({ lineItem }: { lineItem: OrderItem }) {
   const product = typeof lineItem.product === 'object' ? lineItem.product : null
   const mediaId =
-    typeof lineItem.thumbnail === 'object' ? lineItem.thumbnail.id : lineItem.thumbnail
+    typeof lineItem.thumbnail === 'object' ? lineItem.thumbnail?.id : lineItem.thumbnail
 
   return (
     <div className="w-16 sm:w-24">
       <YnsLink
         className="block w-full transition-all duration-200 hover:opacity-80"
-        href={`/product/${product?.slug}`}
+        href={`/shop/product/${product?.slug}`}
       >
         <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xs">
           {mediaId ? (

@@ -69,7 +69,7 @@ export function ShippingStep({
 
     try {
       setIsLoading(true)
-      console.log('[ShippingStep] Starting form submission');
+      console.log('[ShippingStep] Starting form submission')
 
       // Get the complete address from the AddressElement
       const { error } = await elements.submit()
@@ -129,7 +129,7 @@ export function ShippingStep({
         ? 0
         : Math.round((selectedShippingMethod.shippingRules.baseRate || 0) * 100)
 
-      console.log('[ShippingStep] Shipping cost calculated:', shippingCost);
+      console.log('[ShippingStep] Shipping cost calculated:', shippingCost)
 
       // Create a temporary session with updated shipping info
       const tempSession = {
@@ -146,7 +146,7 @@ export function ShippingStep({
       }
 
       // Calculate tax
-      console.log('[ShippingStep] Calculating tax');
+      console.log('[ShippingStep] Calculating tax')
       const taxResult = await calculateTax(tempSession)
 
       if (!taxResult) {
@@ -154,7 +154,7 @@ export function ShippingStep({
       }
 
       // Update session with new values
-      console.log('[ShippingStep] Updating payment intent with details');
+      console.log('[ShippingStep] Updating payment intent with details')
       const updatedSession = await updatePaymentIntentWithDetails({
         ...tempSession,
         // Use tax calculation results
@@ -170,19 +170,22 @@ export function ShippingStep({
       }
 
       // Ensure the session shows shipping as completed
-      updatedSession.steps.shipping.completed = true;
-      
+      updatedSession.steps.shipping.completed = true
+
       // Make sure we don't inadvertently reset the email step
       if (!updatedSession.steps.email.completed && session.steps.email.completed) {
-        updatedSession.steps.email.completed = true;
+        updatedSession.steps.email.completed = true
       }
 
       // Update session in context
-      console.log('[ShippingStep] Updating session in context, shipping step completed:', updatedSession);
+      console.log(
+        '[ShippingStep] Updating session in context, shipping step completed:',
+        updatedSession,
+      )
       updateSession(updatedSession)
 
       // Call onComplete to notify parent component
-      console.log('[ShippingStep] Notifying parent component of completion');
+      console.log('[ShippingStep] Notifying parent component of completion')
       onComplete({
         address,
         method: selectedShippingMethod,
@@ -272,9 +275,9 @@ export function ShippingStep({
                     />
                     <Label
                       htmlFor={method.id.toString()}
-                      className="flex flex-col p-4 border rounded-lg cursor-pointer hover:bg-gray-50 peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-50"
+                      className="flex flex-col items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-50"
                     >
-                      <div className="flex items-start gap-3">
+                      <div className="flex flex-row items-start gap-3">
                         <div className="shrink-0 mt-1">
                           {isPickup ? (
                             <svg
@@ -312,8 +315,8 @@ export function ShippingStep({
                             </svg>
                           )}
                         </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-center mb-1">
+                        <div className="flex-1 justify-start space-y-3">
+                          <div className="flex justify-between items-center">
                             <span className="font-medium">{method.name}</span>
                             <span
                               className={
@@ -328,28 +331,33 @@ export function ShippingStep({
                                   })}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-500">
-                            {isPickup
-                              ? 'Available for pickup during business hours'
-                              : isFreeShipping
-                                ? 'Free shipping available for your order'
-                                : `Standard shipping to ${address.address.postal_code}`}
-                          </p>
-                          {isPickup && (
-                            <p className="text-xs text-blue-600 mt-2">
-                              Pickup location details will be provided after order completion
+                          
+                          <div className="space-y-2">
+                            <p className="text-sm text-gray-500">
+                              {isPickup
+                                ? 'Available for pickup during business hours'
+                                : isFreeShipping
+                                  ? 'Free shipping available for your order'
+                                  : `Standard shipping to ${address.address.postal_code}`}
                             </p>
-                          )}
-                          {!isPickup && !isFreeShipping && isAboveThreshold === false && (
-                            <p className="text-xs text-gray-500 mt-1">
-                              Spend{' '}
-                              {formatMoney({
-                                amount: method.shippingRules?.freeShippingThreshold || 0,
-                                currency: session.currencyCode,
-                              })}{' '}
-                              to qualify for free shipping
-                            </p>
-                          )}
+                            
+                            {isPickup && (
+                              <p className="text-xs text-blue-600">
+                                Pickup location details will be provided after order completion
+                              </p>
+                            )}
+                            
+                            {!isPickup && !isFreeShipping && isAboveThreshold === false && (
+                              <p className="text-xs text-gray-500">
+                                Spend{' '}
+                                {formatMoney({
+                                  amount: method.shippingRules?.freeShippingThreshold || 0,
+                                  currency: session.currencyCode,
+                                })}{' '}
+                                to qualify for free shipping
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </Label>

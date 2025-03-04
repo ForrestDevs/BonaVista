@@ -26,6 +26,12 @@ declare global {
       OPENAI_API_KEY: string
       UPSTASH_REDIS_REST_URL: string
       UPSTASH_REDIS_REST_TOKEN: string
+      NODEMAILER_USER: string
+      NODEMAILER_PASS: string
+      NODEMAILER_HOST: string
+      NODEMAILER_PORT: string
+      DEFAULT_FROM_ADDRESS: string
+      DEFAULT_FROM_NAME: string
     }
   }
 }
