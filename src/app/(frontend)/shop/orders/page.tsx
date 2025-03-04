@@ -118,18 +118,18 @@ export default async function OrderPage({ searchParams }: OrderPageProps) {
                   <p className="text-gray-600">Subtotal</p>
                   <p className="text-gray-600">
                     {formatStripeMoney({
-                      amount: order.total - (order.taxTotal || 0) - (order.shippingRate?.rate || 0),
+                      amount: order.subtotal || 0,
                       currency: order.currency,
                     })}
                   </p>
                 </div>
 
-                {order.shippingRate && (
+                {order.shippingTotal > 0 && (
                   <div className="flex justify-between">
-                    <p className="text-gray-600">Shipping ({order.shippingRate.displayName})</p>
+                    <p className="text-gray-600">Shipping</p>
                     <p className="text-gray-600">
                       {formatStripeMoney({
-                        amount: order.shippingRate.rate || 0,
+                        amount: order.shippingTotal || 0,
                         currency: order.currency,
                       })}
                     </p>
@@ -141,7 +141,7 @@ export default async function OrderPage({ searchParams }: OrderPageProps) {
                     <p className="text-gray-600">Tax</p>
                     <p className="text-gray-600">
                       {formatStripeMoney({
-                        amount: order.taxTotal,
+                        amount: order.taxTotal || 0,
                         currency: order.currency,
                       })}
                     </p>
@@ -152,7 +152,7 @@ export default async function OrderPage({ searchParams }: OrderPageProps) {
                   <p className="font-semibold">Total</p>
                   <p className="font-semibold">
                     {formatStripeMoney({
-                      amount: order.total,
+                      amount: order.total || 0,
                       currency: order.currency,
                     })}
                   </p>

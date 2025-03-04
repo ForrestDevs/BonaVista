@@ -10,7 +10,7 @@ import { Order } from '@payload-types'
 import { PaymentIntent } from '@stripe/stripe-js'
 import { Metadata } from 'next'
 import OrderItemDetails, { OrderItemThumbnail } from '@/components/shop/account/order-item-details'
-import { formatStripeMoney } from '@/lib/utils/formatMoney'
+import { formatMoney, formatStripeMoney } from '@/lib/utils/formatMoney'
 
 export const dynamic = 'force-dynamic'
 
@@ -104,10 +104,10 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
               <div className="text-left sm:text-right">
                 <p className="text-gray-600">
                   {lineItem.quantity}x{' '}
-                  {formatStripeMoney({ amount: lineItem.price, currency: order.currency })}
+                  {formatMoney({ amount: lineItem.price, currency: order.currency })}
                 </p>
                 <p className="font-medium text-lg mt-1">
-                  {formatStripeMoney({
+                  {formatMoney({
                     amount: lineItem.quantity * lineItem.price,
                     currency: order.currency,
                   })}
@@ -126,37 +126,34 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
             <h3 className="font-medium text-gray-900">Shipping Address</h3>
             <div className="text-gray-600 space-y-1">
               <p className="font-medium text-gray-900">
-                {user?.firstName ?? 'Luke'} {user?.lastName ?? 'Gannon'}
+                {order.shippingDetails.shipTo.first_name} {order.shippingDetails.shipTo.last_name}
               </p>
-              <p>{order.paymentIntent.shipping.address.line1}</p>
-              {order.paymentIntent?.shipping.address.line2 && (
-                <p>{order.paymentIntent?.shipping.address.line2}</p>
-              )}
+              <p>{order.shippingDetails.shipTo.line_1}</p>
+              {order.shippingDetails.shipTo.line_2 && <p>{order.shippingDetails.shipTo.line_2}</p>}
               <p>
-                {order.paymentIntent?.shipping.address.city},{' '}
-                {order.paymentIntent?.shipping.address.state}
+                {order.shippingDetails.shipTo.city}, {order.shippingDetails.shipTo.state}
               </p>
-              <p>{order.paymentIntent?.shipping.address.country}</p>
+              <p>{order.shippingDetails.shipTo.country}</p>
             </div>
           </div>
 
           <div className="space-y-3">
             <h3 className="font-medium text-gray-900">Contact Details</h3>
             <div className="text-gray-600 space-y-1">
-              <p>{user?.phone}</p>
-              <p>{customer?.email}</p>
+              <p>{order.shippingDetails.shipTo.phone}</p>
+              <p>{order.shippingDetails.shipTo.email}</p>
             </div>
           </div>
 
           <div className="space-y-3">
             <h3 className="font-medium text-gray-900">Shipping Method</h3>
             <p className="text-gray-600">
-              {order.shippingRate.displayName === 'Standard Shipping'
-                ? `${order.shippingRate.displayName} (${formatStripeMoney({
-                    amount: order.shippingRate.rate,
+              {order.deliveryType === 'pickup'
+                ? 'Local Pickup'
+                : `${order.deliveryType} (${formatStripeMoney({
+                    amount: order.shippingTotal,
                     currency: order.currency,
-                  })})`
-                : 'Local Pickup'}
+                  })})`}
             </p>
           </div>
         </div>
@@ -172,9 +169,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
           </div>
           <div className="flex justify-between text-gray-600">
             <p>Shipping</p>
-            <p>
-              {formatStripeMoney({ amount: order.shippingRate.rate, currency: order.currency })}
-            </p>
+            <p>{formatStripeMoney({ amount: order.shippingTotal, currency: order.currency })}</p>
           </div>
           <div className="flex justify-between text-gray-600">
             <p>Taxes</p>

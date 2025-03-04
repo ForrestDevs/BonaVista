@@ -4,8 +4,9 @@ import { adminOrCurrentUser, admins, adminsOrOrderedByOrPaymentId } from '@paylo
 import { clearUserCart } from './hooks/clearUserCart'
 import { populateOrderedBy } from './hooks/populateOrderedBy'
 import { updateUserOrders } from './hooks/updateUserOrders'
-import { CUSTOMER_SLUG } from '../constants'
+import { CUSTOMER_SLUG, SHIPPING_OPTION_SLUG } from '../constants'
 import { lineItems } from '@/payload/fields/line-items'
+import { address } from '@/payload/fields/address'
 
 const Orders: CollectionConfig = {
   slug: 'orders',
@@ -35,16 +36,8 @@ const Orders: CollectionConfig = {
     {
       name: 'status',
       type: 'select',
-      options: [
-        'canceled',
-        'processing',
-        'requires_action',
-        'requires_capture',
-        'requires_confirmation',
-        'requires_payment_method',
-        'succeeded',
-      ],
-      defaultValue: 'requires_action',
+      options: ['processing', 'ready_for_pickup', 'shipped', 'succeeded', 'canceled'],
+      defaultValue: 'processing',
     },
     {
       name: 'orderedBy',
@@ -58,35 +51,56 @@ const Orders: CollectionConfig = {
       admin: {
         components: {
           Field: 'src/payload/collections/Orders/ui/LinkToPaymentIntent',
-          // Field: LinkToPaymentIntent,
         },
         position: 'sidebar',
       },
       label: 'Stripe Payment Intent ID',
     },
     {
-      name: 'shippingRate',
-      type: 'group',
-      fields: [
-        {
-          name: 'displayName',
-          type: 'text',
-        },
-        {
-          name: 'rate',
-          type: 'number',
-        },
-      ],
+      name: 'deliveryType',
+      type: 'select',
+      options: ['pickup', 'shipping'],
+      defaultValue: 'pickup',
       admin: {
         position: 'sidebar',
       },
-      label: 'Shipping Rate',
+      label: 'Delivery Type',
+    },
+    {
+      name: 'shippingDetails',
+      label: 'Shipping Details',
+      type: 'group',
+      admin: {
+        condition: (data) => data.deliveryType === 'shipping',
+      },
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+        },
+        {
+          name: 'description',
+          type: 'text',
+        },
+        address({
+          overrides: {
+            name: 'shipTo',
+            label: 'Ship To',
+          },
+        }),
+      ],
     },
     {
       type: 'row',
       fields: [
         {
-          name: 'total',
+          name: 'subtotal',
+          type: 'number',
+          min: 0,
+          required: true,
+        },
+        {
+          name: 'shippingTotal',
           type: 'number',
           min: 0,
           required: true,
@@ -98,21 +112,28 @@ const Orders: CollectionConfig = {
           required: true,
         },
         {
+          name: 'total',
+          type: 'number',
+          min: 0,
+          required: true,
+        },
+        {
           name: 'currency',
           type: 'text',
           required: true,
         },
       ],
     },
-    lineItems(),
+    lineItems({
+      overrides: {
+        label: 'Products',
+      },
+    }),
     {
       name: 'paymentIntent',
       type: 'json',
     },
   ],
-  hooks: {
-    // afterChange: [updateUserOrders, clearUserCart],
-  },
   timestamps: true,
 } as const
 

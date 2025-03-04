@@ -4,6 +4,7 @@ import { Order } from '@payload-types'
 import { OptimizedLink } from '@/components/payload/Link/optimized-link'
 import { formatStripeMoney } from '@/lib/utils/formatMoney'
 import { getCurrentUserOrders } from '@/lib/data/order'
+import { OrderItemThumbnail } from '@/components/shop/account/order-item-details'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,11 +17,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Orders() {
   const orders = await getCurrentUserOrders()
-
-  if (!orders) {
-    notFound()
-  }
-
   // If no orders, show empty state
   if (orders.length === 0) {
     return (
@@ -91,7 +87,7 @@ export default async function Orders() {
                 </div>
                 <div className="space-y-1 sm:text-right">
                   <p className="text-sm text-gray-500">Order number</p>
-                  <p className="font-medium text-blue-600">#{order.orderNumber}</p>
+                  <p className="font-medium text-blue-600">#{order.id}</p>
                 </div>
                 <div className="space-y-1 sm:text-right">
                   <p className="text-sm text-gray-500">Total amount</p>
@@ -114,11 +110,8 @@ export default async function Orders() {
                 <div className="flex items-center gap-6 overflow-x-auto pb-4 px-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                   {order.lineItems?.slice(0, 4).map((item, index) => (
                     <div key={index} className="shrink-0 group relative">
-                      <div className="relative h-28 w-28 rounded-xl border border-gray-200 overflow-hidden shadow-xs transition-all duration-200 group-hover:shadow-md group-hover:border-gray-300">
-                        {/* Product thumbnail */}
-                        <div className="h-full w-full bg-gray-100 flex items-center justify-center text-gray-400">
-                          <span className="text-xs">{item.lineItem.sku}</span>
-                        </div>
+                      <div className="shadow-xs transition-all duration-200 group-hover:shadow-md group-hover:border-gray-300">
+                        <OrderItemThumbnail lineItem={item.lineItem} />
                       </div>
                       {index === 3 && order.lineItems.length > 4 && (
                         <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center rounded-xl transition-opacity group-hover:bg-black/60">
@@ -134,7 +127,7 @@ export default async function Orders() {
 
               <div className="flex justify-end pt-4 border-t border-gray-100">
                 <OptimizedLink
-                  href={`/shop/orders?id=${order.id}&auth=${generateOrderAuthHash(order.id.toString(), order.orderNumber)}`}
+                  href={`/shop/account/orders/details/${order.id}`}
                   className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-xs text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                 >
                   View Order Details →
@@ -146,13 +139,4 @@ export default async function Orders() {
       </div>
     </div>
   )
-}
-
-// Generate a secure hash for the order authentication
-function generateOrderAuthHash(orderId: string, orderNumber: string): string {
-  const crypto = require('crypto')
-  return crypto
-    .createHash('sha256')
-    .update(`${orderId}-${orderNumber}-${process.env.NEXTAUTH_SECRET || 'order-secret'}`)
-    .digest('hex')
 }

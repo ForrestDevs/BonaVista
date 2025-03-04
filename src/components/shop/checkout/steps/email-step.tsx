@@ -35,6 +35,8 @@ export function EmailStep({ initialEmail, onComplete, isProcessing = false, isDi
         return
       }
 
+  
+
       onComplete({ value: email })
     } catch (error) {
       console.error('Error submitting email:', error)

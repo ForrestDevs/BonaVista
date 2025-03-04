@@ -23,19 +23,7 @@ const Users: CollectionConfig = {
   },
   fields: [
     {
-      name: 'firstName',
-      type: 'text',
-    },
-    {
-      name: 'lastName',
-      type: 'text',
-    },
-    {
       name: 'name',
-      type: 'text',
-    },
-    {
-      name: 'phone',
       type: 'text',
     },
     {
@@ -45,7 +33,7 @@ const Users: CollectionConfig = {
         read: admins,
         update: admins,
       },
-      defaultValue: ['customer'],
+      defaultValue: [''],
       hasMany: true,
       hooks: {
         beforeChange: [ensureFirstUserIsAdmin],

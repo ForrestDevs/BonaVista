@@ -6,7 +6,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { CheckoutSession } from '@/lib/types/checkout'
 import { EmailStep } from './steps/email-step'
 import { useRouter } from 'next/navigation'
-import { updateCheckoutStep } from '@/lib/data/checkout'
+import { updateCheckoutSession, updateCheckoutStep } from '@/lib/data/checkout'
 import { findOrCreateCheckoutCustomer } from '@/lib/data/customer'
 import { PaymentStep } from './steps/payment-step'
 import { BillingStep } from './steps/billing-step'
@@ -19,6 +19,7 @@ import { Media } from '@/components/payload/Media'
 import { Button } from '@/components/ui/button'
 import { PencilIcon } from '@/components/icons/pencil'
 import { LineItemThumbnail } from './line-item-thumbnail'
+import { Customer } from '@payload-types'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -42,6 +43,21 @@ export function CheckoutForm({ initialSession }: CheckoutFormProps) {
       setError(null)
       console.log(`Completing step: ${step} with data:`, data)
 
+      let customer: Customer | null = null
+
+      if (step === 'email' && 'value' in data && data.value) {
+        const email = data.value
+        const customerResult = await findOrCreateCheckoutCustomer(email)
+
+        customer = customerResult.customer
+
+        if (customerResult.needsLogin) {
+          setError('This email is associated with an account. Please log in to continue.')
+          setIsProcessing(false)
+          return
+        }
+      }
+
       // Handle customer creation/lookup for email step
       // if (step === 'email' && 'value' in data && data.value) {
       //   const email = data.value
@@ -53,6 +69,12 @@ export function CheckoutForm({ initialSession }: CheckoutFormProps) {
       //     return
       //   }
       // }
+
+      const updateSession = await updateCheckoutSession({
+        cartId: session.cartId,
+        customerId: customer?.id,
+        customerEmail: customer?.email,
+      })
 
       // Update on server
       const updatedSession = await updateCheckoutStep({
@@ -370,11 +392,13 @@ function OrderSummary({ session }: { session: CheckoutSession }) {
       <div className="p-4 space-y-4">
         <div className="divide-y divide-gray-100">
           {session.lineItems.map((item) => {
+            console.log('item', item)
             return (
               <div key={item.sku} className="flex py-3 first:pt-0 last:pb-0 group">
                 <div className="relative h-14 w-14 rounded-md border overflow-hidden shrink-0 bg-gray-50">
                   {item.thumbnailMediaId ? (
                     <LineItemThumbnail
+                    
                       mediaId={item.thumbnailMediaId}
                       className="w-full h-full"
                       imgClassName="w-full h-full object-cover"

@@ -289,10 +289,7 @@ export interface Media {
  */
 export interface User {
   id: number;
-  firstName?: string | null;
-  lastName?: string | null;
   name?: string | null;
-  phone?: string | null;
   roles?: ('admin' | 'customer')[] | null;
   customer?: (number | null) | Customer;
   updatedAt: string;
@@ -313,6 +310,9 @@ export interface User {
 export interface Customer {
   id: number;
   email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
   /**
    * Whether the customer is a registered user
    */
@@ -655,25 +655,19 @@ export interface Address {
 export interface Order {
   id: number;
   orderNumber: string;
-  status?:
-    | (
-        | 'canceled'
-        | 'processing'
-        | 'requires_action'
-        | 'requires_capture'
-        | 'requires_confirmation'
-        | 'requires_payment_method'
-        | 'succeeded'
-      )
-    | null;
+  status?: ('processing' | 'ready_for_pickup' | 'shipped' | 'succeeded' | 'canceled') | null;
   orderedBy?: (number | null) | Customer;
   stripePaymentIntentID?: string | null;
-  shippingRate?: {
-    displayName?: string | null;
-    rate?: number | null;
+  deliveryType?: ('pickup' | 'shipping') | null;
+  shippingDetails?: {
+    title?: string | null;
+    description?: string | null;
+    shipTo: Address;
   };
-  total: number;
+  subtotal: number;
+  shippingTotal: number;
   taxTotal: number;
+  total: number;
   currency: string;
   lineItems?: LineItems;
   paymentIntent?:
@@ -1824,10 +1818,7 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  firstName?: T;
-  lastName?: T;
   name?: T;
-  phone?: T;
   roles?: T;
   customer?: T;
   updatedAt?: T;
@@ -1906,19 +1897,41 @@ export interface OrdersSelect<T extends boolean = true> {
   status?: T;
   orderedBy?: T;
   stripePaymentIntentID?: T;
-  shippingRate?:
+  deliveryType?: T;
+  shippingDetails?:
     | T
     | {
-        displayName?: T;
-        rate?: T;
+        title?: T;
+        description?: T;
+        shipTo?: T | AddressSelect<T>;
       };
-  total?: T;
+  subtotal?: T;
+  shippingTotal?: T;
   taxTotal?: T;
+  total?: T;
   currency?: T;
   lineItems?: T | LineItemsSelect<T>;
   paymentIntent?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Address_select".
+ */
+export interface AddressSelect<T extends boolean = true> {
+  first_name?: T;
+  last_name?: T;
+  company?: T;
+  line_1?: T;
+  line_2?: T;
+  city?: T;
+  country?: T;
+  state?: T;
+  postal_code?: T;
+  phone?: T;
+  email?: T;
+  metadata?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2509,6 +2522,9 @@ export interface BrandsSelect<T extends boolean = true> {
  */
 export interface CustomersSelect<T extends boolean = true> {
   email?: T;
+  firstName?: T;
+  lastName?: T;
+  phone?: T;
   has_account?: T;
   account?: T;
   stripeCustomerID?: T;
@@ -2529,24 +2545,6 @@ export interface CustomersSelect<T extends boolean = true> {
   metadata?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Address_select".
- */
-export interface AddressSelect<T extends boolean = true> {
-  first_name?: T;
-  last_name?: T;
-  company?: T;
-  line_1?: T;
-  line_2?: T;
-  city?: T;
-  country?: T;
-  state?: T;
-  postal_code?: T;
-  phone?: T;
-  email?: T;
-  metadata?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -29,7 +29,7 @@ const dirname = path.dirname(filename)
 const serverURL = process.env.NEXT_PUBLIC_SERVER_URL || ''
 const allowedOrigins = [
   serverURL,
-  'https://www2.bonavistaleisurescapes.com',
+  'https://www.bonavistaleisurescapes.com',
   'https://bonavistaleisurescapes.com',
   'https://bona-vista.vercel.app',
 ].filter(Boolean)
@@ -100,15 +100,15 @@ export default buildConfig({
     },
   }),
   email: nodemailerAdapter({
-    defaultFromAddress: 'donotreply@bonavistaleisurescapes.com',
-    defaultFromName: 'Bonavista Leisurescapes',
+    defaultFromAddress: process.env.DEFAULT_FROM_ADDRESS || 'donotreply@bonavistaleisurescapes.com',
+    defaultFromName: process.env.DEFAULT_FROM_NAME || 'Bonavista Leisurescapes',
     transport: nodemailer.createTransport({
-      host: 'smtp.office365.com',
-      port: 587,
+      host: process.env.NODEMAILER_HOST || '',
+      port: parseInt(process.env.NODEMAILER_PORT || '0'),
       secure: false,
       auth: {
-        user: 'admin@bonavistaleisurescapes.com',
-        pass: 'vzdkgktbgvwhtvrk',
+        user: process.env.NODEMAILER_USER || '',
+        pass: process.env.NODEMAILER_PASS || '',
       },
     }),
   }),
@@ -136,7 +136,7 @@ export default buildConfig({
         collection: 'users',
         limit: 1,
       })
-
+      
       // This is useful for local development
       // so you do not need to create a first-user every time
       if (existingUsers.docs.length === 0) {

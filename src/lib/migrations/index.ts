@@ -5,6 +5,7 @@ import * as migration_20250227_033846_productIndex from './20250227_033846_produ
 import * as migration_20250227_044257_productPriceIndex from './20250227_044257_productPriceIndex';
 import * as migration_20250227_045351_productPriceIndex2 from './20250227_045351_productPriceIndex2';
 import * as migration_20250227_211402_productReviews from './20250227_211402_productReviews';
+import * as migration_20250304_041954_ecom2 from './20250304_041954_ecom2';
 
 export const migrations = [
   {
@@ -40,6 +41,11 @@ export const migrations = [
   {
     up: migration_20250227_211402_productReviews.up,
     down: migration_20250227_211402_productReviews.down,
-    name: '20250227_211402_productReviews'
+    name: '20250227_211402_productReviews',
+  },
+  {
+    up: migration_20250304_041954_ecom2.up,
+    down: migration_20250304_041954_ecom2.down,
+    name: '20250304_041954_ecom2'
   },
 ];
