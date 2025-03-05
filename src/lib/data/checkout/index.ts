@@ -23,6 +23,7 @@ import { CART_SLUG } from '@/payload/collections/constants'
 import { deleteCart } from '../cart'
 import { Order } from '@payload-types'
 import { processOrderEmails } from '../email'
+import Stripe from 'stripe'
 
 const CHECKOUT_SESSION_EXPIRY = 1000 * 60 * 30 // 30 minutes
 const ORDER_ARCHIVE_EXPIRY = 1000 * 60 * 60 * 24 * 30 // 30 days
@@ -119,6 +120,7 @@ export async function createStoredCheckoutSession(
       stripeCustomerId,
       customerEmail,
       customerId,
+      currentStep: 'email',
       steps: {
         email: {
           completed: Boolean(customerEmail) || false,
@@ -317,6 +319,7 @@ export async function updateCheckoutStep<T extends CheckoutStep>({
   cartId,
   step,
   data,
+  nextStep,
 }: UpdateCheckoutStepParams<T>): Promise<CheckoutSession | null> {
   console.log(`[updateCheckoutStep] Updating step ${step} with data:`, data)
 
@@ -339,6 +342,7 @@ export async function updateCheckoutStep<T extends CheckoutStep>({
   // Preserve completion states of other steps
   const updatedSession: CheckoutSession = {
     ...session,
+    currentStep: nextStep || step,
     steps: {
       ...session.steps,
       [step]: {
@@ -511,7 +515,6 @@ export async function handlePaymentSuccess({
     const newOrderNumber = uuidv4()
 
     console.log('checkoutSession', checkoutSession.steps.shipping.address)
-
 
     const orderData: Omit<Order, 'createdAt' | 'updatedAt' | 'sizes' | 'id'> = {
       status: 'succeeded',

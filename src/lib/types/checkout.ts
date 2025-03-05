@@ -67,6 +67,7 @@ export interface CheckoutSession {
   stripeCustomerId?: string
   customerEmail?: string
   customerId?: number
+  currentStep: CheckoutStep
   steps: {
     email: {
       completed: boolean
@@ -130,6 +131,7 @@ export interface UpdateCheckoutStepParams<T extends CheckoutStep> {
   cartId: number
   step: T
   data: Partial<CheckoutSession['steps'][T]>
+  nextStep?: keyof CheckoutSession['steps']
 }
 
 export interface HandlePaymentSuccessParams {

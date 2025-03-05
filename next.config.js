@@ -18,7 +18,7 @@ const nextConfig = {
         }
       }),
       {
-        hostname: 'www2.bonavistaleisurescapes.com',
+        hostname: 'www.bonavistaleisurescapes.com',
         protocol: 'https',
         pathname: '/**',
       },

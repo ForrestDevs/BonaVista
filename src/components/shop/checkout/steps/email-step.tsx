@@ -2,78 +2,86 @@
 
 import { Button } from '@/components/ui/button'
 import { LinkAuthenticationElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { useCheckoutSession } from '../checkout-context'
+import { cn } from '@/lib/utils/cn'
+import { Skeleton } from '@/components/ui/skeleton'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
-interface EmailStepProps {
-  initialEmail?: string
-  onComplete: (data: { value: string }) => void
-  isProcessing?: boolean
-  isDisabled?: boolean
-}
-
-export function EmailStep({ initialEmail, onComplete, isProcessing = false, isDisabled = false }: EmailStepProps) {
-  const [email, setEmail] = useState<string>(initialEmail || '')
-  const [isValid, setIsValid] = useState<boolean>(!!initialEmail)
+export function EmailStep() {
   const stripe = useStripe()
   const elements = useElements()
+  const { session, isPending, handleStepComplete, setError } = useCheckoutSession()
+  const [email, setEmail] = useState<string>(session.steps.email.value || '')
+  const [isLoading, setIsLoading] = useState(false)
+  const loadedRef = useRef(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!stripe || !elements || isProcessing || isDisabled) return
+    if (!stripe || !elements || isPending) return
 
     try {
-      // Get the email from the LinkAuthenticationElement
+      setIsLoading(true)
       const { error } = await elements.submit()
 
       if (error) {
-        console.error('Error:', error)
+        setError(error.message)
         return
       }
 
       if (!email) {
-        console.error('No email provided')
+        setError('Please enter an email address')
         return
       }
 
-  
-
-      onComplete({ value: email })
+      handleStepComplete('email', { value: email })
     } catch (error) {
       console.error('Error submitting email:', error)
+      setError('An error occurred while submitting your email')
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className={`space-y-6 ${isDisabled ? 'opacity-60 pointer-events-none' : ''}`}>
+    <div className="space-y-6">
       <p className="text-sm text-gray-500">
         We&apos;ll use this email to send your order confirmation and updates
       </p>
 
-      <div className="space-y-4">
+      <div className="h-fit transition-all duration-300 ease-in-out overflow-hidden">
+        <div className={cn(loadedRef.current === true ? 'hidden' : 'flex flex-col')}>
+          <div className="flex items-center justify-between mb-2">
+            <Skeleton className="h-4 w-16" />
+          </div>
+          <Skeleton className="h-10 w-full rounded-md" />
+        </div>
         <LinkAuthenticationElement
+          key={'email-step'}
+          className={cn(loadedRef.current === false ? 'hidden' : '')}
           options={{
             defaultValues: {
-              email: initialEmail ?? '',
+              email: email ?? '',
             },
+          }}
+          onReady={(e) => {
+            loadedRef.current = true
+            e.focus()
           }}
           onChange={(event) => {
             if (event.complete) {
               setEmail(event.value.email)
-              setIsValid(true)
-            } else {
-              setIsValid(false)
             }
           }}
         />
       </div>
 
-      <Button 
-        type="button" 
-        className="w-full" 
-        disabled={isProcessing || !isValid || isDisabled}
+      <Button
+        type="button"
+        className="w-full"
+        disabled={isPending || isLoading}
         onClick={handleSubmit}
       >
-        {isProcessing ? 'Processing...' : 'Continue to Shipping'}
+        {isLoading ? <LoadingSpinner className="text-white" /> : 'Continue to Shipping'}
       </Button>
     </div>
   )

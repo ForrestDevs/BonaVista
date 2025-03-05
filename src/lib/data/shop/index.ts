@@ -3,7 +3,6 @@
 import Stripe from 'stripe'
 import getPayload from '@lib/utils/getPayload'
 import { stripeClient } from '@/lib/stripe'
-import { getCachedGlobal } from '@/lib/utils/getGlobals'
 import { ShippingOption, ShopSetting } from '@payload-types'
 import { getCachedDocuments } from '@/lib/utils/getDocument'
 import { SHIPPING_OPTION_SLUG } from '@/payload/collections/constants'
@@ -39,58 +38,7 @@ export async function getAvailableShippingMethods(): Promise<ShippingOption[] | 
   return shippingOptions
 }
 
-function addTagPrefix(tags: string[], prefix: string) {
-  if (!tags || !prefix) {
-    return tags
-  }
-
-  return [...tags, `prefix-${prefix}`, ...tags.map((tag) => `${prefix}-${tag}`)]
-}
-
-export async function getStripeClient({
-  tags,
-  revalidate,
-  cache,
-  tagPrefix,
-  secretKey,
-}: {
-  tags: string[]
-  revalidate: number
-  cache: RequestCache
-  tagPrefix: string
-  secretKey: string
-}) {
-  const privateKey = secretKey ?? process.env.STRIPE_SECRET_KEY
-  if (!privateKey) {
-    throw new Error('Missing `secretKey` parameter and `STRIPE_SECRET_KEY` env variable.')
-  }
-
-  const tagsWithPrefix = addTagPrefix(tags, tagPrefix)
-
-  const stripeClient = new Stripe(privateKey, {
-    typescript: true,
-    httpClient: Stripe.createFetchHttpClient((fetch, options) =>
-      fetch(fetch, {
-        ...options,
-        cache: cache ?? options?.cache,
-        next: {
-          tags: tagsWithPrefix ?? options?.next?.tags,
-          revalidate: revalidate ?? options?.next?.revalidate,
-        },
-      }),
-    ),
-    appInfo: {
-      name: 'BonaVista LeisureScapes Payment SDK',
-      version: '1.0.0',
-      url: 'https://bonavistaleisurescapes.com',
-      partner_id: 'fdev45',
-    },
-  })
-
-  return stripeClient
-}
-
-type CreatePaymentIntentParams = {
+interface CreatePaymentIntentParams {
   /**
    * Amount intended to be collected by this PaymentIntent.
    * A positive integer representing how much to charge in the smallest currency unit
@@ -185,3 +133,140 @@ export async function updatePaymentIntent({
     return null
   }
 }
+
+
+// function addTagPrefix(tags: string[], prefix: string) {
+//   if (!tags || !prefix) {
+//     return tags
+//   }
+
+//   return [...tags, `prefix-${prefix}`, ...tags.map((tag) => `${prefix}-${tag}`)]
+// }
+
+// interface CreateStripeCheckoutSessionParams {
+//   /**
+//    * The cart id of the checkout session. Used as the idempotency key.
+//    */
+//   cartId: string
+
+//   /**
+//    * The line items of the checkout session.
+//    */
+//   lineItems: Stripe.Checkout.SessionCreateParams.LineItem[]
+
+//   /**
+//    * The mode of the checkout session.
+//    */
+//   mode: Stripe.Checkout.SessionCreateParams.Mode
+
+//   /**
+//    * The currency of the payment intent.
+//    */
+//   currencyCode: string
+
+//   /**
+//    * The email of the customer.
+//    */
+//   customerEmail?: string
+
+//   /**
+//    * The customer id of the payment intent.
+//    */
+//   stripeCustomerId?: string
+
+//   /**
+//    * The description of the payment intent.
+//    */
+//   description?: string
+
+//   /**
+//    * The metadata of the checkout session.
+//    */
+//   metadata?: Record<string, string>
+// }
+
+// export async function createStripeCheckoutSession({
+//   cartId,
+//   lineItems,
+//   mode,
+//   currencyCode,
+//   stripeCustomerId,
+//   customerEmail,
+//   description,
+//   metadata,
+// }: CreateStripeCheckoutSessionParams): Promise<Stripe.Checkout.Session | null> {
+//   // const stripeClient = await getStripeClient()
+
+//   try {
+//     const checkout = await stripeClient.checkout.sessions.create(
+//       {
+//         line_items: lineItems,
+//         payment_intent_data: {
+//           description: description,
+//         },
+//         mode,
+//         ui_mode: 'custom',
+//         automatic_tax: {
+//           enabled: true,
+//         },
+//         metadata: metadata,
+//         customer_email: customerEmail ?? undefined,
+//         customer: stripeCustomerId ?? undefined,
+//         currency: currencyCode,
+//       },
+//       {
+//         idempotencyKey: cartId,
+//       },
+//     )
+
+//     return checkout
+//   } catch (error) {
+//     console.error('error creating stripe checkout session', error)
+//     return null
+//   }
+// }
+
+// export async function getStripeClient({
+//   tags,
+//   revalidate,
+//   cache,
+//   tagPrefix,
+//   secretKey,
+// }: {
+//   tags: string[]
+//   revalidate: number
+//   cache: RequestCache
+//   tagPrefix: string
+//   secretKey: string
+// }) {
+//   const privateKey = secretKey ?? process.env.STRIPE_SECRET_KEY
+//   if (!privateKey) {
+//     throw new Error('Missing `secretKey` parameter and `STRIPE_SECRET_KEY` env variable.')
+//   }
+
+//   const tagsWithPrefix = addTagPrefix(tags, tagPrefix)
+
+//   const stripeClient = new Stripe(privateKey, {
+//     typescript: true,
+//     // @ts-ignore
+//     apiVersion: '2025-01-27.acacia;custom_checkout_beta=v1',
+//     httpClient: Stripe.createFetchHttpClient((fetch, options) =>
+//       fetch(fetch, {
+//         ...options,
+//         cache: cache ?? options?.cache,
+//         next: {
+//           tags: tagsWithPrefix ?? options?.next?.tags,
+//           revalidate: revalidate ?? options?.next?.revalidate,
+//         },
+//       }),
+//     ),
+//     appInfo: {
+//       name: 'BonaVista LeisureScapes Payment SDK',
+//       version: '1.0.0',
+//       url: 'https://bonavistaleisurescapes.com',
+//       partner_id: 'fdev45',
+//     },
+//   })
+
+//   return stripeClient
+// }

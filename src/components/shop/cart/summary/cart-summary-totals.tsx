@@ -106,7 +106,7 @@ export function CartSummaryTotals({ cart, customer }: CartSummaryTotalsProps) {
       <div className="mt-6">
         <CheckoutButton
           amount={subtotal}
-          currencyCode="CAD"
+          currencyCode="cad"
           description={`Order for ${cart.lineItems.length} items`}
           cartId={cart.id}
           lineItems={lineItems}

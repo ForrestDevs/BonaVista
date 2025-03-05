@@ -2,6 +2,7 @@ import { getStoredCheckoutSession } from '@/lib/data/checkout'
 import { CheckoutForm } from '@/components/shop/checkout/checkout-form'
 import { redirect } from 'next/navigation'
 import { Metadata } from 'next'
+import { CheckoutProvider } from '@/components/shop/checkout/checkout-context'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,7 +26,9 @@ export default async function CheckoutPage() {
           <h1 className="text-3xl font-bold">Checkout</h1>
           <p className="text-gray-600 mt-2">Complete your purchase securely in just a few steps.</p>
         </div>
-        <CheckoutForm initialSession={session} />
+        <CheckoutProvider initialSession={session}>
+          <CheckoutForm />
+        </CheckoutProvider>
       </div>
     </div>
   )

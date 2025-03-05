@@ -1,404 +1,201 @@
 'use client'
 
-import { Suspense, useEffect, useState } from 'react'
-import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
 import { CheckoutSession } from '@/lib/types/checkout'
 import { EmailStep } from './steps/email-step'
-import { useRouter } from 'next/navigation'
-import { updateCheckoutSession, updateCheckoutStep } from '@/lib/data/checkout'
-import { findOrCreateCheckoutCustomer } from '@/lib/data/customer'
 import { PaymentStep } from './steps/payment-step'
 import { BillingStep } from './steps/billing-step'
 import { ShippingStep } from './steps/shipping-step'
-import { CheckoutProvider } from './checkout-context'
-import { Card } from '@/components/ui/card'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils/cn'
-import { formatMoney, formatStripeMoney } from '@/lib/utils/formatMoney'
-import { Media } from '@/components/payload/Media'
+import { formatStripeMoney } from '@/lib/utils/formatMoney'
 import { Button } from '@/components/ui/button'
 import { PencilIcon } from '@/components/icons/pencil'
 import { LineItemThumbnail } from './line-item-thumbnail'
-import { Customer } from '@payload-types'
+import { useCheckoutSession } from './checkout-context'
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
-
-interface CheckoutFormProps {
-  initialSession: CheckoutSession
-}
-
-export function CheckoutForm({ initialSession }: CheckoutFormProps) {
-  const [session, setSession] = useState<CheckoutSession>(initialSession)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [editingStep, setEditingStep] = useState<keyof CheckoutSession['steps'] | null>(null)
-
-  // Update session when steps are completed
-  const handleStepComplete = async (
-    step: keyof CheckoutSession['steps'],
-    data: Partial<CheckoutSession['steps'][typeof step]>,
-  ) => {
-    try {
-      setIsProcessing(true)
-      setError(null)
-      console.log(`Completing step: ${step} with data:`, data)
-
-      let customer: Customer | null = null
-
-      if (step === 'email' && 'value' in data && data.value) {
-        const email = data.value
-        const customerResult = await findOrCreateCheckoutCustomer(email)
-
-        customer = customerResult.customer
-
-        if (customerResult.needsLogin) {
-          setError('This email is associated with an account. Please log in to continue.')
-          setIsProcessing(false)
-          return
-        }
-      }
-
-      // Handle customer creation/lookup for email step
-      // if (step === 'email' && 'value' in data && data.value) {
-      //   const email = data.value
-      //   const customerResult = await findOrCreateCheckoutCustomer(email)
-
-      //   if (customerResult.needsLogin) {
-      //     setError('This email is associated with an account. Please log in to continue.')
-      //     setIsProcessing(false)
-      //     return
-      //   }
-      // }
-
-      const updateSession = await updateCheckoutSession({
-        cartId: session.cartId,
-        customerId: customer?.id,
-        customerEmail: customer?.email,
-      })
-
-      // Update on server
-      const updatedSession = await updateCheckoutStep({
-        cartId: session.cartId,
-        step,
-        data: {
-          ...data,
-          completed: true,
-        },
-      })
-
-      if (updatedSession) {
-        console.log(`Step ${step} completed. Setting session:`, updatedSession)
-        setSession(updatedSession)
-
-        // Reset editing step if we were editing
-        if (editingStep === step) {
-          console.log(`Resetting editing step from ${editingStep} to null`)
-          setEditingStep(null)
-        }
-      }
-    } catch (error) {
-      console.error(`Error completing ${step} step:`, error)
-      setError(`Failed to complete the ${stepLabels[step]} step. Please try again.`)
-    } finally {
-      setIsProcessing(false)
-    }
-  }
-
-  // Handle editing a previously completed step
-  const handleEditStep = async (step: keyof CheckoutSession['steps']) => {
-    console.log(`Editing step: ${step}`)
-
-    // If editing a shipping or billing step that affects totals, we need special handling
-    if ((step === 'shipping' || step === 'billing') && session.steps[step].completed) {
-      try {
-        setIsProcessing(true)
-        setError(null)
-
-        // Mark the step as incomplete in the session but keep the data
-        const updatedSession = await updateCheckoutStep({
-          cartId: session.cartId,
-          step,
-          data: {
-            ...session.steps[step],
-            // We're setting completed to false but not clearing other data
-            completed: false,
-          },
-        })
-
-        if (updatedSession) {
-          console.log(`Updated session after preparing ${step} for edit:`, updatedSession)
-          setSession(updatedSession)
-        }
-      } catch (err: any) {
-        console.error('Error preparing step for edit:', err)
-        setError('Failed to edit this step. Please try again.')
-      } finally {
-        setIsProcessing(false)
-      }
-    }
-
-    // Activate editing mode for this step
-    setEditingStep(step)
-  }
-
-  // Determine which step should be active
-  const getActiveStep = (): keyof CheckoutSession['steps'] | null => {
-    // If we're explicitly editing a step, that's the active one
-    if (editingStep) {
-      console.log(`Using explicit editing step: ${editingStep}`)
-      return editingStep
-    }
-
-    // Otherwise, find the first incomplete step in order
-    const stepOrder: (keyof CheckoutSession['steps'])[] = [
-      'email',
-      'shipping',
-      'billing',
-      'payment',
-    ]
-
-    // Log the current completion status of all steps
-    console.log('Step completion status:', {
-      email: session.steps.email.completed,
-      shipping: session.steps.shipping.completed,
-      billing: session.steps.billing.completed,
-      payment: session.steps.payment.completed,
-    })
-
-    for (const step of stepOrder) {
-      if (!session.steps[step].completed) {
-        console.log(`Found first incomplete step: ${step}`)
-        return step
-      }
-    }
-
-    console.log('All steps completed, defaulting to payment step')
-    return 'payment' // Default to payment step if all are completed
-  }
-
-  const activeStep = getActiveStep()
-
-  // Map step keys to friendly names
-  const stepLabels: Record<keyof CheckoutSession['steps'], string> = {
-    email: 'Contact',
-    shipping: 'Shipping',
-    billing: 'Billing',
-    payment: 'Payment',
-  }
+export function CheckoutForm() {
+  const { session, error, currentStep } = useCheckoutSession()
 
   return (
-    <Elements
-      stripe={stripePromise}
-      options={{
-        clientSecret: session.clientSecret,
-        appearance: {
-          theme: 'stripe',
-          variables: {
-            colorPrimary: '#0F172A',
-            colorBackground: '#ffffff',
-            colorText: '#1e293b',
-            colorDanger: '#ef4444',
-            fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-            spacingUnit: '4px',
-            borderRadius: '8px',
-          },
-        },
-      }}
-    >
-      <CheckoutProvider initialSession={session}>
-        <div className="w-full">
-          {/* Progress bar */}
-          <div className="mb-6 max-w-4xl">
-            <CheckoutProgress session={session} />
+    <div className="w-full">
+      <div className="mb-6 max-w-4xl">
+        <CheckoutProgress />
 
-            {error && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm shadow-xs">
-                {error}
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm shadow-xs">
+            {error}
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        <div className="lg:col-span-7 space-y-5">
+          <CheckoutSection title="Contact Information" step="email">
+            <EmailStep />
+          </CheckoutSection>
+
+          <CheckoutSection title="Shipping Details" step="shipping">
+            <ShippingStep />
+          </CheckoutSection>
+
+          <CheckoutSection title="Billing Information" step="billing">
+            <BillingStep />
+          </CheckoutSection>
+
+          <CheckoutSection title="Payment Method" step="payment">
+            <PaymentStep />
+          </CheckoutSection>
+        </div>
+
+        <div className="lg:col-span-5">
+          <div className="sticky top-6 space-y-5">
+            <OrderSummary />
+            {session.steps.email.completed && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                  Your Information
+                </h3>
+
+                <div className="space-y-2">
+                  {Object.entries(session.steps)
+                    .filter(([key, data]) => data.completed && key !== currentStep)
+                    .map(([key]) => (
+                      <CompletedStepSummary
+                        key={key}
+                        step={key as keyof CheckoutSession['steps']}
+                      />
+                    ))}
+                </div>
               </div>
             )}
           </div>
-
-          {/* Main checkout area */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-            {/* Form steps (left column on desktop) */}
-            <div className="lg:col-span-7 space-y-5">
-              <CheckoutSection
-                title="Contact Information"
-                isCompleted={session.steps.email.completed && activeStep !== 'email'}
-                isActive={activeStep === 'email'}
-                stepNumber={1}
-                onEdit={
-                  session.steps.email.completed && activeStep !== 'email'
-                    ? () => handleEditStep('email')
-                    : undefined
-                }
-              >
-                {activeStep === 'email' ? (
-                  <EmailStep
-                    initialEmail={session.steps.email.value}
-                    onComplete={(data) => handleStepComplete('email', data)}
-                    isProcessing={isProcessing}
-                  />
-                ) : session.steps.email.completed ? (
-                  <CompletedStepSummary
-                    step="email"
-                    data={session.steps.email}
-                    stepLabel={stepLabels.email}
-                    session={session}
-                    onEdit={() => handleEditStep('email')}
-                  />
-                ) : null}
-              </CheckoutSection>
-
-              <CheckoutSection
-                title="Shipping Details"
-                isCompleted={session.steps.shipping.completed && activeStep !== 'shipping'}
-                isActive={activeStep === 'shipping'}
-                stepNumber={2}
-                isDisabled={activeStep !== 'shipping' && !session.steps.shipping.completed}
-                onEdit={
-                  session.steps.shipping.completed && activeStep !== 'shipping'
-                    ? () => handleEditStep('shipping')
-                    : undefined
-                }
-              >
-                {activeStep === 'shipping' ? (
-                  <ShippingStep
-                    initialAddress={session.steps.shipping.address}
-                    onComplete={handleStepComplete.bind(null, 'shipping')}
-                    isProcessing={isProcessing}
-                    isDisabled={!session.steps.email.completed}
-                  />
-                ) : session.steps.shipping.completed ? (
-                  <CompletedStepSummary
-                    step="shipping"
-                    data={session.steps.shipping}
-                    stepLabel={stepLabels.shipping}
-                    session={session}
-                    onEdit={() => handleEditStep('shipping')}
-                  />
-                ) : null}
-              </CheckoutSection>
-
-              <CheckoutSection
-                title="Billing Information"
-                isCompleted={session.steps.billing.completed && activeStep !== 'billing'}
-                isActive={activeStep === 'billing'}
-                stepNumber={3}
-                isDisabled={
-                  !session.steps.shipping.completed ||
-                  (activeStep !== 'billing' && !session.steps.billing.completed)
-                }
-                onEdit={
-                  session.steps.billing.completed && activeStep !== 'billing'
-                    ? () => handleEditStep('billing')
-                    : undefined
-                }
-              >
-                {activeStep === 'billing' ? (
-                  <BillingStep
-                    initialAddress={session.steps.billing.address}
-                    shippingAddress={session.steps.shipping.address}
-                    initialSameAsShipping={session.steps.billing.sameAsShipping}
-                    onComplete={handleStepComplete.bind(null, 'billing')}
-                    isProcessing={isProcessing}
-                    isDisabled={!session.steps.shipping.completed}
-                  />
-                ) : session.steps.billing.completed ? (
-                  <CompletedStepSummary
-                    step="billing"
-                    data={session.steps.billing}
-                    stepLabel={stepLabels.billing}
-                    session={session}
-                    onEdit={() => handleEditStep('billing')}
-                  />
-                ) : null}
-              </CheckoutSection>
-
-              <CheckoutSection
-                title="Payment Method"
-                isCompleted={session.steps.payment.completed}
-                isActive={activeStep === 'payment'}
-                stepNumber={4}
-                isDisabled={
-                  !session.steps.billing.completed ||
-                  (activeStep !== 'payment' && !session.steps.payment.completed)
-                }
-              >
-                {activeStep === 'payment' ? (
-                  <PaymentStep
-                    session={session}
-                    isProcessing={isProcessing}
-                    isDisabled={!session.steps.billing.completed}
-                  />
-                ) : session.steps.payment.completed ? (
-                  <CompletedStepSummary
-                    step="payment"
-                    data={session.steps.payment}
-                    stepLabel={stepLabels.payment}
-                    session={session}
-                    onEdit={() => handleEditStep('payment')}
-                  />
-                ) : null}
-              </CheckoutSection>
-            </div>
-
-            {/* Order summary and completed steps (right column on desktop) */}
-            <div className="lg:col-span-5">
-              <div className="sticky top-6 space-y-5">
-                <OrderSummary session={session} />
-
-                {/* Completed steps summary */}
-                {session.steps.email.completed && (
-                  <div className="space-y-3">
-                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                      Your Information
-                    </h3>
-
-                    <div className="space-y-2">
-                      {Object.entries(session.steps)
-                        .filter(([key, data]) => data.completed && key !== activeStep)
-                        .map(([key, data]) => (
-                          <CompletedStepSummary
-                            key={key}
-                            step={key as keyof CheckoutSession['steps']}
-                            data={data}
-                            stepLabel={stepLabels[key as keyof CheckoutSession['steps']]}
-                            session={session}
-                            onEdit={() => handleEditStep(key as keyof CheckoutSession['steps'])}
-                          />
-                        ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
         </div>
-      </CheckoutProvider>
-    </Elements>
+      </div>
+    </div>
   )
 }
 
-// Order Summary Component
-function OrderSummary({ session }: { session: CheckoutSession }) {
+function CheckoutSection({
+  title,
+  step,
+  children,
+}: {
+  title: string
+  step: keyof CheckoutSession['steps']
+  children: React.ReactNode
+}) {
+  const { session, currentStep, handleEditStep } = useCheckoutSession()
+  const isActive = currentStep === step
+  const isCompleted = session.steps[step].completed
+
+  // Get the step number for display
+  const getStepNumber = () => {
+    switch (step) {
+      case 'email':
+        return 1
+      case 'shipping':
+        return 2
+      case 'billing':
+        return 3
+      case 'payment':
+        return 4
+    }
+  }
+  // Determine if this step should be disabled (based on previous steps completion status)
+  const getIsDisabled = () => {
+    if (isActive) return false
+
+    switch (step) {
+      case 'email':
+        return false
+      case 'shipping':
+        return !session.steps.email.completed
+      case 'billing':
+        return !session.steps.shipping.completed
+      case 'payment':
+        return !session.steps.billing.completed
+      default:
+        return false
+    }
+  }
+
+  // Determine if the edit button should be shown
+  const canEdit = isCompleted && !isActive
+
+  const isDisabled = getIsDisabled()
+
   return (
-    <Card className="overflow-hidden border border-gray-200 rounded-lg shadow-xs">
-      <div className="p-4 border-b border-gray-100 bg-gray-50">
-        <h3 className="text-base font-semibold text-gray-900">Order Summary</h3>
+    <div
+      className={cn(
+        'relative transition-all duration-300 ease-in-out',
+        isDisabled ? 'opacity-60 pointer-events-none' : '',
+        isActive ? 'z-10' : 'z-0',
+      )}
+    >
+      <div className="mb-2">
+        <div className="flex items-center">
+          <div
+            className={cn(
+              'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-medium',
+              isActive
+                ? 'bg-blue-600 text-white ring-1 ring-blue-600'
+                : isCompleted
+                  ? 'bg-green-50 text-green-700 ring-1 ring-green-600'
+                  : 'bg-gray-50 text-gray-500 ring-1 ring-gray-200',
+            )}
+          >
+            {isCompleted && !isActive ? '✓' : getStepNumber()}
+          </div>
+          <h2
+            className={cn(
+              'ml-3 text-lg font-medium',
+              isActive ? 'text-gray-900' : isCompleted ? 'text-gray-700' : 'text-gray-500',
+            )}
+          >
+            {title}
+          </h2>
+
+          {canEdit && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => handleEditStep(step)}
+              className="ml-auto text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-6 px-2"
+            >
+              <PencilIcon className="mr-1 h-3.5 w-3.5" />
+              <span className="text-xs sr-only">Edit</span>
+            </Button>
+          )}
+        </div>
       </div>
 
-      {/* Line items */}
-      <div className="p-4 space-y-4">
+      <div className="mt-4 overflow-hidden transition-all duration-300 ease-in-out">
+        <Card className={cn(!isActive && 'hidden')}>
+          <CardContent>{children}</CardContent>
+        </Card>
+        <div className={cn(isActive && 'hidden', 'border-t border-gray-100 my-3')} />
+      </div>
+    </div>
+  )
+}
+
+function OrderSummary() {
+  const { session } = useCheckoutSession()
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader>
+        <CardTitle className="text-lg">Order Summary</CardTitle>
+      </CardHeader>
+      <CardContent>
         <div className="divide-y divide-gray-100">
           {session.lineItems.map((item) => {
-            console.log('item', item)
             return (
-              <div key={item.sku} className="flex py-3 first:pt-0 last:pb-0 group">
+              <div key={item.sku} className="flex py-3 first:pt-0 group">
                 <div className="relative h-14 w-14 rounded-md border overflow-hidden shrink-0 bg-gray-50">
                   {item.thumbnailMediaId ? (
                     <LineItemThumbnail
-                    
+                      key={item.sku}
                       mediaId={item.thumbnailMediaId}
                       className="w-full h-full"
                       imgClassName="w-full h-full object-cover"
@@ -443,9 +240,9 @@ function OrderSummary({ session }: { session: CheckoutSession }) {
             )
           })}
         </div>
-
-        {/* Totals */}
-        <div className="space-y-2 pt-3 border-t border-gray-100">
+      </CardContent>
+      <CardFooter className="flex flex-col gap-2 border-t border-gray-200 pt-4">
+        <div className="flex flex-col gap-2 w-full">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Subtotal</span>
             <span className="font-medium text-gray-900">
@@ -465,199 +262,154 @@ function OrderSummary({ session }: { session: CheckoutSession }) {
                   currency: session.currencyCode,
                 })
               ) : (
-                <span className="text-gray-500">Calculated next</span>
+                <span className="font-medium text-gray-900">$0.00</span>
               )}
             </span>
           </div>
 
-          {session.taxAmount > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Tax</span>
-              <span className="font-medium text-gray-900">
-                {formatStripeMoney({
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-600">Tax</span>
+            <span className="font-medium text-gray-900">
+              {session.taxAmount > 0 ? (
+                formatStripeMoney({
                   amount: session.taxAmount,
                   currency: session.currencyCode,
-                })}
-              </span>
-            </div>
-          )}
+                })
+              ) : (
+                <span className="font-medium text-gray-900">$0.00</span>
+              )}
+            </span>
+          </div>
         </div>
-
-        {/* Grand total */}
-        <div className="flex justify-between pt-3 border-t border-gray-200">
-          <span className="text-base font-semibold text-gray-900">Total</span>
-          <span className="text-base font-semibold text-gray-900">
+        <div className="flex justify-between w-full">
+          <span className="text-lg font-semibold text-gray-900">Total</span>
+          <span className="text-lg font-semibold text-gray-900">
             {formatStripeMoney({
               amount: session.amount,
               currency: session.currencyCode,
             })}
           </span>
         </div>
-      </div>
+      </CardFooter>
     </Card>
   )
 }
 
-// Completed Step Summary
-function CompletedStepSummary({
-  step,
-  data,
-  stepLabel,
-  session,
-  onEdit,
-}: {
-  step: keyof CheckoutSession['steps']
-  data: any
-  stepLabel: string
-  session: CheckoutSession
-  onEdit: () => void
-}) {
+function CompletedStepSummary({ step }: { step: keyof CheckoutSession['steps'] }) {
+  const { session, handleEditStep } = useCheckoutSession()
+
   // Render different summary content based on step type
   const renderSummaryContent = () => {
     switch (step) {
       case 'email':
-        return <p className="text-sm text-gray-800">{data.value}</p>
+        return (
+          <div>
+            <p className="text-sm font-medium text-gray-700">{session.steps.email.value}</p>
+          </div>
+        )
       case 'shipping':
-        const address = data.address
-        return address ? (
-          <div className="text-sm space-y-0.5">
-            <p className="font-medium text-gray-800">{address.name}</p>
-            <p className="text-gray-600">{address.address.line1}</p>
-            {address.address.line2 && <p className="text-gray-600">{address.address.line2}</p>}
-            <p className="text-gray-600">
-              {address.address.city}, {address.address.state} {address.address.postal_code}
+        return session.steps.shipping.address ? (
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-gray-700">
+              {session.steps.shipping.address.name}
             </p>
-            <p className="text-blue-600 text-xs mt-1">{data.method?.name || 'Standard Shipping'}</p>
+            <p className="text-sm text-gray-600">
+              {session.steps.shipping.address.address.line1}
+              {session.steps.shipping.address.address.line2 && (
+                <>
+                  <br />
+                  {session.steps.shipping.address.address.line2}
+                </>
+              )}
+              <br />
+              {session.steps.shipping.address.address.city},{' '}
+              {session.steps.shipping.address.address.state}{' '}
+              {session.steps.shipping.address.address.postal_code}
+            </p>
+            {session.steps.shipping.method && (
+              <div className="mt-2 flex">
+                <p className="text-sm text-gray-700">
+                  <span className="font-medium">Shipping Method: </span>
+                  {session.steps.shipping.method.name}
+                </p>
+              </div>
+            )}
           </div>
         ) : null
       case 'billing':
-        if (data.sameAsShipping) {
-          return <p className="text-sm text-gray-600">Same as shipping address</p>
+        // If using shipping address for billing
+        if (session.steps.billing.sameAsShipping) {
+          return (
+            <div>
+              <p className="text-sm text-gray-700">Same as shipping address</p>
+            </div>
+          )
         }
-        const billingAddress = data.address
-        return billingAddress ? (
-          <div className="text-sm space-y-0.5">
-            <p className="font-medium text-gray-800">{billingAddress.name}</p>
-            <p className="text-gray-600">{billingAddress.address.line1}</p>
-            {billingAddress.address.line2 && (
-              <p className="text-gray-600">{billingAddress.address.line2}</p>
-            )}
-            <p className="text-gray-600">
-              {billingAddress.address.city}, {billingAddress.address.state}{' '}
-              {billingAddress.address.postal_code}
+
+        // Otherwise show the billing address
+        return session.steps.billing.address ? (
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-gray-700">
+              {session.steps.billing.address.name}
+            </p>
+            <p className="text-sm text-gray-600">
+              {session.steps.billing.address.address.line1}
+              {session.steps.billing.address.address.line2 && (
+                <>
+                  <br />
+                  {session.steps.billing.address.address.line2}
+                </>
+              )}
+              <br />
+              {session.steps.billing.address.address.city},{' '}
+              {session.steps.billing.address.address.state}{' '}
+              {session.steps.billing.address.address.postal_code}
             </p>
           </div>
         ) : null
       default:
-        return <p className="text-sm text-gray-600">Completed</p>
+        return null
+    }
+  }
+
+  // Get step label for display
+  const getStepLabel = () => {
+    switch (step) {
+      case 'email':
+        return 'Contact'
+      case 'shipping':
+        return 'Shipping'
+      case 'billing':
+        return 'Billing'
+      case 'payment':
+        return 'Payment'
     }
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-xs hover:shadow-none transition-shadow duration-200">
-      <div className="p-3">
-        <div className="flex justify-between items-center mb-1">
-          <h4 className="text-sm font-medium text-gray-900">{stepLabel}</h4>
+    <Card className="gap-2 py-4">
+      <CardHeader>
+        <div className="flex flex-row justify-between items-center w-full">
+          <CardTitle>{getStepLabel()}</CardTitle>
           <Button
             variant="ghost"
-            size="sm"
-            className="h-6 px-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-            onClick={onEdit}
+            size="icon"
+            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+            onClick={() => handleEditStep(step)}
           >
-            <PencilIcon className="w-3 h-3" />
-            <span className="text-xs sr-only">Edit</span>
+            <PencilIcon className="w-4 h-4" />
+            <span className="sr-only">Edit</span>
           </Button>
         </div>
-        <div>{renderSummaryContent()}</div>
-      </div>
-    </div>
+      </CardHeader>
+      <CardContent>{renderSummaryContent()}</CardContent>
+    </Card>
   )
 }
 
-interface CheckoutSectionProps {
-  title: string
-  children: React.ReactNode
-  isCompleted: boolean
-  isActive: boolean
-  stepNumber: number
-  isDisabled?: boolean
-  onEdit?: () => void
-}
+function CheckoutProgress() {
+  const { session } = useCheckoutSession()
 
-function CheckoutSection({
-  title,
-  children,
-  isCompleted,
-  isActive,
-  stepNumber,
-  isDisabled = false,
-  onEdit,
-}: CheckoutSectionProps) {
-  // Show step content if it's active
-  const showContent = isActive
-
-  return (
-    <div
-      className={cn(
-        'relative transition-all duration-300 ease-in-out',
-        isDisabled ? 'opacity-60 pointer-events-none' : '',
-        isActive ? 'z-10' : 'z-0',
-      )}
-    >
-      {/* Section Header */}
-      <div className="mb-2">
-        <div className="flex items-center">
-          <div
-            className={cn(
-              'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-medium',
-              isActive
-                ? 'bg-blue-600 text-white ring-1 ring-blue-600'
-                : isCompleted
-                  ? 'bg-green-50 text-green-700 ring-1 ring-green-600'
-                  : 'bg-gray-50 text-gray-500 ring-1 ring-gray-200',
-            )}
-          >
-            {isCompleted && !isActive ? '✓' : stepNumber}
-          </div>
-          <h2
-            className={cn(
-              'ml-2.5 text-base font-medium',
-              isActive ? 'text-gray-900' : isCompleted ? 'text-gray-700' : 'text-gray-500',
-            )}
-          >
-            {title}
-          </h2>
-
-          {isCompleted && !isActive && onEdit && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={onEdit}
-              className="ml-auto text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-6 px-2"
-            >
-              <PencilIcon className="h-3 w-3" />
-              <span className="text-xs sr-only">Edit</span>
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Section Content */}
-      {showContent ? (
-        <div className="mt-4 overflow-hidden transition-all duration-300 ease-in">
-          <Card className={cn('border p-4 shadow-xs', isActive && 'ring-1 ring-blue-200 bg-white')}>
-            {children}
-          </Card>
-        </div>
-      ) : (
-        <div className="border-t border-gray-100 my-3" />
-      )}
-    </div>
-  )
-}
-
-function CheckoutProgress({ session }: { session: CheckoutSession }) {
   const steps = [
     { key: 'email', label: 'Contact' },
     { key: 'shipping', label: 'Shipping' },

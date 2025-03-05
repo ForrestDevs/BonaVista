@@ -6,87 +6,53 @@ import { Label } from '@/components/ui/label'
 import { AddressElement, useElements } from '@stripe/react-stripe-js'
 import { useState } from 'react'
 import { StripeAddress } from '@/lib/types/checkout'
+import { useCheckoutSession } from '../checkout-context'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
-interface BillingStepProps {
-  initialAddress?: StripeAddress
-  shippingAddress?: StripeAddress
-  initialSameAsShipping: boolean
-  onComplete: (data: { address?: StripeAddress; sameAsShipping: boolean }) => void
-  isProcessing?: boolean
-  isDisabled?: boolean
-}
-
-export function BillingStep({
-  initialAddress,
-  shippingAddress,
-  initialSameAsShipping,
-  onComplete,
-  isProcessing = false,
-  isDisabled = false,
-}: BillingStepProps) {
-  const [sameAsShipping, setSameAsShipping] = useState(initialSameAsShipping)
-  const [address, setAddress] = useState<StripeAddress | null>(initialAddress)
+export function BillingStep() {
   const elements = useElements()
+  const { session, isPending, handleStepComplete } = useCheckoutSession()
+  const [sameAsShipping, setSameAsShipping] = useState<boolean>(
+    session.steps.billing.sameAsShipping ?? true,
+  )
+  const [address, setAddress] = useState<StripeAddress | null>(
+    session.steps.billing.address || null,
+  )
+
+  const isDisabled = !session.steps.shipping.completed
+  const shippingAddress = session.steps.shipping.address
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (isProcessing || isDisabled) return
+
+    if (!elements || isPending || isDisabled || (sameAsShipping === false && !address)) {
+      return
+    }
 
     try {
-      if (sameAsShipping) {
-        // If same as shipping, we don't need to collect a new address
-        await onComplete({
-          sameAsShipping: true,
-        })
-        return
+      // If we're using the shipping address, no need to validate the billing address form
+      if (!sameAsShipping) {
+        // Validate the address form
+        const { error } = await elements.submit()
+        if (error) {
+          console.error('[BillingStep] Error validating form:', error)
+          return
+        }
       }
 
-      if (!elements) return
-
-      // Get the complete address from the AddressElement
-      const { error } = await elements.submit()
-
-      if (error) {
-        console.error('Error:', error)
-        return
-      }
-
-      if (!address) {
-        console.error('No address provided')
-        return
-      }
-
-      await onComplete({
-        address: address,
-        sameAsShipping: false,
+      // Complete the step
+      handleStepComplete('billing', {
+        // If same as shipping, we don't need to store a separate address
+        address: sameAsShipping ? undefined : address || undefined,
+        sameAsShipping,
       })
     } catch (error) {
-      console.error('Error submitting billing info:', error)
+      console.error('[BillingStep] Error submitting billing info:', error)
     }
   }
 
   return (
     <div className={`space-y-6 ${isDisabled ? 'opacity-60 pointer-events-none' : ''}`}>
-      <div className="bg-linear-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100 mb-6">
-        <p className="text-sm text-slate-700 flex items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 mr-2 text-blue-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          Enter the address associated with your payment method
-        </p>
-      </div>
-
       <div className="space-y-6">
         <div className="flex items-center p-3 bg-white rounded-lg border border-gray-200 shadow-xs transition-all hover:border-blue-300">
           <Checkbox
@@ -108,7 +74,7 @@ export function BillingStep({
             <AddressElement
               options={{
                 mode: 'billing',
-                defaultValues: initialAddress,
+                defaultValues: address ?? {},
                 allowedCountries: ['US', 'CA'],
               }}
               onChange={(event) => {
@@ -163,52 +129,10 @@ export function BillingStep({
       <Button
         type="button"
         className="w-full"
-        disabled={isProcessing || (!sameAsShipping && !address) || isDisabled}
+        disabled={isPending || (!sameAsShipping && !address) || isDisabled}
         onClick={handleSubmit}
       >
-        {isProcessing ? (
-          <span className="flex items-center">
-            <svg
-              className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            Processing...
-          </span>
-        ) : (
-          <span className="flex items-center">
-            Continue to Payment
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 ml-1.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M14 5l7 7m0 0l-7 7m7-7H3"
-              />
-            </svg>
-          </span>
-        )}
+        {isPending ? <LoadingSpinner className="text-white" /> : 'Continue to Payment'}
       </Button>
     </div>
   )

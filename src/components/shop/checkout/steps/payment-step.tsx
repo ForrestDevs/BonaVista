@@ -1,36 +1,32 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { getOrCreateStripeCustomer, storeHashedPaymentIntent } from '@/lib/data/checkout'
-import { CheckoutSession } from '@/lib/types/checkout'
-import { formatStripeMoney } from '@/lib/utils/formatMoney'
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { useRouter } from 'next/navigation'
-import { useState, useTransition } from 'react'
+import { useCheckoutSession } from '../checkout-context'
+import { getOrCreateStripeCustomer, storeHashedPaymentIntent } from '@/lib/data/checkout'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
-interface PaymentStepProps {
-  session: CheckoutSession
-  isProcessing?: boolean
-  isDisabled?: boolean
-}
-
-export function PaymentStep({
-  session,
-  isProcessing = false,
-  isDisabled = false,
-}: PaymentStepProps) {
-  const [isPending, startTransition] = useTransition()
-  const [error, setError] = useState<string | null>(null)
+export function PaymentStep() {
   const stripe = useStripe()
-  const elements = useElements()
   const router = useRouter()
+  const elements = useElements()
+  const { session, isPending, startTransition, setError, handleStepComplete } = useCheckoutSession()
+  const [isLoading, setIsLoading] = useState(false)
+
+  const isDisabled = !session.steps.billing.completed
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!stripe || !elements || isProcessing || isDisabled || isPending) return
+
+    if (!stripe || !elements || isPending || isDisabled) {
+      return
+    }
 
     try {
       startTransition(async () => {
+        setIsLoading(true)
         setError(null)
 
         // If we have an email but no customer ID, create or get the customer
@@ -58,7 +54,7 @@ export function PaymentStep({
         const { error: paymentError, paymentIntent } = await stripe.confirmPayment({
           elements,
           confirmParams: {
-            return_url: `${window.location.origin}/shop/confirmation?cartId=${session.cartId}&pid=${hashedPaymentIntent}`,
+            return_url: `${process.env.NEXT_PUBLIC_URL}/shop/confirmation?cartId=${session.cartId}&pid=${hashedPaymentIntent}`,
           },
           redirect: 'if_required',
         })
@@ -67,6 +63,11 @@ export function PaymentStep({
           throw paymentError
         }
 
+        handleStepComplete('payment', {
+          method: paymentIntent.status,
+          completed: true,
+        })
+
         const params = new URLSearchParams({
           pid: hashedPaymentIntent,
           cart_id: session.cartId.toString(),
@@ -74,8 +75,10 @@ export function PaymentStep({
         router.push('/shop/confirmation?' + params.toString())
       })
     } catch (error: any) {
-      console.error('Payment error:', error)
-      setError(error.message || 'Something went wrong')
+      console.error('[PaymentStep] Unexpected error:', error)
+      setError('An unexpected error occurred. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -87,15 +90,13 @@ export function PaymentStep({
         <PaymentElement />
       </div>
 
-      {error && <div className="p-4 bg-red-50 text-red-600 rounded-lg text-sm">{error}</div>}
-
       <Button
         type="button"
         className="w-full"
-        disabled={isProcessing || isDisabled || isPending || !stripe || !elements}
+        disabled={isDisabled || isPending || !stripe || !elements || isLoading}
         onClick={handleSubmit}
       >
-        {isPending ? 'Processing Payment...' : 'Pay Now'}
+        {isLoading ? <LoadingSpinner className="text-white" /> : 'Complete Order'}
       </Button>
     </div>
   )
