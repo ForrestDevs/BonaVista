@@ -102,7 +102,7 @@ export const hero: Field = {
       defaultValue: 'medium',
       options: ['large', 'medium', 'small'],
       admin: {
-        condition: (_, { type } = {}) => ['standard'].includes(type),
+        condition: (_, { type } = {}) => ['standard', 'slider'].includes(type),
       },
     },
     {

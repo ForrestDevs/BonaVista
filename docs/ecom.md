@@ -47,3 +47,19 @@
 - Sales
 - New
 - Top Sellers
+
+
+
+
+- Checkout proccess
+
+- Optionally pass in stripeCustomerID and customer if available to use to prefill form
+
+- Email step 
+- Shipping Step
+- Billing Step
+- Payment Step
+
+- On success send user to confirmation page
+
+- WE need to delete cart cookie, create order, save customer information.

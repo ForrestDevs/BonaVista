@@ -162,9 +162,7 @@ TODO
 - add category images 
 - Handle customers and stripeIds
 - save shipping and billing address to customer account (after checkout is complete)
-- fix checkout race condition with steps
 - deploy to prod with live stripe keys
-- fix store hours
 - find and fix any broken links 
 - add newsletter zoho webhook
 - subscriptions

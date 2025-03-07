@@ -96,7 +96,7 @@
     "react-remove-scroll": "latest",
     "sharp": "latest",
     "sonner": "latest",
-    "stripe": "latest",
+    "stripe": "17.7.0",
     "tailwind-merge": "latest",
     "tailwind-scrollbar": "latest",
     "tailwind-scrollbar-hide": "latest",

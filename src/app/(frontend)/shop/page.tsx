@@ -92,8 +92,9 @@ export default async function StoreHome() {
                     height={400}
                     className="w-full h-64 object-cover transition-transform group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                    <h3 className="text-white text-2xl font-bold">{category.name}</h3>
+
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <h3 className="text-white text-2xl font-bold relative z-10">{category.name}</h3>
                   </div>
                 </Link>
               ))}
