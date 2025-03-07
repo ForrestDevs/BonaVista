@@ -51,28 +51,32 @@ export function PaymentStep() {
           session.clientSecret,
         )
 
-        const { error: paymentError, paymentIntent } = await stripe.confirmPayment({
-          elements,
-          confirmParams: {
-            return_url: `${process.env.NEXT_PUBLIC_URL}/shop/confirmation?cartId=${session.cartId}&pid=${hashedPaymentIntent}`,
-          },
-          redirect: 'if_required',
-        })
+        setError(
+          'Checkout is currently disabled while beta testing new website. Please contact us directly.',
+        )
 
-        if (paymentError) {
-          throw paymentError
-        }
+        // const { error: paymentError, paymentIntent } = await stripe.confirmPayment({
+        //   elements,
+        //   confirmParams: {
+        //     return_url: `${process.env.NEXT_PUBLIC_URL}/shop/confirmation?cartId=${session.cartId}&pid=${hashedPaymentIntent}`,
+        //   },
+        //   redirect: 'if_required',
+        // })
 
-        handleStepComplete('payment', {
-          method: paymentIntent.status,
-          completed: true,
-        })
+        // if (paymentError) {
+        //   throw paymentError
+        // }
 
-        const params = new URLSearchParams({
-          pid: hashedPaymentIntent,
-          cart_id: session.cartId.toString(),
-        })
-        router.push('/shop/confirmation?' + params.toString())
+        // handleStepComplete('payment', {
+        //   method: paymentIntent.status,
+        //   completed: true,
+        // })
+
+        // const params = new URLSearchParams({
+        //   pid: hashedPaymentIntent,
+        //   cart_id: session.cartId.toString(),
+        // })
+        // router.push('/shop/confirmation?' + params.toString())
       })
     } catch (error: any) {
       console.error('[PaymentStep] Unexpected error:', error)
