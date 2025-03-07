@@ -12,7 +12,8 @@ import { querySpaBySlug } from '@/lib/utils/queryBySlug'
 import { SPA_SLUG } from '@/payload/collections/constants'
 import { generateMeta } from '@/lib/utils/generateMeta'
 import { Metadata } from 'next'
-
+import { formatMoney } from '@/lib/utils/formatMoney'
+import Link from 'next/link'
 type Args = {
   params: Promise<{ slug?: string }>
 }
@@ -41,10 +42,38 @@ export default async function HotTubProductPage({ params }: Args) {
 }
 
 function Hero({ product }: { product: Spa }) {
+  const calculateWeeklyPayment = (price: number): number => {
+    // Constants from the financing terms
+    const downPayment = 1000
+    const apr = 13.99 / 100 // Convert percentage to decimal
+    const amortizationPeriodMonths = 240
+    const termMonths = 60
+    const adminFee = 149
+
+    // Calculate purchase amount after down payment and adding admin fee
+    const purchaseAmount = price - downPayment + adminFee
+
+    // Monthly interest rate
+    const monthlyInterestRate = apr / 12
+
+    // Calculate monthly payment using amortization formula
+    const monthlyPayment =
+      (purchaseAmount *
+        monthlyInterestRate *
+        Math.pow(1 + monthlyInterestRate, amortizationPeriodMonths)) /
+      (Math.pow(1 + monthlyInterestRate, amortizationPeriodMonths) - 1)
+
+    // Convert monthly payment to weekly
+    const weeklyPayment = (monthlyPayment * 12) / 52
+
+    return weeklyPayment
+  }
+
+  const weeklyPayment = calculateWeeklyPayment(product.startingPrice)
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
-        {/* Left Column - Product Image */}
         <div className="relative">
           {product.thumbnail && (
             <Media
@@ -55,9 +84,7 @@ function Hero({ product }: { product: Spa }) {
           )}
         </div>
 
-        {/* Right Column - Product Information */}
         <div className="space-y-8">
-          {/* Header Section */}
           <div className="flex justify-between items-start">
             <div className="space-y-4">
               <p className="text-xl">{product.modelYear}</p>
@@ -67,44 +94,34 @@ function Hero({ product }: { product: Spa }) {
             </div>
           </div>
 
-          {/* Pricing Section */}
           <div className="space-y-6">
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <p className="text-lg text-muted-foreground">MSRP PRICE*</p>
-                <p className="text-xl font-semibold">$19,995</p>
-              </div>
-              <div className="flex justify-between items-center text-sky-500">
-                <p className="text-lg font-medium">PROMO PRICE*</p>
-                <p className="text-2xl font-bold">$14,995</p>
+                <p className="text-xl font-semibold">
+                  {formatMoney({ amount: product.startingPrice, currency: 'CAD' })}
+                </p>
               </div>
             </div>
 
             <div className="text-center space-y-1">
               <p className="text-muted-foreground">STARTING FROM</p>
-              <p className="text-sky-500 text-4xl font-bold">$30.86</p>
+              <p className="text-sky-500 text-4xl font-bold">${weeklyPayment.toFixed(2)}</p>
               <p className="text-muted-foreground">WEEKLY PAYMENTS* **</p>
             </div>
 
             <p className="text-xs text-muted-foreground text-center italic">
-              **Financing payment based on 7.99% for 24 months with $1,000 down. The amortization
+              **Financing payment based on 13.99% for 60 months with $1,000 down. The amortization
               period varies by product. Other financing options are available.
             </p>
           </div>
 
-          {/* Buttons Section */}
           <div className="space-y-4">
-            <Button className="w-full bg-sky-500 hover:bg-sky-600 text-white py-6 text-lg">
-              VIEW SALE PRICING
+            <Button variant="outline" className="w-full py-6 text-lg border-2" asChild>
+              <Link href="https://www.financeit.ca/s/Cqye-w">FINANCING OPTIONS</Link>
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              THIS PRICING IS NOT AVAILABLE ONLINE
-            </p>
-            <Button variant="outline" className="w-full py-6 text-lg border-2">
-              FINANCING OPTIONS
-            </Button>
-            <Button variant="outline" className="w-full py-6 text-lg border-2">
-              SAVE $250 - BOOK APPOINTMENT
+            <Button variant="outline" className="w-full py-6 text-lg border-2" asChild>
+              <Link href="/contact">SAVE $250 - BOOK APPOINTMENT</Link>
             </Button>
           </div>
         </div>

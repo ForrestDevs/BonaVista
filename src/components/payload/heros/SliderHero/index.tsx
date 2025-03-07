@@ -7,8 +7,9 @@ import { Media } from '@components/payload/Media'
 import Fade from 'embla-carousel-fade'
 import Autoplay from 'embla-carousel-autoplay'
 import { Carousel, CarouselItem, CarouselContent, CarouselDots } from '@/components/ui/carousel'
+import { cn } from '@/lib/utils/cn'
 
-export const SliderHero: React.FC<Page['hero']> = ({ slides, autoplay, fade, delay }) => {
+export const SliderHero: React.FC<Page['hero']> = ({ slides, autoplay, fade, delay, size }) => {
   const plugin = React.useRef(Autoplay({ delay: delay || 6000, stopOnInteraction: false }))
 
   return (
@@ -22,7 +23,14 @@ export const SliderHero: React.FC<Page['hero']> = ({ slides, autoplay, fade, del
       <CarouselContent>
         {slides.map((slide, index) => (
           <CarouselItem key={index}>
-            <section className="relative flex items-center justify-start min-h-[95vh]">
+            <section
+              className={cn(
+                'relative flex items-center justify-start',
+                size === 'small' && 'min-h-[40vh]',
+                size === 'medium' && 'min-h-[60vh]',
+                size === 'large' && 'min-h-[95vh]',
+              )}
+            >
               <Media
                 resource={slide.background}
                 fill

@@ -4,13 +4,14 @@ import React, { createContext, useContext, useEffect, useState, useTransition } 
 import { CheckoutSession } from '@/lib/types/checkout'
 import { updateCheckoutSession, updateCheckoutStep } from '@/lib/data/checkout'
 import { Customer } from '@payload-types'
-import { findOrCreateCheckoutCustomer } from '@/lib/data/customer'
+import { findCustomerByEmail, findOrCreateCheckoutCustomer, getCustomer } from '@/lib/data/customer'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 interface CheckoutContextType {
+  authCustomer: Customer | null
   session: CheckoutSession
   currentStep: keyof CheckoutSession['steps']
   handleStepComplete: (
@@ -27,11 +28,17 @@ interface CheckoutContextType {
 const CheckoutContext = createContext<CheckoutContextType | undefined>(undefined)
 
 interface CheckoutProviderProps {
+  authenticatedCustomer: Customer | null
   initialSession: CheckoutSession
   children: React.ReactNode
 }
 
-export function CheckoutProvider({ initialSession, children }: CheckoutProviderProps) {
+export function CheckoutProvider({
+  initialSession,
+  authenticatedCustomer,
+  children,
+}: CheckoutProviderProps) {
+  const [authCustomer, setAuthCustomer] = useState<Customer | null>(authenticatedCustomer)
   const [session, setSession] = useState<CheckoutSession>(initialSession)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -47,68 +54,120 @@ export function CheckoutProvider({ initialSession, children }: CheckoutProviderP
     setSession(updatedSession)
   }
 
+  const advanceStep = async (
+    step: keyof CheckoutSession['steps'],
+    data: Partial<CheckoutSession['steps'][typeof step]>,
+  ) => {
+    // Determine the next step
+    const currentIndex = stepOrder.indexOf(step)
+    const nextStep =
+      currentIndex < stepOrder.length - 1 ? stepOrder[currentIndex + 1] : stepOrder[currentIndex]
+
+    // Preserve completion states of other steps
+    const updatedSession: CheckoutSession = {
+      ...session,
+      currentStep: nextStep || step,
+      steps: {
+        ...session.steps,
+        [step]: {
+          ...session.steps[step],
+          ...data,
+          completed: true,
+        },
+      },
+      lastUpdated: Date.now(),
+    }
+
+    await updateSessionState(updatedSession)
+  }
+
   // Handle completing a step
   const handleStepComplete = async (
     step: keyof CheckoutSession['steps'],
     data: Partial<CheckoutSession['steps'][typeof step]>,
   ) => {
     try {
-      startTransition(async () => {
-        setError(null)
-        console.log(`[CheckoutContext] Completing step: ${step} with data:`, data)
-
-        let customer: Customer | null = null
-
-        // If this is the email step, handle customer creation/lookup
-        if (step === 'email' && 'value' in data && data.value) {
-          const email = data.value
-          const customerResult = await findOrCreateCheckoutCustomer(email)
-
-          customer = customerResult.customer
-
-          if (customerResult.needsLogin) {
-            setError('This email is associated with an account. Please log in to continue.')
-            return
-          }
-        }
-
-        // First update customer info if needed
-        if (customer) {
-          await updateCheckoutSession({
-            cartId: session.cartId,
-            customerId: customer.id,
-            customerEmail: customer.email,
+      switch (step) {
+        case 'email':
+          startTransition(async () => {
+            await advanceStep(step, data)
           })
-        }
+          break
+        case 'shipping':
+          startTransition(async () => {
+            await advanceStep(step, data)
+          })
+          break
+        case 'billing':
+          startTransition(async () => {
+            await advanceStep(step, data)
+          })
+          break
+        case 'payment':
+          startTransition(async () => {
+            await advanceStep(step, data)
+          })
+          break
+        default:
+          break
+      }
 
-        // Determine the next step
-        const currentIndex = stepOrder.indexOf(step)
-        const nextStep =
-          currentIndex < stepOrder.length - 1
-            ? stepOrder[currentIndex + 1]
-            : stepOrder[currentIndex]
+      // startTransition(async () => {
+      //   setError(null)
+      //   console.log(`[CheckoutContext] Completing step: ${step} with data:`, data)
 
-        // Update step data on server
-        const updatedSession = await updateCheckoutStep({
-          cartId: session.cartId,
-          step,
-          data: {
-            ...data,
-            completed: true,
-          },
-          nextStep,
-        })
+      //   let customer: Customer | null = null
 
-        if (updatedSession) {
-          console.log(`[CheckoutContext] Step ${step} completed. Updated session:`, updatedSession)
+      //   // If this is the email step, handle customer creation/lookup
+      //   if (step === 'email' && 'value' in data && data.value) {
+      //     const email = data.value
+      //     const customerResult = await findOrCreateCheckoutCustomer(email)
 
-          // Update client state with server response
-          await updateSessionState(updatedSession)
+      //     customer = customerResult.customer
 
-          // If we need to update the current step on the server separately
-          // we would do that here with another API call
-        }
-      })
+      //     if (customerResult.needsLogin) {
+      //       setError('This email is associated with an account. Please log in to continue.')
+      //       return
+      //     }
+      //   }
+
+      //   // First update customer info if needed
+      //   if (customer) {
+      //     await updateCheckoutSession({
+      //       cartId: session.cartId,
+      //       customerId: customer.id,
+      //       customerEmail: customer.email,
+      //     })
+      //   }
+
+      //   // Determine the next step
+      //   const currentIndex = stepOrder.indexOf(step)
+      //   const nextStep =
+      //     currentIndex < stepOrder.length - 1
+      //       ? stepOrder[currentIndex + 1]
+      //       : stepOrder[currentIndex]
+
+      //   // Update step data on server
+      //   const updatedSession = await updateCheckoutStep({
+      //     cartId: session.cartId,
+      //     step,
+      //     data: {
+      //       ...data,
+      //       completed: true,
+      //     },
+      //     nextStep,
+      //   })
+
+      //   if (updatedSession) {
+      //     console.log(`[CheckoutContext] Step ${step} completed. Updated session:`, updatedSession)
+
+      //     // Update client state with server response
+      //     await updateSessionState(updatedSession)
+
+      //     // If we need to update the current step on the server separately
+      //     // we would do that here with another API call
+      //   }
+      // })
     } catch (error) {
       console.error(`Error completing ${step} step:`, error)
       setError(
@@ -121,51 +180,64 @@ export function CheckoutProvider({ initialSession, children }: CheckoutProviderP
   const handleEditStep = (step: keyof CheckoutSession['steps']) => {
     console.log(`[CheckoutContext] Editing step: ${step}`)
 
-    startTransition(async () => {
-      setError(null)
-
-      try {
-        // For steps that affect totals, we need to mark them as incomplete on the server
-        if ((step === 'shipping' || step === 'billing') && session.steps[step].completed) {
-          // Mark the step as incomplete in the session but keep the data
-          const updatedSession = await updateCheckoutStep({
-            cartId: session.cartId,
-            step,
-            data: {
-              ...session.steps[step],
-              // We're setting completed to false but not clearing other data
-              completed: false,
-            },
-          })
-
-          if (updatedSession) {
-            // Store the current step in the updated session
-            const sessionWithEditStep = {
-              ...updatedSession,
-              currentStep: step,
-            }
-
-            console.log(
-              `[CheckoutContext] Updated session after preparing ${step} for edit:`,
-              sessionWithEditStep,
-            )
-            await updateSessionState(sessionWithEditStep)
-          }
-        } else {
-          // For steps that don't affect totals, just update the current step in client state
-          const updatedSession = {
-            ...session,
-            currentStep: step,
-          }
-
-          console.log(`[CheckoutContext] Updated current step to ${step}:`, updatedSession)
-          await updateSessionState(updatedSession)
-        }
-      } catch (error) {
-        console.error('[CheckoutContext] Error preparing step for edit:', error)
-        setError('Failed to edit this step. Please try again.')
-      }
+    // update client session state
+    updateSessionState({
+      ...session,
+      currentStep: step,
+      steps: {
+        ...session.steps,
+        [step]: {
+          ...session.steps[step],
+          completed: false,
+        },
+      },
     })
+
+    // startTransition(async () => {
+    //   setError(null)
+
+    //   try {
+    //     // For steps that affect totals, we need to mark them as incomplete on the server
+    //     if ((step === 'shipping' || step === 'billing') && session.steps[step].completed) {
+    //       // Mark the step as incomplete in the session but keep the data
+    //       const updatedSession = await updateCheckoutStep({
+    //         cartId: session.cartId,
+    //         step,
+    //         data: {
+    //           ...session.steps[step],
+    //           // We're setting completed to false but not clearing other data
+    //           completed: false,
+    //         },
+    //       })
+
+    //       if (updatedSession) {
+    //         // Store the current step in the updated session
+    //         const sessionWithEditStep = {
+    //           ...updatedSession,
+    //           currentStep: step,
+    //         }
+
+    //         console.log(
+    //           `[CheckoutContext] Updated session after preparing ${step} for edit:`,
+    //           sessionWithEditStep,
+    //         )
+    //         await updateSessionState(sessionWithEditStep)
+    //       }
+    //     } else {
+    //       // For steps that don't affect totals, just update the current step in client state
+    //       const updatedSession = {
+    //         ...session,
+    //         currentStep: step,
+    //       }
+
+    //       console.log(`[CheckoutContext] Updated current step to ${step}:`, updatedSession)
+    //       await updateSessionState(updatedSession)
+    //     }
+    //   } catch (error) {
+    //     console.error('[CheckoutContext] Error preparing step for edit:', error)
+    //     setError('Failed to edit this step. Please try again.')
+    //   }
+    // })
   }
 
   // Determine the active step based on session state
@@ -192,6 +264,7 @@ export function CheckoutProvider({ initialSession, children }: CheckoutProviderP
   return (
     <CheckoutContext.Provider
       value={{
+        authCustomer,
         session,
         currentStep,
         handleStepComplete,

@@ -133,7 +133,6 @@ export async function findOrCreateCheckoutCustomer(email: string) {
 
     const customer = customers[0] || null
 
-
     // // If customer has an account and user is not logged in, they need to login
     // if (customer?.has_account && !isLoggedIn) {
     //   return {
@@ -169,6 +168,17 @@ export async function findOrCreateCheckoutCustomer(email: string) {
     console.error('Error in findOrCreateCheckoutCustomer:', error)
     throw error
   }
+}
+
+export async function findCustomerByEmail(email: string) {
+  const payload = await getPayload()
+  const { docs: customers } = await payload.find({
+    collection: CUSTOMER_SLUG,
+    where: { email: { equals: email.toLowerCase() } },
+    limit: 1,
+  })
+
+  return customers[0] || null
 }
 
 export async function getCachedCustomerById(id: number) {
